@@ -1,0 +1,12 @@
+<section class="erp-page">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+
+  <div class="card">
+    <div class="card-body">
+      <app-advanced-search-bar [showDateRange]="false" [showStatus]="false" (search)="onSearch($event)"></app-advanced-search-bar>
+      <div class="alert alert-danger mt-3" *ngIf="errorKey">{{ errorKey | translate }}</div>
+      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+    </div>
+  </div>
+</section>
+

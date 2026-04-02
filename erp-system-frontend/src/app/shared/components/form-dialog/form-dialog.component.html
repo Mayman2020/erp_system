@@ -1,0 +1,29 @@
+<div class="erp-dialog" *ngIf="visible" (click)="close.emit()">
+  <div class="erp-dialog__backdrop"></div>
+  <section class="erp-dialog__surface" [ngClass]="'erp-dialog__surface--' + size" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <header class="erp-dialog__header">
+      <div class="erp-dialog__title-wrap">
+        <h2 class="erp-dialog__title">{{ title | translate }}</h2>
+        <ng-content select="[dialog-title-extra]"></ng-content>
+      </div>
+      <button
+        type="button"
+        class="erp-icon-button erp-icon-button--ghost"
+        (click)="close.emit()"
+        [ngbTooltip]="'COMMON.CLOSE' | translate"
+        placement="auto"
+        container="body"
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+      >
+        <mat-icon aria-hidden="true">close</mat-icon>
+      </button>
+    </header>
+    <div class="erp-dialog__body">
+      <ng-content select="[dialog-body]"></ng-content>
+      <ng-content></ng-content>
+    </div>
+    <footer class="erp-dialog__footer">
+      <ng-content select="[dialog-footer]"></ng-content>
+    </footer>
+  </section>
+</div>

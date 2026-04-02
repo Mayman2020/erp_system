@@ -1,0 +1,151 @@
+<section class="erp-page">
+  <app-page-header titleKey="JOURNAL.TITLE">
+    <div header-actions>
+      <button
+        class="erp-button erp-button--primary"
+        type="button"
+        (click)="openCreate()"
+      >
+        <mat-icon aria-hidden="true">add</mat-icon>
+        <span>{{ 'JOURNAL.CREATE' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="alert alert-danger" *ngIf="errorKey && !formVisible && !accountPickerVisible">{{ errorKey | translate }}</div>
+  <div class="alert alert-success" *ngIf="successKey && !formVisible && !accountPickerVisible">{{ successKey | translate }}</div>
+
+  <app-advanced-search-bar [showStatus]="true" [showDateRange]="true" [showAmountRange]="true" [statusOptions]="statusCodes" (search)="onSearch($event)"></app-advanced-search-bar>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <app-data-table [columns]="columns" [data]="filteredEntries" [actions]="actions" [loading]="loading" (actionClick)="onRowAction($event)"></app-data-table>
+    </div>
+  </div>
+</section>
+
+<app-erp-dialog [visible]="formVisible" [title]="'JOURNAL.FORM_TITLE_' + formMode.toUpperCase()" size="xxl" (close)="closeForm()">
+  <div dialog-body>
+  <form [formGroup]="form">
+    <div class="alert alert-danger mb-2" *ngIf="errorKey">{{ errorKey | translate }}</div>
+    <div class="alert alert-success mb-2" *ngIf="successKey">{{ successKey | translate }}</div>
+    <div class="row">
+      <div class="col-md-3 form-group">
+        <app-form-field [control]="form.controls.entryDate" labelKey="JOURNAL.DATE" icon="calendar_month" type="date"></app-form-field>
+      </div>
+      <div class="col-md-3 form-group">
+        <label>{{ 'JOURNAL.CURRENCY' | translate }}</label>
+        <select class="form-control" formControlName="currencyCode">
+          <option *ngFor="let option of currencyLookups" [value]="option.code">{{ option.code }}</option>
+        </select>
+      </div>
+      <div class="col-md-3 form-group">
+        <label>{{ 'JOURNAL.ENTRY_TYPE' | translate }}</label>
+        <select class="form-control" formControlName="entryType">
+          <option *ngFor="let option of entryTypeLookups" [value]="option.code">{{ ('ENTRY_TYPE.' + option.code) | translate }}</option>
+        </select>
+      </div>
+      <div class="col-md-3 form-group">
+        <label>{{ 'JOURNAL.REFERENCE_NUMBER' | translate }}</label>
+        <input class="form-control" formControlName="externalReference" />
+      </div>
+      <div class="col-12 form-group">
+        <label>{{ 'JOURNAL.DESCRIPTION' | translate }}</label>
+        <input class="form-control" formControlName="description" />
+      </div>
+    </div>
+
+      <div class="card mt-2">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">{{ 'JOURNAL.LINES' | translate }}</h6>
+        <button
+          type="button"
+          class="erp-icon-button"
+          (click)="addLine()"
+          [disabled]="formMode === 'view'"
+        >
+          <mat-icon aria-hidden="true">add</mat-icon>
+        </button>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-bordered mb-0">
+            <thead>
+              <tr>
+                <th>{{ 'JOURNAL.ACCOUNT' | translate }}</th>
+                <th>{{ 'JOURNAL.LINE_DESCRIPTION' | translate }}</th>
+                <th>{{ 'JOURNAL.DEBIT' | translate }}</th>
+                <th>{{ 'JOURNAL.CREDIT' | translate }}</th>
+                <th>{{ 'COMMON.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let line of lines.controls; let i = index" [class.invalid-row]="lineInvalid(i)">
+                <td>
+                  <div class="d-flex">
+                    <input class="form-control" [value]="line.get('accountName')?.value" readonly (focus)="pickLine(i)" />
+                    <button
+                      type="button"
+                      class="erp-icon-button ml-1"
+                      (click)="openAccountSelector(i)"
+                      [disabled]="formMode === 'view'"
+                    >
+                      <mat-icon aria-hidden="true">search</mat-icon>
+                    </button>
+                  </div>
+                </td>
+                <td><input class="form-control" [formControl]="line.get('description')" /></td>
+                <td><input type="number" class="form-control" [formControl]="line.get('debit')" min="0" step="0.01" /></td>
+                <td><input type="number" class="form-control" [formControl]="line.get('credit')" min="0" step="0.01" /></td>
+                <td>
+                  <button
+                    type="button"
+                    class="erp-icon-button erp-action-btn erp-action-btn--danger"
+                    (click)="removeLine(i)"
+                    [disabled]="formMode === 'view'"
+                  >
+                    <mat-icon aria-hidden="true">delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="totals-box" [class.unbalanced]="!isBalanced()">
+          <div class="d-flex justify-content-between"><span>{{ 'JOURNAL.TOTAL_DEBIT' | translate }}</span><strong>{{ totalDebit() | number:'1.2-2' }}</strong></div>
+          <div class="d-flex justify-content-between"><span>{{ 'JOURNAL.TOTAL_CREDIT' | translate }}</span><strong>{{ totalCredit() | number:'1.2-2' }}</strong></div>
+          <div class="d-flex justify-content-between"><span>{{ 'JOURNAL.DIFFERENCE' | translate }}</span><strong>{{ difference() | number:'1.2-2' }}</strong></div>
+          <div class="text-danger mt-2" *ngIf="!isBalanced()">{{ 'JOURNAL.NOT_BALANCED' | translate }}</div>
+        </div>
+      </div>
+    </div>
+  </form>
+  </div>
+  <div dialog-footer class="erp-dialog-actions">
+    <button type="button" class="erp-button erp-button--ghost" (click)="closeForm()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button type="button" class="erp-button erp-button--primary" (click)="save()" [disabled]="saving || formMode === 'view'">
+      {{ 'COMMON.SAVE' | translate }}
+    </button>
+  </div>
+</app-erp-dialog>
+
+<app-erp-dialog [visible]="accountPickerVisible" [title]="'JOURNAL.ACCOUNT'" size="xl" (close)="closeAccountSelector()">
+  <div dialog-body>
+    <div class="alert alert-danger mb-2" *ngIf="errorKey">{{ errorKey | translate }}</div>
+    <div class="journal-account-picker">
+      <app-tree-selector [nodes]="accountTree" [minSelectableLevel]="2" (selected)="selectAccount($event)"></app-tree-selector>
+    </div>
+  </div>
+  <div dialog-footer class="erp-dialog-actions">
+    <button type="button" class="erp-button erp-button--ghost" (click)="closeAccountSelector()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+  </div>
+</app-erp-dialog>

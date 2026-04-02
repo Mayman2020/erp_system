@@ -1,0 +1,141 @@
+<section class="erp-page">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions class="erp-toolbar-icons">
+          <button
+            type="button"
+            class="erp-button"
+            [ngClass]="activeVoucherType === 'payment' ? 'erp-button--primary' : 'erp-button--ghost'"
+            (click)="goToVoucherKind('payment')"
+          >
+            <mat-icon aria-hidden="true">payments</mat-icon>
+            <span>{{ 'VOUCHERS.PAYMENT.TITLE' | translate }}</span>
+          </button>
+          <button
+            type="button"
+            class="erp-button"
+            [ngClass]="activeVoucherType === 'receipt' ? 'erp-button--primary' : 'erp-button--ghost'"
+            (click)="goToVoucherKind('receipt')"
+          >
+            <mat-icon aria-hidden="true">receipt_long</mat-icon>
+            <span>{{ 'VOUCHERS.RECEIPT.TITLE' | translate }}</span>
+          </button>
+          <button
+            type="button"
+            class="erp-button erp-button--primary"
+            (click)="createVoucher()"
+          >
+            <mat-icon aria-hidden="true">add</mat-icon>
+            <span>{{ 'VOUCHERS.CREATE' | translate }}</span>
+          </button>
+    </div>
+  </app-page-header>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="alert alert-success" *ngIf="successKey">{{ successKey | translate }}</div>
+      <div class="alert alert-danger" *ngIf="errorKey">{{ errorKey | translate }}</div>
+      <app-advanced-search-bar (search)="onSearch($event)" [showStatus]="true" [showAmountRange]="true" [statusOptions]="voucherStatuses"></app-advanced-search-bar>
+        <div class="row mb-3">
+          <div class="col-md-2">
+            <label class="form-label">{{ 'COMMON.STATUS' | translate }}</label>
+            <select class="form-control" [(ngModel)]="filters.status" (ngModelChange)="load()">
+              <option value="">{{ 'COMMON.ALL' | translate }}</option>
+              <option *ngFor="let item of voucherStatuses" [value]="item">{{ ('STATUS.' + item) | translate }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'VOUCHERS.LIST.METHOD' | translate }}</label>
+            <select class="form-control" [(ngModel)]="filters.paymentMethod" (ngModelChange)="load()">
+              <option value="">{{ 'COMMON.ALL' | translate }}</option>
+              <option *ngFor="let item of paymentMethods" [value]="item">{{ ('PAYMENT_METHOD.' + item) | translate }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'VOUCHERS.FORM.BANK_ACCOUNT' | translate }}</label>
+            <select class="form-control" [(ngModel)]="filters.bankAccountId" (ngModelChange)="load()">
+              <option value="">{{ 'COMMON.ALL' | translate }}</option>
+              <option *ngFor="let bank of bankAccounts" [value]="bank.linkedAccountId">{{ bank.bankName }} - {{ bank.accountNumber }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'VOUCHERS.FILTER.MIN_AMOUNT' | translate }}</label>
+            <input class="form-control" type="number" [(ngModel)]="filters.minAmount" (change)="load()" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'VOUCHERS.FILTER.MAX_AMOUNT' | translate }}</label>
+            <input class="form-control" type="number" [(ngModel)]="filters.maxAmount" (change)="load()" />
+          </div>
+        </div>
+      <app-data-table [columns]="columns" [data]="rows" [actions]="actions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+    </div>
+  </div>
+</section>
+
+<app-erp-dialog [visible]="dialogVisible" [title]="dialogTitle" size="xl" (close)="dialogVisible = false">
+  <div dialog-body>
+  <form [formGroup]="form" class="row">
+    <div class="col-md-6 mb-3">
+      <app-form-field [control]="form.controls.voucherDate" labelKey="VOUCHERS.FORM.DATE" icon="calendar_month" type="date" [readonly]="readOnlyMode"></app-form-field>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ 'VOUCHERS.FORM.NUMBER' | translate }}</label>
+      <input class="form-control" formControlName="reference" [readonly]="readOnlyMode" />
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ activeVoucherType === 'payment' ? ('VOUCHERS.FORM.BENEFICIARY' | translate) : ('VOUCHERS.FORM.PAYER' | translate) }}</label>
+      <input class="form-control" formControlName="partyName" [readonly]="readOnlyMode" />
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ 'VOUCHERS.FORM.METHOD' | translate }}</label>
+      <select class="form-control" formControlName="paymentMethod" [disabled]="readOnlyMode">
+        <option *ngFor="let method of paymentMethods" [value]="method">{{ ('PAYMENT_METHOD.' + method) | translate }}</option>
+      </select>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ 'VOUCHERS.FORM.CURRENCY' | translate }}</label>
+      <select class="form-control" formControlName="currencyCode" [disabled]="readOnlyMode">
+        <option *ngFor="let currency of currencies" [value]="currency">{{ currency }}</option>
+      </select>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ 'VOUCHERS.FORM.VOUCHER_TYPE' | translate }}</label>
+      <select class="form-control" formControlName="voucherType" [disabled]="readOnlyMode">
+        <option *ngFor="let type of voucherTypes" [value]="type">{{ ('VOUCHER_TYPE.' + type) | translate }}</option>
+      </select>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ 'VOUCHERS.FORM.BANK_ACCOUNT' | translate }}</label>
+      <select class="form-control" formControlName="cashAccountId" [disabled]="readOnlyMode">
+        <option *ngFor="let bank of bankAccounts" [value]="bank.linkedAccountId">{{ bank.bankName }} - {{ bank.accountNumber }}</option>
+      </select>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ activeVoucherType === 'payment' ? ('VOUCHERS.FORM.TARGET_ACCOUNT_PAYMENT' | translate) : ('VOUCHERS.FORM.TARGET_ACCOUNT_RECEIPT' | translate) }}</label>
+      <select class="form-control" formControlName="targetAccountId" [disabled]="readOnlyMode">
+        <option *ngFor="let account of accountOptions" [value]="account.id">{{ account.code }} - {{ account.name }}</option>
+      </select>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ 'VOUCHERS.FORM.AMOUNT' | translate }}</label>
+      <input type="number" class="form-control" formControlName="amount" [readonly]="readOnlyMode" />
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">{{ 'VOUCHERS.FORM.REFERENCE' | translate }}</label>
+      <input class="form-control" formControlName="linkedReference" [readonly]="readOnlyMode" />
+    </div>
+    <div class="col-12 mb-3">
+      <label class="form-label">{{ 'VOUCHERS.FORM.DESCRIPTION' | translate }}</label>
+      <textarea class="form-control" rows="3" formControlName="description" [readonly]="readOnlyMode"></textarea>
+    </div>
+  </form>
+  </div>
+  <div dialog-footer class="erp-dialog-actions">
+    <button type="button" class="erp-button erp-button--ghost" (click)="dialogVisible = false">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button type="button" class="erp-button erp-button--primary" (click)="save()" [disabled]="readOnlyMode || saving">
+      {{ 'COMMON.SAVE' | translate }}
+    </button>
+  </div>
+</app-erp-dialog>
+

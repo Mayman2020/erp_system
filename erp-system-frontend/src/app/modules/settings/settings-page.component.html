@@ -1,0 +1,134 @@
+<section class="erp-page">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+
+  <div class="card">
+    <div class="card-body">
+      <app-loading-state *ngIf="loading"></app-loading-state>
+      <div *ngIf="!loading && errorKey" class="alert alert-danger mb-3">{{ errorKey | translate }}</div>
+      <div *ngIf="!loading && successKey" class="alert alert-success mb-3">{{ successKey | translate }}</div>
+
+      <div *ngIf="!loading" class="profile-layout">
+        <div class="row">
+          <div class="col-lg-4 mb-4">
+            <div class="profile-card">
+              <div class="avatar-wrap">
+                <img [src]="imagePreview || 'assets/images/user/avatar-1.jpg'" class="profile-avatar" [attr.alt]="'PROFILE.AVATAR_ALT' | translate" />
+              </div>
+              <h6 class="mb-1">{{ form.value.fullName || '-' }}</h6>
+              <p class="text-muted mb-2">{{ form.value.email || '-' }}</p>
+              <p class="text-muted mb-3">{{ ('ROLE.' + (user?.role || '')) | translate }}</p>
+              <label class="erp-button erp-button--ghost mb-0">
+                <mat-icon aria-hidden="true">photo_camera</mat-icon>
+                <span>{{ 'PROFILE.CHANGE_IMAGE' | translate }}</span>
+                <input type="file" hidden accept="image/*" (change)="onSelectImage($event)" />
+              </label>
+            </div>
+          </div>
+
+          <div class="col-lg-8">
+            <ngb-tabset>
+              <ngb-tab [title]="'PROFILE.PERSONAL_INFO' | translate">
+                <ng-template ngbTabContent>
+                  <form [formGroup]="form" class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                      <app-form-field [control]="form.controls.fullName" labelKey="PROFILE.FULL_NAME" icon="badge"></app-form-field>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <app-form-field [control]="form.controls.username" labelKey="PROFILE.USERNAME" icon="person"></app-form-field>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <app-form-field [control]="form.controls.email" labelKey="PROFILE.EMAIL" icon="mail" type="email"></app-form-field>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <app-form-field [control]="form.controls.phone" labelKey="PROFILE.PHONE" icon="call"></app-form-field>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <app-form-field [control]="form.controls.nationalId" labelKey="PROFILE.NATIONAL_ID" icon="credit_card"></app-form-field>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <app-form-field [control]="form.controls.companyName" labelKey="PROFILE.COMPANY_NAME" icon="business"></app-form-field>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end">
+                      <button type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">
+                        <mat-icon aria-hidden="true">save</mat-icon>
+                        <span>{{ 'PROFILE.SAVE_CHANGES' | translate }}</span>
+                      </button>
+                    </div>
+                  </form>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab [title]="'PROFILE.SECURITY' | translate">
+                <ng-template ngbTabContent>
+                  <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6>{{ 'PROFILE.ACCOUNT_ROLE' | translate }}</h6>
+                          <p class="text-muted mb-0">{{ ('ROLE.' + (user?.role || '')) | translate }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6>{{ 'PROFILE.EMAIL' | translate }}</h6>
+                          <p class="text-muted mb-0">{{ form.value.email || '-' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6>{{ 'PROFILE.SECURITY' | translate }}</h6>
+                          <p class="text-muted mb-0">{{ 'PROFILE.SECURITY_NOTE' | translate }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab [title]="'PROFILE.PREFERENCES' | translate">
+                <ng-template ngbTabContent>
+                  <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6 class="mb-3">{{ 'PROFILE.VISUAL_THEME' | translate }}</h6>
+                          <div class="erp-toolbar-icons">
+                            <button type="button" class="erp-button" [ngClass]="themeMode === 'light' ? 'erp-button--primary' : 'erp-button--ghost'" (click)="setTheme('light')">{{ 'PROFILE.LIGHT_MODE' | translate }}</button>
+                            <button type="button" class="erp-button" [ngClass]="themeMode === 'dark' ? 'erp-button--primary' : 'erp-button--ghost'" (click)="setTheme('dark')">{{ 'PROFILE.DARK_MODE' | translate }}</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6 class="mb-3">{{ 'PROFILE.LANGUAGE' | translate }}</h6>
+                          <div class="erp-toolbar-icons">
+                            <button type="button" class="erp-button" [ngClass]="translationService.currentLanguage === 'en' ? 'erp-button--primary' : 'erp-button--ghost'" (click)="setLanguage('en')">{{ 'LANG.EN' | translate }}</button>
+                            <button type="button" class="erp-button" [ngClass]="translationService.currentLanguage === 'ar' ? 'erp-button--primary' : 'erp-button--ghost'" (click)="setLanguage('ar')">{{ 'LANG.AR' | translate }}</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-body">
+                          <p class="text-muted mb-0">{{ 'PROFILE.PREFERENCES_NOTE' | translate }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-tab>
+            </ngb-tabset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+

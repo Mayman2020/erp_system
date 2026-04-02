@@ -1,0 +1,47 @@
+<form [formGroup]="form" class="erp-search-panel">
+  <div class="erp-search-panel__fields">
+    <app-form-field *ngIf="showDateRange" class="erp-search-panel__field" [control]="form.controls.fromDate" labelKey="COMMON.FROM_DATE" icon="calendar_month" type="date"></app-form-field>
+    <app-form-field *ngIf="showDateRange" class="erp-search-panel__field" [control]="form.controls.toDate" labelKey="COMMON.TO_DATE" icon="event" type="date"></app-form-field>
+    <app-form-field
+      *ngIf="showStatus"
+      class="erp-search-panel__field"
+      [control]="form.controls.status"
+      labelKey="COMMON.STATUS"
+      icon="filter_alt"
+      type="select"
+      [options]="statusOptions"
+      [includeEmptyOption]="true"
+      emptyLabelKey="COMMON.ALL"
+      [optionLabelPrefix]="statusLabelPrefix"
+    ></app-form-field>
+    <div *ngIf="showAmountRange" class="erp-search-panel__amount-group">
+      <app-form-field class="erp-search-panel__field" [control]="form.controls.minAmount" labelKey="COMMON.MIN_AMOUNT" icon="payments" type="number" step="0.01"></app-form-field>
+      <app-form-field class="erp-search-panel__field" [control]="form.controls.maxAmount" labelKey="COMMON.MAX_AMOUNT" icon="monitoring" type="number" step="0.01"></app-form-field>
+    </div>
+    <app-form-field class="erp-search-panel__field erp-search-panel__field--query" [control]="form.controls.query" labelKey="COMMON.SEARCH" icon="search"></app-form-field>
+  </div>
+  <div class="erp-search-panel__actions">
+    <button
+      type="button"
+      class="erp-button erp-button--primary"
+      (click)="emitSearch()"
+      [ngbTooltip]="'COMMON.SEARCH' | translate"
+      placement="top"
+      container="body"
+    >
+      <mat-icon aria-hidden="true">search</mat-icon>
+      <span>{{ 'COMMON.SEARCH' | translate }}</span>
+    </button>
+    <button
+      type="button"
+      class="erp-button erp-button--ghost"
+      (click)="clear()"
+      [ngbTooltip]="'COMMON.RESET' | translate"
+      placement="top"
+      container="body"
+    >
+      <mat-icon aria-hidden="true">restart_alt</mat-icon>
+      <span>{{ 'COMMON.RESET' | translate }}</span>
+    </button>
+  </div>
+</form>

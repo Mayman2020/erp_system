@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 40" fill="none" role="img" aria-label="CoreERP">
+  <defs>
+    <linearGradient id="cedg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="45%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#cedg)" d="M18 3 32.5 11.4v15.2L18 35 3.5 26.6V11.4L18 3z"/>
+  <text x="18" y="25" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="800" font-size="15" fill="#f8fafc">C</text>
+  <text x="44" y="27" font-family="Segoe UI, system-ui, sans-serif" font-weight="700" font-size="20" fill="#e8eef7" letter-spacing="-0.02em">CoreERP</text>
+</svg>

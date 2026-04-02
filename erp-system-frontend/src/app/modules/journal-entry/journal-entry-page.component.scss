@@ -1,0 +1,23 @@
+.invalid-row {
+  background-color: rgba(255, 82, 82, 0.08);
+}
+
+.totals-box {
+  border: 1px solid #dfe4ea;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.totals-box.unbalanced {
+  border-color: #ff5252;
+}
+
+.journal-account-picker {
+  min-height: 58vh;
+  max-height: 68vh;
+  overflow: auto;
+  border: 1px solid #e6ebf3;
+  border-radius: 10px;
+  padding: 0.35rem;
+  background: #f9fbff;
+}

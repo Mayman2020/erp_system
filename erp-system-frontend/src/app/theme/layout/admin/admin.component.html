@@ -1,0 +1,37 @@
+<div
+  class="erp-admin-shell"
+  [class.erp-admin-shell--sidebar-hidden]="navSidebarHidden"
+  [class.erp-admin-shell--sidebar-collapsed]="navCollapsed && !navSidebarHidden"
+  [class.erp-admin-shell--mobile-open]="navCollapsedMob"
+>
+  <app-navigation
+    class="pcoded-navbar erp-admin-shell__sidebar"
+    [ngClass]="{
+      'navbar-collapsed': navCollapsed && !navSidebarHidden,
+      'erp-sidebar-hidden': navSidebarHidden,
+      'theme-horizontal': this.flatConfig['layout'] === 'horizontal',
+      'mob-open': navCollapsedMob
+    }"
+    (onNavMobCollapse)="navMobClick()"
+  ></app-navigation>
+  <div class="erp-admin-shell__workspace">
+    <app-nav-bar
+      class="navbar pcoded-header navbar-expand-lg navbar-light erp-admin-shell__header"
+      (onNavCollapse)="toggleDesktopSidebar()"
+      (onNavHeaderMobCollapse)="navMobClick()"
+    ></app-nav-bar>
+    <div class="pcoded-main-container erp-main-container erp-admin-shell__main">
+      <div class="pcoded-content erp-content" [ngClass]="{'container': this.flatConfig.layout === 'horizontal' && this.flatConfig.subLayout === 'horizontal-2'}">
+        <app-breadcrumb class="erp-breadcrumb-host"></app-breadcrumb>
+        <div class="erp-route-shell">
+          <router-outlet></router-outlet>
+        </div>
+        <footer class="erp-app-footer">
+          <span>{{ 'APP.BRAND' | translate }}</span>
+          <span class="erp-app-footer__separator">•</span>
+          <span>{{ 'APP.RIGHTS_RESERVED' | translate }}</span>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>

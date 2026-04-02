@@ -1,0 +1,110 @@
+<div class="erp-table-card" [class.erp-table-card--compact]="compact">
+  <app-loading-state *ngIf="loading"></app-loading-state>
+
+  <ng-container *ngIf="!loading && visibleRows.length; else erpTableState">
+    <div class="erp-table-scroll">
+      <table class="erp-table">
+        <thead>
+          <tr>
+            <th
+              *ngFor="let column of columns"
+              [class.erp-table__col--priority]="isPriorityTextColumn(column)"
+              [ngClass]="column.className || null"
+              [class.erp-table__cell--align-start]="column.align === 'start'"
+              [class.erp-table__cell--align-end]="column.align === 'end'"
+            >
+              {{ column.title | translate }}
+            </th>
+            <th *ngIf="actions.length" class="erp-table__cell--actions">{{ 'COMMON.ACTIONS' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of visibleRows">
+            <td
+              *ngFor="let column of columns"
+              [class.erp-table__col--priority]="isPriorityTextColumn(column)"
+              [ngClass]="column.className || null"
+              [class.erp-table__cell--align-start]="column.align === 'start'"
+              [class.erp-table__cell--align-end]="column.align === 'end'"
+            >
+              <ng-container [ngSwitch]="column.kind || 'text'">
+                <ng-container *ngSwitchCase="'text'">
+                  <button *ngIf="column.clickable" type="button" class="erp-table__link" (click)="onCellClick(column, row)">{{ formatCellValue(column, row[column.key]) }}</button>
+                  <span *ngIf="!column.clickable">{{ formatCellValue(column, row[column.key]) }}</span>
+                </ng-container>
+                <span *ngSwitchCase="'date'">{{ formatCellValue(column, row[column.key]) }}</span>
+                <app-status-badge *ngSwitchCase="'status'" [status]="(row[column.key] || 'DRAFT').toString()" [labelPrefix]="column.prefix || 'STATUS.'"></app-status-badge>
+                <app-type-badge *ngSwitchCase="'type'" [type]="(row[column.key] || '').toString()" [labelPrefix]="column.prefix || ''"></app-type-badge>
+                <app-status-badge *ngSwitchCase="'boolean'" [status]="row[column.key] ? 'YES' : 'NO'" [labelPrefix]="column.prefix || 'COMMON.BOOL.'"></app-status-badge>
+              </ng-container>
+            </td>
+            <td *ngIf="actions.length" class="erp-table__cell--actions">
+              <div class="erp-table-actions">
+                <button
+                  type="button"
+                  *ngFor="let action of visibleActions"
+                  class="erp-action-btn"
+                  [ngClass]="'erp-action-btn--' + resolveActionTone(action)"
+                  [ngbTooltip]="action.labelKey | translate"
+                  placement="top"
+                  container="body"
+                  triggers="hover focus"
+                  [attr.aria-label]="action.labelKey | translate"
+                  (click)="actionClick.emit({ actionId: action.id, row: row })"
+                >
+                  <mat-icon aria-hidden="true">{{ resolveActionIcon(action) }}</mat-icon>
+                </button>
+
+                <div class="erp-table-actions__menu" *ngIf="overflowActions.length" ngbDropdown placement="bottom-right">
+                  <button
+                    type="button"
+                    class="erp-action-btn erp-action-btn--neutral"
+                    ngbDropdownToggle
+                    [ngbTooltip]="'COMMON.MORE_ACTIONS' | translate"
+                    placement="top"
+                    container="body"
+                    triggers="hover focus"
+                    [attr.aria-label]="'COMMON.MORE_ACTIONS' | translate"
+                  >
+                    <mat-icon aria-hidden="true">more_horiz</mat-icon>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right erp-table-actions__dropdown" ngbDropdownMenu>
+                    <button
+                      type="button"
+                      *ngFor="let action of overflowActions"
+                      class="dropdown-item erp-table-actions__item"
+                      (click)="actionClick.emit({ actionId: action.id, row: row })"
+                    >
+                      <mat-icon aria-hidden="true">{{ resolveActionIcon(action) }}</mat-icon>
+                      <span>{{ action.labelKey | translate }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="erp-table-pagination" *ngIf="totalPages > 1" [attr.aria-label]="'COMMON.PAGINATION' | translate">
+      <button type="button" class="erp-pagination-btn erp-pagination-btn--nav" (click)="setPage(currentPage - 1)" [disabled]="currentPage <= 1" [attr.aria-label]="'COMMON.PREVIOUS' | translate">
+        <mat-icon aria-hidden="true">chevron_left</mat-icon>
+        <span>{{ 'COMMON.PREVIOUS' | translate }}</span>
+      </button>
+      <button type="button" class="erp-pagination-btn" *ngIf="hasLeadingJump()" (click)="setPage(1)">1</button>
+      <span class="erp-pager-ellipsis" *ngIf="hasLeadingJump()">...</span>
+      <button type="button" class="erp-pagination-btn" *ngFor="let p of visiblePages()" [class.is-active]="p === currentPage" (click)="setPage(p)">{{ p }}</button>
+      <span class="erp-pager-ellipsis" *ngIf="hasTrailingJump()">...</span>
+      <button type="button" class="erp-pagination-btn" *ngIf="hasTrailingJump()" (click)="setPage(totalPages)">{{ totalPages }}</button>
+      <button type="button" class="erp-pagination-btn erp-pagination-btn--nav" (click)="setPage(currentPage + 1)" [disabled]="currentPage >= totalPages" [attr.aria-label]="'COMMON.NEXT' | translate">
+        <span>{{ 'COMMON.NEXT' | translate }}</span>
+        <mat-icon aria-hidden="true">chevron_right</mat-icon>
+      </button>
+    </nav>
+  </ng-container>
+
+  <ng-template #erpTableState>
+    <app-empty-state *ngIf="!loading" icon="table_rows" [titleKey]="emptyTitleKey" [descriptionKey]="emptyDescriptionKey"></app-empty-state>
+  </ng-template>
+</div>

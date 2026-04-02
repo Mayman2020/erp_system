@@ -1,0 +1,138 @@
+<section class="erp-page">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+
+  <div class="card">
+    <div class="card-body">
+        <app-advanced-search-bar (search)="onSearch($event)" [showDateRange]="false"></app-advanced-search-bar>
+        <div class="row erp-reconciliation-form" [formGroup]="createForm">
+          <div class="col-md-4">
+            <label class="form-label">{{ 'RECONCILIATION.FORM.BANK_ACCOUNT' | translate }}</label>
+            <select class="form-control" formControlName="bankAccountId">
+              <option *ngFor="let bank of bankAccounts" [value]="bank.id">{{ bank.bankName }} - {{ bank.accountNumber }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'RECONCILIATION.FORM.START_DATE' | translate }}</label>
+            <input type="date" class="form-control" formControlName="statementStartDate" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'RECONCILIATION.FORM.END_DATE' | translate }}</label>
+            <input type="date" class="form-control" formControlName="statementEndDate" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'RECONCILIATION.FORM.OPENING_BALANCE' | translate }}</label>
+            <input type="number" class="form-control" formControlName="openingBalance" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'RECONCILIATION.FORM.CLOSING_BALANCE' | translate }}</label>
+            <input type="number" class="form-control" formControlName="closingBalance" />
+          </div>
+        </div>
+        <button
+          type="button"
+          class="erp-button erp-button--primary mb-3"
+          (click)="createReconciliation()"
+          [disabled]="saving"
+        >
+          <mat-icon aria-hidden="true">add</mat-icon>
+          <span>{{ 'RECONCILIATION.CREATE' | translate }}</span>
+        </button>
+
+        <div *ngIf="loading" class="text-muted">{{ 'COMMON.LOADING' | translate }}</div>
+        <div *ngIf="!loading && errorKey" class="text-danger">{{ errorKey | translate }}</div>
+
+        <div class="row" *ngIf="selectedReconciliation">
+          <div class="col-md-12 mb-3">
+            <div class="alert" [ngClass]="summary?.difference === 0 ? 'alert-success' : 'alert-warning'">
+              {{ 'RECONCILIATION.SUMMARY.DIFFERENCE' | translate }}: {{ summary?.difference || 0 }} |
+              {{ 'RECONCILIATION.SUMMARY.MATCHED' | translate }}: {{ summary?.matchedCount || 0 }} |
+              {{ 'RECONCILIATION.SUMMARY.UNMATCHED' | translate }}: {{ summary?.unmatchedCount || 0 }}
+            </div>
+            <div class="erp-reconciliation-actions">
+              <button
+                type="button"
+                class="erp-button erp-button--ghost"
+                (click)="matchSelected()"
+              >
+                <mat-icon aria-hidden="true">link</mat-icon>
+                <span>{{ 'RECONCILIATION.MATCH' | translate }}</span>
+              </button>
+              <button
+                type="button"
+                class="erp-button erp-button--primary"
+                (click)="finalizeReconciliation()"
+              >
+                <mat-icon aria-hidden="true">task_alt</mat-icon>
+                <span>{{ 'RECONCILIATION.FINALIZE' | translate }}</span>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6>{{ 'RECONCILIATION.STATEMENT_LINES' | translate }}</h6>
+            <div class="table-responsive erp-unified-table-wrap">
+            <table class="table table-sm table-hover erp-unified-table mb-0">
+              <thead>
+                <tr>
+                  <th>{{ 'RECONCILIATION.DATE' | translate }}</th>
+                  <th>{{ 'RECONCILIATION.DESCRIPTION' | translate }}</th>
+                  <th>{{ 'RECONCILIATION.REFERENCE' | translate }}</th>
+                  <th>{{ 'RECONCILIATION.AMOUNT' | translate }}</th>
+                  <th>{{ 'COMMON.STATUS' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let line of statementLines" (click)="pickStatement(line)" [class.table-active]="selectedStatementLineId === line.id">
+                  <td>{{ line.transactionDate }}</td>
+                  <td>{{ line.description }}</td>
+                  <td>{{ line.sourceReference }}</td>
+                  <td [ngClass]="amountClass(line)">{{ line.amount | number:'1.2-2' }}</td>
+                  <td><app-status-badge [status]="line.status" labelPrefix="RECON_STATUS."></app-status-badge></td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6>{{ 'RECONCILIATION.SYSTEM_TRANSACTIONS' | translate }}</h6>
+            <div class="table-responsive erp-unified-table-wrap">
+            <table class="table table-sm table-hover erp-unified-table mb-0">
+              <thead>
+                <tr>
+                  <th>{{ 'RECONCILIATION.DATE' | translate }}</th>
+                  <th>{{ 'RECONCILIATION.DESCRIPTION' | translate }}</th>
+                  <th>{{ 'RECONCILIATION.REFERENCE' | translate }}</th>
+                  <th>{{ 'RECONCILIATION.AMOUNT' | translate }}</th>
+                  <th>{{ 'COMMON.STATUS' | translate }}</th>
+                  <th>{{ 'COMMON.ACTIONS' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let line of systemLines" (click)="pickSystem(line)" [class.table-active]="selectedSystemLineId === line.id">
+                  <td>{{ line.transactionDate }}</td>
+                  <td>{{ line.description }}</td>
+                  <td>{{ line.sourceReference }}</td>
+                  <td [ngClass]="amountClass(line)">{{ line.amount | number:'1.2-2' }}</td>
+                  <td><app-status-badge [status]="line.status" labelPrefix="RECON_STATUS."></app-status-badge></td>
+                  <td>
+                    <button
+                      type="button"
+                      class="erp-action-btn erp-action-btn--danger"
+                      [ngbTooltip]="'RECONCILIATION.UNMATCH' | translate"
+                      placement="top"
+                      container="body"
+                      [attr.aria-label]="'RECONCILIATION.UNMATCH' | translate"
+                      (click)="unmatchLine(line)"
+                    >
+                      <mat-icon aria-hidden="true">link_off</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</section>
+

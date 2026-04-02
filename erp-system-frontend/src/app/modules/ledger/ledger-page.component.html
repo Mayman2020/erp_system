@@ -1,0 +1,19 @@
+<section class="erp-page">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-lg-4 col-md-6">
+          <label class="mb-2 d-block">{{ 'LEDGER.ACCOUNT' | translate }}</label>
+          <select class="form-control" [(ngModel)]="selectedAccountId" (ngModelChange)="load()">
+            <option *ngFor="let account of accounts" [value]="account.id">{{ account.code }} - {{ account.name }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert alert-danger mb-3" *ngIf="errorKey">{{ errorKey | translate }}</div>
+      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+    </div>
+  </div>
+</section>
+

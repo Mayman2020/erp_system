@@ -1,0 +1,134 @@
+<section class="erp-page">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+
+  <div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-4" *ngFor="let card of reportCards">
+            <div class="report-card" [class.active]="activeReport === card.id">
+              <h6>{{ card.title | translate }}</h6>
+              <p class="text-muted">{{ card.description | translate }}</p>
+              <button
+                type="button"
+                class="erp-button erp-button--primary"
+                (click)="runReportCard(card.id)"
+              >
+                <mat-icon aria-hidden="true">play_arrow</mat-icon>
+                <span>{{ 'REPORTS.RUN' | translate }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <form [formGroup]="form" class="row mb-3">
+          <div class="col-md-3" *ngIf="activeReport === 'profitLoss'">
+            <app-form-field [control]="form.controls.fromDate" labelKey="REPORTS.FILTER.FROM_DATE" icon="calendar_month" type="date"></app-form-field>
+          </div>
+          <div class="col-md-3" *ngIf="activeReport === 'profitLoss'">
+            <app-form-field [control]="form.controls.toDate" labelKey="REPORTS.FILTER.TO_DATE" icon="event" type="date"></app-form-field>
+          </div>
+          <div class="col-md-3" *ngIf="activeReport === 'profitLoss'">
+            <label class="form-label">{{ 'REPORTS.FILTER.PERIOD' | translate }}</label>
+            <select class="form-control" formControlName="period">
+              <option *ngFor="let option of periodOptions" [value]="option">{{ ('REPORT_PERIOD.' + option) | translate }}</option>
+            </select>
+          </div>
+          <div class="col-md-3" *ngIf="activeReport === 'balanceSheet'">
+            <app-form-field [control]="form.controls.asOfDate" labelKey="REPORTS.FILTER.AS_OF_DATE" icon="calendar_month" type="date"></app-form-field>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button
+              type="button"
+              class="erp-button erp-button--primary"
+              (click)="runReport(activeReport)"
+            >
+              <mat-icon aria-hidden="true">play_arrow</mat-icon>
+              <span>{{ 'REPORTS.RUN' | translate }}</span>
+            </button>
+          </div>
+        </form>
+
+        <div *ngIf="loading" class="text-muted">{{ 'COMMON.LOADING' | translate }}</div>
+        <div *ngIf="!loading && errorKey" class="text-danger">{{ errorKey | translate }}</div>
+
+        <div *ngIf="!loading && activeReport === 'profitLoss' && profitLoss" class="report-table">
+          <h6>{{ 'REPORTS.PROFIT_LOSS.REVENUE_SECTION' | translate }}</h6>
+          <table class="table table-sm">
+            <tr *ngFor="let line of profitLoss.revenues">
+              <td>{{ line.accountCode }} - {{ line.accountNameEn }}</td>
+              <td class="text-right">{{ line.amount | number:'1.2-2' }}</td>
+            </tr>
+            <tr class="font-weight-bold">
+              <td>{{ 'REPORTS.PROFIT_LOSS.TOTAL_REVENUE' | translate }}</td>
+              <td class="text-right">{{ profitLoss.totalRevenue | number:'1.2-2' }}</td>
+            </tr>
+          </table>
+          <h6>{{ 'REPORTS.PROFIT_LOSS.EXPENSE_SECTION' | translate }}</h6>
+          <table class="table table-sm">
+            <tr *ngFor="let line of profitLoss.expenses">
+              <td>{{ line.accountCode }} - {{ line.accountNameEn }}</td>
+              <td class="text-right">{{ line.amount | number:'1.2-2' }}</td>
+            </tr>
+            <tr class="font-weight-bold">
+              <td>{{ 'REPORTS.PROFIT_LOSS.TOTAL_EXPENSES' | translate }}</td>
+              <td class="text-right">{{ profitLoss.totalExpenses | number:'1.2-2' }}</td>
+            </tr>
+            <tr class="table-success font-weight-bold">
+              <td>{{ 'REPORTS.PROFIT_LOSS.NET_RESULT' | translate }}</td>
+              <td class="text-right">{{ profitLoss.netProfit | number:'1.2-2' }}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div *ngIf="!loading && activeReport === 'balanceSheet' && balanceSheet" class="report-table">
+          <div class="row">
+            <div class="col-md-4">
+              <h6>{{ 'REPORTS.BALANCE_SHEET.ASSETS' | translate }}</h6>
+              <table class="table table-sm">
+                <tr *ngFor="let line of balanceSheet.assets">
+                  <td>{{ line.accountCode }} - {{ line.accountNameEn }}</td>
+                  <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="font-weight-bold">
+                  <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_ASSETS' | translate }}</td>
+                  <td class="text-right">{{ balanceSheet.totalAssets | number:'1.2-2' }}</td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-4">
+              <h6>{{ 'REPORTS.BALANCE_SHEET.LIABILITIES' | translate }}</h6>
+              <table class="table table-sm">
+                <tr *ngFor="let line of balanceSheet.liabilities">
+                  <td>{{ line.accountCode }} - {{ line.accountNameEn }}</td>
+                  <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="font-weight-bold">
+                  <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES' | translate }}</td>
+                  <td class="text-right">{{ balanceSheet.totalLiabilities | number:'1.2-2' }}</td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-4">
+              <h6>{{ 'REPORTS.BALANCE_SHEET.EQUITY' | translate }}</h6>
+              <table class="table table-sm">
+                <tr *ngFor="let line of balanceSheet.equity">
+                  <td>{{ line.accountCode }} - {{ line.accountNameEn }}</td>
+                  <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="font-weight-bold">
+                  <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_EQUITY' | translate }}</td>
+                  <td class="text-right">{{ balanceSheet.totalEquity | number:'1.2-2' }}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="alert" [ngClass]="balanceSheet.balanced ? 'alert-success' : 'alert-warning'">
+            {{ 'REPORTS.BALANCE_SHEET.EQUATION' | translate }}:
+            {{ balanceSheet.totalAssets | number:'1.2-2' }} =
+            {{ balanceSheet.liabilitiesAndEquity | number:'1.2-2' }}
+          </div>
+        </div>
+    </div>
+  </div>
+</section>
+

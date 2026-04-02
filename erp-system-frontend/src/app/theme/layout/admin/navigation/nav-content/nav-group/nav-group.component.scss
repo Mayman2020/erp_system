@@ -1,0 +1,30 @@
+.erp-nav-module-group {
+  .erp-nav-module-group__head {
+    position: relative;
+    padding-inline-end: 2rem;
+  }
+
+  /* Hide theme default hasmenu arrow; keep only custom caret */
+  > .erp-nav-module-group__head:after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .erp-nav-module-group__caret {
+    position: absolute;
+    inset-inline-end: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.75;
+    font-size: 0.95rem;
+    pointer-events: none;
+  }
+
+  &:not(.pcoded-trigger) .erp-nav-module-group__children {
+    display: none;
+  }
+
+  &.pcoded-trigger .erp-nav-module-group__children {
+    display: block;
+  }
+}

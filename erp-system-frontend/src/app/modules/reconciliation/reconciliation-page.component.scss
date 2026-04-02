@@ -1,0 +1,29 @@
+.erp-reconciliation-form {
+  row-gap: 16px;
+  margin-bottom: 24px;
+}
+
+.erp-reconciliation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.erp-reconciliation-actions .erp-button {
+  min-width: 180px;
+}
+
+.table-hover tbody tr {
+  cursor: pointer;
+}
+
+.card {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 767px) {
+  .erp-reconciliation-actions .erp-button {
+    width: 100%;
+  }
+}

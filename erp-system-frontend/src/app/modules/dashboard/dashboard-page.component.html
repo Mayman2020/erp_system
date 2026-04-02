@@ -1,0 +1,158 @@
+<section class="erp-page">
+  <app-page-header titleKey="DASHBOARD.TITLE"></app-page-header>
+
+<div class="row dashboard-grid" *ngIf="!loading && !errorKey && summary; else dashboardState">
+  <div class="col-xl-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="text-muted mb-0">{{ 'DASHBOARD.TOTAL_REVENUE' | translate }}</h6>
+          <mat-icon class="text-success" aria-hidden="true">trending_up</mat-icon>
+        </div>
+        <h3>{{ formatAmount(summary.totalRevenue) }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="text-muted mb-0">{{ 'DASHBOARD.TOTAL_EXPENSES' | translate }}</h6>
+          <mat-icon class="text-danger" aria-hidden="true">trending_down</mat-icon>
+        </div>
+        <h3>{{ formatAmount(summary.totalExpenses) }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="text-muted mb-0">{{ 'DASHBOARD.NET_PROFIT' | translate }}</h6>
+          <mat-icon [ngClass]="metricTrendClass(summary.netProfit)" aria-hidden="true">monitoring</mat-icon>
+        </div>
+        <h3>{{ formatAmount(summary.netProfit) }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="text-muted mb-0">{{ 'DASHBOARD.ASSETS_LIABILITIES_EQUITY' | translate }}</h6>
+          <mat-icon class="text-primary" aria-hidden="true">stacked_bar_chart</mat-icon>
+        </div>
+        <div>{{ formatAmount(summary.totalAssets) }} / {{ formatAmount(summary.totalLiabilities) }} / {{ formatAmount(summary.totalEquity) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header"><h5>{{ 'DASHBOARD.CHART_REVENUE_EXPENSES' | translate }}</h5></div>
+      <div class="card-body">
+        <app-apex-chart [chartID]="revenueExpenseChartId" [chartConfig]="revenueExpenseChartConfig"></app-apex-chart>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header"><h5>{{ 'DASHBOARD.CHART_CASH_FLOW' | translate }}</h5></div>
+      <div class="card-body">
+        <app-apex-chart [chartID]="cashFlowChartId" [chartConfig]="cashFlowChartConfig"></app-apex-chart>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header"><h5>{{ 'DASHBOARD.MONTHLY_FINANCIAL_SUMMARY' | translate }}</h5></div>
+      <div class="card-body" *ngIf="monthlySummaries?.length; else monthlyEmpty">
+        <app-data-table
+          [columns]="monthlySummaryColumns"
+          [data]="toMonthlySummaryRows()"
+          [pageSize]="4"
+          [compact]="true"
+        ></app-data-table>
+      </div>
+      <ng-template #monthlyEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+    </div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header"><h5>{{ 'DASHBOARD.LATEST_JOURNALS' | translate }}</h5></div>
+      <div class="card-body" *ngIf="summary.recentJournals?.length; else journalsEmpty">
+        <app-data-table [columns]="documentColumns" [data]="toDocumentRows(summary.recentJournals)" [compact]="true"></app-data-table>
+      </div>
+      <ng-template #journalsEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+    </div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header"><h5>{{ 'DASHBOARD.LATEST_PAYMENTS' | translate }}</h5></div>
+      <div class="card-body" *ngIf="summary.recentPayments?.length; else paymentsEmpty">
+        <app-data-table [columns]="documentColumns" [data]="toDocumentRows(summary.recentPayments)" [compact]="true"></app-data-table>
+      </div>
+      <ng-template #paymentsEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+    </div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header"><h5>{{ 'DASHBOARD.LATEST_RECEIPTS' | translate }}</h5></div>
+      <div class="card-body" *ngIf="summary.recentReceipts?.length; else receiptsEmpty">
+        <app-data-table [columns]="documentColumns" [data]="toDocumentRows(summary.recentReceipts)" [compact]="true"></app-data-table>
+      </div>
+      <ng-template #receiptsEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+    </div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header"><h5>{{ 'DASHBOARD.RECEIVABLES_PAYABLES' | translate }}</h5></div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2"><span>{{ 'DASHBOARD.RECEIVABLES' | translate }}</span><strong>{{ formatAmount(summary.receivablesSummary) }}</strong></div>
+        <div class="d-flex justify-content-between mb-2"><span>{{ 'DASHBOARD.PAYABLES_OUTSTANDING' | translate }}</span><strong>{{ formatAmount(summary.payablesOutstanding) }}</strong></div>
+        <div class="d-flex justify-content-between"><span>{{ 'DASHBOARD.PAYABLES_PAID' | translate }}</span><strong>{{ formatAmount(summary.payablesPaid) }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><h5>{{ 'DASHBOARD.BANK_BALANCES' | translate }}</h5></div>
+      <div class="card-body" *ngIf="summary.bankBalances?.length; else banksEmpty">
+        <app-data-table
+          [columns]="bankBalanceColumns"
+          [data]="toBankBalanceRows()"
+          [pageSize]="5"
+        ></app-data-table>
+      </div>
+      <ng-template #banksEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+    </div>
+  </div>
+</div>
+
+<ng-template #dashboardState>
+  <div class="card" *ngIf="loading"><app-loading-state></app-loading-state></div>
+  <div class="card" *ngIf="!loading && !errorKey">
+    <app-empty-state icon="dashboard"></app-empty-state>
+  </div>
+  <div class="card" *ngIf="errorKey">
+    <div class="card-body text-center text-danger" *ngIf="errorKey">
+      {{ errorKey | translate }}
+      <button
+        class="erp-icon-button"
+        type="button"
+        (click)="fetchDashboard()"
+      >
+        <mat-icon aria-hidden="true">refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+</ng-template>
+</section>
+

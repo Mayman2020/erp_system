@@ -1,0 +1,121 @@
+:host {
+  display: block;
+}
+
+.erp-login-page {
+  min-height: 100vh;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f4f8ff, #eef4ff);
+}
+
+.erp-login-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  min-height: calc(100vh - 2rem);
+  border-radius: 24px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  box-shadow: 0 24px 56px rgba(20, 45, 90, 0.12);
+}
+
+.erp-login-hero {
+  position: relative;
+  padding: 2rem;
+  color: #f3f7ff;
+  background: linear-gradient(150deg, #0e2b4f, #1f4d86);
+}
+
+.top-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.erp-logo {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 1rem;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(255, 192, 74, 0.22);
+  color: #ffe7b6;
+  border: 1px solid rgba(255, 192, 74, 0.42);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 0.8rem;
+}
+
+.hero-points {
+  margin-top: 1.2rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.hero-point {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+}
+
+.erp-login-card {
+  background: #ffffff;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap .form-control {
+  padding-right: 2.4rem;
+}
+
+.toggle-pass {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #6d7b95;
+}
+
+.erp-login-btn {
+  border-radius: 12px;
+  min-height: 44px;
+}
+
+.erp-login-page.dark-mode {
+  background: linear-gradient(135deg, #121a2a, #0f1a2a);
+}
+
+.erp-login-page.dark-mode .erp-login-card {
+  background: #1b2436;
+  color: #eef4ff;
+}
+
+.erp-login-page.dark-mode .text-muted {
+  color: #9eaecd !important;
+}
+
+.erp-login-page.dark-mode .form-control {
+  background: #1f2b42;
+  color: #f3f7ff;
+  border-color: #334462;
+}
+
+@media (max-width: 900px) {
+  .erp-login-shell {
+    grid-template-columns: 1fr;
+  }
+}

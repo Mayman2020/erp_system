@@ -1,0 +1,17 @@
+.report-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  height: 100%;
+}
+
+.report-card.active {
+  border-color: #04a9f5;
+  box-shadow: 0 6px 18px rgba(4, 169, 245, 0.2);
+}
+
+.report-table {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+}

@@ -1,0 +1,39 @@
+<ul class="navbar-nav erp-header-actions">
+  <li class="nav-item d-flex align-items-center">
+    <div class="erp-lang-switcher" ngbDropdown placement="bottom-right">
+      <button
+        type="button"
+        class="erp-lang-flag-btn erp-lang-flag-btn--dropdown"
+        ngbDropdownToggle
+        [attr.aria-label]="'PROFILE.LANGUAGE' | translate"
+        [attr.title]="'PROFILE.LANGUAGE' | translate"
+      >
+        <img [src]="currentLanguageOption().flagSrc" [attr.alt]="currentLanguageOption().labelKey | translate" class="erp-lang-flag-btn__flag" />
+        <mat-icon aria-hidden="true">expand_more</mat-icon>
+      </button>
+      <div class="dropdown-menu dropdown-menu-right erp-lang-menu" ngbDropdownMenu>
+        <button
+          type="button"
+          class="dropdown-item erp-lang-menu__item"
+          *ngFor="let language of languages"
+          [class.is-active]="isActiveLanguage(language.code)"
+          (click)="switchLanguage(language.code)"
+        >
+          <img [src]="language.flagSrc" [attr.alt]="language.labelKey | translate" class="erp-lang-menu__flag" />
+          <span>{{ language.labelKey | translate }}</span>
+        </button>
+      </div>
+    </div>
+  </li>
+  <li class="nav-item d-flex align-items-center erp-nav-theme-item">
+    <button
+      type="button"
+      class="btn btn-link nav-link erp-nav-theme-btn"
+      (click)="toggleTheme()"
+      [attr.title]="'NAV.TOGGLE_THEME' | translate"
+      [attr.aria-label]="'NAV.TOGGLE_THEME' | translate"
+    >
+      <mat-icon aria-hidden="true">{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+  </li>
+</ul>

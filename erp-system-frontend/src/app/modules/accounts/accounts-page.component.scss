@@ -1,0 +1,41 @@
+.clickable {
+  cursor: pointer;
+}
+
+.card {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.accounts-dialog-form .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.accounts-dialog-tree-wrap {
+  min-height: 220px;
+}
+
+.accounts-dialog-tree {
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid #e6ebf3;
+  border-radius: 10px;
+  padding: 0.25rem;
+  background: #f9fbff;
+}
+
+.accounts-tree-page-wrap {
+  min-height: 240px;
+  max-height: calc(100vh - 280px);
+  overflow: auto;
+  border: 1px solid #e6ebf3;
+  border-radius: 12px;
+  background: #f9fbff;
+  padding: 0.5rem;
+}
+
+@media (min-width: 992px) {
+  .accounts-dialog-form .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
