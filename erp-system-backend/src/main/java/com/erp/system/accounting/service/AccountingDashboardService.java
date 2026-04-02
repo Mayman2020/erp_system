@@ -42,6 +42,7 @@ public class AccountingDashboardService {
 
         BigDecimal totalRevenue = balanceFor(AccountingType.INCOME);
         BigDecimal totalExpenses = balanceFor(AccountingType.EXPENSE);
+        BigDecimal netProfit = totalRevenue.subtract(totalExpenses);
         BigDecimal payablesOutstanding = billRepository.findAllByOrderByBillDateDescIdDesc().stream()
                 .filter(bill -> bill.getStatus() != BillStatus.CANCELLED)
                 .map(bill -> bill.getOutstandingAmount())
@@ -73,10 +74,10 @@ public class AccountingDashboardService {
         return AccountingDashboardDisplayDto.builder()
                 .totalAssets(balanceFor(AccountingType.ASSET))
                 .totalLiabilities(balanceFor(AccountingType.LIABILITY))
-                .totalEquity(balanceFor(AccountingType.EQUITY))
+                .totalEquity(balanceFor(AccountingType.EQUITY).add(netProfit))
                 .totalRevenue(totalRevenue)
                 .totalExpenses(totalExpenses)
-                .netProfit(totalRevenue.subtract(totalExpenses))
+                .netProfit(netProfit)
                 .monthDebitTotal(journalEntryLineRepository.sumDebitBetween(firstDay, lastDay))
                 .monthCreditTotal(journalEntryLineRepository.sumCreditBetween(firstDay, lastDay))
                 .weekDebitSeries(weekDebits)
@@ -125,7 +126,7 @@ public class AccountingDashboardService {
                                 .id(account.getId())
                                 .bankName(account.getBankName())
                                 .accountNumber(account.getAccountNumber())
-                                .balance(account.getOpeningBalance().add(journalEntryLineRepository.sumNetMovementByAccountId(account.getLinkedAccount().getId())))
+                                .balance(currentBankBalance(account))
                                 .currency(account.getCurrency())
                                 .build())
                         .toList())
@@ -133,12 +134,17 @@ public class AccountingDashboardService {
     }
 
     private BigDecimal balanceFor(AccountingType accountType) {
+        BigDecimal openingBalance = switch (accountType) {
+            case ASSET, LIABILITY, EQUITY -> openingBalanceFor(accountType);
+            default -> BigDecimal.ZERO;
+        };
         BigDecimal debit = journalEntryLineRepository.sumDebitByAccountType(accountType);
         BigDecimal credit = journalEntryLineRepository.sumCreditByAccountType(accountType);
-        return switch (accountType) {
+        BigDecimal movement = switch (accountType) {
             case ASSET, EXPENSE -> debit.subtract(credit);
             case LIABILITY, EQUITY, INCOME -> credit.subtract(debit);
         };
+        return openingBalance.add(movement);
     }
 
     private BigDecimal totalAssetReceivables() {
@@ -146,5 +152,23 @@ public class AccountingDashboardService {
                 .filter(voucher -> voucher.getRevenueAccount() != null && voucher.getRevenueAccount().getAccountType() == AccountingType.ASSET)
                 .map(voucher -> journalEntryLineRepository.sumNetMovementByAccountId(voucher.getRevenueAccount().getId()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal openingBalanceFor(AccountingType accountType) {
+        return accountRepository.findByAccountTypeAndActiveTrue(accountType).stream()
+                .map(account -> normalizeForDisplay(accountType, account.signedOpeningBalance()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal normalizeForDisplay(AccountingType accountType, BigDecimal signedBalance) {
+        return switch (accountType) {
+            case ASSET, EXPENSE -> signedBalance;
+            case LIABILITY, EQUITY, INCOME -> signedBalance.negate();
+        };
+    }
+
+    private BigDecimal currentBankBalance(com.erp.system.accounting.domain.BankAccount account) {
+        return (account.getOpeningBalance() == null ? BigDecimal.ZERO : account.getOpeningBalance())
+                .add(journalEntryLineRepository.sumNetMovementByAccountId(account.getLinkedAccount().getId()));
     }
 }

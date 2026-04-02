@@ -13,6 +13,10 @@ import {
   BalanceSheetReportDto,
   BankAccountDto,
   DashboardSummary,
+  FiscalPeriodDto,
+  FiscalPeriodFormDto,
+  FiscalYearDto,
+  FiscalYearFormDto,
   JournalEntry,
   JournalEntryForm,
   PaymentVoucher,
@@ -26,7 +30,8 @@ import {
   ReconciliationBankAccountDto,
   ReconciliationDto,
   ReconciliationLineDto,
-  ReconciliationSummaryDto
+  ReconciliationSummaryDto,
+  AccountingSettingsUpdateDto
 } from '../models/accounting.models';
 import { ApiResponse } from '../models/api.models';
 
@@ -250,6 +255,11 @@ export class AccountingApiService {
     return this.http.post<ApiResponse<ReconciliationDto>>(`${this.base}/reconciliation/${reconciliationId}/finalize`, {}, { params }).pipe(map((res) => res.data));
   }
 
+  cancelReconciliation(reconciliationId: number, actor: string): Observable<ReconciliationDto> {
+    const params = new HttpParams().set('actor', actor);
+    return this.http.post<ApiResponse<ReconciliationDto>>(`${this.base}/reconciliation/${reconciliationId}/cancel`, {}, { params }).pipe(map((res) => res.data));
+  }
+
   getProfitLoss(fromDate: string, toDate: string): Observable<ProfitLossReportDto> {
     const params = new HttpParams().set('fromDate', fromDate).set('toDate', toDate);
     return this.http.get<ApiResponse<ProfitLossReportDto>>(`${this.base}/reports/profit-loss`, { params }).pipe(map((res) => res.data));
@@ -262,6 +272,38 @@ export class AccountingApiService {
 
   getSettings(): Observable<AccountingSettingsDto> {
     return this.http.get<ApiResponse<AccountingSettingsDto>>(`${this.base}/settings`).pipe(map((res) => res.data));
+  }
+
+  updateSettings(payload: AccountingSettingsUpdateDto): Observable<AccountingSettingsDto> {
+    return this.http.put<ApiResponse<AccountingSettingsDto>>(`${this.base}/settings`, payload).pipe(map((res) => res.data));
+  }
+
+  createFiscalYear(payload: FiscalYearFormDto): Observable<FiscalYearDto> {
+    return this.http.post<ApiResponse<FiscalYearDto>>(`${this.base}/settings/fiscal-years`, payload).pipe(map((res) => res.data));
+  }
+
+  closeFiscalYear(id: number, actor: string): Observable<FiscalYearDto> {
+    const params = new HttpParams().set('actor', actor);
+    return this.http.post<ApiResponse<FiscalYearDto>>(`${this.base}/settings/fiscal-years/${id}/close`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  openFiscalYear(id: number): Observable<FiscalYearDto> {
+    return this.http.post<ApiResponse<FiscalYearDto>>(`${this.base}/settings/fiscal-years/${id}/open`, {}).pipe(map((res) => res.data));
+  }
+
+  createFiscalPeriod(fiscalYearId: number, payload: FiscalPeriodFormDto): Observable<FiscalPeriodDto> {
+    return this.http
+      .post<ApiResponse<FiscalPeriodDto>>(`${this.base}/settings/fiscal-years/${fiscalYearId}/periods`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  closeFiscalPeriod(id: number, actor: string): Observable<FiscalPeriodDto> {
+    const params = new HttpParams().set('actor', actor);
+    return this.http.post<ApiResponse<FiscalPeriodDto>>(`${this.base}/settings/fiscal-periods/${id}/close`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  openFiscalPeriod(id: number): Observable<FiscalPeriodDto> {
+    return this.http.post<ApiResponse<FiscalPeriodDto>>(`${this.base}/settings/fiscal-periods/${id}/open`, {}).pipe(map((res) => res.data));
   }
 
   private toParams(filters: Record<string, string | number | boolean | ''>): HttpParams {

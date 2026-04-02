@@ -18,7 +18,7 @@ export interface DataTableAction {
   icon?: string;
 }
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-data-table',
   templateUrl: './data-table.component.html'
 })
@@ -118,8 +118,19 @@ export class DataTableComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data']) {
+    if (changes['data'] || changes['pageSize']) {
+      this.syncCurrentPage();
+    }
+  }
+
+  private syncCurrentPage(): void {
+    const totalPages = this.totalPages;
+    if (this.currentPage < 1) {
       this.currentPage = 1;
+      return;
+    }
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
     }
   }
 

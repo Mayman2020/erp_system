@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { distinctUntilChanged, finalize, map } from 'rxjs/operators';
@@ -9,7 +9,7 @@ import { AccountingApiService } from '../../core/services/accounting-api.service
 import { LookupService } from '../../core/services/lookup.service';
 import { DataTableAction, DataTableColumn } from '../../shared/components/data-table/data-table.component';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-vouchers-page',
   templateUrl: './vouchers-page.component.html',
   styleUrls: ['./vouchers-page.component.scss']
@@ -89,7 +89,8 @@ export class VouchersPageComponent implements OnInit {
     private i18n: TranslationService,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -151,15 +152,19 @@ export class VouchersPageComponent implements OnInit {
       this.openEdit(id, true);
       return;
     }
+    const status = String(event.row['status'] || '');
     if (event.actionId === 'edit') {
-      const status = String(event.row['status'] || '');
-      if (status !== 'DRAFT') {
+      if (status !== 'DRAFT' && status !== 'APPROVED') {
         return;
       }
       this.openEdit(id, false);
       return;
     }
     if (event.actionId === 'approve') {
+      if (status !== 'DRAFT') {
+        this.errorKey = 'VOUCHERS.ONLY_DRAFT_CAN_APPROVE';
+        return;
+      }
       if (!confirm(this.i18n.instant('VOUCHERS.CONFIRM_APPROVE'))) {
         return;
       }
@@ -167,6 +172,10 @@ export class VouchersPageComponent implements OnInit {
       return;
     }
     if (event.actionId === 'post') {
+      if (status === 'POSTED' || status === 'CANCELLED') {
+        this.errorKey = 'VOUCHERS.CANNOT_POST_STATUS';
+        return;
+      }
       if (!confirm(this.i18n.instant('VOUCHERS.CONFIRM_POST'))) {
         return;
       }
@@ -174,6 +183,9 @@ export class VouchersPageComponent implements OnInit {
       return;
     }
     if (event.actionId === 'cancel') {
+      if (status === 'CANCELLED') {
+        return;
+      }
       if (!confirm(this.i18n.instant('VOUCHERS.CONFIRM_CANCEL'))) {
         return;
       }
@@ -215,8 +227,8 @@ export class VouchersPageComponent implements OnInit {
           this.dialogVisible = false;
           this.load();
         },
-        () => {
-          this.errorKey = 'VOUCHERS.SAVE_ERROR';
+        (err) => {
+          this.errorKey = this.extractError(err, 'VOUCHERS.SAVE_ERROR');
         }
       );
       return;
@@ -235,8 +247,8 @@ export class VouchersPageComponent implements OnInit {
         this.dialogVisible = false;
         this.load();
       },
-      () => {
-        this.errorKey = 'VOUCHERS.SAVE_ERROR';
+      (err) => {
+        this.errorKey = this.extractError(err, 'VOUCHERS.SAVE_ERROR');
       }
     );
   }
@@ -260,7 +272,12 @@ export class VouchersPageComponent implements OnInit {
     if (this.activeVoucherType === 'payment') {
       this.api
         .getPaymentVouchers(filters)
-        .pipe(finalize(() => (this.loading = false)))
+        .pipe(
+          finalize(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          })
+        )
         .subscribe(
           (items: PaymentVoucher[]) => {
             this.paymentVouchers = items;
@@ -276,7 +293,12 @@ export class VouchersPageComponent implements OnInit {
 
     this.api
       .getReceiptVouchers(filters)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe(
         (items: ReceiptVoucher[]) => {
           this.receiptVouchers = items;
@@ -297,13 +319,13 @@ export class VouchersPageComponent implements OnInit {
     if (this.activeVoucherType === 'payment') {
       this.api.getPaymentVoucher(id).subscribe(
         (voucher: PaymentVoucher) => this.patchDialogForm(voucher, voucher.expenseAccountId, voucher.linkedDocumentReference, readOnly),
-        () => undefined
+        () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
       );
       return;
     }
     this.api.getReceiptVoucher(id).subscribe(
       (voucher: ReceiptVoucher) => this.patchDialogForm(voucher, voucher.revenueAccountId, voucher.invoiceReference, readOnly),
-      () => undefined
+      () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
     );
   }
 
@@ -312,71 +334,47 @@ export class VouchersPageComponent implements OnInit {
     if (this.activeVoucherType === 'payment') {
       if (action === 'approve') {
         this.api.approvePaymentVoucher(id, actor).subscribe(
-          () => {
-            this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS';
-            this.errorKey = '';
-            this.load();
-          },
-          () => (this.errorKey = 'VOUCHERS.WORKFLOW_ERROR')
+          () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
+          (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
         );
       } else if (action === 'post') {
         this.api.postPaymentVoucher(id, actor).subscribe(
-          () => {
-            this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS';
-            this.errorKey = '';
-            this.load();
-          },
-          () => (this.errorKey = 'VOUCHERS.WORKFLOW_ERROR')
+          () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
+          (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
         );
       } else {
         this.api.cancelPaymentVoucher(id, actor).subscribe(
-          () => {
-            this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS';
-            this.errorKey = '';
-            this.load();
-          },
-          () => (this.errorKey = 'VOUCHERS.WORKFLOW_ERROR')
+          () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
+          (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
         );
       }
       return;
     }
     if (action === 'approve') {
       this.api.approveReceiptVoucher(id, actor).subscribe(
-        () => {
-          this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS';
-          this.errorKey = '';
-          this.load();
-        },
-        () => (this.errorKey = 'VOUCHERS.WORKFLOW_ERROR')
+        () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
+        (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
       );
     } else if (action === 'post') {
       this.api.postReceiptVoucher(id, actor).subscribe(
-        () => {
-          this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS';
-          this.errorKey = '';
-          this.load();
-        },
-        () => (this.errorKey = 'VOUCHERS.WORKFLOW_ERROR')
+        () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
+        (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
       );
     } else {
       this.api.cancelReceiptVoucher(id, actor).subscribe(
-        () => {
-          this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS';
-          this.errorKey = '';
-          this.load();
-        },
-        () => (this.errorKey = 'VOUCHERS.WORKFLOW_ERROR')
+        () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
+        (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
       );
     }
   }
 
   private bootstrapLookups(): void {
-    this.lookupService.getLookup('payment-methods').subscribe((items) => (this.paymentMethods = items.map((item) => item.code)), () => undefined);
-    this.lookupService.getLookup('voucher-statuses').subscribe((items) => (this.voucherStatuses = items.map((item) => item.code)), () => undefined);
-    this.lookupService.getLookup('currencies').subscribe((items) => (this.currencies = items.map((item) => item.code)), () => undefined);
-    this.lookupService.getLookup('voucher-types').subscribe((items) => (this.voucherTypes = items.map((item) => item.code)), () => undefined);
-    this.api.getBankAccounts({ active: true }).subscribe((items) => (this.bankAccounts = items), () => undefined);
-    this.api.getAccounts({ active: true }).subscribe((items) => (this.accountOptions = items.filter((item) => item.postable)), () => undefined);
+    this.lookupService.getLookup('payment-methods').subscribe((items) => (this.paymentMethods = items.map((item) => item.code)), () => { /* lookup fallback */ });
+    this.lookupService.getLookup('voucher-statuses').subscribe((items) => (this.voucherStatuses = items.map((item) => item.code)), () => { /* lookup fallback */ });
+    this.lookupService.getLookup('currencies').subscribe((items) => (this.currencies = items.map((item) => item.code)), () => { /* lookup fallback */ });
+    this.lookupService.getLookup('voucher-types').subscribe((items) => (this.voucherTypes = items.map((item) => item.code)), () => { /* lookup fallback */ });
+    this.api.getBankAccounts({ active: true }).subscribe((items) => (this.bankAccounts = items), () => { /* lookup fallback */ });
+    this.api.getAccounts({ active: true }).subscribe((items) => (this.accountOptions = items.filter((item) => item.postable)), () => { /* lookup fallback */ });
   }
 
   private currentUser(): string {
@@ -418,5 +416,10 @@ export class VouchersPageComponent implements OnInit {
       this.form.enable();
     }
     this.dialogVisible = true;
+  }
+
+  private extractError(err: any, fallback: string): string {
+    const serverMsg = err?.error?.message;
+    return serverMsg && serverMsg !== 'COMMON.OK' ? serverMsg : fallback;
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CustomerInvoiceDto } from '../../core/models/accounting.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
-@Component({ selector: 'app-invoices-page', templateUrl: './invoices-page.component.html' })
+@Component({ standalone: false, selector: 'app-invoices-page', templateUrl: './invoices-page.component.html' })
 export class InvoicesPageComponent implements OnInit {
   titleKey = 'NAV.INVOICES';
   loading = false;

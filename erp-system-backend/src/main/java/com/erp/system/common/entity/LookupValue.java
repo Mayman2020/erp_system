@@ -31,6 +31,12 @@ public class LookupValue {
     @Column(name = "code", nullable = false, length = 80)
     private String code;
 
+    @Column(name = "name_en", length = 150)
+    private String nameEn;
+
+    @Column(name = "name_ar", length = 150)
+    private String nameAr;
+
     @Column(name = "sort_order", nullable = false)
     @Builder.Default
     private Integer sortOrder = 0;

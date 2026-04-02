@@ -86,7 +86,7 @@ public class PaymentVoucher extends BaseEntity {
     private Account expenseAccount;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "journal_entry_id", nullable = false, unique = true)
+    @JoinColumn(name = "journal_entry_id", unique = true)
     private JournalEntry journalEntry;
 
     @OneToOne(fetch = FetchType.LAZY)

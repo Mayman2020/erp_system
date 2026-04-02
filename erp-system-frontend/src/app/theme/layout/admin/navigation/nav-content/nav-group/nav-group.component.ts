@@ -4,7 +4,7 @@ import {Location} from '@angular/common';
 import {Router} from '@angular/router';
 import {NextConfig} from '../../../../../../app-config';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-nav-group',
   templateUrl: './nav-group.component.html',
   styleUrls: ['./nav-group.component.scss']

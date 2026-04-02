@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -8,7 +8,13 @@ import { LookupItem } from '../../core/models/lookup.models';
 import { LookupService } from '../../core/services/lookup.service';
 import { TranslationService } from '../../core/i18n/translation.service';
 
+interface ParentOption {
+  id: number;
+  label: string;
+}
+
 @Component({
+  standalone: false,
   selector: 'app-accounts-page',
   templateUrl: './accounts-page.component.html',
   styleUrls: ['./accounts-page.component.scss']
@@ -24,6 +30,7 @@ export class AccountsPageComponent implements OnInit {
   rows: AccountDto[] = [];
   pagedRows: AccountDto[] = [];
   treeRows: AccountTreeDto[] = [];
+  parentOptions: ParentOption[] = [];
 
   query = '';
   selectedType: AccountingType | '' = '';
@@ -35,7 +42,6 @@ export class AccountsPageComponent implements OnInit {
   dialogVisible = false;
   dialogMode: 'create' | 'edit' | 'view' = 'create';
   selectedAccountId: number | null = null;
-  selectedParentLabel = '';
 
   readonly form = this.fb.group({
     code: [''],
@@ -67,8 +73,14 @@ export class AccountsPageComponent implements OnInit {
     private api: AccountingApiService,
     private fb: FormBuilder,
     private translationService: TranslationService,
-    private lookupService: LookupService
-  ) {}
+    private lookupService: LookupService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.form.get('accountType')?.valueChanges.subscribe((type) => {
+      const side = this.defaultBalanceSide(type as AccountingType);
+      this.form.patchValue({ openingBalanceSide: side }, { emitEvent: false });
+    });
+  }
 
   ngOnInit(): void {
     this.loadLookupsAndData();
@@ -89,16 +101,6 @@ export class AccountsPageComponent implements OnInit {
     this.loadAccounts();
   }
 
-  onSortChange(field: 'code' | 'name' | 'accountType'): void {
-    if (this.sortBy === field) {
-      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortBy = field;
-      this.sortDir = 'asc';
-    }
-    this.applyTableState();
-  }
-
   setSort(field: 'code' | 'name' | 'accountType', direction: 'asc' | 'desc'): void {
     this.sortBy = field;
     this.sortDir = direction;
@@ -108,7 +110,6 @@ export class AccountsPageComponent implements OnInit {
   openCreateDialog(): void {
     this.dialogMode = 'create';
     this.selectedAccountId = null;
-    this.selectedParentLabel = '';
     this.form.reset({
       code: '',
       nameEn: '',
@@ -151,27 +152,24 @@ export class AccountsPageComponent implements OnInit {
     }
   }
 
-  selectParent(node: AccountTreeDto): void {
-    this.form.patchValue({ parentId: node.id });
-    this.selectedParentLabel = `${node.code} - ${node.name}`;
-  }
-
   saveAccount(): void {
     if (this.form.invalid || this.dialogMode === 'view') {
       this.form.markAllAsTouched();
       return;
     }
 
+    const acctType = this.form.value.accountType as AccountingType;
     const payload: AccountFormDto = {
       code: this.form.value.code || undefined,
-      nameEn: this.form.value.nameEn,
+      name: this.form.value.nameAr || this.form.value.nameEn || '',
+      nameEn: this.form.value.nameEn || '',
       nameAr: this.form.value.nameAr || undefined,
       parentId: this.form.value.parentId,
-      accountType: this.form.value.accountType as AccountingType,
+      accountType: acctType,
       postable: !!this.form.value.postable,
       active: this.form.value.statusCode === 'ACTIVE',
       openingBalance: Number(this.form.value.openingBalance || 0),
-      openingBalanceSide: (this.form.value.openingBalanceSide as 'DEBIT' | 'CREDIT') || 'DEBIT'
+      openingBalanceSide: (this.form.value.openingBalanceSide as 'DEBIT' | 'CREDIT') || this.defaultBalanceSide(acctType)
     };
 
     this.actionLoading = true;
@@ -191,8 +189,9 @@ export class AccountsPageComponent implements OnInit {
           this.dialogVisible = false;
           this.loadAll();
         },
-        error: () => {
-          this.errorKey = 'ACCOUNTS.SAVE_ERROR';
+        error: (err) => {
+          this.errorKey = this.extractError(err, 'ACCOUNTS.SAVE_ERROR');
+          console.error('Account save failed:', err);
         }
       });
   }
@@ -220,6 +219,22 @@ export class AccountsPageComponent implements OnInit {
       });
   }
 
+  onTableAction(event: { actionId: string; row: Record<string, unknown> }): void {
+    const account = this.rows.find((item) => item.id === Number(event.row.id));
+    if (!account) {
+      return;
+    }
+    if (event.actionId === 'view') {
+      this.openViewDialog(account);
+      return;
+    }
+    if (event.actionId === 'edit') {
+      this.openEditDialog(account);
+      return;
+    }
+    this.toggleActive(account);
+  }
+
   private loadAll(): void {
     this.loadAccounts();
     this.loadAccountTree();
@@ -227,7 +242,7 @@ export class AccountsPageComponent implements OnInit {
 
   private loadLookupsAndData(): void {
     forkJoin({
-      accountTypes: this.lookupService.getLookup('account-type'),
+      accountTypes: this.lookupService.getLookup('account-types'),
       statuses: this.lookupService.getLookup('status')
     }).subscribe({
       next: (lookup) => {
@@ -252,7 +267,12 @@ export class AccountsPageComponent implements OnInit {
         type: this.selectedType || undefined,
         active: this.selectedActive === 'ALL' ? '' : this.selectedActive === 'ACTIVE'
       })
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: (rows) => {
           this.rows = rows || [];
@@ -268,9 +288,11 @@ export class AccountsPageComponent implements OnInit {
     this.api.getAccountTree().subscribe({
       next: (tree) => {
         this.treeRows = tree || [];
+        this.parentOptions = this.flattenTreeOptions(this.treeRows);
       },
       error: () => {
         this.treeRows = [];
+        this.parentOptions = [];
       }
     });
   }
@@ -301,23 +323,24 @@ export class AccountsPageComponent implements OnInit {
       openingBalance: account.openingBalance || 0,
       openingBalanceSide: account.openingBalanceSide || 'DEBIT'
     });
-    this.selectedParentLabel = account.parentCode || '';
   }
 
-  onTableAction(event: { actionId: string; row: Record<string, unknown> }): void {
-    const account = this.rows.find((item) => item.id === Number(event.row.id));
-    if (!account) {
-      return;
-    }
-    if (event.actionId === 'view') {
-      this.openViewDialog(account);
-      return;
-    }
-    if (event.actionId === 'edit') {
-      this.openEditDialog(account);
-      return;
-    }
-    this.toggleActive(account);
+  private flattenTreeOptions(nodes: AccountTreeDto[], depth = 0): ParentOption[] {
+    return nodes.flatMap((node) => {
+      const labelPrefix = depth ? `${'  '.repeat(depth)}- ` : '';
+      return [
+        { id: node.id, label: `${labelPrefix}${node.code} - ${node.name}` },
+        ...this.flattenTreeOptions(node.children || [], depth + 1)
+      ];
+    });
   }
 
+  private defaultBalanceSide(type: AccountingType | string): 'DEBIT' | 'CREDIT' {
+    return type === 'ASSET' || type === 'EXPENSE' ? 'DEBIT' : 'CREDIT';
+  }
+
+  private extractError(err: any, fallback: string): string {
+    const serverMsg = err?.error?.message;
+    return serverMsg && serverMsg !== 'COMMON.OK' ? serverMsg : fallback;
+  }
 }

@@ -20,21 +20,26 @@ public class PostingPeriodService {
 
     @Transactional(readOnly = true)
     public void validatePostingDate(LocalDate postingDate) {
-        FiscalPeriod openPeriod = fiscalPeriodRepository
-                .findFirstByStartDateLessThanEqualAndEndDateGreaterThanEqual(postingDate, postingDate)
-                .orElse(null);
-        if (openPeriod != null) {
-            if (!openPeriod.isOpen()) {
-                throw new BusinessException("Posting is not allowed in a closed fiscal period");
-            }
-            return;
-        }
-
         FiscalYear fiscalYear = fiscalYearRepository
                 .findFirstByStartDateLessThanEqualAndEndDateGreaterThanEqual(postingDate, postingDate)
                 .orElse(null);
-        if (fiscalYear != null && !fiscalYear.isOpen()) {
+
+        if (fiscalYear == null) {
+            throw new BusinessException("No fiscal year covers the posting date " + postingDate + ". Create a fiscal year first.");
+        }
+        if (!fiscalYear.isOpen()) {
             throw new BusinessException("Posting is not allowed in a closed fiscal year");
+        }
+
+        FiscalPeriod openPeriod = fiscalPeriodRepository
+                .findFirstByStartDateLessThanEqualAndEndDateGreaterThanEqual(postingDate, postingDate)
+                .orElse(null);
+
+        if (openPeriod == null) {
+            throw new BusinessException("No fiscal period covers the posting date " + postingDate + ". Create a fiscal period first.");
+        }
+        if (!openPeriod.isOpen()) {
+            throw new BusinessException("Posting is not allowed in a closed fiscal period");
         }
     }
 }

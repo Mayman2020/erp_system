@@ -3,7 +3,7 @@ import {NavigationItem} from '../../navigation';
 import {animate, style, transition, trigger} from '@angular/animations';
 import {NextConfig} from '../../../../../../app-config';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-nav-collapse',
   templateUrl: './nav-collapse.component.html',
   styleUrls: ['./nav-collapse.component.scss'],

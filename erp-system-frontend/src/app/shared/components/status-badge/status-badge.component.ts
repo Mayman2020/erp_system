@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { TranslationService } from '../../../core/i18n/translation.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-status-badge',
   template: '<span class="erp-badge erp-badge--status" [ngClass]="statusClass">{{ label }}</span>'
 })

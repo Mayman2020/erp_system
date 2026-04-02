@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { BalanceSheetReportDto, ProfitLossReportDto } from '../../core/models/accounting.models';
+import { TranslationService } from '../../core/i18n/translation.service';
+import { LookupItem } from '../../core/models/lookup.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 import { LookupService } from '../../core/services/lookup.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-reports-page',
   templateUrl: './reports-page.component.html',
   styleUrls: ['./reports-page.component.scss']
@@ -14,7 +16,7 @@ export class ReportsPageComponent implements OnInit {
   readonly titleKey = 'REPORTS.TITLE';
   loading = false;
   activeReport: 'profitLoss' | 'balanceSheet' = 'profitLoss';
-  periodOptions: string[] = [];
+  periodOptions: LookupItem[] = [];
   profitLoss: ProfitLossReportDto | null = null;
   balanceSheet: BalanceSheetReportDto | null = null;
   errorKey = '';
@@ -31,17 +33,30 @@ export class ReportsPageComponent implements OnInit {
     { id: 'balanceSheet', title: 'REPORTS.BALANCE_SHEET.TITLE', description: 'REPORTS.BALANCE_SHEET.DESCRIPTION' }
   ];
 
-  constructor(private api: AccountingApiService, private lookupService: LookupService, private fb: FormBuilder) {}
+  constructor(
+    private api: AccountingApiService,
+    private lookupService: LookupService,
+    private fb: FormBuilder,
+    private translationService: TranslationService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     const today = new Date().toISOString().slice(0, 10);
     const monthStart = `${today.slice(0, 8)}01`;
     this.form.patchValue({ fromDate: monthStart, toDate: today, asOfDate: today });
-    this.lookupService.getLookup('report-periods').subscribe((items) => (this.periodOptions = items.map((item) => item.code)), () => undefined);
+    this.lookupService.getLookup('report-periods').subscribe((items) => (this.periodOptions = items), () => undefined);
+    this.form.controls.period.valueChanges.subscribe((value) => this.applyPeriodPreset(String(value || 'CUSTOM')));
     this.runReport('profitLoss');
   }
 
   runReport(report: 'profitLoss' | 'balanceSheet'): void {
+    this.activeReport = report;
+    if (!this.isRangeValid()) {
+      this.errorKey = 'REPORTS.INVALID_RANGE';
+      return;
+    }
+
     this.activeReport = report;
     this.loading = true;
     this.errorKey = '';
@@ -49,7 +64,12 @@ export class ReportsPageComponent implements OnInit {
     if (report === 'profitLoss') {
       this.api
         .getProfitLoss(String(raw.fromDate || ''), String(raw.toDate || ''))
-        .pipe(finalize(() => (this.loading = false)))
+        .pipe(
+          finalize(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          })
+        )
         .subscribe({
           next: (result) => (this.profitLoss = result),
           error: () => (this.errorKey = 'COMMON.ERROR_LOADING')
@@ -59,7 +79,12 @@ export class ReportsPageComponent implements OnInit {
 
     this.api
       .getBalanceSheet(String(raw.asOfDate || ''))
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: (result) => (this.balanceSheet = result),
         error: () => (this.errorKey = 'COMMON.ERROR_LOADING')
@@ -73,5 +98,60 @@ export class ReportsPageComponent implements OnInit {
     }
     this.runReport('profitLoss');
   }
-}
 
+  displayAccountName(line: { accountNameAr?: string; accountNameEn: string }): string {
+    if (this.translationService.currentLanguage === 'ar') {
+      return line.accountNameAr || line.accountNameEn;
+    }
+    return line.accountNameEn || line.accountNameAr || '';
+  }
+
+  private isRangeValid(): boolean {
+    if (this.activeReport === 'balanceSheet') {
+      return !!this.form.controls.asOfDate.value;
+    }
+    const fromDate = String(this.form.controls.fromDate.value || '');
+    const toDate = String(this.form.controls.toDate.value || '');
+    return !!fromDate && !!toDate && fromDate <= toDate;
+  }
+
+  private applyPeriodPreset(periodCode: string): void {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+    let fromDate = this.form.controls.fromDate.value || '';
+    let toDate = this.form.controls.toDate.value || '';
+
+    switch (periodCode) {
+      case 'THIS_MONTH':
+        fromDate = this.toIsoDate(new Date(currentYear, currentMonth, 1));
+        toDate = this.toIsoDate(today);
+        break;
+      case 'LAST_MONTH': {
+        const start = new Date(currentYear, currentMonth - 1, 1);
+        const end = new Date(currentYear, currentMonth, 0);
+        fromDate = this.toIsoDate(start);
+        toDate = this.toIsoDate(end);
+        break;
+      }
+      case 'THIS_QUARTER': {
+        const quarterStartMonth = Math.floor(currentMonth / 3) * 3;
+        fromDate = this.toIsoDate(new Date(currentYear, quarterStartMonth, 1));
+        toDate = this.toIsoDate(today);
+        break;
+      }
+      case 'THIS_YEAR':
+        fromDate = this.toIsoDate(new Date(currentYear, 0, 1));
+        toDate = this.toIsoDate(today);
+        break;
+      default:
+        return;
+    }
+
+    this.form.patchValue({ fromDate, toDate, asOfDate: toDate }, { emitEvent: false });
+  }
+
+  private toIsoDate(value: Date): string {
+    return value.toISOString().slice(0, 10);
+  }
+}

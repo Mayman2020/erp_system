@@ -6,7 +6,6 @@ import { AlertModule, BreadcrumbModule, CardModule, ModalModule } from './compon
 import { DataFilterPipe } from './components/data-table/data-filter.pipe';
 import { TodoListRemoveDirective } from './components/todo/todo-list-remove.directive';
 import { TodoCardCompleteDirective } from './components/todo/todo-card-complete.directive';
-import { PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarConfigInterface, PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ClickOutsideModule } from 'ng-click-outside';
 
 import { SpinnerComponent } from './components/spinner/spinner.component';
@@ -14,22 +13,11 @@ import { ApexChartComponent } from './components/chart/apex-chart/apex-chart.com
 import {ApexChartService} from './components/chart/apex-chart/apex-chart.service';
 import { ToastComponent } from './components/toast/toast.component';
 import {ToastService} from './components/toast/toast.service';
-import { GalleryComponent } from './components/gallery/gallery.component';
-import {LightboxModule} from 'ngx-lightbox';
 import { SharedModule as ErpSharedModule } from '../../shared/shared.module';
-
-/*import 'hammerjs';
-import 'mousetrap';
-import { GalleryModule } from '@ks89/angular-modal-gallery';*/
-
-const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-  suppressScrollX: true
-};
 
 @NgModule({
   imports: [
     CommonModule,
-    PerfectScrollbarModule,
     FormsModule,
     ReactiveFormsModule,
     AlertModule,
@@ -37,12 +25,10 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     BreadcrumbModule,
     ModalModule,
     ClickOutsideModule,
-    LightboxModule,
     ErpSharedModule
   ],
   exports: [
     CommonModule,
-    PerfectScrollbarModule,
     FormsModule,
     ReactiveFormsModule,
     AlertModule,
@@ -55,7 +41,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ClickOutsideModule,
     SpinnerComponent,
     ApexChartComponent,
-    GalleryComponent,
     ToastComponent,
     ErpSharedModule
   ],
@@ -65,14 +50,9 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     TodoCardCompleteDirective,
     SpinnerComponent,
     ApexChartComponent,
-    ToastComponent,
-    GalleryComponent
+    ToastComponent
   ],
   providers: [
-    {
-      provide: PERFECT_SCROLLBAR_CONFIG,
-      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
-    },
     ApexChartService,
     ToastService
   ]

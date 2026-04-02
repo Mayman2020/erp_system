@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api.models';
+import { PermissionService } from '../services/permission.service';
 
 export interface LoginRequest {
   email?: string;
@@ -33,6 +34,7 @@ export interface AuthUser {
   email: string;
   phone: string;
   role?: string;
+  roles?: string[];
   active?: boolean;
   createdAt?: string;
   profile?: UserProfile | null;
@@ -51,10 +53,11 @@ export interface UpdateProfileRequest {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly tokenKey = 'erp_auth_token';
+  private readonly menuCacheKey = 'erp_ui_menu_cache';
   private readonly authenticatedSubject = new BehaviorSubject<boolean>(!!localStorage.getItem(this.tokenKey));
   private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private permissionService: PermissionService) {}
 
   get isAuthenticated$(): Observable<boolean> {
     return this.authenticatedSubject.asObservable();
@@ -78,7 +81,9 @@ export class AuthService {
       map((res) => res.data),
       tap((response) => {
         localStorage.setItem(this.tokenKey, response.token);
+        localStorage.removeItem(this.menuCacheKey);
         this.authenticatedSubject.next(true);
+        this.permissionService.refresh().subscribe({ error: () => undefined });
         this.refreshCurrentUser();
       })
     );
@@ -104,8 +109,10 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.menuCacheKey);
     this.authenticatedSubject.next(false);
     this.currentUserSubject.next(null);
+    this.permissionService.refresh().subscribe({ error: () => undefined });
   }
 
   refreshCurrentUser(): void {

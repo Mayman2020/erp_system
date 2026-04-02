@@ -1,7 +1,8 @@
-import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectorRef, Directive, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TranslationService } from '../../core/i18n/translation.service';
 
+@Directive()
 abstract class BaseTranslatePipe implements PipeTransform, OnDestroy {
   private key = '';
   private translated = '';
@@ -34,13 +35,13 @@ abstract class BaseTranslatePipe implements PipeTransform, OnDestroy {
   }
 }
 
-@Pipe({
+@Pipe({ standalone: false,
   name: 'translate',
   pure: false
 })
 export class TranslatePipe extends BaseTranslatePipe {}
 
-@Pipe({
+@Pipe({ standalone: false,
   name: 't',
   pure: false
 })

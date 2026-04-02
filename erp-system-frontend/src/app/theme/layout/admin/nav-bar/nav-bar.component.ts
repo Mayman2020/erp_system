@@ -4,19 +4,19 @@ import { takeUntil } from 'rxjs/operators';
 import { NextConfig } from '../../../../app-config';
 import { ThemeService, ThemeMode } from '../../../../core/services/theme.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-nav-bar',
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.scss']
 })
 export class NavBarComponent implements OnInit, OnDestroy {
   public flatConfig: any;
-  public menuClass: boolean;
-  public collapseStyle: string;
   public windowWidth: number;
 
   logoFullSrc = 'assets/images/brand/coreerp-logo-light.svg';
   logoMarkSrc = 'assets/images/brand/coreerp-mark-light.svg';
+  // The mark icon is always the dark variant — it is the official app icon for all themes
+  readonly logoIconSrc = 'assets/images/brand/coreerp-mark-dark.svg';
 
   @Output() onNavCollapse = new EventEmitter();
   @Output() onNavHeaderMobCollapse = new EventEmitter();
@@ -25,8 +25,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   constructor(private themeService: ThemeService) {
     this.flatConfig = NextConfig.config;
-    this.menuClass = false;
-    this.collapseStyle = 'none';
     this.windowWidth = window.innerWidth;
   }
 
@@ -48,11 +46,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
       this.logoFullSrc = 'assets/images/brand/coreerp-logo-light.svg';
       this.logoMarkSrc = 'assets/images/brand/coreerp-mark-light.svg';
     }
-  }
-
-  toggleMobOption() {
-    this.menuClass = !this.menuClass;
-    this.collapseStyle = (this.menuClass) ? 'block' : 'none';
+    // logoIconSrc stays dark-variant always
   }
 
   navCollapse() {

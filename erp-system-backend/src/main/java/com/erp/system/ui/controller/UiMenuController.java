@@ -1,6 +1,8 @@
 package com.erp.system.ui.controller;
 
+import com.erp.system.auth.service.AccessControlService;
 import com.erp.system.common.dto.ApiResponse;
+import com.erp.system.ui.dto.MenuActionPermissionDto;
 import com.erp.system.ui.dto.MenuNodeDto;
 import com.erp.system.ui.service.UiMenuService;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +19,15 @@ import java.util.List;
 public class UiMenuController {
 
     private final UiMenuService uiMenuService;
+    private final AccessControlService accessControlService;
 
     @GetMapping
     public ApiResponse<List<MenuNodeDto>> getMenu(Authentication authentication) {
         return ApiResponse.success(uiMenuService.getMenuForUser(authentication));
+    }
+
+    @GetMapping("/permissions")
+    public ApiResponse<List<MenuActionPermissionDto>> getPermissions(Authentication authentication) {
+        return ApiResponse.success(accessControlService.menuPermissions(authentication));
     }
 }

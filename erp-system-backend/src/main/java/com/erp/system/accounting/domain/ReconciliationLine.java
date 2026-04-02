@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,4 +70,11 @@ public class ReconciliationLine extends BaseEntity {
 
     @Column(name = "matched_amount", precision = 19, scale = 2)
     private BigDecimal matchedAmount;
+
+    @Column(name = "remaining_amount", precision = 19, scale = 2)
+    private BigDecimal remainingAmount;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 }

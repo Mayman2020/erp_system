@@ -4,118 +4,238 @@
 
 .erp-login-page {
   min-height: 100vh;
-  padding: 1rem;
-  background: linear-gradient(135deg, #f4f8ff, #eef4ff);
+  padding: var(--erp-space-3);
+  background: var(--erp-login-page-bg);
 }
 
 .erp-login-shell {
-  max-width: 1120px;
+  min-height: calc(100vh - (var(--erp-space-3) * 2));
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  justify-content: center;
+  gap: var(--erp-space-4);
+  max-width: 1320px;
   margin: 0 auto;
-  min-height: calc(100vh - 2rem);
+}
+
+.erp-login-form-panel,
+.erp-login-brand-panel {
+  border: 1px solid var(--erp-border);
   border-radius: 24px;
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 1.2fr 0.9fr;
-  box-shadow: 0 24px 56px rgba(20, 45, 90, 0.12);
+  box-shadow: var(--erp-shadow-md);
 }
 
-.erp-login-hero {
-  position: relative;
-  padding: 2rem;
-  color: #f3f7ff;
-  background: linear-gradient(150deg, #0e2b4f, #1f4d86);
-}
-
-.top-actions {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-}
-
-.erp-logo {
-  width: 72px;
-  height: 72px;
-  margin-bottom: 1rem;
-}
-
-.hero-badge {
-  display: inline-block;
-  background: rgba(255, 192, 74, 0.22);
-  color: #ffe7b6;
-  border: 1px solid rgba(255, 192, 74, 0.42);
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  margin-bottom: 0.8rem;
-}
-
-.hero-points {
-  margin-top: 1.2rem;
-  display: grid;
-  gap: 0.55rem;
-}
-
-.hero-point {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  padding: 0.6rem 0.75rem;
-}
-
-.erp-login-card {
-  background: #ffffff;
-  padding: 2rem;
+.erp-login-form-panel {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: var(--erp-space-4);
+  padding: var(--erp-space-4);
+  background: var(--erp-bg-card);
 }
 
-.password-wrap {
+.erp-login-form-panel__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--erp-space-2);
+}
+
+.erp-login-card {
+  display: grid;
+  gap: var(--erp-space-3);
+}
+
+.erp-login-mode-switch {
+  display: inline-flex;
+  gap: var(--erp-space-2);
+  flex-wrap: wrap;
+}
+
+.erp-login-card__copy {
+  display: grid;
+  gap: var(--erp-space-1);
+}
+
+.erp-login-card__copy h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.erp-login-card__copy p,
+.erp-login-footer {
+  margin: 0;
+  color: var(--erp-text-secondary);
+}
+
+.erp-login-form {
+  display: grid;
+  gap: var(--erp-space-2);
+}
+
+.erp-login-field {
+  display: grid;
+  gap: var(--erp-space-1);
+  margin: 0;
+}
+
+.erp-login-field > span:first-child {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--erp-text);
+}
+
+.erp-login-password {
   position: relative;
 }
 
-.password-wrap .form-control {
-  padding-right: 2.4rem;
+.erp-login-password .erp-input {
+  padding-inline-end: 48px;
 }
 
-.toggle-pass {
+.erp-login-password__toggle {
   position: absolute;
-  right: 0.5rem;
+  inset-inline-end: 12px;
   top: 50%;
-  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: 0;
   background: transparent;
-  color: #6d7b95;
+  color: var(--erp-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
 }
 
-.erp-login-btn {
-  border-radius: 12px;
-  min-height: 44px;
+.erp-login-form__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--erp-space-2);
+  flex-wrap: wrap;
 }
 
-.erp-login-page.dark-mode {
-  background: linear-gradient(135deg, #121a2a, #0f1a2a);
+.erp-login-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--erp-space-1);
+  margin: 0;
+  color: var(--erp-text-secondary);
 }
 
-.erp-login-page.dark-mode .erp-login-card {
-  background: #1b2436;
-  color: #eef4ff;
+.erp-login-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--erp-primary);
+  font-weight: 600;
 }
 
-.erp-login-page.dark-mode .text-muted {
-  color: #9eaecd !important;
+.erp-login-submit {
+  min-height: 50px;
 }
 
-.erp-login-page.dark-mode .form-control {
-  background: #1f2b42;
-  color: #f3f7ff;
-  border-color: #334462;
+.erp-login-brand-panel {
+  position: relative;
+  background:
+    radial-gradient(circle at top left, rgba(var(--erp-primary-rgb), 0.22), transparent 28%),
+    radial-gradient(circle at top right, rgba(var(--erp-info-rgb), 0.18), transparent 32%),
+    linear-gradient(160deg, var(--erp-brand-surface-start), var(--erp-brand-surface-end));
+  color: #ffffff;
 }
 
-@media (max-width: 900px) {
+.erp-login-brand-panel__inner {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--erp-space-3);
+  padding: clamp(24px, 4vw, 48px);
+}
+
+.erp-logo {
+  width: auto;
+  height: 48px;
+}
+
+.erp-login-brand-panel__badge {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.erp-login-brand-panel h2 {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.02;
+  font-weight: 800;
+}
+
+.erp-login-brand-panel p {
+  margin: 0;
+  max-width: 560px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 16px;
+}
+
+.erp-login-brand-panel__points {
+  display: grid;
+  gap: var(--erp-space-2);
+}
+
+.erp-login-brand-panel__point {
+  display: flex;
+  align-items: center;
+  gap: var(--erp-space-2);
+  min-height: 56px;
+  padding: 0 var(--erp-space-2);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.erp-login-brand-panel__point .mat-icon {
+  color: #ffffff;
+}
+
+@media (max-width: 991px) {
   .erp-login-shell {
     grid-template-columns: 1fr;
+  }
+
+  .erp-login-form-panel {
+    order: 2;
+  }
+
+  .erp-login-brand-panel {
+    order: 1;
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 767px) {
+  .erp-login-page {
+    padding: var(--erp-space-2);
+  }
+
+  .erp-login-shell {
+    min-height: calc(100vh - (var(--erp-space-2) * 2));
+    gap: var(--erp-space-2);
+  }
+
+  .erp-login-form-panel {
+    padding: var(--erp-space-3);
   }
 }

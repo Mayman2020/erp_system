@@ -73,13 +73,21 @@
 
 <app-erp-dialog [visible]="dialogVisible" [title]="dialogTitle" size="xl" (close)="dialogVisible = false">
   <div dialog-body>
+    <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
+      {{ successKey | translate }}
+      <button type="button" class="close" (click)="successKey=''"><span>&times;</span></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
+      {{ errorKey | translate }}
+      <button type="button" class="close" (click)="errorKey=''"><span>&times;</span></button>
+    </div>
   <form [formGroup]="form" class="row">
     <div class="col-md-6 mb-3">
       <app-form-field [control]="form.controls.voucherDate" labelKey="VOUCHERS.FORM.DATE" icon="calendar_month" type="date" [readonly]="readOnlyMode"></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
       <label class="form-label">{{ 'VOUCHERS.FORM.NUMBER' | translate }}</label>
-      <input class="form-control" formControlName="reference" [readonly]="readOnlyMode" />
+      <input class="form-control" formControlName="reference" readonly />
     </div>
     <div class="col-md-6 mb-3">
       <label class="form-label">{{ activeVoucherType === 'payment' ? ('VOUCHERS.FORM.BENEFICIARY' | translate) : ('VOUCHERS.FORM.PAYER' | translate) }}</label>
@@ -130,11 +138,11 @@
   </form>
   </div>
   <div dialog-footer class="erp-dialog-actions">
-    <button type="button" class="erp-button erp-button--ghost" (click)="dialogVisible = false">
-      {{ 'COMMON.CANCEL' | translate }}
-    </button>
     <button type="button" class="erp-button erp-button--primary" (click)="save()" [disabled]="readOnlyMode || saving">
       {{ 'COMMON.SAVE' | translate }}
+    </button>
+    <button type="button" class="erp-button erp-button--ghost" (click)="dialogVisible = false">
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
   </div>
 </app-erp-dialog>

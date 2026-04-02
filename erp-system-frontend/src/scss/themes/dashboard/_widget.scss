@@ -892,7 +892,7 @@
             border: none;
         }
     }
-    @media only screen and(max-width:767px) {
+    @media only screen and (max-width: 767px) {
         ~ .card-footer [class*=col-]:nth-child(2) {
             border: 0;
         }
@@ -1011,7 +1011,7 @@
                 border-right: none;
             }
         }
-        @media only screen and(max-width:767px) {
+        @media only screen and (max-width: 767px) {
             [class*="col-"]:nth-child(2) {
                 border: 0;
             }
@@ -1058,7 +1058,7 @@
 
     ~ .card-footer {
         border-top: none;
-        @media only screen and(max-width:575px) {
+        @media only screen and (max-width: 575px) {
             [class*="col-"] {
                 margin-bottom: 10px;
             }

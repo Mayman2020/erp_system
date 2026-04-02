@@ -15,7 +15,7 @@ import '@angular/localize/init';
  * automatically update themselves. This includes Safari >= 10, Chrome >= 55 (including Opera),
  * Edge >= 13 on the desktop, and iOS 10 and Chrome on mobile.
  *
- * Learn more in https://angular.io/guide/browser-support
+ * Learn more in https://angular.dev/reference/versions
  */
 
 /***************************************************************************************************
@@ -59,7 +59,7 @@ import '@angular/localize/init';
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js/dist/zone';  // Included with Angular CLI.
+import 'zone.js';
 
 
 /***************************************************************************************************

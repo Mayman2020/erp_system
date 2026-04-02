@@ -2,6 +2,7 @@ package com.erp.system.common.security;
 
 import com.erp.system.auth.domain.User;
 import com.erp.system.auth.repository.UserRepository;
+import com.erp.system.auth.service.AccessControlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,7 @@ import java.util.List;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final AccessControlService accessControlService;
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
@@ -28,7 +30,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getUsername(),
                 user.getPassword(),
                 user.isActive(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+                accessControlService.authorityCodesFor(user).stream()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                        .toList()
         );
     }
 }

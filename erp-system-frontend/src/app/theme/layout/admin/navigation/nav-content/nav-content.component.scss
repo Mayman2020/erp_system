@@ -14,7 +14,7 @@
   height: 100%;
 }
 
-:host ::ng-deep perfect-scrollbar.erp-nav-scroll {
+:host ::ng-deep .erp-nav-scroll {
   display: block;
   flex: 1 1 auto;
   min-height: 0;
@@ -22,13 +22,6 @@
   max-height: 100%;
 }
 
-:host ::ng-deep .erp-nav-scroll > .ps,
-:host ::ng-deep .erp-nav-scroll .ps-content,
-:host ::ng-deep .erp-nav-scroll .ps__content {
-  min-height: 100%;
-}
-
-:host ::ng-deep .erp-nav-scroll .erp-navbar-content,
-:host ::ng-deep .erp-nav-scroll .ps__content {
+:host ::ng-deep .erp-nav-scroll .erp-navbar-content {
   padding-top: 0 !important;
 }

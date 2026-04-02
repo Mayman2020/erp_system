@@ -28,7 +28,7 @@ public class LedgerService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
 
-        BigDecimal openingBalance = account.getOpeningBalance() == null ? BigDecimal.ZERO : account.getOpeningBalance();
+        BigDecimal openingBalance = account.signedOpeningBalance();
         if (fromDate != null) {
             openingBalance = openingBalance.add(journalEntryLineRepository.sumNetMovementBefore(accountId, fromDate));
         }

@@ -1,50 +1,81 @@
 package com.erp.system.common.service;
 
 import com.erp.system.common.dto.LookupItemDto;
-import com.erp.system.common.entity.LookupValue;
-import com.erp.system.common.enums.AccountingType;
-import com.erp.system.common.enums.JournalEntryStatus;
-import com.erp.system.common.enums.PaymentMethod;
-import com.erp.system.common.enums.ReconciliationLineStatus;
-import com.erp.system.common.enums.ReconciliationStatus;
-import com.erp.system.common.enums.VoucherStatus;
 import com.erp.system.common.repository.LookupValueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Stream;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class LookupService {
+
+    private static final Map<String, String> TYPE_ALIASES = Map.ofEntries(
+            Map.entry("account-type", "account-types"),
+            Map.entry("account-types", "account-types"),
+            Map.entry("status", "statuses"),
+            Map.entry("statuses", "statuses"),
+            Map.entry("voucher-status", "voucher-statuses"),
+            Map.entry("voucher-statuses", "voucher-statuses"),
+            Map.entry("journal-entry-status", "journal-entry-statuses"),
+            Map.entry("journal-entry-statuses", "journal-entry-statuses"),
+            Map.entry("entry-type", "entry-types"),
+            Map.entry("entry-types", "entry-types"),
+            Map.entry("payment-method", "payment-methods"),
+            Map.entry("payment-methods", "payment-methods"),
+            Map.entry("receipt-methods", "payment-methods"),
+            Map.entry("currency", "currencies"),
+            Map.entry("currencies", "currencies"),
+            Map.entry("reconciliation-status", "reconciliation-statuses"),
+            Map.entry("reconciliation-statuses", "reconciliation-statuses"),
+            Map.entry("reconciliation-line-status", "reconciliation-line-statuses"),
+            Map.entry("reconciliation-line-statuses", "reconciliation-line-statuses"),
+            Map.entry("report-period", "report-periods"),
+            Map.entry("report-periods", "report-periods"),
+            Map.entry("accounting-method", "accounting-methods"),
+            Map.entry("accounting-methods", "accounting-methods"),
+            Map.entry("transfer-status", "transfer-statuses"),
+            Map.entry("transfer-statuses", "transfer-statuses"),
+            Map.entry("transaction-type", "transaction-types"),
+            Map.entry("transaction-types", "transaction-types"),
+            Map.entry("transaction-status", "transaction-statuses"),
+            Map.entry("transaction-statuses", "transaction-statuses"),
+            Map.entry("bill-status", "bill-statuses"),
+            Map.entry("bill-statuses", "bill-statuses"),
+            Map.entry("budget-status", "budget-statuses"),
+            Map.entry("budget-statuses", "budget-statuses"),
+            Map.entry("check-type", "check-types"),
+            Map.entry("check-types", "check-types"),
+            Map.entry("check-status", "check-statuses"),
+            Map.entry("check-statuses", "check-statuses")
+    );
+
     private final LookupValueRepository lookupValueRepository;
 
     public List<LookupItemDto> getLookups(String type) {
-        String normalized = type.toLowerCase(Locale.ROOT);
-        List<LookupItemDto> fromTable = lookupValueRepository
-                .findByTypeCodeIgnoreCaseAndActiveTrueOrderBySortOrderAscCodeAsc(normalized)
+        String canonicalType = canonicalType(type);
+        return lookupValueRepository
+                .findByTypeCodeIgnoreCaseAndActiveTrueOrderBySortOrderAscCodeAsc(canonicalType)
                 .stream()
                 .map(value -> LookupItemDto.builder()
+                        .id(value.getId())
+                        .typeCode(value.getTypeCode())
                         .code(value.getCode())
-                        .icon(resolveLookupIcon(normalized, value.getCode()))
+                        .nameEn(value.getNameEn())
+                        .nameAr(value.getNameAr())
+                        .sortOrder(value.getSortOrder())
+                        .active(value.isActive())
+                        .icon(resolveLookupIcon(canonicalType, value.getCode()))
                         .build())
                 .toList();
-        if (!fromTable.isEmpty()) {
-            return fromTable;
-        }
-        return fallbackLookups(normalized);
     }
 
-    private <T extends Enum<T>> List<LookupItemDto> enumCodes(T[] values) {
-        return Arrays.stream(values)
-                .map(value -> LookupItemDto.builder()
-                        .code(value.name())
-                        .icon(resolveLookupIcon(null, value.name()))
-                        .build())
-                .toList();
+    private String canonicalType(String type) {
+        String normalized = type == null ? "" : type.trim().toLowerCase(Locale.ROOT);
+        return TYPE_ALIASES.getOrDefault(normalized, normalized);
     }
 
     private String resolveLookupIcon(String type, String code) {
@@ -66,31 +97,6 @@ public class LookupService {
             case "INACTIVE", "CANCELLED", "REVERSED" -> "feather icon-x-circle";
             case "DRAFT", "OPEN", "UNMATCHED", "UNDER_REVIEW" -> "feather icon-clock";
             default -> "feather icon-circle";
-        };
-    }
-
-    private List<LookupItemDto> fallbackLookups(String type) {
-        return switch (type) {
-            case "account-type", "account-types" -> enumCodes(AccountingType.values());
-            case "status", "statuses" -> List.of(
-                    LookupItemDto.builder().code("ACTIVE").build(),
-                    LookupItemDto.builder().code("INACTIVE").build()
-            );
-            case "voucher-status", "voucher-statuses" -> enumCodes(VoucherStatus.values());
-            case "journal-entry-status", "journal-entry-statuses" -> enumCodes(JournalEntryStatus.values());
-            case "entry-type", "entry-types" -> Stream.of("MANUAL", "ADJUSTMENT", "OPENING", "CLOSING", "REVERSAL")
-                    .map(code -> LookupItemDto.builder().code(code).build())
-                    .toList();
-            case "payment-method", "payment-methods", "receipt-methods" -> enumCodes(PaymentMethod.values());
-            case "currency", "currencies" -> Stream.of("USD", "EUR", "GBP", "AED", "SAR", "EGP")
-                    .map(code -> LookupItemDto.builder().code(code).build())
-                    .toList();
-            case "reconciliation-status", "reconciliation-statuses" -> enumCodes(ReconciliationStatus.values());
-            case "reconciliation-line-status", "reconciliation-line-statuses" -> enumCodes(ReconciliationLineStatus.values());
-            case "report-period", "report-periods" -> Stream.of("THIS_MONTH", "LAST_MONTH", "THIS_QUARTER", "THIS_YEAR", "CUSTOM")
-                    .map(code -> LookupItemDto.builder().code(code).build())
-                    .toList();
-            default -> List.of();
         };
     }
 }

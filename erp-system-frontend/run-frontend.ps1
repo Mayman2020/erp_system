@@ -7,22 +7,23 @@ Set-Location -Path $PSScriptRoot
 $nodeVersion = (& node -v).TrimStart("v")
 $major = [int]($nodeVersion.Split(".")[0])
 
-if ($major -lt 16 -or $major -ge 19) {
-    Write-Host "Detected Node.js v$nodeVersion (outside recommended range 16/18)." -ForegroundColor Yellow
+if ($major -lt 20) {
+    Write-Host "Detected Node.js v$nodeVersion. Angular 21 requires Node.js 20+." -ForegroundColor Yellow
     $nvmCommand = Get-Command nvm -ErrorAction SilentlyContinue
     if ($nvmCommand) {
-        Write-Host "Trying to switch to Node.js 18 using nvm..." -ForegroundColor Yellow
-        nvm use 18 | Out-Host
+        Write-Host "Trying to switch to Node.js 22 using nvm..." -ForegroundColor Yellow
+        nvm use 22 | Out-Host
         $nodeVersion = (& node -v).TrimStart("v")
         $major = [int]($nodeVersion.Split(".")[0])
     }
 
-    if ($major -lt 16 -or $major -ge 19) {
-        Write-Host "Continuing with Node.js v$nodeVersion. If startup fails, install/use Node 18." -ForegroundColor Yellow
+    if ($major -lt 20) {
+        Write-Host "Node.js 20+ is required. Please install Node.js 20, 22, or 24." -ForegroundColor Red
+        exit 1
     }
 }
 
-$env:NODE_OPTIONS = "--openssl-legacy-provider"
+Write-Host "Using Node.js v$nodeVersion" -ForegroundColor Green
 
 if (-not $SkipInstall -and -not (Test-Path "$PSScriptRoot\node_modules")) {
     Write-Host "Installing dependencies..."

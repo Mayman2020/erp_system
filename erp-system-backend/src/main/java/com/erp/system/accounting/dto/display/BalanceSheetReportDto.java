@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BalanceSheetReportDto {
     private LocalDate asOfDate;
+    private String reportCurrency;
     private List<BalanceSheetLineDto> assets;
     private List<BalanceSheetLineDto> liabilities;
     private List<BalanceSheetLineDto> equity;

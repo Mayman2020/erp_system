@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {NavigationItem} from '../../../layout/admin/navigation/navigation';
+import {NavigationService} from '../../../layout/admin/navigation/navigation';
 import {Router} from '@angular/router';
 import {Title} from '@angular/platform-browser';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-breadcrumb',
   templateUrl: './breadcrumb.component.html',
   styleUrls: ['./breadcrumb.component.scss']
@@ -17,13 +17,17 @@ export class BreadcrumbComponent implements OnInit {
   public navigationList: Array<any> = [];
   private activeTitleKey = 'NAV.DASHBOARD';
 
-  constructor(private route: Router, public nav: NavigationItem, private titleService: Title, private translationService: TranslationService) {
-    this.navigation = this.nav.get();
+  constructor(private route: Router, private nav: NavigationService, private titleService: Title, private translationService: TranslationService) {
+    this.navigation = [];
     this.type = 'theme2';
     this.setBreadcrumb();
   }
 
   ngOnInit() {
+    this.nav.get().subscribe((items) => {
+      this.navigation = items || [];
+      this.filterNavigation(this.route.url || '');
+    });
     let routerUrl: string;
     routerUrl = this.route.url;
     if (routerUrl && typeof routerUrl === 'string') {

@@ -23,15 +23,17 @@ public class AccountingReportController {
     @GetMapping("/profit-loss")
     public ApiResponse<ProfitLossReportDto> getProfitLoss(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) String currency
     ) {
-        return ApiResponse.success(accountingReportService.getProfitLoss(fromDate, toDate));
+        return ApiResponse.success(accountingReportService.getProfitLoss(fromDate, toDate, currency));
     }
 
     @GetMapping("/balance-sheet")
     public ApiResponse<BalanceSheetReportDto> getBalanceSheet(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOfDate
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOfDate,
+            @RequestParam(required = false) String currency
     ) {
-        return ApiResponse.success(accountingReportService.getBalanceSheet(asOfDate));
+        return ApiResponse.success(accountingReportService.getBalanceSheet(asOfDate, currency));
     }
 }

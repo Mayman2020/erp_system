@@ -3,7 +3,7 @@ import {NavigationItem} from '../../navigation';
 import {NextConfig} from '../../../../../../app-config';
 import {Location} from '@angular/common';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-nav-item',
   templateUrl: './nav-item.component.html',
   styleUrls: ['./nav-item.component.scss']

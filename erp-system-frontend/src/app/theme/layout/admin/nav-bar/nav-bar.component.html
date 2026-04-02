@@ -1,24 +1,38 @@
 <div class="container" *ngIf="this.flatConfig.layout === 'horizontal' && this.flatConfig.subLayout === 'horizontal-2'; else mainHeader">
   <ng-container *ngTemplateOutlet="mainHeader"></ng-container>
 </div>
+
 <ng-template #mainHeader>
-  <div class="m-header">
-    <button
-      type="button"
-      class="erp-header-toggle"
-      id="mobile-collapse"
-      (click)="navCollapse()"
-      [attr.aria-label]="'NAV.TOGGLE_MENU' | translate"
-      [attr.title]="'NAV.TOGGLE_MENU' | translate"
-    >
-      <mat-icon aria-hidden="true">menu</mat-icon>
-    </button>
-    <a [routerLink]="['/dashboard']" class="b-brand" [attr.title]="'APP.BRAND' | translate">
-      <img id="main-logo" [src]="logoFullSrc" [attr.alt]="'APP.BRAND' | translate" class="logo logo-main erp-brand-logo-full">
-      <img [src]="logoMarkSrc" alt="" class="logo-thumb erp-brand-logo-mark" aria-hidden="true">
-    </a>
-  </div>
-  <div class="collapse navbar-collapse" [style.display]="this.collapseStyle">
-    <app-nav-right [ngClass]="flatConfig.rtlLayout ? 'mr-auto' : 'ml-auto'"></app-nav-right>
+  <div class="erp-header-shell">
+    <div class="erp-header-shell__brand">
+      <button
+        type="button"
+        class="erp-header-toggle"
+        id="mobile-collapse"
+        (click)="navCollapse()"
+        [attr.aria-label]="'NAV.TOGGLE_MENU' | translate"
+        [attr.title]="'NAV.TOGGLE_MENU' | translate"
+      >
+        <mat-icon aria-hidden="true">menu</mat-icon>
+      </button>
+
+      <a
+        [routerLink]="['/dashboard']"
+        class="erp-header-brand-pill"
+        [attr.title]="'APP.BRAND' | translate"
+        [attr.aria-label]="'APP.BRAND' | translate"
+      >
+        <span class="erp-header-brand-pill__icon-wrap">
+          <img [src]="logoIconSrc" alt="" class="erp-header-brand-pill__icon" aria-hidden="true" />
+        </span>
+        <span class="erp-header-brand-pill__wordmark">
+          <img [src]="logoFullSrc" [alt]="'APP.BRAND' | translate" class="erp-header-brand-pill__logo" />
+        </span>
+      </a>
+    </div>
+
+    <div class="erp-header-shell__actions">
+      <app-nav-right></app-nav-right>
+    </div>
   </div>
 </ng-template>

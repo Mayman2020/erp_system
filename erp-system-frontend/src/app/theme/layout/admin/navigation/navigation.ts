@@ -1,4 +1,9 @@
-import {Injectable} from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { catchError, map, shareReplay, tap } from 'rxjs/operators';
+import { environment } from '../../../../../environments/environment';
+import { ApiResponse } from '../../../../core/models/api.models';
 
 export interface NavigationItem {
   id: string;
@@ -26,35 +31,55 @@ export interface Navigation extends NavigationItem {
   children?: NavigationItem[];
 }
 
-const NavigationItems = [
-  {
-    id: 'hesabaty',
-    title: 'NAV.HESABATY',
-    type: 'group',
-    icon: 'apartment',
-    children: [
-      { id: 'dashboard', title: 'NAV.DASHBOARD', type: 'item', url: '/dashboard', classes: 'nav-item', icon: 'space_dashboard' },
-      { id: 'accounts', title: 'NAV.CHART_OF_ACCOUNTS', type: 'item', url: '/accounts', classes: 'nav-item', icon: 'account_tree' },
-      { id: 'journal-entry', title: 'NAV.JOURNAL_ENTRIES', type: 'item', url: '/journal-entry', classes: 'nav-item', icon: 'menu_book' },
-      { id: 'payment-vouchers', title: 'NAV.PAYMENT_VOUCHERS', type: 'item', url: '/vouchers/payment', classes: 'nav-item', icon: 'payments' },
-      { id: 'receipt-vouchers', title: 'NAV.RECEIPT_VOUCHERS', type: 'item', url: '/vouchers/receipt', classes: 'nav-item', icon: 'receipt_long' },
-      { id: 'transfers', title: 'NAV.TRANSFERS', type: 'item', url: '/transfers', classes: 'nav-item', icon: 'swap_horiz' },
-      { id: 'transactions', title: 'NAV.TRANSACTIONS', type: 'item', url: '/transactions', classes: 'nav-item', icon: 'sync_alt' },
-      { id: 'invoices', title: 'NAV.INVOICES', type: 'item', url: '/invoices', classes: 'nav-item', icon: 'request_quote' },
-      { id: 'checks', title: 'NAV.CHECKS', type: 'item', url: '/checks', classes: 'nav-item', icon: 'rule' },
-      { id: 'banks', title: 'NAV.BANK_ACCOUNTS', type: 'item', url: '/banks', classes: 'nav-item', icon: 'account_balance' },
-      { id: 'ledger', title: 'NAV.LEDGER', type: 'item', url: '/ledger', classes: 'nav-item', icon: 'library_books' },
-      { id: 'reconciliation', title: 'NAV.RECONCILIATION', type: 'item', url: '/reconciliation', classes: 'nav-item', icon: 'fact_check' },
-      { id: 'reports', title: 'NAV.REPORTS', type: 'item', url: '/reports', classes: 'nav-item', icon: 'insert_chart' },
-      { id: 'settings', title: 'NAV.SETTINGS', type: 'item', url: '/settings', classes: 'nav-item', icon: 'tune' },
-      { id: 'accountants', title: 'NAV.ACCOUNTANTS_PORTAL', type: 'item', url: '/accountants', classes: 'nav-item', icon: 'groups' }
-    ]
-  }
-];
+@Injectable({ providedIn: 'root' })
+export class NavigationService {
+  private readonly endpoint = `${environment.apiBaseUrl}/ui/menu`;
+  private readonly storageKey = 'erp_ui_menu_cache';
+  private menu$?: Observable<Navigation[]>;
 
-@Injectable()
-export class NavigationItem {
-  public get() {
-    return NavigationItems;
+  constructor(private http: HttpClient) {}
+
+  public get(): Observable<Navigation[]> {
+    if (!this.menu$) {
+      const cached = this.readCache();
+      this.menu$ = this.http.get<ApiResponse<Navigation[]>>(this.endpoint).pipe(
+        map((response) => this.normalize(response.data || [])),
+        tap((items) => this.writeCache(items)),
+        catchError(() => of(cached)),
+        shareReplay(1)
+      );
+    }
+
+    return this.menu$;
+  }
+
+  public refresh(): Observable<Navigation[]> {
+    this.menu$ = undefined;
+    return this.get();
+  }
+
+  private normalize(items: Navigation[] | null | undefined): Navigation[] {
+    return (items || []).map((item) => ({
+      ...item,
+      classes: item.classes || 'nav-item',
+      children: this.normalize(item.children)
+    }));
+  }
+
+  private readCache(): Navigation[] {
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      return raw ? this.normalize(JSON.parse(raw) as Navigation[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private writeCache(items: Navigation[]): void {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(items));
+    } catch {
+      // Ignore storage quota/privacy mode issues and keep runtime menu.
+    }
   }
 }

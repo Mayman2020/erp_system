@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-alert',
   templateUrl: './alert.component.html',
   styleUrls: ['./alert.component.scss']

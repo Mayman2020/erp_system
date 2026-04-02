@@ -80,6 +80,7 @@ export interface AccountTreeDto {
 
 export interface AccountFormDto {
   code?: string;
+  name: string;
   nameEn: string;
   nameAr?: string;
   parentId?: number | null;
@@ -384,6 +385,8 @@ export interface FiscalPeriodDto {
   startDate: string;
   endDate: string;
   open: boolean;
+  closedAt?: string;
+  closedBy?: string;
 }
 
 export interface FiscalYearDto {
@@ -392,6 +395,8 @@ export interface FiscalYearDto {
   startDate: string;
   endDate: string;
   open: boolean;
+  closedAt?: string;
+  closedBy?: string;
   periods: FiscalPeriodDto[];
 }
 
@@ -401,4 +406,22 @@ export interface AccountingSettingsDto {
   allowedCurrencies: string;
   sequences: NumberingSequenceDto[];
   fiscalYears: FiscalYearDto[];
+}
+
+export interface AccountingSettingsUpdateDto {
+  accountingMethod: string;
+  baseCurrency: string;
+  allowedCurrencies: string;
+}
+
+export interface FiscalYearFormDto {
+  year: number;
+  startDate: string;
+  endDate: string;
+}
+
+export interface FiscalPeriodFormDto {
+  periodName: string;
+  startDate: string;
+  endDate: string;
 }

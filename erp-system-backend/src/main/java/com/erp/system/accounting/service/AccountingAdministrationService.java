@@ -22,8 +22,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,9 +52,18 @@ public class AccountingAdministrationService {
 
     @Transactional
     public AccountingSettingsDisplayDto updateSettings(AccountingSettingsUpdateDto request) {
+        Set<String> allowedCurrencies = normalizeCurrencies(request.getAllowedCurrencies());
+        String baseCurrency = request.getBaseCurrency().trim().toUpperCase(Locale.ROOT);
+        if (allowedCurrencies.isEmpty()) {
+            throw new BusinessException("At least one allowed currency is required");
+        }
+        if (!allowedCurrencies.contains(baseCurrency)) {
+            throw new BusinessException("Base currency must be included in allowed currencies");
+        }
+
         upsertSetting("ACCOUNTING_METHOD", request.getAccountingMethod().name(), "Accounting method");
-        upsertSetting("BASE_CURRENCY", request.getBaseCurrency().trim(), "Base currency");
-        upsertSetting("ALLOWED_CURRENCIES", request.getAllowedCurrencies().trim(), "Allowed currencies");
+        upsertSetting("BASE_CURRENCY", baseCurrency, "Base currency");
+        upsertSetting("ALLOWED_CURRENCIES", String.join(",", allowedCurrencies), "Allowed currencies");
         return getSettings();
     }
 
@@ -57,6 +71,14 @@ public class AccountingAdministrationService {
     public FiscalYearDisplayDto createFiscalYear(FiscalYearFormDto request) {
         if (request.getEndDate().isBefore(request.getStartDate())) {
             throw new BusinessException("Fiscal year end date cannot be before start date");
+        }
+        if (fiscalYearRepository.findByYear(request.getYear()).isPresent()) {
+            throw new BusinessException("Fiscal year already exists");
+        }
+        boolean overlapsExistingYear = fiscalYearRepository.findAll().stream()
+                .anyMatch(year -> rangesOverlap(request.getStartDate(), request.getEndDate(), year.getStartDate(), year.getEndDate()));
+        if (overlapsExistingYear) {
+            throw new BusinessException("Fiscal year dates overlap with an existing fiscal year");
         }
         FiscalYear fiscalYear = FiscalYear.builder()
                 .year(request.getYear())
@@ -73,6 +95,14 @@ public class AccountingAdministrationService {
                 .orElseThrow(() -> new ResourceNotFoundException("FiscalYear", fiscalYearId));
         if (request.getEndDate().isBefore(request.getStartDate())) {
             throw new BusinessException("Fiscal period end date cannot be before start date");
+        }
+        if (request.getStartDate().isBefore(fiscalYear.getStartDate()) || request.getEndDate().isAfter(fiscalYear.getEndDate())) {
+            throw new BusinessException("Fiscal period dates must stay within the selected fiscal year");
+        }
+        boolean overlapsExistingPeriod = fiscalPeriodRepository.findByFiscalYearIdOrderByStartDateAsc(fiscalYearId).stream()
+                .anyMatch(period -> rangesOverlap(request.getStartDate(), request.getEndDate(), period.getStartDate(), period.getEndDate()));
+        if (overlapsExistingPeriod) {
+            throw new BusinessException("Fiscal period dates overlap with an existing fiscal period");
         }
         FiscalPeriod period = FiscalPeriod.builder()
                 .fiscalYear(fiscalYear)
@@ -187,5 +217,16 @@ public class AccountingAdministrationService {
                 .createdAt(period.getCreatedAt())
                 .updatedAt(period.getUpdatedAt())
                 .build();
+    }
+
+    private Set<String> normalizeCurrencies(String currencies) {
+        return Arrays.stream((currencies == null ? "" : currencies).split(","))
+                .map(value -> value == null ? "" : value.trim().toUpperCase(Locale.ROOT))
+                .filter(value -> !value.isBlank())
+                .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
+    }
+
+    private boolean rangesOverlap(LocalDate firstStart, LocalDate firstEnd, LocalDate secondStart, LocalDate secondEnd) {
+        return !firstEnd.isBefore(secondStart) && !secondEnd.isBefore(firstStart);
     }
 }

@@ -46,6 +46,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordResetOtpRepository passwordResetOtpRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccessControlService accessControlService;
 
     @Transactional(readOnly = true)
     public AuthResponseDto login(AuthLoginRequestDto request) {
@@ -70,7 +71,7 @@ public class AuthService {
     public List<String> resolveLoginRoles(AuthLoginRolesRequestDto request) {
         String identifier = normalizeIdentifier(request.getUsernameOrEmail());
         return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(identifier, identifier)
-                .map(user -> mapRoleAliases(user.getRole()))
+                .map(accessControlService::authorityCodesFor)
                 .orElse(List.of());
     }
 
@@ -150,14 +151,15 @@ public class AuthService {
     }
 
     private AuthResponseDto buildResponse(User user) {
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), List.of(user.getRole().name()));
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername(), List.of(user.getRole().name()));
+        List<String> roles = accessControlService.authorityCodesFor(user);
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), roles);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername(), roles);
 
         return AuthResponseDto.builder()
                 .token(accessToken)
                 .refreshToken(refreshToken)
                 .type("ACCESS")
-                .roles(List.of(user.getRole().name()))
+                .roles(roles)
                 .userType(user.getRole().name())
                 .displayName(resolveDisplayName(user))
                 .expiresInSeconds(jwtProperties.getExpirationMs() / 1000)
@@ -174,6 +176,7 @@ public class AuthService {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .role(user.getRole().name())
+                .roles(accessControlService.authorityCodesFor(user))
                 .active(user.isActive())
                 .createdAt(user.getCreatedAt())
                 .profile(profile == null ? null : UserProfileDto.builder()
@@ -243,14 +246,4 @@ public class AuthService {
         return normalized == null || normalized.isBlank() ? null : normalized;
     }
 
-    private List<String> mapRoleAliases(UserRole role) {
-        if (role == null) {
-            return List.of();
-        }
-        return switch (role.name().toUpperCase(Locale.ROOT)) {
-            case "ADMIN" -> List.of("ADMIN");
-            case "ACCOUNTANT" -> List.of("ACCOUNTANT");
-            default -> List.of(role.name());
-        };
-    }
 }

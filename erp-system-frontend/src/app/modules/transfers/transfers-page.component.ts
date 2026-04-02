@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TransferDto } from '../../core/models/accounting.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
-@Component({ selector: 'app-transfers-page', templateUrl: './transfers-page.component.html' })
+@Component({ standalone: false, selector: 'app-transfers-page', templateUrl: './transfers-page.component.html' })
 export class TransfersPageComponent implements OnInit {
   titleKey = 'NAV.TRANSFERS';
   loading = false;

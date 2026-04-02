@@ -1,29 +1,51 @@
 .erp-reconciliation-form {
   row-gap: 16px;
   margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 8px;
+  background: var(--bs-light, #f8f9fa);
 }
 
 .erp-reconciliation-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 16px;
+  gap: 12px;
 }
 
 .erp-reconciliation-actions .erp-button {
-  min-width: 180px;
+  min-width: 160px;
 }
 
-.table-hover tbody tr {
+.erp-button--danger {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  &:hover { background-color: #bb2d3b; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.erp-summary-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s;
+  &:hover { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1); }
+}
+
+.erp-recon-list-item {
   cursor: pointer;
+  transition: background 0.15s;
+  &.active { background-color: var(--bs-primary-bg-subtle, #e7f1ff) !important; border-color: var(--bs-primary, #0d6efd); }
 }
 
-.card {
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+.erp-line-matched {
+  opacity: 0.7;
+  background: rgba(25, 135, 84, 0.05);
 }
+
+.table-hover tbody tr { cursor: pointer; }
+
+.card { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06); }
 
 @media (max-width: 767px) {
-  .erp-reconciliation-actions .erp-button {
-    width: 100%;
-  }
+  .erp-reconciliation-actions .erp-button { width: 100%; }
 }

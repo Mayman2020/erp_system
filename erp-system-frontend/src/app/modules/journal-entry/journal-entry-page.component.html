@@ -127,11 +127,11 @@
   </form>
   </div>
   <div dialog-footer class="erp-dialog-actions">
-    <button type="button" class="erp-button erp-button--ghost" (click)="closeForm()">
-      {{ 'COMMON.CANCEL' | translate }}
-    </button>
     <button type="button" class="erp-button erp-button--primary" (click)="save()" [disabled]="saving || formMode === 'view'">
       {{ 'COMMON.SAVE' | translate }}
+    </button>
+    <button type="button" class="erp-button erp-button--ghost" (click)="closeForm()">
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
   </div>
 </app-erp-dialog>

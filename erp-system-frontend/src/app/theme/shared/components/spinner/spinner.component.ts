@@ -3,7 +3,7 @@ import {Spinkit} from './spinkits';
 import {Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError} from '@angular/router';
 import {DOCUMENT} from '@angular/common';
 
-@Component({
+@Component({ standalone: false,
     selector: 'app-spinner',
     templateUrl: './spinner.component.html',
     styleUrls: [

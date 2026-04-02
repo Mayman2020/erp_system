@@ -8,4 +8,10 @@ import java.util.List;
 public interface LookupValueRepository extends JpaRepository<LookupValue, Long> {
 
     List<LookupValue> findByTypeCodeIgnoreCaseAndActiveTrueOrderBySortOrderAscCodeAsc(String typeCode);
+
+    List<LookupValue> findByTypeCodeIgnoreCaseOrderBySortOrderAscCodeAsc(String typeCode);
+
+    boolean existsByTypeCodeIgnoreCaseAndCodeIgnoreCase(String typeCode, String code);
+
+    boolean existsByTypeCodeIgnoreCaseAndCodeIgnoreCaseAndIdNot(String typeCode, String code, Long id);
 }

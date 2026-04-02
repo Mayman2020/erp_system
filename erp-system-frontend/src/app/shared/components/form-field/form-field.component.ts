@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { DateFormatService } from '../../../core/services/date-format.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-form-field',
   template: `
     <div

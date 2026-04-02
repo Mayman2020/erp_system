@@ -2,10 +2,9 @@ import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
-import { TranslationService } from '../../../core/i18n/translation.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -39,17 +38,9 @@ export class LoginComponent {
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
-    public i18n: TranslationService,
     private themeService: ThemeService
   ) {
     this.darkMode = this.themeService.mode === 'dark';
-  }
-
-  switchLanguage(lang: string): void {
-    if (this.i18n.currentLanguage === lang) {
-      return;
-    }
-    this.i18n.setLanguage(lang).subscribe();
   }
 
   toggleTheme(): void {
@@ -71,7 +62,10 @@ export class LoginComponent {
     } else {
       localStorage.removeItem('erp_login_email');
     }
-    this.auth.login(this.form.value).subscribe({
+    this.auth.login({
+      email,
+      password: String(this.form.value.password || '')
+    }).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/dashboard']);

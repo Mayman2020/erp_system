@@ -3,13 +3,14 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { NgbDropdownModule, NgbTabsetModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AdvancedSearchBarComponent } from './components/advanced-search-bar/advanced-search-bar.component';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { EmptyStateComponent } from './components/empty-state/empty-state.component';
 import { FormFieldComponent } from './components/form-field/form-field.component';
 import { FormDialogComponent } from './components/form-dialog/form-dialog.component';
 import { LoadingStateComponent } from './components/loading-state/loading-state.component';
+import { LanguageSwitcherComponent } from './components/language-switcher/language-switcher.component';
 import { PageHeaderComponent } from './components/page-header/page-header.component';
 import { StatusBadgeComponent } from './components/status-badge/status-badge.component';
 import { TreeSelectorComponent } from './components/tree-selector/tree-selector.component';
@@ -26,12 +27,13 @@ import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
     StatusBadgeComponent,
     TypeBadgeComponent,
     FormDialogComponent,
+    LanguageSwitcherComponent,
     TreeSelectorComponent,
     PageHeaderComponent,
     EmptyStateComponent,
     LoadingStateComponent
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgbDropdownModule, NgbTooltipModule, NgbTabsetModule, MatIconModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgbDropdownModule, NgbTooltipModule, NgbNavModule, MatIconModule],
   exports: [
     CommonModule,
     FormsModule,
@@ -39,7 +41,7 @@ import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
     RouterModule,
     NgbDropdownModule,
     NgbTooltipModule,
-    NgbTabsetModule,
+    NgbNavModule,
     MatIconModule,
     TranslatePipe,
     LegacyTranslatePipe,
@@ -49,6 +51,7 @@ import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
     StatusBadgeComponent,
     TypeBadgeComponent,
     FormDialogComponent,
+    LanguageSwitcherComponent,
     TreeSelectorComponent,
     PageHeaderComponent,
     EmptyStateComponent,

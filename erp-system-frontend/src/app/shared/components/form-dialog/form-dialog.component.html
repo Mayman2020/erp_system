@@ -1,6 +1,12 @@
 <div class="erp-dialog" *ngIf="visible" (click)="close.emit()">
   <div class="erp-dialog__backdrop"></div>
-  <section class="erp-dialog__surface" [ngClass]="'erp-dialog__surface--' + size" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+  <section
+    class="erp-dialog__surface"
+    [ngClass]="['erp-dialog__surface--' + size, surfaceClass]"
+    (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+  >
     <header class="erp-dialog__header">
       <div class="erp-dialog__title-wrap">
         <h2 class="erp-dialog__title">{{ title | translate }}</h2>

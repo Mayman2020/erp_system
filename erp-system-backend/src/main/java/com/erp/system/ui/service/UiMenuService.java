@@ -1,21 +1,20 @@
 package com.erp.system.ui.service;
 
+import com.erp.system.auth.service.AccessControlService;
 import com.erp.system.ui.domain.UiMenuItem;
+import com.erp.system.ui.dto.MenuActionPermissionDto;
 import com.erp.system.ui.dto.MenuNodeDto;
 import com.erp.system.ui.repository.UiMenuItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,14 +24,16 @@ import java.util.stream.Collectors;
 public class UiMenuService {
 
     private final UiMenuItemRepository uiMenuItemRepository;
+    private final AccessControlService accessControlService;
 
     @Transactional(readOnly = true)
     public List<MenuNodeDto> getMenuForUser(Authentication authentication) {
-        Set<String> userRoles = extractRoles(authentication);
         List<UiMenuItem> flat = uiMenuItemRepository.findAllByOrderByParentIdAscSortOrderAsc();
+        Map<String, MenuActionPermissionDto> permissionIndex = accessControlService.menuPermissions(authentication).stream()
+                .collect(Collectors.toMap(MenuActionPermissionDto::menuItemId, permission -> permission, (left, right) -> left));
         Set<String> visibleIds = new HashSet<>();
         for (UiMenuItem row : flat) {
-            if (canSee(row, userRoles)) {
+            if (canSee(row, permissionIndex)) {
                 visibleIds.add(row.getId());
             }
         }
@@ -80,31 +81,11 @@ public class UiMenuService {
                 .build();
     }
 
-    private static Set<String> extractRoles(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return Set.of();
-        }
-        return authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(a -> a.startsWith("ROLE_") ? a.substring(5) : a)
-                .collect(Collectors.toSet());
-    }
-
-    private static boolean canSee(UiMenuItem row, Set<String> userRoles) {
-        String csv = row.getRolesCsv();
-        if (csv == null || csv.isBlank()) {
+    private static boolean canSee(UiMenuItem row, Map<String, MenuActionPermissionDto> permissionIndex) {
+        if ("group".equalsIgnoreCase(row.getItemType())) {
             return true;
         }
-        List<String> required = Arrays.stream(csv.split(","))
-                .map(s -> s.trim().toUpperCase(Locale.ROOT))
-                .filter(s -> !s.isEmpty())
-                .toList();
-        if (required.isEmpty()) {
-            return true;
-        }
-        Set<String> upperUser = userRoles.stream()
-                .map(r -> r.toUpperCase(Locale.ROOT))
-                .collect(Collectors.toSet());
-        return required.stream().anyMatch(upperUser::contains);
+        MenuActionPermissionDto permission = permissionIndex.get(row.getId());
+        return permission != null && permission.canView();
     }
 }

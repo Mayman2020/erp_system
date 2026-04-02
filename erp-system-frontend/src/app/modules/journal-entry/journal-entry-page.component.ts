@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -9,7 +9,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 import { LookupService } from '../../core/services/lookup.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-journal-entry-page',
   templateUrl: './journal-entry-page.component.html',
   styleUrls: ['./journal-entry-page.component.scss']
@@ -43,14 +43,11 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly columns = [
-    { key: 'id', title: 'COMMON.ID', kind: 'text' as 'text' },
     { key: 'referenceNumber', title: 'JOURNAL.ENTRY_NUMBER', kind: 'text' as 'text' },
-    { key: 'entryDate', title: 'JOURNAL.DATE', kind: 'text' as 'text' },
     { key: 'description', title: 'JOURNAL.DESCRIPTION', kind: 'text' as 'text', align: 'start' as 'start' },
-    { key: 'totalDebit', title: 'JOURNAL.TOTAL_DEBIT', kind: 'text' as 'text', align: 'end' as 'end' },
-    { key: 'totalCredit', title: 'JOURNAL.TOTAL_CREDIT', kind: 'text' as 'text', align: 'end' as 'end' },
     { key: 'status', title: 'COMMON.STATUS', kind: 'status' as 'status', prefix: 'STATUS.' },
-    { key: 'createdBy', title: 'JOURNAL.CREATED_BY', kind: 'text' as 'text', align: 'start' as 'start' }
+    { key: 'totalDebit', title: 'JOURNAL.TOTAL_DEBIT', kind: 'text' as 'text', align: 'end' as 'end' },
+    { key: 'totalCredit', title: 'JOURNAL.TOTAL_CREDIT', kind: 'text' as 'text', align: 'end' as 'end' }
   ];
 
   readonly actions = [
@@ -74,7 +71,8 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     private lookupService: LookupService,
     private translationService: TranslationService,
     private authService: AuthService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -197,8 +195,11 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   }
 
   save(): void {
-    if (!this.isFormValid()) {
-      this.showError('JOURNAL.VALIDATION_ERRORS');
+    const validationKey = this.getJournalValidationMessageKey();
+    if (validationKey) {
+      this.markJournalFormTouched();
+      this.showError(validationKey);
+      this.cdr.detectChanges();
       return;
     }
     this.saving = true;
@@ -207,15 +208,21 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     const request$ =
       this.formMode === 'edit' && this.selectedEntry ? this.api.updateJournalEntry(this.selectedEntry.id, payload) : this.api.createJournalEntry(payload);
     request$
-      .pipe(finalize(() => (this.saving = false)))
+      .pipe(
+        finalize(() => {
+          this.saving = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: () => {
           this.showSuccess('JOURNAL.SAVE_SUCCESS');
           this.formVisible = false;
           this.loadEntries();
         },
-        error: () => {
-          this.showError('JOURNAL.SAVE_ERROR');
+        error: (err) => {
+          const msg = err?.error?.message;
+          this.showError(msg && msg !== 'COMMON.OK' ? msg : 'JOURNAL.SAVE_ERROR');
         }
       });
   }
@@ -263,9 +270,9 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
 
   private loadLookupsAndData(): void {
     forkJoin({
-      statuses: this.lookupService.getLookup('journal-entry-status'),
-      currencies: this.lookupService.getLookup('currency'),
-      entryTypes: this.lookupService.getLookup('entry-type'),
+      statuses: this.lookupService.getLookup('journal-entry-statuses'),
+      currencies: this.lookupService.getLookup('currencies'),
+      entryTypes: this.lookupService.getLookup('entry-types'),
       accounts: this.api.getAccountTree()
     }).subscribe({
       next: (data) => {
@@ -287,7 +294,12 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.api
       .getJournalEntries(filters)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: (rows) => {
           this.entries = rows;
@@ -328,10 +340,13 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   }
 
   private openById(id: number): void {
-    this.loading = true;
     this.api
       .getJournalEntry(id)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        finalize(() => {
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: (entry) => {
           this.selectedEntry = entry;
@@ -385,16 +400,36 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     this.form.enable();
   }
 
-  private isFormValid(): boolean {
-    if (this.form.invalid || this.lines.length < 2 || !this.isBalanced()) {
-      return false;
+  /** First blocking validation issue for user-facing messages (translation key). */
+  private getJournalValidationMessageKey(): string | null {
+    if (this.lines.length < 2) {
+      return 'JOURNAL.VALIDATION_MIN_LINES';
     }
-    return this.lines.controls.every((row) => {
+    for (const row of this.lines.controls) {
       const accountId = Number(row.get('accountId')?.value || 0);
       const debit = Number(row.get('debit')?.value || 0);
       const credit = Number(row.get('credit')?.value || 0);
       const hasOneSide = (debit > 0 && credit === 0) || (credit > 0 && debit === 0);
-      return accountId > 0 && hasOneSide;
+      if (accountId <= 0) {
+        return 'JOURNAL.VALIDATION_LINE_ACCOUNT';
+      }
+      if (!hasOneSide) {
+        return 'JOURNAL.VALIDATION_LINE_AMOUNT';
+      }
+    }
+    if (!this.isBalanced()) {
+      return 'JOURNAL.NOT_BALANCED';
+    }
+    if (this.form.invalid) {
+      return 'JOURNAL.VALIDATION_HEADER';
+    }
+    return null;
+  }
+
+  private markJournalFormTouched(): void {
+    this.form.markAllAsTouched();
+    this.lines.controls.forEach((line) => {
+      Object.values((line as FormGroup).controls).forEach((c) => c.markAsTouched());
     });
   }
 
@@ -432,8 +467,9 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
           this.formVisible = false;
           this.loadEntries();
         },
-        error: () => {
-          this.showError('JOURNAL.POST_ERROR');
+        error: (err) => {
+          const msg = err?.error?.message;
+          this.showError(msg && msg !== 'COMMON.OK' ? msg : 'JOURNAL.POST_ERROR');
         }
       });
   }
@@ -455,8 +491,9 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
           this.showSuccess('JOURNAL.REVERSE_SUCCESS');
           this.loadEntries();
         },
-        error: () => {
-          this.showError('JOURNAL.REVERSE_ERROR');
+        error: (err) => {
+          const msg = err?.error?.message;
+          this.showError(msg && msg !== 'COMMON.OK' ? msg : 'JOURNAL.REVERSE_ERROR');
         }
       });
   }

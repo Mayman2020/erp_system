@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-ui-modal',
   templateUrl: './ui-modal.component.html',
   styleUrls: ['./ui-modal.component.scss'],

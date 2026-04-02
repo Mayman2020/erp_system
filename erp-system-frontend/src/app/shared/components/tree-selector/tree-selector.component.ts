@@ -1,17 +1,25 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-tree-selector',
   templateUrl: './tree-selector.component.html',
   styleUrls: ['./tree-selector.component.scss']
 })
-export class TreeSelectorComponent {
+export class TreeSelectorComponent implements OnChanges {
+  @Input() initiallyExpandedDepth = 1;
   @Input() nodes: any[] = [];
   @Input() selectedId: number | null = null;
   @Input() selectableLeafOnly = false;
   @Input() minSelectableLevel = 1;
   @Output() selected = new EventEmitter<any>();
   expanded = new Set<number>();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['nodes']) {
+      this.expanded = new Set<number>();
+      this.expandToDepth(this.nodes, 0);
+    }
+  }
 
   toggle(nodeId: number): void {
     if (this.expanded.has(nodeId)) {
@@ -49,5 +57,22 @@ export class TreeSelectorComponent {
       return;
     }
     this.selected.emit(node);
+  }
+
+  normalizeLevel(level: number): number {
+    return Math.max(0, Math.min(10, Number(level || 0)));
+  }
+
+  private expandToDepth(nodes: any[], depth: number): void {
+    if (depth >= this.initiallyExpandedDepth) {
+      return;
+    }
+
+    for (const node of nodes || []) {
+      if (node?.children?.length) {
+        this.expanded.add(node.id);
+        this.expandToDepth(node.children, depth + 1);
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-nav-search',
   templateUrl: './nav-search.component.html',
   styleUrls: ['./nav-search.component.scss']

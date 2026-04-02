@@ -2,7 +2,7 @@ import {Component, NgZone, OnInit, ViewEncapsulation} from '@angular/core';
 import {NextConfig} from '../../../../app-config';
 import {Location} from '@angular/common';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-configuration',
   templateUrl: './configuration.component.html',
   styleUrls: ['./configuration.component.scss'],

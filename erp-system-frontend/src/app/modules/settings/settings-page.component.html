@@ -3,11 +3,9 @@
 
   <div class="card">
     <div class="card-body">
-      <app-loading-state *ngIf="loading"></app-loading-state>
-      <div *ngIf="!loading && errorKey" class="alert alert-danger mb-3">{{ errorKey | translate }}</div>
-      <div *ngIf="!loading && successKey" class="alert alert-success mb-3">{{ successKey | translate }}</div>
+      <app-loading-state *ngIf="loading && accountingLoading"></app-loading-state>
 
-      <div *ngIf="!loading" class="profile-layout">
+      <div *ngIf="!loading || !accountingLoading" class="profile-layout">
         <div class="row">
           <div class="col-lg-4 mb-4">
             <div class="profile-card">
@@ -26,9 +24,216 @@
           </div>
 
           <div class="col-lg-8">
-            <ngb-tabset>
-              <ngb-tab [title]="'PROFILE.PERSONAL_INFO' | translate">
-                <ng-template ngbTabContent>
+            <ul ngbNav #settingsNav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs erp-settings-tabs">
+              <li [ngbNavItem]="'accounting'">
+                <button ngbNavLink>{{ 'SETTINGS.ACCOUNTING_TAB' | translate }}</button>
+                <ng-template ngbNavContent>
+                  <div class="mt-4">
+                    <app-loading-state *ngIf="accountingLoading"></app-loading-state>
+                    <div *ngIf="!accountingLoading && accountingErrorKey" class="alert alert-danger mb-3">{{ accountingErrorKey | translate }}</div>
+                    <div *ngIf="!accountingLoading && accountingSuccessKey" class="alert alert-success mb-3">{{ accountingSuccessKey | translate }}</div>
+
+                    <div *ngIf="!accountingLoading" class="erp-settings">
+                      <div class="row">
+                        <div class="col-md-6 col-xl-3 mb-3">
+                          <div class="erp-settings-card">
+                            <div class="erp-settings-card__label">{{ 'SETTINGS.ACCOUNTING_METHOD' | translate }}</div>
+                            <div class="erp-settings-card__value">{{ ('ACCOUNTING_METHOD_OPTION.' + (accountingForm.value.accountingMethod || '-')) | translate }}</div>
+                          </div>
+                        </div>
+                        <div class="col-md-6 col-xl-3 mb-3">
+                          <div class="erp-settings-card">
+                            <div class="erp-settings-card__label">{{ 'SETTINGS.BASE_CURRENCY' | translate }}</div>
+                            <div class="erp-settings-card__value">{{ accountingForm.value.baseCurrency || '-' }}</div>
+                          </div>
+                        </div>
+                        <div class="col-md-6 col-xl-3 mb-3">
+                          <div class="erp-settings-card">
+                            <div class="erp-settings-card__label">{{ 'SETTINGS.ALLOWED_CURRENCIES' | translate }}</div>
+                            <div class="erp-settings-card__value">{{ allowedCurrenciesLabel() }}</div>
+                          </div>
+                        </div>
+                        <div class="col-md-6 col-xl-3 mb-3">
+                          <div class="erp-settings-card">
+                            <div class="erp-settings-card__label">{{ 'SETTINGS.FISCAL_YEARS_COUNT' | translate }}</div>
+                            <div class="erp-settings-card__value">{{ fiscalYears.length }}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="card mb-4">
+                        <div class="card-body">
+                          <h6 class="mb-3">{{ 'SETTINGS.ACCOUNTING_FORM_TITLE' | translate }}</h6>
+                          <form [formGroup]="accountingForm" class="row">
+                            <div class="col-md-6 mb-3">
+                              <app-form-field
+                                [control]="accountingForm.controls.accountingMethod"
+                                labelKey="SETTINGS.ACCOUNTING_METHOD"
+                                icon="calculate"
+                                type="select"
+                                [options]="accountingMethodOptions"
+                                optionValueField="code"
+                                optionLabelField="code"
+                                optionLabelPrefix="ACCOUNTING_METHOD_OPTION."
+                              ></app-form-field>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                              <app-form-field
+                                [control]="accountingForm.controls.baseCurrency"
+                                labelKey="SETTINGS.BASE_CURRENCY"
+                                icon="paid"
+                                type="select"
+                                [options]="currencyOptions"
+                                optionValueField="code"
+                                optionLabelField="code"
+                              ></app-form-field>
+                            </div>
+                            <div class="col-12 mb-3">
+                              <label class="erp-settings__section-label">{{ 'SETTINGS.SELECT_ALLOWED_CURRENCIES' | translate }}</label>
+                              <div class="erp-settings__currency-grid">
+                                <label class="erp-settings__currency-item" *ngFor="let currency of currencyOptions">
+                                  <input
+                                    type="checkbox"
+                                    [checked]="isCurrencySelected(currency.code)"
+                                    (change)="toggleAllowedCurrency(currency.code, $event.target.checked)"
+                                  />
+                                  <span>{{ currency.code }}</span>
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-12 d-flex justify-content-end">
+                              <button type="button" class="erp-button erp-button--primary" [disabled]="accountingSaving" (click)="saveAccountingSettings()">
+                                <mat-icon aria-hidden="true">save</mat-icon>
+                                <span>{{ 'COMMON.SAVE' | translate }}</span>
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-6 mb-4">
+                          <div class="card h-100">
+                            <div class="card-body">
+                              <h6 class="mb-3">{{ 'SETTINGS.FISCAL_YEAR_FORM_TITLE' | translate }}</h6>
+                              <form [formGroup]="fiscalYearForm" class="row">
+                                <div class="col-md-4 mb-3">
+                                  <app-form-field [control]="fiscalYearForm.controls.year" labelKey="SETTINGS.YEAR" icon="calendar_today" type="number"></app-form-field>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                  <app-form-field [control]="fiscalYearForm.controls.startDate" labelKey="SETTINGS.START_DATE" icon="event" type="date"></app-form-field>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                  <app-form-field [control]="fiscalYearForm.controls.endDate" labelKey="SETTINGS.END_DATE" icon="event_available" type="date"></app-form-field>
+                                </div>
+                                <div class="col-12 d-flex justify-content-end">
+                                  <button type="button" class="erp-button erp-button--ghost" [disabled]="fiscalYearSaving" (click)="createFiscalYear()">
+                                    <mat-icon aria-hidden="true">add_circle</mat-icon>
+                                    <span>{{ 'SETTINGS.CREATE_FISCAL_YEAR' | translate }}</span>
+                                  </button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-lg-6 mb-4">
+                          <div class="card h-100">
+                            <div class="card-body">
+                              <h6 class="mb-3">{{ 'SETTINGS.FISCAL_PERIOD_FORM_TITLE' | translate }}</h6>
+                              <form [formGroup]="fiscalPeriodForm" class="row">
+                                <div class="col-12 mb-3">
+                                  <app-form-field
+                                    [control]="fiscalPeriodForm.controls.fiscalYearId"
+                                    labelKey="SETTINGS.SELECT_FISCAL_YEAR"
+                                    icon="account_balance"
+                                    type="select"
+                                    [options]="fiscalYears"
+                                    optionValueField="id"
+                                    optionLabelField="year"
+                                  ></app-form-field>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                  <app-form-field [control]="fiscalPeriodForm.controls.periodName" labelKey="SETTINGS.PERIOD_NAME" icon="schedule"></app-form-field>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                  <app-form-field [control]="fiscalPeriodForm.controls.startDate" labelKey="SETTINGS.START_DATE" icon="event" type="date"></app-form-field>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                  <app-form-field [control]="fiscalPeriodForm.controls.endDate" labelKey="SETTINGS.END_DATE" icon="event_available" type="date"></app-form-field>
+                                </div>
+                                <div class="col-12 d-flex justify-content-end">
+                                  <button type="button" class="erp-button erp-button--ghost" [disabled]="fiscalPeriodSaving" (click)="createFiscalPeriod()">
+                                    <mat-icon aria-hidden="true">playlist_add</mat-icon>
+                                    <span>{{ 'SETTINGS.CREATE_FISCAL_PERIOD' | translate }}</span>
+                                  </button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <h6 class="mb-0">{{ 'SETTINGS.FISCAL_CALENDAR' | translate }}</h6>
+                            <div class="text-muted">{{ 'SETTINGS.SEQUENCES_COUNT' | translate }}: {{ accountingSettings?.sequences?.length || 0 }}</div>
+                          </div>
+
+                          <div *ngIf="!fiscalYears.length" class="text-muted">{{ 'SETTINGS.NO_FISCAL_YEARS' | translate }}</div>
+
+                          <div class="erp-settings__year-list" *ngIf="fiscalYears.length">
+                            <div class="erp-settings__year-card" *ngFor="let year of fiscalYears">
+                              <div class="erp-settings__year-header">
+                                <div>
+                                  <h6 class="mb-1">{{ year.year }}</h6>
+                                  <div class="text-muted">{{ year.startDate }} - {{ year.endDate }}</div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                  <span class="erp-settings__status" [ngClass]="year.open ? 'is-open' : 'is-closed'">
+                                    {{ (year.open ? 'SETTINGS.OPEN' : 'SETTINGS.CLOSED') | translate }}
+                                  </span>
+                                  <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="toggleFiscalYear(year)">
+                                    {{ (year.open ? 'SETTINGS.CLOSE_ACTION' : 'SETTINGS.REOPEN') | translate }}
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div *ngIf="year.periods?.length; else emptyPeriods" class="erp-settings__period-list">
+                                <div class="erp-settings__period-item" *ngFor="let period of year.periods">
+                                  <div>
+                                    <strong>{{ period.periodName }}</strong>
+                                    <div class="text-muted">{{ period.startDate }} - {{ period.endDate }}</div>
+                                  </div>
+                                  <div class="d-flex align-items-center gap-2">
+                                    <span class="erp-settings__status" [ngClass]="period.open ? 'is-open' : 'is-closed'">
+                                      {{ (period.open ? 'SETTINGS.OPEN' : 'SETTINGS.CLOSED') | translate }}
+                                    </span>
+                                    <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="toggleFiscalPeriod(period)">
+                                      {{ (period.open ? 'SETTINGS.CLOSE_ACTION' : 'SETTINGS.REOPEN') | translate }}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <ng-template #emptyPeriods>
+                                <div class="text-muted">{{ 'SETTINGS.NO_PERIODS' | translate }}</div>
+                              </ng-template>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </li>
+
+              <li [ngbNavItem]="'profile'">
+                <button ngbNavLink>{{ 'PROFILE.PERSONAL_INFO' | translate }}</button>
+                <ng-template ngbNavContent>
+                  <div *ngIf="errorKey" class="alert alert-danger mb-3 mt-4">{{ errorKey | translate }}</div>
+                  <div *ngIf="successKey" class="alert alert-success mb-3 mt-4">{{ successKey | translate }}</div>
                   <form [formGroup]="form" class="row mt-4">
                     <div class="col-md-6 mb-3">
                       <app-form-field [control]="form.controls.fullName" labelKey="PROFILE.FULL_NAME" icon="badge"></app-form-field>
@@ -56,10 +261,11 @@
                     </div>
                   </form>
                 </ng-template>
-              </ngb-tab>
+              </li>
 
-              <ngb-tab [title]="'PROFILE.SECURITY' | translate">
-                <ng-template ngbTabContent>
+              <li [ngbNavItem]="'security'">
+                <button ngbNavLink>{{ 'PROFILE.SECURITY' | translate }}</button>
+                <ng-template ngbNavContent>
                   <div class="row mt-4">
                     <div class="col-md-6 mb-3">
                       <div class="card">
@@ -87,10 +293,11 @@
                     </div>
                   </div>
                 </ng-template>
-              </ngb-tab>
+              </li>
 
-              <ngb-tab [title]="'PROFILE.PREFERENCES' | translate">
-                <ng-template ngbTabContent>
+              <li [ngbNavItem]="'preferences'">
+                <button ngbNavLink>{{ 'PROFILE.PREFERENCES' | translate }}</button>
+                <ng-template ngbNavContent>
                   <div class="row mt-4">
                     <div class="col-md-6 mb-3">
                       <div class="card">
@@ -123,12 +330,12 @@
                     </div>
                   </div>
                 </ng-template>
-              </ngb-tab>
-            </ngb-tabset>
+              </li>
+            </ul>
+            <div [ngbNavOutlet]="settingsNav"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
-

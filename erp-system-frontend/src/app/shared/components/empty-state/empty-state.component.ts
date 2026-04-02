@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-empty-state',
   template: `
     <div class="erp-empty-state">

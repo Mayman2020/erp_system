@@ -1,35 +1,42 @@
 <ng-template #treeNode let-node let-level="level">
-  <li class="list-group-item tree-item" [class.selected]="selectedId === node.id">
-    <div class="d-flex align-items-center">
-      <button
-        type="button"
-        class="btn btn-link p-0 mr-1"
-        *ngIf="node.children?.length"
-        (click)="toggle(node.id)"
-        [style.margin-inline-start.px]="level * 16"
-      >
-        <mat-icon aria-hidden="true">{{ isExpanded(node.id) ? 'expand_more' : 'chevron_right' }}</mat-icon>
-      </button>
-      <span *ngIf="!node.children?.length" [style.margin-inline-start.px]="level * 16 + 18"></span>
-      <button
-        type="button"
-        class="btn btn-link p-0 text-left"
-        [class.tree-select-disabled]="!isSelectable(node)"
-        (click)="selectNode(node)"
-      >
-        <mat-icon class="mr-1" aria-hidden="true">{{ icon(node.accountType) }}</mat-icon>
-        {{ node.code }} - {{ node.name || node.accountName }}
-      </button>
+  <li class="erp-tree__item" [class.is-selected]="selectedId === node.id" [class.is-disabled]="!isSelectable(node)">
+    <div class="erp-tree__row" [ngClass]="'erp-tree__row--level-' + normalizeLevel(level)">
+      <div class="erp-tree__content">
+        <button
+          type="button"
+          class="erp-tree__toggle"
+          *ngIf="node.children?.length"
+          (click)="toggle(node.id)"
+          [attr.aria-label]="isExpanded(node.id) ? 'Collapse' : 'Expand'"
+        >
+          <mat-icon aria-hidden="true">{{ isExpanded(node.id) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+        </button>
+
+        <span class="erp-tree__toggle erp-tree__toggle--placeholder" *ngIf="!node.children?.length" aria-hidden="true"></span>
+
+        <button type="button" class="erp-tree__label" [disabled]="!isSelectable(node)" (click)="selectNode(node)">
+          <span class="erp-tree__icon">
+            <mat-icon aria-hidden="true">{{ icon(node.accountType) }}</mat-icon>
+          </span>
+          <span class="erp-tree__text">
+            <strong>{{ node.code }}</strong>
+            <span>{{ node.name || node.accountName }}</span>
+          </span>
+        </button>
+      </div>
+
+      <span class="erp-tree__meta" *ngIf="node.accountType">{{ ('ACCOUNT_TYPE.' + node.accountType) | translate }}</span>
     </div>
+
+    <ul class="erp-tree__children" *ngIf="node.children?.length && isExpanded(node.id)">
+      <ng-container *ngFor="let child of node.children">
+        <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: child, level: level + 1 }"></ng-container>
+      </ng-container>
+    </ul>
   </li>
-  <ng-container *ngIf="node.children?.length && isExpanded(node.id)">
-    <ng-container *ngFor="let child of node.children">
-      <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: child, level: level + 1 }"></ng-container>
-    </ng-container>
-  </ng-container>
 </ng-template>
 
-<ul class="list-group">
+<ul class="erp-tree">
   <ng-container *ngFor="let node of nodes">
     <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: node, level: 0 }"></ng-container>
   </ng-container>

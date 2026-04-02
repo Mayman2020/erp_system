@@ -1,41 +1,109 @@
-.clickable {
-  cursor: pointer;
+:host {
+  display: block;
 }
 
-.card {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+.accounts-page {
+  display: grid;
+  gap: var(--erp-space-3);
 }
 
-.accounts-dialog-form .form-group {
-  margin-bottom: 0.75rem;
+.accounts-page__controls,
+.accounts-page__content {
+  display: grid;
+  gap: var(--erp-space-3);
+  padding: var(--erp-space-3);
 }
 
-.accounts-dialog-tree-wrap {
-  min-height: 220px;
+.accounts-page__filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--erp-space-2);
 }
 
-.accounts-dialog-tree {
-  max-height: 220px;
-  overflow: auto;
-  border: 1px solid #e6ebf3;
-  border-radius: 10px;
-  padding: 0.25rem;
-  background: #f9fbff;
+.accounts-page__filter {
+  display: grid;
+  gap: var(--erp-space-1);
+  margin: 0;
+}
+
+.accounts-page__filter-label,
+.accounts-dialog__field-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--erp-text);
+}
+
+.accounts-page__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--erp-space-2);
+}
+
+.accounts-page__section-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .accounts-tree-page-wrap {
-  min-height: 240px;
-  max-height: calc(100vh - 280px);
+  min-height: 320px;
+  padding: var(--erp-space-2);
   overflow: auto;
-  border: 1px solid #e6ebf3;
-  border-radius: 12px;
-  background: #f9fbff;
-  padding: 0.5rem;
 }
 
-@media (min-width: 992px) {
-  .accounts-dialog-form .col-md-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
+.accounts-dialog__form {
+  display: grid;
+  gap: var(--erp-space-3);
+}
+
+.accounts-dialog__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--erp-space-3) var(--erp-space-2);
+}
+
+.accounts-dialog__parent-field {
+  display: grid;
+  gap: var(--erp-space-1);
+  margin: 0;
+}
+
+.accounts-dialog__parent-field--full {
+  grid-column: 1 / -1;
+}
+
+.accounts-dialog__toggle {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--erp-space-2);
+  padding: 0 var(--erp-space-2);
+  margin: 0;
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius-button);
+  background: var(--erp-bg-muted);
+  color: var(--erp-text);
+  font-weight: 600;
+}
+
+.accounts-dialog__toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--erp-primary);
+}
+
+@media (max-width: 767px) {
+  .accounts-page__controls,
+  .accounts-page__content {
+    padding: var(--erp-space-2);
+  }
+
+  .accounts-dialog__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accounts-dialog__parent-field--full {
+    grid-column: auto;
   }
 }

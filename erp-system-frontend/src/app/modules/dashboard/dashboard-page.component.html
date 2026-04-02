@@ -2,136 +2,257 @@
   <app-page-header titleKey="DASHBOARD.TITLE"></app-page-header>
 
 <div class="row dashboard-grid" *ngIf="!loading && !errorKey && summary; else dashboardState">
+
+  <!-- KPI Cards Row -->
   <div class="col-xl-3 col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="text-muted mb-0">{{ 'DASHBOARD.TOTAL_REVENUE' | translate }}</h6>
-          <mat-icon class="text-success" aria-hidden="true">trending_up</mat-icon>
-        </div>
-        <h3>{{ formatAmount(summary.totalRevenue) }}</h3>
+    <div class="dash-kpi-card dash-kpi-card--revenue">
+      <div class="dash-kpi-card__icon">
+        <mat-icon aria-hidden="true">trending_up</mat-icon>
+      </div>
+      <div class="dash-kpi-card__body">
+        <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_REVENUE' | translate }}</span>
+        <span class="dash-kpi-card__value">{{ formatAmount(summary.totalRevenue) }}</span>
       </div>
     </div>
   </div>
   <div class="col-xl-3 col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="text-muted mb-0">{{ 'DASHBOARD.TOTAL_EXPENSES' | translate }}</h6>
-          <mat-icon class="text-danger" aria-hidden="true">trending_down</mat-icon>
-        </div>
-        <h3>{{ formatAmount(summary.totalExpenses) }}</h3>
+    <div class="dash-kpi-card dash-kpi-card--expense">
+      <div class="dash-kpi-card__icon">
+        <mat-icon aria-hidden="true">trending_down</mat-icon>
+      </div>
+      <div class="dash-kpi-card__body">
+        <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_EXPENSES' | translate }}</span>
+        <span class="dash-kpi-card__value">{{ formatAmount(summary.totalExpenses) }}</span>
       </div>
     </div>
   </div>
   <div class="col-xl-3 col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="text-muted mb-0">{{ 'DASHBOARD.NET_PROFIT' | translate }}</h6>
-          <mat-icon [ngClass]="metricTrendClass(summary.netProfit)" aria-hidden="true">monitoring</mat-icon>
-        </div>
-        <h3>{{ formatAmount(summary.netProfit) }}</h3>
+    <div class="dash-kpi-card dash-kpi-card--profit">
+      <div class="dash-kpi-card__icon">
+        <mat-icon aria-hidden="true">monitoring</mat-icon>
+      </div>
+      <div class="dash-kpi-card__body">
+        <span class="dash-kpi-card__label">{{ 'DASHBOARD.NET_PROFIT' | translate }}</span>
+        <span class="dash-kpi-card__value" [class.text-danger]="summary.netProfit < 0">{{ formatAmount(summary.netProfit) }}</span>
       </div>
     </div>
   </div>
   <div class="col-xl-3 col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="text-muted mb-0">{{ 'DASHBOARD.ASSETS_LIABILITIES_EQUITY' | translate }}</h6>
-          <mat-icon class="text-primary" aria-hidden="true">stacked_bar_chart</mat-icon>
-        </div>
-        <div>{{ formatAmount(summary.totalAssets) }} / {{ formatAmount(summary.totalLiabilities) }} / {{ formatAmount(summary.totalEquity) }}</div>
+    <div class="dash-kpi-card dash-kpi-card--balance">
+      <div class="dash-kpi-card__icon">
+        <mat-icon aria-hidden="true">account_balance</mat-icon>
+      </div>
+      <div class="dash-kpi-card__body">
+        <span class="dash-kpi-card__label">{{ 'DASHBOARD.MONTH_DEBIT' | translate }} / {{ 'DASHBOARD.MONTH_CREDIT' | translate }}</span>
+        <span class="dash-kpi-card__value">{{ formatAmount(summary.monthDebitTotal) }} / {{ formatAmount(summary.monthCreditTotal) }}</span>
       </div>
     </div>
   </div>
 
+  <!-- Charts Row 1: Revenue vs Expenses + Cash Flow -->
   <div class="col-xl-6">
-    <div class="card">
-      <div class="card-header"><h5>{{ 'DASHBOARD.CHART_REVENUE_EXPENSES' | translate }}</h5></div>
-      <div class="card-body">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.CHART_REVENUE_EXPENSES' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body">
         <app-apex-chart [chartID]="revenueExpenseChartId" [chartConfig]="revenueExpenseChartConfig"></app-apex-chart>
       </div>
     </div>
   </div>
-
   <div class="col-xl-6">
-    <div class="card">
-      <div class="card-header"><h5>{{ 'DASHBOARD.CHART_CASH_FLOW' | translate }}</h5></div>
-      <div class="card-body">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.CHART_CASH_FLOW' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body">
         <app-apex-chart [chartID]="cashFlowChartId" [chartConfig]="cashFlowChartConfig"></app-apex-chart>
       </div>
     </div>
   </div>
 
+  <!-- Charts Row 2: Net Profit Trend + Balance Sheet Donut -->
+  <div class="col-xl-8">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.CHART_NET_PROFIT_TREND' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body">
+        <app-apex-chart [chartID]="netProfitTrendChartId" [chartConfig]="netProfitTrendChartConfig"></app-apex-chart>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.CHART_BALANCE_SHEET' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body">
+        <app-apex-chart [chartID]="balanceSheetChartId" [chartConfig]="balanceSheetChartConfig"></app-apex-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 3: Weekly Activity + Receivables/Payables Radial -->
+  <div class="col-xl-8">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.CHART_WEEKLY_ACTIVITY' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body">
+        <app-apex-chart [chartID]="weeklyActivityChartId" [chartConfig]="weeklyActivityChartConfig"></app-apex-chart>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.CHART_RECEIVABLES_PAYABLES' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body">
+        <app-apex-chart [chartID]="receivablesPayablesChartId" [chartConfig]="receivablesPayablesChartConfig"></app-apex-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Performance (if data exists) -->
+  <div class="col-xl-6" *ngIf="hasBudgetData">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.CHART_BUDGET_PERFORMANCE' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body">
+        <app-apex-chart [chartID]="budgetChartId" [chartConfig]="budgetChartConfig"></app-apex-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receivables / Payables Summary Card -->
+  <div [class]="hasBudgetData ? 'col-xl-6' : 'col-xl-4'">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.RECEIVABLES_PAYABLES' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body dash-summary-list">
+        <div class="dash-summary-row">
+          <div class="dash-summary-row__icon dash-summary-row__icon--success"><mat-icon aria-hidden="true">arrow_downward</mat-icon></div>
+          <span class="dash-summary-row__label">{{ 'DASHBOARD.RECEIVABLES' | translate }}</span>
+          <strong class="dash-summary-row__value text-success">{{ formatAmount(summary.receivablesSummary) }}</strong>
+        </div>
+        <div class="dash-summary-row">
+          <div class="dash-summary-row__icon dash-summary-row__icon--danger"><mat-icon aria-hidden="true">arrow_upward</mat-icon></div>
+          <span class="dash-summary-row__label">{{ 'DASHBOARD.PAYABLES_OUTSTANDING' | translate }}</span>
+          <strong class="dash-summary-row__value text-danger">{{ formatAmount(summary.payablesOutstanding) }}</strong>
+        </div>
+        <div class="dash-summary-row">
+          <div class="dash-summary-row__icon dash-summary-row__icon--info"><mat-icon aria-hidden="true">check_circle</mat-icon></div>
+          <span class="dash-summary-row__label">{{ 'DASHBOARD.PAYABLES_PAID' | translate }}</span>
+          <strong class="dash-summary-row__value text-primary">{{ formatAmount(summary.payablesPaid) }}</strong>
+        </div>
+        <div class="dash-summary-row">
+          <div class="dash-summary-row__icon dash-summary-row__icon--warning"><mat-icon aria-hidden="true">stacked_bar_chart</mat-icon></div>
+          <span class="dash-summary-row__label">{{ 'DASHBOARD.ASSETS_LIABILITIES_EQUITY' | translate }}</span>
+          <strong class="dash-summary-row__value">{{ formatAmount(summary.totalAssets) }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assets / Liabilities / Equity Mini Cards -->
+  <div class="col-xl-4" *ngIf="!hasBudgetData">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.ASSETS_LIABILITIES_EQUITY' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body dash-summary-list">
+        <div class="dash-summary-row">
+          <div class="dash-summary-row__icon dash-summary-row__icon--info"><mat-icon aria-hidden="true">account_balance_wallet</mat-icon></div>
+          <span class="dash-summary-row__label">{{ 'DASHBOARD.ASSETS' | translate }}</span>
+          <strong class="dash-summary-row__value">{{ formatAmount(summary.totalAssets) }}</strong>
+        </div>
+        <div class="dash-summary-row">
+          <div class="dash-summary-row__icon dash-summary-row__icon--warning"><mat-icon aria-hidden="true">credit_card</mat-icon></div>
+          <span class="dash-summary-row__label">{{ 'DASHBOARD.LIABILITIES' | translate }}</span>
+          <strong class="dash-summary-row__value">{{ formatAmount(summary.totalLiabilities) }}</strong>
+        </div>
+        <div class="dash-summary-row">
+          <div class="dash-summary-row__icon dash-summary-row__icon--purple"><mat-icon aria-hidden="true">savings</mat-icon></div>
+          <span class="dash-summary-row__label">{{ 'DASHBOARD.EQUITY' | translate }}</span>
+          <strong class="dash-summary-row__value">{{ formatAmount(summary.totalEquity) }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables Row: Monthly Summary + Latest Journals -->
   <div class="col-xl-6">
-    <div class="card">
-      <div class="card-header"><h5>{{ 'DASHBOARD.MONTHLY_FINANCIAL_SUMMARY' | translate }}</h5></div>
-      <div class="card-body" *ngIf="monthlySummaries?.length; else monthlyEmpty">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.MONTHLY_FINANCIAL_SUMMARY' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body" *ngIf="monthlySummaries?.length; else monthlyEmpty">
         <app-data-table
           [columns]="monthlySummaryColumns"
           [data]="toMonthlySummaryRows()"
-          [pageSize]="4"
+          [pageSize]="5"
           [compact]="true"
         ></app-data-table>
       </div>
-      <ng-template #monthlyEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+      <ng-template #monthlyEmpty><div class="dash-chart-card__body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
     </div>
   </div>
 
   <div class="col-xl-6">
-    <div class="card">
-      <div class="card-header"><h5>{{ 'DASHBOARD.LATEST_JOURNALS' | translate }}</h5></div>
-      <div class="card-body" *ngIf="summary.recentJournals?.length; else journalsEmpty">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.LATEST_JOURNALS' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body" *ngIf="summary.recentJournals?.length; else journalsEmpty">
         <app-data-table [columns]="documentColumns" [data]="toDocumentRows(summary.recentJournals)" [compact]="true"></app-data-table>
       </div>
-      <ng-template #journalsEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+      <ng-template #journalsEmpty><div class="dash-chart-card__body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
     </div>
   </div>
 
+  <!-- Tables Row: Payments + Receipts -->
   <div class="col-xl-6">
-    <div class="card">
-      <div class="card-header"><h5>{{ 'DASHBOARD.LATEST_PAYMENTS' | translate }}</h5></div>
-      <div class="card-body" *ngIf="summary.recentPayments?.length; else paymentsEmpty">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.LATEST_PAYMENTS' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body" *ngIf="summary.recentPayments?.length; else paymentsEmpty">
         <app-data-table [columns]="documentColumns" [data]="toDocumentRows(summary.recentPayments)" [compact]="true"></app-data-table>
       </div>
-      <ng-template #paymentsEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+      <ng-template #paymentsEmpty><div class="dash-chart-card__body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
     </div>
   </div>
 
   <div class="col-xl-6">
-    <div class="card">
-      <div class="card-header"><h5>{{ 'DASHBOARD.LATEST_RECEIPTS' | translate }}</h5></div>
-      <div class="card-body" *ngIf="summary.recentReceipts?.length; else receiptsEmpty">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.LATEST_RECEIPTS' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body" *ngIf="summary.recentReceipts?.length; else receiptsEmpty">
         <app-data-table [columns]="documentColumns" [data]="toDocumentRows(summary.recentReceipts)" [compact]="true"></app-data-table>
       </div>
-      <ng-template #receiptsEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+      <ng-template #receiptsEmpty><div class="dash-chart-card__body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
     </div>
   </div>
 
-  <div class="col-xl-6">
-    <div class="card">
-      <div class="card-header"><h5>{{ 'DASHBOARD.RECEIVABLES_PAYABLES' | translate }}</h5></div>
-      <div class="card-body">
-        <div class="d-flex justify-content-between mb-2"><span>{{ 'DASHBOARD.RECEIVABLES' | translate }}</span><strong>{{ formatAmount(summary.receivablesSummary) }}</strong></div>
-        <div class="d-flex justify-content-between mb-2"><span>{{ 'DASHBOARD.PAYABLES_OUTSTANDING' | translate }}</span><strong>{{ formatAmount(summary.payablesOutstanding) }}</strong></div>
-        <div class="d-flex justify-content-between"><span>{{ 'DASHBOARD.PAYABLES_PAID' | translate }}</span><strong>{{ formatAmount(summary.payablesPaid) }}</strong></div>
-      </div>
-    </div>
-  </div>
-
+  <!-- Bank Balances Table -->
   <div class="col-12">
-    <div class="card">
-      <div class="card-header"><h5>{{ 'DASHBOARD.BANK_BALANCES' | translate }}</h5></div>
-      <div class="card-body" *ngIf="summary.bankBalances?.length; else banksEmpty">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card__header">
+        <h5>{{ 'DASHBOARD.BANK_BALANCES' | translate }}</h5>
+      </div>
+      <div class="dash-chart-card__body" *ngIf="summary.bankBalances?.length; else banksEmpty">
         <app-data-table
           [columns]="bankBalanceColumns"
           [data]="toBankBalanceRows()"
           [pageSize]="5"
         ></app-data-table>
       </div>
-      <ng-template #banksEmpty><div class="card-body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
+      <ng-template #banksEmpty><div class="dash-chart-card__body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
     </div>
   </div>
 </div>
@@ -144,15 +265,10 @@
   <div class="card" *ngIf="errorKey">
     <div class="card-body text-center text-danger" *ngIf="errorKey">
       {{ errorKey | translate }}
-      <button
-        class="erp-icon-button"
-        type="button"
-        (click)="fetchDashboard()"
-      >
+      <button class="erp-icon-button" type="button" (click)="fetchDashboard()">
         <mat-icon aria-hidden="true">refresh</mat-icon>
       </button>
     </div>
   </div>
 </ng-template>
 </section>
-

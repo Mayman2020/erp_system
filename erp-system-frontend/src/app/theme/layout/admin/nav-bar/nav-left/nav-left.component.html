@@ -1,28 +1,3 @@
-<ul class="navbar-nav" [ngClass]="flatConfig.rtlLayout ? 'ml-auto' : 'mr-auto'">
-  <li class="nav-item d-flex align-items-center">
-    <div class="erp-lang-switcher" [ngClass]="flatConfig.rtlLayout ? 'ml-2' : 'mr-2'" ngbDropdown placement="bottom-left">
-      <button
-        type="button"
-        class="erp-lang-flag-btn erp-lang-flag-btn--dropdown"
-        ngbDropdownToggle
-        [attr.aria-label]="'PROFILE.LANGUAGE' | translate"
-        [attr.title]="'PROFILE.LANGUAGE' | translate"
-      >
-        <img [src]="currentLanguageOption().flagSrc" [attr.alt]="currentLanguageOption().labelKey | translate" class="erp-lang-flag-btn__flag" />
-        <mat-icon aria-hidden="true">expand_more</mat-icon>
-      </button>
-      <div class="dropdown-menu dropdown-menu-right erp-lang-menu" ngbDropdownMenu>
-        <button
-          type="button"
-          class="dropdown-item erp-lang-menu__item"
-          *ngFor="let language of languages"
-          [class.is-active]="isActiveLanguage(language.code)"
-          (click)="switchLanguage(language.code)"
-        >
-          <img [src]="language.flagSrc" [attr.alt]="language.labelKey | translate" class="erp-lang-menu__flag" />
-          <span>{{ language.labelKey | translate }}</span>
-        </button>
-      </div>
-    </div>
-  </li>
-</ul>
+<div class="erp-header-actions" [ngClass]="flatConfig.rtlLayout ? 'ml-auto' : 'mr-auto'">
+  <app-language-switcher [compact]="true" placement="bottom-left" align="start"></app-language-switcher>
+</div>

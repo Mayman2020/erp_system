@@ -35,7 +35,22 @@ const routes: Routes = [
       },
       {
         path: 'journal-entry',
+        redirectTo: 'journal-entries',
+        pathMatch: 'full'
+      },
+      {
+        path: 'journal-entries',
         loadChildren: () => import('./modules/journal-entry/journal-entry.module').then(module => module.JournalEntryModule)
+      },
+      {
+        path: 'payment-vouchers',
+        redirectTo: 'vouchers/payment',
+        pathMatch: 'full'
+      },
+      {
+        path: 'receipt-vouchers',
+        redirectTo: 'vouchers/receipt',
+        pathMatch: 'full'
       },
       {
         path: 'vouchers',
@@ -67,6 +82,11 @@ const routes: Routes = [
       },
       {
         path: 'banks',
+        redirectTo: 'bank-accounts',
+        pathMatch: 'full'
+      },
+      {
+        path: 'bank-accounts',
         loadChildren: () => import('./modules/banks/banks.module').then(module => module.BanksModule)
       },
       {

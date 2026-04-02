@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -26,4 +27,6 @@ public class ReconciliationLineDisplayDto {
     private Long journalEntryLineId;
     private Long matchedLineId;
     private BigDecimal matchedAmount;
+    private BigDecimal remainingAmount;
+    private List<ReconciliationMatchPairDisplayDto> matchPairs;
 }

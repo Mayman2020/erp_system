@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-loading-state',
   template: `
     <div class="erp-loading-state" [class.erp-loading-state--compact]="compact">

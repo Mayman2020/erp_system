@@ -28,8 +28,8 @@ File: style.css
 @import "themes/plugin/perfect-scrollbar";
 
 // main framework
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
 @import "settings/custom-variables";
 @import "settings/theme-variables";
 
@@ -37,7 +37,7 @@ File: style.css
 @import "ng-module/ng-module";
 
 // bootstrap
-@import "~bootstrap/scss/bootstrap";
+@import "bootstrap/scss/bootstrap";
 
 
 // icon

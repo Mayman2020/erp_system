@@ -3,7 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-advanced-search-bar',
   templateUrl: './advanced-search-bar.component.html'
 })

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BankAccountDto } from '../../core/models/accounting.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-banks-page',
   templateUrl: './banks-page.component.html'
 })

@@ -35,10 +35,10 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
            select distinct je
            from JournalEntry je
            left join je.lines line
-           where (:status is null or je.status = :status)
-             and (:fromDate is null or je.entryDate >= :fromDate)
-             and (:toDate is null or je.entryDate <= :toDate)
-             and (:accountId is null or line.account.id = :accountId)
+           where je.status = coalesce(:status, je.status)
+             and je.entryDate >= coalesce(:fromDate, je.entryDate)
+             and je.entryDate <= coalesce(:toDate, je.entryDate)
+             and line.account.id = coalesce(:accountId, line.account.id)
            order by je.entryDate desc, je.id desc
            """)
     List<JournalEntry> searchJournalEntries(@Param("status") JournalEntryStatus status,

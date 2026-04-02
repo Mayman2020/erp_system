@@ -7,6 +7,7 @@ import com.erp.system.auth.dto.UpdateProfileRequestDto;
 import com.erp.system.auth.dto.UserProfileDto;
 import com.erp.system.auth.repository.UserProfileRepository;
 import com.erp.system.auth.repository.UserRepository;
+import com.erp.system.auth.service.AccessControlService;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.security.JwtPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
+    private final AccessControlService accessControlService;
 
     @Transactional(readOnly = true)
     public AuthUserDto getMyProfile() {
@@ -69,6 +71,7 @@ public class UserProfileService {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .role(user.getRole().name())
+                .roles(accessControlService.authorityCodesFor(user))
                 .active(user.isActive())
                 .createdAt(user.getCreatedAt())
                 .profile(profile == null ? null : UserProfileDto.builder()

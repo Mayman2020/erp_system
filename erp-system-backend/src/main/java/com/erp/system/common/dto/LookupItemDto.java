@@ -10,6 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LookupItemDto {
+    private Long id;
+    private String typeCode;
     private String code;
+    private String nameEn;
+    private String nameAr;
+    private Integer sortOrder;
+    private Boolean active;
     private String icon;
 }

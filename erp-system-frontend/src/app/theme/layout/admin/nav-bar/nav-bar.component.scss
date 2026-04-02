@@ -1,3 +1,33 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.erp-header-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--erp-space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.erp-header-shell__brand,
+.erp-header-shell__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--erp-space-3);
+}
+
+.erp-header-shell__brand {
+  min-width: 0;
+}
+
+.erp-header-shell__actions {
+  justify-content: flex-end;
+  margin-inline-start: auto;
+}
+
 .erp-brand-logo-full {
   display: block;
   max-height: 30px;
@@ -8,4 +38,15 @@
   display: block;
   max-height: 28px;
   width: auto;
+}
+
+@media (max-width: 767px) {
+  .erp-header-shell {
+    gap: var(--erp-space-2);
+  }
+
+  .erp-header-shell__brand,
+  .erp-header-shell__actions {
+    gap: var(--erp-space-2);
+  }
 }

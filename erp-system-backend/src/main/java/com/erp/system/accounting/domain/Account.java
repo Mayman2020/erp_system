@@ -29,6 +29,9 @@ public class Account extends BaseEntity {
     @Column(name = "code", nullable = false, length = 30, unique = true)
     private String code;
 
+    @Column(name = "name", nullable = false, length = 150)
+    private String legacyName;
+
     @Column(name = "name_en", nullable = false, length = 150)
     private String nameEn;
 
@@ -69,18 +72,44 @@ public class Account extends BaseEntity {
     @Column(name = "opening_balance_side", length = 10)
     private BalanceSide openingBalanceSide;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     public enum BalanceSide {
         DEBIT, CREDIT
     }
 
+    @PostLoad
     @PrePersist
     @PreUpdate
-    private void updateFullPath() {
+    private void synchronizeDerivedFields() {
+        this.nameEn = firstNonBlank(nameEn, legacyName);
+        this.legacyName = this.nameEn;
+        this.nameAr = normalize(nameAr);
+
         if (parent != null) {
-            this.fullPath = parent.getFullPath() + "/" + this.nameEn;
+            String parentPath = parent.getFullPath();
+            this.fullPath = (parentPath == null || parentPath.isBlank() ? this.nameEn : parentPath + "/" + this.nameEn);
         } else {
             this.fullPath = this.nameEn;
         }
+    }
+
+    private String firstNonBlank(String primary, String fallback) {
+        String normalizedPrimary = normalize(primary);
+        if (normalizedPrimary != null) {
+            return normalizedPrimary;
+        }
+        return normalize(fallback);
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     public boolean isDebitBalance() {
@@ -89,5 +118,15 @@ public class Account extends BaseEntity {
 
     public boolean isCreditBalance() {
         return accountType == AccountingType.LIABILITY || accountType == AccountingType.EQUITY || accountType == AccountingType.INCOME;
+    }
+
+    public BalanceSide normalBalanceSide() {
+        return isDebitBalance() ? BalanceSide.DEBIT : BalanceSide.CREDIT;
+    }
+
+    public BigDecimal signedOpeningBalance() {
+        BigDecimal amount = openingBalance == null ? BigDecimal.ZERO : openingBalance;
+        BalanceSide side = openingBalanceSide == null ? normalBalanceSide() : openingBalanceSide;
+        return side == BalanceSide.DEBIT ? amount : amount.negate();
     }
 }

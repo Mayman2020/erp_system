@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { NavigationItem } from '../navigation';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Navigation, NavigationService } from '../navigation';
 import { NextConfig } from '../../../../../app-config';
 import { Location } from '@angular/common';
 import { Subject } from 'rxjs';
@@ -7,14 +7,14 @@ import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService, AuthUser } from '../../../../../core/auth/auth.service';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-nav-content',
   templateUrl: './nav-content.component.html',
   styleUrls: ['./nav-content.component.scss']
 })
 export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public flatConfig: any;
-  public navigation: any;
+  public navigation: Navigation[] = [];
   public prevDisabled: string;
   public nextDisabled: string;
   public contentWidth: number;
@@ -24,6 +24,9 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public displayName = '';
   public roleKey = 'PROFILE.TITLE';
   public avatarUrl = 'assets/images/user/avatar-1.jpg';
+  public loadingUser = true;
+  public menuLoading = false;
+  public profileMenuOpen = false;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -33,26 +36,29 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('navbarWrapper') navbarWrapper: ElementRef;
 
   constructor(
-    public nav: NavigationItem,
+    private navigationService: NavigationService,
     private zone: NgZone,
     private location: Location,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.flatConfig = NextConfig.config;
     this.windowWidth = window.innerWidth;
-
-    this.navigation = this.nav.get();
     this.prevDisabled = 'disabled';
     this.nextDisabled = '';
     this.scrollWidth = 0;
     this.contentWidth = 0;
-
   }
 
   ngOnInit() {
+    this.loadNavigation();
+    // Subscribe first, then trigger load so the first emission is always caught
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
+      this.applyUser(user);
+      this.cdr.detectChanges();
+    });
     this.authService.refreshCurrentUser();
-    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user) => this.applyUser(user));
     if (this.windowWidth < 992) {
       this.flatConfig['layout'] = 'vertical';
       setTimeout(() => {
@@ -63,10 +69,7 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    if (this.flatConfig['layout'] === 'horizontal') {
-      this.contentWidth = this.navbarContent.nativeElement.clientWidth;
-      this.wrapperWidth = this.navbarWrapper.nativeElement.clientWidth;
-    }
+    this.refreshHorizontalDimensions();
   }
 
   scrollPlus() {
@@ -165,7 +168,16 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  toggleProfileMenu(): void {
+    this.profileMenuOpen = !this.profileMenuOpen;
+  }
+
+  closeProfileMenu(): void {
+    this.profileMenuOpen = false;
+  }
+
   logout(): void {
+    this.profileMenuOpen = false;
     this.authService.logout();
     this.router.navigate(['/auth/signin']);
   }
@@ -175,6 +187,7 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
       this.displayName = '';
       this.roleKey = 'PROFILE.TITLE';
       this.avatarUrl = 'assets/images/user/avatar-1.jpg';
+      this.loadingUser = false;
       return;
     }
 
@@ -188,4 +201,24 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.avatarUrl = image || 'assets/images/user/avatar-1.jpg';
   }
 
+  private loadNavigation(): void {
+    this.menuLoading = true;
+    this.navigationService
+      .get()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((items) => {
+        this.navigation = items || [];
+        this.menuLoading = false;
+        setTimeout(() => this.refreshHorizontalDimensions());
+      });
+  }
+
+  private refreshHorizontalDimensions(): void {
+    if (this.flatConfig['layout'] !== 'horizontal' || !this.navbarContent || !this.navbarWrapper) {
+      return;
+    }
+
+    this.contentWidth = this.navbarContent.nativeElement.clientWidth;
+    this.wrapperWidth = this.navbarWrapper.nativeElement.clientWidth;
+  }
 }

@@ -30,6 +30,9 @@ spring:
     schemas: erp_system
     locations: classpath:db/migration
 
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
 server:
   port: 8091
   servlet:

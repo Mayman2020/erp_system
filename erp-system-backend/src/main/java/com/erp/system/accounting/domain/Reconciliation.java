@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -76,4 +77,8 @@ public class Reconciliation extends BaseEntity {
     @OneToMany(mappedBy = "reconciliation", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ReconciliationLine> lines = new ArrayList<>();
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 }

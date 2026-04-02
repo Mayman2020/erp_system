@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-animation-modal',
   templateUrl: './animation-modal.component.html',
   styleUrls: ['./animation-modal.component.scss'],

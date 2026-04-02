@@ -38,6 +38,7 @@ public class JournalEntryService {
     private final JournalEntryMapper journalEntryMapper;
     private final NumberingService numberingService;
     private final PostingPeriodService postingPeriodService;
+    private final AccountingAuditService auditService;
 
     @Transactional(readOnly = true)
     public List<JournalEntryDisplayDto> getJournalEntries() {
@@ -221,6 +222,7 @@ public class JournalEntryService {
         journalEntry.setPostedBy(postedBy);
 
         JournalEntry saved = journalEntryRepository.save(journalEntry);
+        auditService.log("JournalEntry", saved.getId(), "POST", postedBy, "Posted journal " + saved.getReferenceNumber());
         return toDisplay(saved);
     }
 
@@ -256,7 +258,7 @@ public class JournalEntryService {
             JournalEntryLine reversalLine = new JournalEntryLine();
             reversalLine.setJournalEntry(reversalEntry);
             reversalLine.setAccount(originalLine.getAccount());
-            reversalLine.setDescription("Reversal of " + originalLine.getDescription());
+            reversalLine.setDescription("Reversal of " + (originalLine.getDescription() != null ? originalLine.getDescription() : ""));
             reversalLine.setDebit(originalLine.getCredit()); // Swap debit and credit
             reversalLine.setCredit(originalLine.getDebit());
             reversalLine.setLineNumber(lineNumber++);
@@ -278,6 +280,7 @@ public class JournalEntryService {
 
         journalEntryRepository.save(originalEntry);
         JournalEntry savedReversal = journalEntryRepository.save(reversalEntry);
+        auditService.log("JournalEntry", originalEntry.getId(), "REVERSE", reversedBy, "Reversed journal " + originalEntry.getReferenceNumber() + " → " + savedReversal.getReferenceNumber());
 
         return toDisplay(savedReversal);
     }
@@ -325,12 +328,14 @@ public class JournalEntryService {
         }
 
         journalEntry.setStatus(JournalEntryStatus.CANCELLED);
-        return toDisplay(journalEntryRepository.save(journalEntry));
+        JournalEntry saved = journalEntryRepository.save(journalEntry);
+        auditService.log("JournalEntry", journalEntry.getId(), "CANCEL", "system", "Cancelled journal " + journalEntry.getReferenceNumber());
+        return toDisplay(saved);
     }
 
     private String generateReferenceNumber() {
         try {
-            return numberingService.generateNextNumber("JOURNAL_ENTRY");
+            return numberingService.generateNextNumber("JOURNAL_REFERENCE");
         } catch (Exception e) {
             // Fallback
             return "JE-" + System.currentTimeMillis();

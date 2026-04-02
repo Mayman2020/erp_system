@@ -1,14 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbDropdownConfig } from '@ng-bootstrap/ng-bootstrap';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 /*import { AnimationBuilder, AnimationService } from 'css-animator';*/
 import { animate, AUTO_STYLE, state, style, transition, trigger } from '@angular/animations';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
-  providers: [NgbDropdownConfig],
   animations: [
     trigger('collapsedCard', [
       state('collapsed, void',
@@ -66,8 +64,7 @@ export class CardComponent implements OnInit {
 
   public cardRemove: string;
 
-  constructor(config: NgbDropdownConfig, private translationService: TranslationService) { /* animationService: AnimationService,  */
-    config.placement = 'bottom-right';
+  constructor(private translationService: TranslationService) { /* animationService: AnimationService,  */
     this.customHeader = false;
     this.options = true;
     this.hidHeader = false;

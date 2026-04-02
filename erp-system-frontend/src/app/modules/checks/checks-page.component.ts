@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountingCheckDto } from '../../core/models/accounting.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
-@Component({ selector: 'app-checks-page', templateUrl: './checks-page.component.html' })
+@Component({ standalone: false, selector: 'app-checks-page', templateUrl: './checks-page.component.html' })
 export class ChecksPageComponent implements OnInit {
   titleKey = 'NAV.CHECKS';
   loading = false;

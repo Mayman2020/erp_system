@@ -1,44 +1,64 @@
-<perfect-scrollbar *ngIf="this.flatConfig['layout'] === 'vertical'" (clickOutside)="navMob()" [excludeBeforeClick]="true" [exclude]="'#mobile-collapse'" id="nav-ps-flat-able" ngClass="flat-able-scroll erp-nav-scroll" [style.max-width]="'100%'" [usePSClass]="'flat-able'" [disabled]="null">
+<div *ngIf="this.flatConfig['layout'] === 'vertical'" (clickOutside)="navMob()" [excludeBeforeClick]="true" [exclude]="'#mobile-collapse'" id="nav-ps-flat-able" class="flat-able-scroll erp-nav-scroll" [style.max-width]="'100%'">
   <div class="navbar-content erp-navbar-content">
-    <div class="erp-sidebar-profile" ngbDropdown placement="bottom-right" container="body">
-      <button
-        type="button"
-        class="erp-sidebar-profile__toggle"
-        ngbDropdownToggle
-        [attr.aria-label]="displayName || ('PROFILE.TITLE' | translate)"
-      >
-        <img [src]="avatarUrl" class="erp-sidebar-profile__avatar" [attr.alt]="'PROFILE.AVATAR_ALT' | translate" />
-        <span class="erp-sidebar-profile__info">
-          <strong>{{ displayName || ('NAV.HESABATY' | translate) }}</strong>
-          <small>{{ roleKey | translate }}</small>
-        </span>
-        <mat-icon aria-hidden="true">expand_more</mat-icon>
-      </button>
-      <div class="dropdown-menu erp-sidebar-profile__menu" ngbDropdownMenu>
-        <a href="javascript:" class="erp-sidebar-profile__menu-link" [routerLink]="['/settings']" title="{{ 'PROFILE.TITLE' | translate }}">
-          <mat-icon aria-hidden="true">person</mat-icon>
-          <span>{{ 'PROFILE.TITLE' | translate }}</span>
-        </a>
-        <button type="button" class="erp-sidebar-profile__menu-link erp-sidebar-profile__menu-link--danger" (click)="logout()">
-          <mat-icon aria-hidden="true">logout</mat-icon>
-          <span>{{ 'AUTH.LOGOUT' | translate }}</span>
+    <section class="erp-sidebar-panel">
+      <div class="erp-sidebar-profile" [class.erp-sidebar-profile--open]="profileMenuOpen" (clickOutside)="closeProfileMenu()" [excludeBeforeClick]="true">
+        <button
+          type="button"
+          class="erp-sidebar-profile__toggle"
+          (click)="toggleProfileMenu()"
+          [attr.aria-label]="displayName || ('PROFILE.TITLE' | translate)"
+          [attr.aria-expanded]="profileMenuOpen"
+          *ngIf="!loadingUser; else profileSkeleton"
+        >
+          <img [src]="avatarUrl" class="erp-sidebar-profile__avatar" [attr.alt]="'PROFILE.AVATAR_ALT' | translate" />
+          <span class="erp-sidebar-profile__info">
+            <strong>{{ displayName || ('NAV.HESABATY' | translate) | slice:0:18 }}</strong>
+            <small>{{ roleKey | translate }}</small>
+          </span>
+          <mat-icon aria-hidden="true" class="erp-sidebar-profile__caret">{{ profileMenuOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
         </button>
+
+        <ng-template #profileSkeleton>
+          <div class="erp-sidebar-profile__toggle erp-sidebar-profile__skeleton">
+            <div class="erp-sidebar-profile__avatar skeleton-pulse"></div>
+            <div class="erp-sidebar-profile__info">
+              <div class="skeleton-line skeleton-line--primary skeleton-pulse"></div>
+              <div class="skeleton-line skeleton-line--secondary skeleton-pulse"></div>
+            </div>
+          </div>
+        </ng-template>
+
+        <div class="erp-sidebar-profile__menu" *ngIf="profileMenuOpen" role="menu">
+          <a class="erp-sidebar-profile__menu-link" [routerLink]="['/settings']" title="{{ 'PROFILE.TITLE' | translate }}" (click)="closeProfileMenu()" role="menuitem">
+            <mat-icon aria-hidden="true">person</mat-icon>
+            <span>{{ 'PROFILE.TITLE' | translate }}</span>
+          </a>
+          <button type="button" class="erp-sidebar-profile__menu-link erp-sidebar-profile__menu-link--danger" (click)="logout()" role="menuitem">
+            <mat-icon aria-hidden="true">logout</mat-icon>
+            <span>{{ 'AUTH.LOGOUT' | translate }}</span>
+          </button>
+        </div>
       </div>
-    </div>
-    <ul class="nav pcoded-inner-navbar" (clickOutside)="fireOutClick()">
-      <ng-container *ngFor="let item of navigation">
-        <app-nav-group *ngIf="item.type=='group'" [item]="item"></app-nav-group>
-        <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item"></app-nav-collapse>
-        <app-nav-item *ngIf="item.type=='item'" [item]="item"></app-nav-item>
-      </ng-container>
-    </ul>
+
+      <div class="erp-sidebar-panel__divider"></div>
+
+      <ul class="nav pcoded-inner-navbar erp-sidebar-menu" (clickOutside)="fireOutClick()">
+        <li class="nav-item pcoded-menu-caption" *ngIf="menuLoading"><label>{{ 'COMMON.LOADING' | translate }}</label></li>
+        <ng-container *ngFor="let item of navigation">
+          <app-nav-group *ngIf="item.type=='group'" [item]="item"></app-nav-group>
+          <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item"></app-nav-collapse>
+          <app-nav-item *ngIf="item.type=='item'" [item]="item"></app-nav-item>
+        </ng-container>
+      </ul>
+    </section>
   </div>
-</perfect-scrollbar>
+</div>
 
 <div *ngIf="this.flatConfig['layout'] === 'horizontal'" #navbarWrapper class="navbar-content sidenav-horizontal" id="layout-sidenav">
   <a href="javascript:" class="sidenav-horizontal-prev" [ngClass]="prevDisabled" (click)="scrollMinus()"></a>
   <div class="sidenav-horizontal-wrapper">
     <ul #navbarContent id="side-nav-horizontal" class="nav pcoded-inner-navbar sidenav-inner" (clickOutside)="fireLeave()" (mouseleave)="fireLeave()">
+      <li class="nav-item pcoded-menu-caption" *ngIf="menuLoading"><label>{{ 'COMMON.LOADING' | translate }}</label></li>
       <ng-container *ngFor="let item of navigation">
         <app-nav-group *ngIf="item.type=='group'" [item]="item"></app-nav-group>
         <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item"></app-nav-collapse>

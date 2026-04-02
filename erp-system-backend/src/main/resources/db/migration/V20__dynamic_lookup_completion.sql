@@ -1,0 +1,36 @@
+SET search_path TO erp_system, public;
+
+INSERT INTO lookup_values (type_code, code, sort_order, is_active, created_by, updated_by)
+VALUES
+('statuses', 'ACTIVE', 1, TRUE, 'flyway', 'flyway'),
+('statuses', 'INACTIVE', 2, TRUE, 'flyway', 'flyway'),
+('accounting-methods', 'ACCRUAL', 1, TRUE, 'flyway', 'flyway'),
+('accounting-methods', 'CASH', 2, TRUE, 'flyway', 'flyway'),
+('transfer-statuses', 'DRAFT', 1, TRUE, 'flyway', 'flyway'),
+('transfer-statuses', 'POSTED', 2, TRUE, 'flyway', 'flyway'),
+('transfer-statuses', 'CANCELLED', 3, TRUE, 'flyway', 'flyway'),
+('transaction-types', 'SALE', 1, TRUE, 'flyway', 'flyway'),
+('transaction-types', 'PURCHASE', 2, TRUE, 'flyway', 'flyway'),
+('transaction-types', 'REFUND', 3, TRUE, 'flyway', 'flyway'),
+('transaction-types', 'ADJUSTMENT', 4, TRUE, 'flyway', 'flyway'),
+('transaction-statuses', 'DRAFT', 1, TRUE, 'flyway', 'flyway'),
+('transaction-statuses', 'POSTED', 2, TRUE, 'flyway', 'flyway'),
+('transaction-statuses', 'CANCELLED', 3, TRUE, 'flyway', 'flyway'),
+('bill-statuses', 'DRAFT', 1, TRUE, 'flyway', 'flyway'),
+('bill-statuses', 'APPROVED', 2, TRUE, 'flyway', 'flyway'),
+('bill-statuses', 'POSTED', 3, TRUE, 'flyway', 'flyway'),
+('bill-statuses', 'PARTIALLY_PAID', 4, TRUE, 'flyway', 'flyway'),
+('bill-statuses', 'PAID', 5, TRUE, 'flyway', 'flyway'),
+('bill-statuses', 'CANCELLED', 6, TRUE, 'flyway', 'flyway'),
+('budget-statuses', 'DRAFT', 1, TRUE, 'flyway', 'flyway'),
+('budget-statuses', 'APPROVED', 2, TRUE, 'flyway', 'flyway'),
+('budget-statuses', 'ACTIVE', 3, TRUE, 'flyway', 'flyway'),
+('budget-statuses', 'CLOSED', 4, TRUE, 'flyway', 'flyway'),
+('check-types', 'ISSUED', 1, TRUE, 'flyway', 'flyway'),
+('check-types', 'RECEIVED', 2, TRUE, 'flyway', 'flyway'),
+('check-statuses', 'PENDING', 1, TRUE, 'flyway', 'flyway'),
+('check-statuses', 'DEPOSITED', 2, TRUE, 'flyway', 'flyway'),
+('check-statuses', 'CLEARED', 3, TRUE, 'flyway', 'flyway'),
+('check-statuses', 'BOUNCED', 4, TRUE, 'flyway', 'flyway'),
+('check-statuses', 'CANCELLED', 5, TRUE, 'flyway', 'flyway')
+ON CONFLICT (type_code, code) DO NOTHING;

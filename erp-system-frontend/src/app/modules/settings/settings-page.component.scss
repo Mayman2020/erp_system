@@ -18,6 +18,113 @@
   border: 3px solid #d7e2f2;
 }
 
+.erp-settings-card,
+.erp-settings__year-card {
+  border: 1px solid #e8edf5;
+  border-radius: 14px;
+  background: #f8faff;
+}
+
+.erp-settings-card {
+  padding: 1rem;
+  min-height: 100%;
+}
+
+.erp-settings-card__label {
+  color: #6c7a92;
+  font-size: 0.82rem;
+  margin-bottom: 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.erp-settings-card__value {
+  color: #22304a;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.erp-settings__section-label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #22304a;
+  font-weight: 600;
+}
+
+.erp-settings__currency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.75rem;
+}
+
+.erp-settings__currency-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #d7e2f2;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.erp-settings__year-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.erp-settings__year-card {
+  padding: 1rem;
+}
+
+.erp-settings__year-header,
+.erp-settings__period-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.erp-settings__year-header {
+  margin-bottom: 0.9rem;
+}
+
+.erp-settings__period-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.erp-settings__period-item {
+  padding-top: 0.75rem;
+  border-top: 1px solid #e8edf5;
+}
+
+.erp-settings__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.erp-settings__status.is-open {
+  background: rgba(40, 167, 69, 0.12);
+  color: #1f7a35;
+}
+
+.erp-settings__status.is-closed {
+  background: rgba(220, 53, 69, 0.12);
+  color: #b02a37;
+}
+
+.erp-button--sm {
+  padding: 0.45rem 0.8rem;
+  font-size: 0.82rem;
+}
+
 body.flat-able-dark {
   .profile-layout .profile-card {
     background: #202c42;
@@ -26,5 +133,25 @@ body.flat-able-dark {
 
   .profile-avatar {
     border-color: #3b4d70;
+  }
+
+  .erp-settings-card,
+  .erp-settings__year-card,
+  .erp-settings__currency-item {
+    background: #202c42;
+    border-color: #32405b;
+  }
+
+  .erp-settings-card__label {
+    color: #9db0cf;
+  }
+
+  .erp-settings-card__value,
+  .erp-settings__section-label {
+    color: #f4f7fb;
+  }
+
+  .erp-settings__period-item {
+    border-top-color: #32405b;
   }
 }

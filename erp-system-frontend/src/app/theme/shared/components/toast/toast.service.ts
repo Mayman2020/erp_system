@@ -1,7 +1,8 @@
 import {EventEmitter, Injectable, Output} from '@angular/core';
 interface Toast {
-  id: string;
-  delay: number;
+  id?: string;
+  uid?: string;
+  delay?: number;
 }
 
 @Injectable()

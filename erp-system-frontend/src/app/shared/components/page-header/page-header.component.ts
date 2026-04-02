@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-@Component({
+@Component({ standalone: false,
   selector: 'app-page-header',
   template: `
     <section class="erp-page-header">

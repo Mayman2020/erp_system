@@ -83,7 +83,7 @@ public class ReceiptVoucher extends BaseEntity {
     private Account revenueAccount;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "journal_entry_id", nullable = false, unique = true)
+    @JoinColumn(name = "journal_entry_id", unique = true)
     private JournalEntry journalEntry;
 
     @OneToOne(fetch = FetchType.LAZY)
