@@ -28,9 +28,13 @@ public class AccountingTransactionDisplayDto {
     private Long debitAccountId;
     private String debitAccountCode;
     private String debitAccountName;
+    private String debitAccountNameEn;
+    private String debitAccountNameAr;
     private Long creditAccountId;
     private String creditAccountCode;
     private String creditAccountName;
+    private String creditAccountNameEn;
+    private String creditAccountNameAr;
     private Long originalTransactionId;
     private String relatedDocumentReference;
     private Long journalEntryId;

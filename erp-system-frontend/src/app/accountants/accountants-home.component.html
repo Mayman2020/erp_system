@@ -37,244 +37,260 @@
           </article>
         </div>
 
-        <ul ngbNav #adminNav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs erp-settings-tabs">
-          <li [ngbNavItem]="'users'">
-            <button ngbNavLink>{{ 'ACCESS_MANAGEMENT.USERS_TAB' | translate }}</button>
-            <ng-template ngbNavContent>
-              <div class="erp-admin-tab">
-                <div class="erp-admin-toolbar">
-                  <div class="erp-admin-toolbar__copy">
-                    <h3>{{ 'ACCESS_MANAGEMENT.USERS_TITLE' | translate }}</h3>
-                    <p>{{ 'ACCESS_MANAGEMENT.USERS_HINT' | translate }}</p>
-                  </div>
-                  <div class="erp-admin-toolbar__actions">
+        <ng-container [ngSwitch]="activeTabId">
+          <div *ngSwitchCase="'users'" class="erp-admin-tab">
+            <div class="erp-admin-toolbar">
+              <div class="erp-admin-toolbar__copy">
+                <h3>{{ 'ACCESS_MANAGEMENT.USERS_TITLE' | translate }}</h3>
+                <p>{{ 'ACCESS_MANAGEMENT.USERS_HINT' | translate }}</p>
+              </div>
+              <div class="erp-admin-toolbar__actions">
+                <input
+                  type="text"
+                  class="erp-input erp-admin-inline-input"
+                  [value]="userQuery"
+                  [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_USERS' | translate"
+                  (input)="userQuery = $any($event.target).value"
+                />
+                <button type="button" class="erp-button erp-button--primary" (click)="openCreateUserDialog()">
+                  <mat-icon aria-hidden="true">person_add</mat-icon>
+                  <span>{{ 'ACCESS_MANAGEMENT.ADD_USER' | translate }}</span>
+                </button>
+              </div>
+            </div>
+
+            <app-data-table
+              [columns]="userColumns"
+              [data]="filteredUsers"
+              [actions]="userActions"
+              [loading]="loading"
+              emptyTitleKey="ACCESS_MANAGEMENT.NO_USERS"
+              emptyDescriptionKey="ACCESS_MANAGEMENT.NO_USERS_HINT"
+              (actionClick)="onUserAction($event)"
+              (cellClick)="onUserCellClick($event)"
+              (booleanToggle)="onUserActiveToggle($event)"
+            ></app-data-table>
+          </div>
+
+          <div *ngSwitchCase="'roles'" class="erp-admin-tab">
+            <div class="erp-admin-toolbar">
+              <div class="erp-admin-toolbar__copy">
+                <h3>{{ 'ACCESS_MANAGEMENT.ROLES_TITLE' | translate }}</h3>
+                <p>{{ 'ACCESS_MANAGEMENT.ROLES_HINT' | translate }}</p>
+              </div>
+              <div class="erp-admin-toolbar__actions">
+                <button type="button" class="erp-button erp-button--primary" (click)="openCreateRoleDialog()">
+                  <mat-icon aria-hidden="true">security</mat-icon>
+                  <span>{{ 'ACCESS_MANAGEMENT.ADD_ROLE' | translate }}</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xl-5 mb-4">
+                <div class="erp-admin-panel">
+                  <div class="erp-admin-panel__header">
+                    <h4>{{ 'ACCESS_MANAGEMENT.ROLES_LIST' | translate }}</h4>
                     <input
                       type="text"
                       class="erp-input erp-admin-inline-input"
-                      [value]="userQuery"
-                      [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_USERS' | translate"
-                      (input)="userQuery = $any($event.target).value"
+                      [value]="roleQuery"
+                      [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_ROLES' | translate"
+                      (input)="roleQuery = $any($event.target).value"
                     />
-                    <button type="button" class="erp-button erp-button--primary" (click)="openCreateUserDialog()">
-                      <mat-icon aria-hidden="true">person_add</mat-icon>
-                      <span>{{ 'ACCESS_MANAGEMENT.ADD_USER' | translate }}</span>
-                    </button>
                   </div>
-                </div>
-
-                <app-data-table
-                  [columns]="userColumns"
-                  [data]="filteredUsers"
-                  [actions]="userActions"
-                  [loading]="loading"
-                  emptyTitleKey="ACCESS_MANAGEMENT.NO_USERS"
-                  emptyDescriptionKey="ACCESS_MANAGEMENT.NO_USERS_HINT"
-                  (actionClick)="onUserAction($event)"
-                  (cellClick)="onUserCellClick($event)"
-                ></app-data-table>
-              </div>
-            </ng-template>
-          </li>
-
-          <li [ngbNavItem]="'roles'">
-            <button ngbNavLink>{{ 'ACCESS_MANAGEMENT.ROLES_TAB' | translate }}</button>
-            <ng-template ngbNavContent>
-              <div class="erp-admin-tab">
-                <div class="erp-admin-toolbar">
-                  <div class="erp-admin-toolbar__copy">
-                    <h3>{{ 'ACCESS_MANAGEMENT.ROLES_TITLE' | translate }}</h3>
-                    <p>{{ 'ACCESS_MANAGEMENT.ROLES_HINT' | translate }}</p>
-                  </div>
-                  <div class="erp-admin-toolbar__actions">
-                    <button type="button" class="erp-button erp-button--primary" (click)="openCreateRoleDialog()">
-                      <mat-icon aria-hidden="true">security</mat-icon>
-                      <span>{{ 'ACCESS_MANAGEMENT.ADD_ROLE' | translate }}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-xl-5 mb-4">
-                    <div class="erp-admin-panel">
-                      <div class="erp-admin-panel__header">
-                        <h4>{{ 'ACCESS_MANAGEMENT.ROLES_LIST' | translate }}</h4>
-                        <input
-                          type="text"
-                          class="erp-input erp-admin-inline-input"
-                          [value]="roleQuery"
-                          [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_ROLES' | translate"
-                          (input)="roleQuery = $any($event.target).value"
-                        />
-                      </div>
-                      <app-data-table
-                        [columns]="roleColumns"
-                        [data]="filteredRoles"
-                        [actions]="roleActions"
-                        [loading]="loading"
-                        emptyTitleKey="ACCESS_MANAGEMENT.NO_ROLES"
-                        emptyDescriptionKey="ACCESS_MANAGEMENT.NO_ROLES_HINT"
-                        (actionClick)="onRoleAction($event)"
-                        (cellClick)="onRoleCellClick($event)"
-                      ></app-data-table>
-                    </div>
-                  </div>
-
-                  <div class="col-xl-7 mb-4">
-                    <div class="erp-admin-panel">
-                      <ng-container *ngIf="selectedRole; else noSelectedRole">
-                        <div class="erp-admin-panel__header erp-admin-panel__header--stacked">
-                          <div>
-                            <h4>{{ displayName(selectedRole?.nameEn, selectedRole?.nameAr, selectedRole?.code) }}</h4>
-                            <p>
-                              {{ 'ACCESS_MANAGEMENT.ROLE_CODE' | translate }}: <strong>{{ selectedRole?.code }}</strong>
-                              <span class="erp-admin-dot"></span>
-                              {{ 'ACCESS_MANAGEMENT.ENABLED_PERMISSIONS' | translate }}:
-                              <strong>{{ permissionEnabledCount(selectedRole) }}</strong>
-                            </p>
-                          </div>
-                          <div class="erp-admin-panel__actions">
-                            <button type="button" class="erp-button erp-button--ghost" (click)="openEditRoleDialog(selectedRole!.id)">
-                              <mat-icon aria-hidden="true">edit</mat-icon>
-                              <span>{{ 'COMMON.EDIT' | translate }}</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        <div class="erp-admin-subfilters">
-                          <input
-                            type="text"
-                            class="erp-input erp-admin-inline-input"
-                            [value]="permissionQuery"
-                            [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_PERMISSIONS' | translate"
-                            (input)="permissionQuery = $any($event.target).value"
-                          />
-                        </div>
-
-                        <div class="erp-permission-matrix">
-                          <table class="erp-matrix-table">
-                            <thead>
-                              <tr>
-                                <th>{{ 'ACCESS_MANAGEMENT.SCREEN' | translate }}</th>
-                                <th>{{ 'ACCESS_MANAGEMENT.MENU_GROUP' | translate }}</th>
-                                <th>{{ 'ACCESS_MANAGEMENT.MENU_ROUTE' | translate }}</th>
-                                <th>{{ 'COMMON.VIEW' | translate }}</th>
-                                <th>{{ 'COMMON.CREATE' | translate }}</th>
-                                <th>{{ 'COMMON.EDIT' | translate }}</th>
-                                <th>{{ 'COMMON.DELETE' | translate }}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr *ngFor="let permission of selectedRolePermissions">
-                                <td>{{ permission.titleKey | translate }}</td>
-                                <td>{{ permissionPathLabel(permission.parentId) }}</td>
-                                <td>{{ permissionRouteLabel(permission.url) }}</td>
-                                <td><app-status-badge [status]="permission.canView ? 'YES' : 'NO'" labelPrefix="COMMON.BOOL."></app-status-badge></td>
-                                <td><app-status-badge [status]="permission.canCreate ? 'YES' : 'NO'" labelPrefix="COMMON.BOOL."></app-status-badge></td>
-                                <td><app-status-badge [status]="permission.canEdit ? 'YES' : 'NO'" labelPrefix="COMMON.BOOL."></app-status-badge></td>
-                                <td><app-status-badge [status]="permission.canDelete ? 'YES' : 'NO'" labelPrefix="COMMON.BOOL."></app-status-badge></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </ng-container>
-                      <ng-template #noSelectedRole>
-                        <app-empty-state icon="shield" titleKey="ACCESS_MANAGEMENT.NO_ROLE_SELECTED" descriptionKey="ACCESS_MANAGEMENT.NO_ROLE_SELECTED_HINT"></app-empty-state>
-                      </ng-template>
-                    </div>
-                  </div>
+                  <app-data-table
+                    [columns]="roleColumns"
+                    [data]="filteredRoles"
+                    [actions]="roleActions"
+                    [loading]="loading"
+                    emptyTitleKey="ACCESS_MANAGEMENT.NO_ROLES"
+                    emptyDescriptionKey="ACCESS_MANAGEMENT.NO_ROLES_HINT"
+                    (actionClick)="onRoleAction($event)"
+                    (cellClick)="onRoleCellClick($event)"
+                  ></app-data-table>
                 </div>
               </div>
-            </ng-template>
-          </li>
 
-          <li [ngbNavItem]="'lookups'">
-            <button ngbNavLink>{{ 'ACCESS_MANAGEMENT.LOOKUPS_TAB' | translate }}</button>
-            <ng-template ngbNavContent>
-              <div class="erp-admin-tab">
-                <div class="erp-admin-toolbar">
-                  <div class="erp-admin-toolbar__copy">
-                    <h3>{{ 'ACCESS_MANAGEMENT.LOOKUPS_TITLE' | translate }}</h3>
-                    <p>{{ 'ACCESS_MANAGEMENT.LOOKUPS_HINT' | translate }}</p>
-                  </div>
-                  <div class="erp-admin-toolbar__actions">
-                    <button type="button" class="erp-button erp-button--ghost" (click)="openCreateLookupTypeDialog()">
-                      <mat-icon aria-hidden="true">playlist_add</mat-icon>
-                      <span>{{ 'ACCESS_MANAGEMENT.ADD_LOOKUP_TYPE' | translate }}</span>
-                    </button>
-                    <button type="button" class="erp-button erp-button--primary" [disabled]="!selectedLookupType" (click)="openCreateLookupValueDialog()">
-                      <mat-icon aria-hidden="true">add_circle</mat-icon>
-                      <span>{{ 'ACCESS_MANAGEMENT.ADD_LOOKUP_VALUE' | translate }}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-xl-5 mb-4">
-                    <div class="erp-admin-panel">
-                      <div class="erp-admin-panel__header">
-                        <h4>{{ 'ACCESS_MANAGEMENT.LOOKUP_TYPES' | translate }}</h4>
-                        <input
-                          type="text"
-                          class="erp-input erp-admin-inline-input"
-                          [value]="lookupTypeQuery"
-                          [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_LOOKUP_TYPES' | translate"
-                          (input)="lookupTypeQuery = $any($event.target).value"
-                        />
+              <div class="col-xl-7 mb-4">
+                <div class="erp-admin-panel">
+                  <ng-container *ngIf="selectedRole; else noSelectedRole">
+                    <div class="erp-admin-panel__header erp-admin-panel__header--stacked">
+                      <div>
+                        <h4>{{ displayName(selectedRole?.nameEn, selectedRole?.nameAr, selectedRole?.code) }}</h4>
+                        <p>
+                          {{ 'ACCESS_MANAGEMENT.ROLE_CODE' | translate }}: <strong>{{ selectedRole?.code }}</strong>
+                          <span class="erp-admin-dot"></span>
+                          {{ 'ACCESS_MANAGEMENT.ENABLED_PERMISSIONS' | translate }}:
+                          <strong>{{ permissionEnabledCount(selectedRole) }}</strong>
+                        </p>
                       </div>
-                      <app-data-table
-                        [columns]="lookupTypeColumns"
-                        [data]="filteredLookupTypes"
-                        [actions]="lookupTypeActions"
-                        [loading]="lookupTypesLoading"
-                        emptyTitleKey="ACCESS_MANAGEMENT.NO_LOOKUP_TYPES"
-                        emptyDescriptionKey="ACCESS_MANAGEMENT.NO_LOOKUP_TYPES_HINT"
-                        (actionClick)="onLookupTypeAction($event)"
-                        (cellClick)="onLookupTypeCellClick($event)"
-                      ></app-data-table>
-                    </div>
-                  </div>
-
-                  <div class="col-xl-7 mb-4">
-                    <div class="erp-admin-panel">
-                      <div class="erp-admin-panel__header erp-admin-panel__header--stacked">
-                        <div>
-                          <h4>{{ selectedLookupType ? displayName(selectedLookupType.nameEn, selectedLookupType.nameAr, selectedLookupType.code) : ('ACCESS_MANAGEMENT.SELECT_LOOKUP_TYPE' | translate) }}</h4>
-                          <p *ngIf="selectedLookupType">{{ 'ACCESS_MANAGEMENT.TYPE_CODE' | translate }}: <strong>{{ selectedLookupType.code }}</strong></p>
-                        </div>
+                      <div class="erp-admin-panel__actions">
+                        <button type="button" class="erp-button erp-button--ghost" (click)="openEditRoleDialog(selectedRole!.id)">
+                          <mat-icon aria-hidden="true">edit</mat-icon>
+                          <span>{{ 'COMMON.EDIT' | translate }}</span>
+                        </button>
                       </div>
-
-                      <ng-container *ngIf="selectedLookupType; else noLookupTypeSelected">
-                        <div class="erp-admin-subfilters">
-                          <input
-                            type="text"
-                            class="erp-input erp-admin-inline-input"
-                            [value]="lookupValueQuery"
-                            [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_LOOKUP_VALUES' | translate"
-                            (input)="lookupValueQuery = $any($event.target).value"
-                          />
-                        </div>
-                        <app-data-table
-                          [columns]="lookupValueColumns"
-                          [data]="filteredLookupValues"
-                          [actions]="lookupValueActions"
-                          [loading]="lookupValuesLoading"
-                          emptyTitleKey="ACCESS_MANAGEMENT.NO_LOOKUP_VALUES"
-                          emptyDescriptionKey="ACCESS_MANAGEMENT.NO_LOOKUP_VALUES_HINT"
-                          (actionClick)="onLookupValueAction($event)"
-                        ></app-data-table>
-                      </ng-container>
-                      <ng-template #noLookupTypeSelected>
-                        <app-empty-state icon="view_list" titleKey="ACCESS_MANAGEMENT.SELECT_LOOKUP_TYPE" descriptionKey="ACCESS_MANAGEMENT.SELECT_LOOKUP_TYPE_HINT"></app-empty-state>
-                      </ng-template>
                     </div>
-                  </div>
+
+                    <div class="erp-admin-subfilters">
+                      <input
+                        type="text"
+                        class="erp-input erp-admin-inline-input"
+                        [value]="permissionQuery"
+                        [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_PERMISSIONS' | translate"
+                        (input)="permissionQuery = $any($event.target).value"
+                      />
+                    </div>
+
+                    <div class="erp-permission-matrix">
+                      <table class="erp-matrix-table">
+                        <thead>
+                          <tr>
+                            <th>{{ 'ACCESS_MANAGEMENT.SCREEN' | translate }}</th>
+                            <th>{{ 'ACCESS_MANAGEMENT.MENU_GROUP' | translate }}</th>
+                            <th>{{ 'ACCESS_MANAGEMENT.MENU_ROUTE' | translate }}</th>
+                            <th>{{ 'COMMON.VIEW' | translate }}</th>
+                            <th>{{ 'COMMON.CREATE' | translate }}</th>
+                            <th>{{ 'COMMON.EDIT' | translate }}</th>
+                            <th>{{ 'COMMON.DELETE' | translate }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let permission of selectedRolePermissions">
+                            <td>{{ permission.titleKey | translate }}</td>
+                            <td>{{ permissionPathLabel(permission.parentId) }}</td>
+                            <td>{{ permissionRouteLabel(permission.url) }}</td>
+                            <td><app-status-badge [status]="permission.canView ? 'YES' : 'NO'" labelPrefix="COMMON.BOOL."></app-status-badge></td>
+                            <td><app-status-badge [status]="permission.canCreate ? 'YES' : 'NO'" labelPrefix="COMMON.BOOL."></app-status-badge></td>
+                            <td><app-status-badge [status]="permission.canEdit ? 'YES' : 'NO'" labelPrefix="COMMON.BOOL."></app-status-badge></td>
+                            <td><app-status-badge [status]="permission.canDelete ? 'YES' : 'NO'" labelPrefix="COMMON.BOOL."></app-status-badge></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </ng-container>
+                  <ng-template #noSelectedRole>
+                    <app-empty-state icon="shield" titleKey="ACCESS_MANAGEMENT.NO_ROLE_SELECTED" descriptionKey="ACCESS_MANAGEMENT.NO_ROLE_SELECTED_HINT"></app-empty-state>
+                  </ng-template>
                 </div>
               </div>
-            </ng-template>
-          </li>
-        </ul>
+            </div>
+          </div>
 
-        <div [ngbNavOutlet]="adminNav"></div>
+          <div *ngSwitchCase="'screens'" class="erp-admin-tab">
+            <div class="erp-admin-toolbar">
+              <div class="erp-admin-toolbar__copy">
+                <h3>{{ 'ACCESS_MANAGEMENT.SCREENS_TITLE' | translate }}</h3>
+                <p>{{ 'ACCESS_MANAGEMENT.SCREENS_HINT' | translate }}</p>
+              </div>
+              <div class="erp-admin-toolbar__actions">
+                <input
+                  type="text"
+                  class="erp-input erp-admin-inline-input"
+                  [value]="screenQuery"
+                  [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_SCREENS' | translate"
+                  (input)="screenQuery = $any($event.target).value"
+                />
+                <button type="button" class="erp-button erp-button--primary" (click)="openCreateScreenDialog()">
+                  <mat-icon aria-hidden="true">add</mat-icon>
+                  <span>{{ 'ACCESS_MANAGEMENT.ADD_SCREEN' | translate }}</span>
+                </button>
+              </div>
+            </div>
+            <app-data-table
+              [columns]="screenColumns"
+              [data]="filteredScreens"
+              [actions]="screenActions"
+              [loading]="loading"
+              [pageSize]="20"
+              emptyTitleKey="ACCESS_MANAGEMENT.NO_SCREENS"
+              emptyDescriptionKey="ACCESS_MANAGEMENT.NO_SCREENS_HINT"
+              (actionClick)="onScreenAction($event)"
+            ></app-data-table>
+          </div>
+
+          <div *ngSwitchCase="'lookups'" class="erp-admin-tab">
+            <div class="erp-admin-toolbar">
+              <div class="erp-admin-toolbar__copy">
+                <h3>{{ 'ACCESS_MANAGEMENT.LOOKUPS_TITLE' | translate }}</h3>
+                <p>{{ 'ACCESS_MANAGEMENT.LOOKUPS_HINT' | translate }}</p>
+              </div>
+              <div class="erp-admin-toolbar__actions">
+                <button type="button" class="erp-button erp-button--ghost" (click)="openCreateLookupTypeDialog()">
+                  <mat-icon aria-hidden="true">playlist_add</mat-icon>
+                  <span>{{ 'ACCESS_MANAGEMENT.ADD_LOOKUP_TYPE' | translate }}</span>
+                </button>
+                <button type="button" class="erp-button erp-button--primary" [disabled]="!selectedLookupType" (click)="openCreateLookupValueDialog()">
+                  <mat-icon aria-hidden="true">add_circle</mat-icon>
+                  <span>{{ 'ACCESS_MANAGEMENT.ADD_LOOKUP_VALUE' | translate }}</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xl-5 mb-4">
+                <div class="erp-admin-panel">
+                  <div class="erp-admin-panel__header">
+                    <h4>{{ 'ACCESS_MANAGEMENT.LOOKUP_TYPES' | translate }}</h4>
+                    <input
+                      type="text"
+                      class="erp-input erp-admin-inline-input"
+                      [value]="lookupTypeQuery"
+                      [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_LOOKUP_TYPES' | translate"
+                      (input)="lookupTypeQuery = $any($event.target).value"
+                    />
+                  </div>
+                  <app-data-table
+                    [columns]="lookupTypeColumns"
+                    [data]="filteredLookupTypes"
+                    [actions]="lookupTypeActions"
+                    [loading]="lookupTypesLoading"
+                    emptyTitleKey="ACCESS_MANAGEMENT.NO_LOOKUP_TYPES"
+                    emptyDescriptionKey="ACCESS_MANAGEMENT.NO_LOOKUP_TYPES_HINT"
+                    (actionClick)="onLookupTypeAction($event)"
+                    (cellClick)="onLookupTypeCellClick($event)"
+                  ></app-data-table>
+                </div>
+              </div>
+
+              <div class="col-xl-7 mb-4">
+                <div class="erp-admin-panel">
+                  <div class="erp-admin-panel__header erp-admin-panel__header--stacked">
+                    <div>
+                      <h4>{{ selectedLookupType ? displayName(selectedLookupType.nameEn, selectedLookupType.nameAr, selectedLookupType.code) : ('ACCESS_MANAGEMENT.SELECT_LOOKUP_TYPE' | translate) }}</h4>
+                      <p *ngIf="selectedLookupType">{{ 'ACCESS_MANAGEMENT.TYPE_CODE' | translate }}: <strong>{{ selectedLookupType.code }}</strong></p>
+                    </div>
+                  </div>
+
+                  <ng-container *ngIf="selectedLookupType; else noLookupTypeSelected">
+                    <div class="erp-admin-subfilters">
+                      <input
+                        type="text"
+                        class="erp-input erp-admin-inline-input"
+                        [value]="lookupValueQuery"
+                        [attr.placeholder]="'ACCESS_MANAGEMENT.SEARCH_LOOKUP_VALUES' | translate"
+                        (input)="lookupValueQuery = $any($event.target).value"
+                      />
+                    </div>
+                    <app-data-table
+                      [columns]="lookupValueColumns"
+                      [data]="filteredLookupValues"
+                      [actions]="lookupValueActions"
+                      [loading]="lookupValuesLoading"
+                      emptyTitleKey="ACCESS_MANAGEMENT.NO_LOOKUP_VALUES"
+                      emptyDescriptionKey="ACCESS_MANAGEMENT.NO_LOOKUP_VALUES_HINT"
+                      (actionClick)="onLookupValueAction($event)"
+                    ></app-data-table>
+                  </ng-container>
+                  <ng-template #noLookupTypeSelected>
+                    <app-empty-state icon="view_list" titleKey="ACCESS_MANAGEMENT.SELECT_LOOKUP_TYPE" descriptionKey="ACCESS_MANAGEMENT.SELECT_LOOKUP_TYPE_HINT"></app-empty-state>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
     </div>
   </div>
@@ -296,7 +312,7 @@
       <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.email" labelKey="PROFILE.EMAIL" icon="mail" type="email"></app-form-field></div>
       <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.phone" labelKey="PROFILE.PHONE" icon="call"></app-form-field></div>
       <div class="col-md-6 mb-3">
-        <app-form-field [control]="userForm.controls.password" labelKey="AUTH.PASSWORD" icon="lock" type="password" [hintKey]="userDialogMode === 'create' ? 'ACCESS_MANAGEMENT.PASSWORD_REQUIRED' : 'ACCESS_MANAGEMENT.PASSWORD_OPTIONAL'"></app-form-field>
+        <app-form-field [control]="userForm.controls.password" labelKey="AUTH.PASSWORD" icon="lock" type="text" [hintKey]="userDialogMode === 'create' ? 'ACCESS_MANAGEMENT.PASSWORD_REQUIRED' : 'ACCESS_MANAGEMENT.PASSWORD_OPTIONAL_ADMIN'"></app-form-field>
       </div>
       <div class="col-md-3 mb-3">
         <app-form-field [control]="userForm.controls.primaryRole" labelKey="ACCESS_MANAGEMENT.PRIMARY_ROLE" icon="admin_panel_settings" type="select" [options]="['ADMIN', 'ACCOUNTANT']" [optionLabelPrefix]="'ROLE.'"></app-form-field>
@@ -449,6 +465,52 @@
   <div dialog-footer>
     <button type="button" class="erp-button erp-button--primary" [disabled]="lookupValueSaving" (click)="saveLookupValue()"><mat-icon aria-hidden="true">save</mat-icon><span>{{ 'COMMON.SAVE' | translate }}</span></button>
     <button type="button" class="erp-button erp-button--ghost" (click)="closeLookupValueDialog()">{{ 'COMMON.CANCEL' | translate }}</button>
+  </div>
+</app-form-dialog>
+
+<app-form-dialog [visible]="screenDialogVisible" [title]="screenDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_SCREEN' : 'ACCESS_MANAGEMENT.EDIT_SCREEN'" size="xl" (close)="closeScreenDialog()">
+  <div dialog-body>
+    <div class="alert alert-danger mb-2" *ngIf="accessErrorKey">{{ accessErrorKey | translate }}</div>
+    <form [formGroup]="screenForm" class="row">
+      <div class="col-md-6 mb-3"><app-form-field [control]="screenForm.controls.id" labelKey="ACCESS_MANAGEMENT.SCREEN_ID" icon="tag"></app-form-field></div>
+      <div class="col-md-6 mb-3"><app-form-field [control]="screenForm.controls.sortOrder" labelKey="ACCESS_MANAGEMENT.SORT_ORDER" icon="format_list_numbered" type="number"></app-form-field></div>
+      <div class="col-md-6 mb-3">
+        <label class="d-block mb-1">{{ 'ACCESS_MANAGEMENT.PARENT_ID' | translate }}</label>
+        <select class="form-control" formControlName="parentId">
+          <option value="">{{ 'ACCESS_MANAGEMENT.PARENT_NONE' | translate }}</option>
+          <option *ngFor="let s of menuScreens" [value]="s.id">{{ s.id }} — {{ s.titleKey | translate }}</option>
+        </select>
+      </div>
+      <div class="col-md-6 mb-3">
+        <app-form-field
+          [control]="screenForm.controls.itemType"
+          labelKey="ACCESS_MANAGEMENT.ITEM_TYPE"
+          icon="category"
+          type="select"
+          [options]="screenItemTypeOptions"
+          optionValueField="value"
+          optionLabelField="labelKey"
+        ></app-form-field>
+      </div>
+      <div class="col-md-12 mb-3"><app-form-field [control]="screenForm.controls.titleKey" labelKey="ACCESS_MANAGEMENT.TITLE_KEY" icon="translate"></app-form-field></div>
+      <div class="col-md-6 mb-3"><app-form-field [control]="screenForm.controls.icon" labelKey="ACCESS_MANAGEMENT.ICON" icon="emoji_symbols"></app-form-field></div>
+      <div class="col-md-6 mb-3"><app-form-field [control]="screenForm.controls.url" labelKey="ACCESS_MANAGEMENT.MENU_ROUTE" icon="link"></app-form-field></div>
+      <div class="col-md-12 mb-3"><app-form-field [control]="screenForm.controls.rolesCsv" labelKey="ACCESS_MANAGEMENT.ROLES_CSV" icon="lock"></app-form-field></div>
+      <div class="col-md-6 mb-3"><app-form-field [control]="screenForm.controls.itemClasses" labelKey="ACCESS_MANAGEMENT.ITEM_CLASSES" icon="style"></app-form-field></div>
+      <div class="col-md-3 mb-3">
+        <app-form-field [control]="screenForm.controls.external" labelKey="ACCESS_MANAGEMENT.EXTERNAL_LINK" icon="open_in_new" type="select" [options]="[{ value: false, labelKey: 'COMMON.BOOL.NO' }, { value: true, labelKey: 'COMMON.BOOL.YES' }]" optionValueField="value" optionLabelField="labelKey"></app-form-field>
+      </div>
+      <div class="col-md-3 mb-3">
+        <app-form-field [control]="screenForm.controls.targetBlank" labelKey="ACCESS_MANAGEMENT.TARGET_BLANK" icon="launch" type="select" [options]="[{ value: false, labelKey: 'COMMON.BOOL.NO' }, { value: true, labelKey: 'COMMON.BOOL.YES' }]" optionValueField="value" optionLabelField="labelKey"></app-form-field>
+      </div>
+      <div class="col-md-3 mb-3">
+        <app-form-field [control]="screenForm.controls.breadcrumbsFlag" labelKey="ACCESS_MANAGEMENT.BREADCRUMBS" icon="menu_book" type="select" [options]="[{ value: false, labelKey: 'COMMON.BOOL.NO' }, { value: true, labelKey: 'COMMON.BOOL.YES' }]" optionValueField="value" optionLabelField="labelKey"></app-form-field>
+      </div>
+    </form>
+  </div>
+  <div dialog-footer>
+    <button type="button" class="erp-button erp-button--primary" [disabled]="screenSaving" (click)="saveScreen()"><mat-icon aria-hidden="true">save</mat-icon><span>{{ 'COMMON.SAVE' | translate }}</span></button>
+    <button type="button" class="erp-button erp-button--ghost" (click)="closeScreenDialog()">{{ 'COMMON.CANCEL' | translate }}</button>
   </div>
 </app-form-dialog>
 

@@ -41,6 +41,11 @@ public class CustomerInvoiceController {
         return ApiResponse.success(invoiceService.updateInvoice(id, request));
     }
 
+    @PostMapping("/{id}/approve")
+    public ApiResponse<CustomerInvoiceDisplayDto> approveInvoice(@PathVariable Long id, @RequestParam String actor) {
+        return ApiResponse.success(invoiceService.postInvoice(id, actor));
+    }
+
     @PostMapping("/{id}/post")
     public ApiResponse<CustomerInvoiceDisplayDto> postInvoice(@PathVariable Long id, @RequestParam String actor) {
         return ApiResponse.success(invoiceService.postInvoice(id, actor));

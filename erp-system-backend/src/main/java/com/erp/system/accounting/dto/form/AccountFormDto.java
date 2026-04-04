@@ -28,8 +28,6 @@ public class AccountFormDto {
 
     private Boolean active = true;
 
-    private Boolean postable = true;
-
     @DecimalMin(value = "0", message = "VALIDATION.NON_NEGATIVE")
     @DecimalMax(value = "999999999.99", message = "VALIDATION.MAX_VALUE")
     private BigDecimal openingBalance = BigDecimal.ZERO;

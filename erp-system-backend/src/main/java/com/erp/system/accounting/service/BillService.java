@@ -82,20 +82,18 @@ public class BillService {
     @Transactional
     public BillDisplayDto approveBill(Long id, String actor) {
         Bill bill = loadBill(id);
-        if (bill.getStatus() != BillStatus.DRAFT) {
-            throw new BusinessException("Only draft bills can be approved");
+        if (bill.getStatus() == BillStatus.CANCELLED) {
+            throw new BusinessException("Cancelled bills cannot be approved");
         }
-        bill.setStatus(BillStatus.APPROVED);
-        bill.setApprovedAt(LocalDateTime.now());
-        bill.setApprovedBy(actor);
-        return toDisplay(billRepository.save(bill));
-    }
-
-    @Transactional
-    public BillDisplayDto postBill(Long id, String actor) {
-        Bill bill = loadBill(id);
+        if (bill.getJournalEntry() != null) {
+            return toDisplay(bill);
+        }
         if (bill.getStatus() != BillStatus.DRAFT && bill.getStatus() != BillStatus.APPROVED) {
-            throw new BusinessException("Only draft or approved bills can be posted");
+            throw new BusinessException("Only draft or approved bills can be approved");
+        }
+        if (bill.getStatus() == BillStatus.DRAFT) {
+            bill.setApprovedAt(LocalDateTime.now());
+            bill.setApprovedBy(actor);
         }
 
         List<AccountingPostingService.JournalLineDraft> journalLines = new ArrayList<>();
@@ -144,6 +142,11 @@ public class BillService {
     }
 
     @Transactional
+    public BillDisplayDto postBill(Long id, String actor) {
+        return approveBill(id, actor);
+    }
+
+    @Transactional
     public BillDisplayDto cancelBill(Long id, String actor, String reason) {
         Bill bill = loadBill(id);
         if (bill.getStatus() == BillStatus.CANCELLED) {
@@ -167,7 +170,7 @@ public class BillService {
     public void refreshBillPaymentStatus(Long billId) {
         Bill bill = loadBill(billId);
         BigDecimal paidAmount = paymentVoucherRepository.findByBillIdOrderByVoucherDateAscIdAsc(billId).stream()
-                .filter(voucher -> voucher.getStatus() == VoucherStatus.POSTED)
+                .filter(v -> v.getJournalEntry() != null && v.getStatus() != VoucherStatus.CANCELLED)
                 .map(voucher -> voucher.getAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -229,7 +232,7 @@ public class BillService {
     private Account resolvePayableAccount(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable() || account.getAccountType() != AccountingType.LIABILITY) {
+        if (!account.isActive() || account.getAccountType() != AccountingType.LIABILITY) {
             throw new BusinessException("Payable account must be an active liability account");
         }
         return account;
@@ -238,8 +241,8 @@ public class BillService {
     private Account resolveTaxAccount(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable()) {
-            throw new BusinessException("Tax account must be active and postable");
+        if (!account.isActive()) {
+            throw new BusinessException("Tax account must be active");
         }
         return account;
     }
@@ -247,8 +250,8 @@ public class BillService {
     private Account resolveExpenseAccount(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable()) {
-            throw new BusinessException("Bill line account must be active and postable");
+        if (!account.isActive()) {
+            throw new BusinessException("Bill line account must be active");
         }
         if (account.getAccountType() != AccountingType.EXPENSE && account.getAccountType() != AccountingType.ASSET) {
             throw new BusinessException("Bill line account must be an expense or inventory asset account");

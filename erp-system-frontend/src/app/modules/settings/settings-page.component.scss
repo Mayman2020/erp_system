@@ -1,9 +1,9 @@
 .profile-layout .profile-card {
-  border: 1px solid #e8edf5;
-  border-radius: 14px;
-  padding: 1.25rem;
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius-card);
+  padding: var(--erp-space-4);
   text-align: center;
-  background: #f8faff;
+  background: var(--erp-bg-muted);
 }
 
 .avatar-wrap {
@@ -15,14 +15,14 @@
   height: 96px;
   border-radius: 999px;
   object-fit: cover;
-  border: 3px solid #d7e2f2;
+  border: 3px solid color-mix(in srgb, var(--erp-primary) 18%, transparent);
 }
 
 .erp-settings-card,
 .erp-settings__year-card {
-  border: 1px solid #e8edf5;
+  border: 1px solid var(--erp-border);
   border-radius: 14px;
-  background: #f8faff;
+  background: var(--erp-bg-muted);
 }
 
 .erp-settings-card {
@@ -31,7 +31,7 @@
 }
 
 .erp-settings-card__label {
-  color: #6c7a92;
+  color: var(--erp-text-secondary);
   font-size: 0.82rem;
   margin-bottom: 0.45rem;
   text-transform: uppercase;
@@ -39,7 +39,7 @@
 }
 
 .erp-settings-card__value {
-  color: #22304a;
+  color: var(--erp-text);
   font-size: 1.05rem;
   font-weight: 700;
 }
@@ -47,7 +47,7 @@
 .erp-settings__section-label {
   display: block;
   margin-bottom: 0.75rem;
-  color: #22304a;
+  color: var(--erp-text);
   font-weight: 600;
 }
 
@@ -62,9 +62,9 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 0.9rem;
-  border: 1px solid #d7e2f2;
+  border: 1px solid var(--erp-border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--erp-bg-card);
   cursor: pointer;
 }
 
@@ -96,7 +96,7 @@
 
 .erp-settings__period-item {
   padding-top: 0.75rem;
-  border-top: 1px solid #e8edf5;
+  border-top: 1px solid var(--erp-border);
 }
 
 .erp-settings__status {
@@ -111,13 +111,13 @@
 }
 
 .erp-settings__status.is-open {
-  background: rgba(40, 167, 69, 0.12);
-  color: #1f7a35;
+  background: var(--erp-success-soft);
+  color: var(--erp-success);
 }
 
 .erp-settings__status.is-closed {
-  background: rgba(220, 53, 69, 0.12);
-  color: #b02a37;
+  background: var(--erp-danger-soft);
+  color: var(--erp-danger);
 }
 
 .erp-button--sm {
@@ -125,33 +125,6 @@
   font-size: 0.82rem;
 }
 
-body.flat-able-dark {
-  .profile-layout .profile-card {
-    background: #202c42;
-    border-color: #32405b;
-  }
-
-  .profile-avatar {
-    border-color: #3b4d70;
-  }
-
-  .erp-settings-card,
-  .erp-settings__year-card,
-  .erp-settings__currency-item {
-    background: #202c42;
-    border-color: #32405b;
-  }
-
-  .erp-settings-card__label {
-    color: #9db0cf;
-  }
-
-  .erp-settings-card__value,
-  .erp-settings__section-label {
-    color: #f4f7fb;
-  }
-
-  .erp-settings__period-item {
-    border-top-color: #32405b;
-  }
+.profile-layout app-tabs {
+  display: block;
 }

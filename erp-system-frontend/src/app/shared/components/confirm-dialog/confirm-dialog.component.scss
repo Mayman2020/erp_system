@@ -1,0 +1,39 @@
+.erp-confirm-dialog {
+  display: grid;
+  gap: 16px;
+  min-width: min(100%, 320px);
+}
+
+.erp-confirm-dialog__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--erp-text, #0f172a);
+  line-height: 1.3;
+}
+
+.erp-confirm-dialog__message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--erp-text-muted, #64748b);
+}
+
+.erp-confirm-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.erp-confirm-dialog__btn {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+body.rtl .erp-confirm-dialog__actions {
+  flex-direction: row-reverse;
+}

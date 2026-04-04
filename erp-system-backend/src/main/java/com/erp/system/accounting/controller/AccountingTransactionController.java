@@ -46,6 +46,11 @@ public class AccountingTransactionController {
         return ApiResponse.success(transactionService.updateTransaction(id, request));
     }
 
+    @PostMapping("/{id}/approve")
+    public ApiResponse<AccountingTransactionDisplayDto> approveTransaction(@PathVariable Long id, @RequestParam String actor) {
+        return ApiResponse.success(transactionService.postTransaction(id, actor));
+    }
+
     @PostMapping("/{id}/post")
     public ApiResponse<AccountingTransactionDisplayDto> postTransaction(@PathVariable Long id, @RequestParam String actor) {
         return ApiResponse.success(transactionService.postTransaction(id, actor));

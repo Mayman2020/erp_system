@@ -14,4 +14,6 @@ public interface UserAccessRoleRepository extends JpaRepository<UserAccessRole, 
     boolean existsByUserId(Long userId);
 
     void deleteByUserId(Long userId);
+
+    void deleteByRoleId(Long roleId);
 }

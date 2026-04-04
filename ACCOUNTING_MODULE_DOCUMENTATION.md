@@ -51,7 +51,7 @@ The Accounting Module is the financial backbone of the CoreERP system. It provid
 - **Purpose:** Manage the hierarchical account structure
 - **Users:** Accountants, Admins
 - **Actions:** Create, Edit, View, Activate, Deactivate, Switch between Table/Tree views
-- **Fields:** Code, Name EN, Name AR, Parent Account, Account Type, Postable, Opening Balance, Balance Side
+- **Fields:** Code, Name EN, Name AR, Parent Account, Account Type, Opening Balance, Balance Side
 - **Validations:**
   - Code must be unique
   - Parent must be a valid existing account
@@ -182,9 +182,8 @@ The Accounting Module is the financial backbone of the CoreERP system. It provid
 ### Chart of Accounts Management Flow
 1. Admin creates root accounts (Assets, Liabilities, Equity, Revenue, Expenses)
 2. Sub-accounts are created under parents with proper type inheritance
-3. Leaf accounts are marked as "postable" for journal entries
-4. Opening balances are set with debit/credit side
-5. Accounts can be deactivated (if not used in posted journals) and reactivated
+3. Opening balances are set with debit/credit side
+4. Accounts can be deactivated (if not used in posted journals) and reactivated
 
 ### Journal Entry Lifecycle
 1. **Create** → Entry saved as DRAFT with auto-generated reference number
@@ -230,7 +229,6 @@ The Accounting Module is the financial backbone of the CoreERP system. It provid
 
 ### Accounting Rules
 - **Double-entry enforcement:** Every journal entry must have total debit = total credit
-- **Account posting restriction:** Only postable (leaf) accounts accept journal lines
 - **Inactive account restriction:** Cannot post to inactive accounts
 - **Minimum lines:** Every journal must have at least 2 lines
 

@@ -1,0 +1,36 @@
+<div class="account-tree-picker" [class.account-tree-picker--disabled]="disabled">
+  <label class="account-tree-picker__label" *ngIf="labelKey">{{ labelKey | translate }}</label>
+  <div class="account-tree-picker__control" (click)="openDialog()">
+    <mat-icon class="account-tree-picker__icon" aria-hidden="true">{{ icon }}</mat-icon>
+    <input
+      class="erp-input account-tree-picker__input"
+      [value]="displayLabel"
+      readonly
+      [disabled]="disabled"
+      [attr.placeholder]="''"
+    />
+    <button
+      *ngIf="nullable && selectedId && !disabled"
+      type="button"
+      class="account-tree-picker__clear"
+      (click)="clearSelection($event)"
+    >
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+    <button type="button" class="account-tree-picker__browse" [disabled]="disabled">
+      <mat-icon aria-hidden="true">search</mat-icon>
+    </button>
+  </div>
+</div>
+
+<app-erp-dialog [visible]="dialogVisible" [title]="labelKey" size="xl" (close)="closeDialog()">
+  <div dialog-body>
+    <app-tree-selector
+      [nodes]="accountTree"
+      [minSelectableLevel]="minSelectableLevel"
+      [selectedId]="selectedId"
+      [initiallyExpandedDepth]="2"
+      (selected)="onNodeSelected($event)"
+    ></app-tree-selector>
+  </div>
+</app-erp-dialog>

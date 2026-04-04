@@ -30,7 +30,17 @@
             ],
             "styles": [
               "src/styles.scss"
-            ]
+            ],
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": [
+                  "import",
+                  "global-builtin",
+                  "slash-div",
+                  "color-functions"
+                ]
+              }
+            }
           },
           "configurations": {
             "production": {

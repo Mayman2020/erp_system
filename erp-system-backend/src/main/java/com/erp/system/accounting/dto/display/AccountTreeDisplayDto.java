@@ -21,6 +21,7 @@ public class AccountTreeDisplayDto {
     private String nameAr;
     private String nameEn;
     private AccountingType accountType;
+    private String financialStatement;
     private Integer level;
     private boolean active;
 

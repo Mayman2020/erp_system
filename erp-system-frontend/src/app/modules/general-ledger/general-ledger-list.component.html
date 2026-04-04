@@ -1,0 +1,24 @@
+<section class="erp-page">
+  <app-page-header titleKey="GENERAL_LEDGER.TITLE"></app-page-header>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="alert alert-danger" *ngIf="errorKey">{{ errorKey | translate }}</div>
+
+      <app-advanced-search-bar
+        (search)="onSearch($event)"
+        [showStatus]="true"
+        [statusOptions]="statusOptions"
+      ></app-advanced-search-bar>
+
+      <app-data-table
+        [columns]="columns"
+        [data]="rows"
+        [actions]="actions"
+        [loading]="loading"
+        (actionClick)="onTableAction($event)"
+        (cellClick)="onCellClick($event)"
+      ></app-data-table>
+    </div>
+  </div>
+</section>

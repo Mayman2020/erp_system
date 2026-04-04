@@ -7,11 +7,7 @@ import { AccountingApiService } from '../../core/services/accounting-api.service
 import { LookupItem } from '../../core/models/lookup.models';
 import { LookupService } from '../../core/services/lookup.service';
 import { TranslationService } from '../../core/i18n/translation.service';
-
-interface ParentOption {
-  id: number;
-  label: string;
-}
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 
 @Component({
   standalone: false,
@@ -30,11 +26,11 @@ export class AccountsPageComponent implements OnInit {
   rows: AccountDto[] = [];
   pagedRows: AccountDto[] = [];
   treeRows: AccountTreeDto[] = [];
-  parentOptions: ParentOption[] = [];
 
   query = '';
   selectedType: AccountingType | '' = '';
   selectedActive: 'ALL' | 'ACTIVE' | 'INACTIVE' = 'ALL';
+  selectedFinancialStatement: '' | 'BALANCE_SHEET' | 'INCOME_STATEMENT' = '';
   sortBy: 'code' | 'name' | 'accountType' = 'code';
   sortDir: 'asc' | 'desc' = 'asc';
 
@@ -49,7 +45,6 @@ export class AccountsPageComponent implements OnInit {
     nameAr: [''],
     accountType: ['ASSET', Validators.required],
     parentId: [null as number | null],
-    postable: [true],
     statusCode: ['ACTIVE'],
     openingBalance: [0],
     openingBalanceSide: ['DEBIT']
@@ -59,8 +54,8 @@ export class AccountsPageComponent implements OnInit {
     { key: 'code', title: 'ACCOUNTS.CODE', kind: 'text' },
     { key: 'name', title: 'COMMON.NAME', kind: 'text', clickable: true },
     { key: 'accountType', title: 'ACCOUNTS.TYPE', kind: 'type', prefix: 'ACCOUNT_TYPE.' },
-    { key: 'status', title: 'COMMON.STATUS', kind: 'status', prefix: 'STATUS.' },
-    { key: 'postable', title: 'ACCOUNTS.POSTABLE', kind: 'boolean', prefix: 'COMMON.BOOL.' }
+    { key: 'financialStatement', title: 'ACCOUNTS.FINANCIAL_STATEMENT', kind: 'type', prefix: 'FINANCIAL_STATEMENT.' },
+    { key: 'status', title: 'COMMON.STATUS', kind: 'status', prefix: 'STATUS.' }
   ];
 
   readonly rowActions = [
@@ -73,6 +68,7 @@ export class AccountsPageComponent implements OnInit {
     private api: AccountingApiService,
     private fb: FormBuilder,
     private translationService: TranslationService,
+    private confirmDialog: ConfirmDialogService,
     private lookupService: LookupService,
     private cdr: ChangeDetectorRef
   ) {
@@ -101,6 +97,11 @@ export class AccountsPageComponent implements OnInit {
     this.loadAccounts();
   }
 
+  onFinancialStatementFilterChange(value: '' | 'BALANCE_SHEET' | 'INCOME_STATEMENT'): void {
+    this.selectedFinancialStatement = value;
+    this.applyTableState();
+  }
+
   setSort(field: 'code' | 'name' | 'accountType', direction: 'asc' | 'desc'): void {
     this.sortBy = field;
     this.sortDir = direction;
@@ -116,7 +117,6 @@ export class AccountsPageComponent implements OnInit {
       nameAr: '',
       accountType: 'ASSET',
       parentId: null,
-      postable: true,
       statusCode: 'ACTIVE',
       openingBalance: 0,
       openingBalanceSide: 'DEBIT'
@@ -166,7 +166,6 @@ export class AccountsPageComponent implements OnInit {
       nameAr: this.form.value.nameAr || undefined,
       parentId: this.form.value.parentId,
       accountType: acctType,
-      postable: !!this.form.value.postable,
       active: this.form.value.statusCode === 'ACTIVE',
       openingBalance: Number(this.form.value.openingBalance || 0),
       openingBalanceSide: (this.form.value.openingBalanceSide as 'DEBIT' | 'CREDIT') || this.defaultBalanceSide(acctType)
@@ -198,25 +197,27 @@ export class AccountsPageComponent implements OnInit {
 
   toggleActive(account: AccountDto): void {
     const key = account.active ? 'ACCOUNTS.CONFIRM_DEACTIVATE' : 'ACCOUNTS.CONFIRM_ACTIVATE';
-    if (!window.confirm(this.translationService.instant(key))) {
-      return;
-    }
+    this.confirmDialog.confirmByKey({ messageKey: key }).subscribe((ok) => {
+      if (!ok) {
+        return;
+      }
 
-    this.actionLoading = true;
-    this.errorKey = '';
-    this.successKey = '';
-    const request$ = account.active ? this.api.deactivateAccount(account.id) : this.api.activateAccount(account.id);
-    request$
-      .pipe(finalize(() => (this.actionLoading = false)))
-      .subscribe({
-        next: () => {
-          this.successKey = account.active ? 'ACCOUNTS.DEACTIVATE_SUCCESS' : 'ACCOUNTS.ACTIVATE_SUCCESS';
-          this.loadAll();
-        },
-        error: () => {
-          this.errorKey = account.active ? 'ACCOUNTS.DEACTIVATE_ERROR' : 'ACCOUNTS.ACTIVATE_ERROR';
-        }
-      });
+      this.actionLoading = true;
+      this.errorKey = '';
+      this.successKey = '';
+      const request$ = account.active ? this.api.deactivateAccount(account.id) : this.api.activateAccount(account.id);
+      request$
+        .pipe(finalize(() => (this.actionLoading = false)))
+        .subscribe({
+          next: () => {
+            this.successKey = account.active ? 'ACCOUNTS.DEACTIVATE_SUCCESS' : 'ACCOUNTS.ACTIVATE_SUCCESS';
+            this.loadAll();
+          },
+          error: () => {
+            this.errorKey = account.active ? 'ACCOUNTS.DEACTIVATE_ERROR' : 'ACCOUNTS.ACTIVATE_ERROR';
+          }
+        });
+    });
   }
 
   onTableAction(event: { actionId: string; row: Record<string, unknown> }): void {
@@ -288,17 +289,18 @@ export class AccountsPageComponent implements OnInit {
     this.api.getAccountTree().subscribe({
       next: (tree) => {
         this.treeRows = tree || [];
-        this.parentOptions = this.flattenTreeOptions(this.treeRows);
       },
       error: () => {
         this.treeRows = [];
-        this.parentOptions = [];
       }
     });
   }
 
   private applyTableState(): void {
-    const sorted = [...this.rows].sort((a, b) => {
+    const filtered = this.selectedFinancialStatement
+      ? this.rows.filter((row) => row.financialStatement === this.selectedFinancialStatement)
+      : this.rows;
+    const sorted = [...filtered].sort((a, b) => {
       const aValue = (a[this.sortBy] || '').toString().toLowerCase();
       const bValue = (b[this.sortBy] || '').toString().toLowerCase();
       const result = aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
@@ -318,20 +320,9 @@ export class AccountsPageComponent implements OnInit {
       nameAr: account.nameAr || '',
       accountType: account.accountType,
       parentId: account.parentId,
-      postable: account.postable,
       statusCode: account.active ? 'ACTIVE' : 'INACTIVE',
       openingBalance: account.openingBalance || 0,
       openingBalanceSide: account.openingBalanceSide || 'DEBIT'
-    });
-  }
-
-  private flattenTreeOptions(nodes: AccountTreeDto[], depth = 0): ParentOption[] {
-    return nodes.flatMap((node) => {
-      const labelPrefix = depth ? `${'  '.repeat(depth)}- ` : '';
-      return [
-        { id: node.id, label: `${labelPrefix}${node.code} - ${node.name}` },
-        ...this.flattenTreeOptions(node.children || [], depth + 1)
-      ];
     });
   }
 

@@ -56,8 +56,8 @@ class JournalEntryServiceTest {
 
     @Test
     void createValidBalancedJournal_succeeds() {
-        Account debitAccount = buildAccount(1L, "1001", "Cash", true, true);
-        Account creditAccount = buildAccount(2L, "2001", "Revenue", true, true);
+        Account debitAccount = buildAccount(1L, "1001", "Cash", true);
+        Account creditAccount = buildAccount(2L, "2001", "Revenue", true);
 
         JournalEntryFormDto form = new JournalEntryFormDto();
         form.setEntryDate(LocalDate.of(2026, 1, 15));
@@ -93,8 +93,8 @@ class JournalEntryServiceTest {
 
     @Test
     void createUnbalancedJournal_throwsBusinessException() {
-        Account debitAccount = buildAccount(1L, "1001", "Cash", true, true);
-        Account creditAccount = buildAccount(2L, "2001", "Revenue", true, true);
+        Account debitAccount = buildAccount(1L, "1001", "Cash", true);
+        Account creditAccount = buildAccount(2L, "2001", "Revenue", true);
 
         JournalEntryFormDto form = new JournalEntryFormDto();
         form.setEntryDate(LocalDate.of(2026, 1, 15));
@@ -127,7 +127,7 @@ class JournalEntryServiceTest {
     }
 
     @Test
-    void postDraftJournal_setsStatusToPosted() {
+    void postDraftJournal_setsStatusToApproved() {
         JournalEntry draft = buildJournalEntry(1L, JournalEntryStatus.DRAFT,
                 new BigDecimal("100.0000"), new BigDecimal("100.0000"));
         draft.setEntryDate(LocalDate.of(2026, 1, 15));
@@ -146,14 +146,14 @@ class JournalEntryServiceTest {
 
         JournalEntryDisplayDto result = journalEntryService.postJournalEntry(1L, "admin");
 
-        assertThat(result.getStatus()).isEqualTo(JournalEntryStatus.POSTED);
+        assertThat(result.getStatus()).isEqualTo(JournalEntryStatus.APPROVED);
         assertThat(draft.getPostedBy()).isEqualTo("admin");
         assertThat(draft.getPostedAt()).isNotNull();
     }
 
     @Test
     void postNonDraftJournal_throwsBusinessException() {
-        JournalEntry posted = buildJournalEntry(1L, JournalEntryStatus.POSTED,
+        JournalEntry posted = buildJournalEntry(1L, JournalEntryStatus.APPROVED,
                 new BigDecimal("100.0000"), new BigDecimal("100.0000"));
 
         when(journalEntryRepository.findById(1L)).thenReturn(Optional.of(posted));
@@ -165,10 +165,10 @@ class JournalEntryServiceTest {
 
     @Test
     void reversePostedJournal_createsReversalEntry() {
-        Account account1 = buildAccount(1L, "1001", "Cash", true, true);
-        Account account2 = buildAccount(2L, "2001", "Revenue", true, true);
+        Account account1 = buildAccount(1L, "1001", "Cash", true);
+        Account account2 = buildAccount(2L, "2001", "Revenue", true);
 
-        JournalEntry original = buildJournalEntry(10L, JournalEntryStatus.POSTED,
+        JournalEntry original = buildJournalEntry(10L, JournalEntryStatus.APPROVED,
                 new BigDecimal("200.0000"), new BigDecimal("200.0000"));
         original.setReferenceNumber("JE-ORIG");
         original.setCurrencyCode("USD");
@@ -208,7 +208,7 @@ class JournalEntryServiceTest {
 
         JournalEntryDisplayDto result = journalEntryService.reverseJournalEntry(10L, "admin", "Correction");
 
-        assertThat(result.getStatus()).isEqualTo(JournalEntryStatus.POSTED);
+        assertThat(result.getStatus()).isEqualTo(JournalEntryStatus.APPROVED);
         assertThat(result.getEntryType()).isEqualTo("REVERSAL");
         assertThat(result.getReferenceNumber()).isEqualTo("JE-REV-001");
 
@@ -228,12 +228,12 @@ class JournalEntryServiceTest {
 
         assertThatThrownBy(() -> journalEntryService.reverseJournalEntry(1L, "admin", "reason"))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Only posted");
+                .hasMessageContaining("Only approved");
     }
 
     @Test
     void deleteNonDraftJournal_throwsBusinessException() {
-        JournalEntry posted = buildJournalEntry(1L, JournalEntryStatus.POSTED,
+        JournalEntry posted = buildJournalEntry(1L, JournalEntryStatus.APPROVED,
                 new BigDecimal("100.0000"), new BigDecimal("100.0000"));
 
         when(journalEntryRepository.findById(1L)).thenReturn(Optional.of(posted));
@@ -245,13 +245,12 @@ class JournalEntryServiceTest {
 
     // ── helpers ──────────────────────────────────────────────────────────
 
-    private Account buildAccount(Long id, String code, String name, boolean active, boolean postable) {
+    private Account buildAccount(Long id, String code, String name, boolean active) {
         return Account.builder()
                 .id(id)
                 .code(code)
                 .nameEn(name)
                 .active(active)
-                .postable(postable)
                 .build();
     }
 

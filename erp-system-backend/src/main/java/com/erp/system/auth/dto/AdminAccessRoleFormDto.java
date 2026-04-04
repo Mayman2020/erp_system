@@ -19,6 +19,7 @@ public class AdminAccessRoleFormDto {
     @Size(max = 150)
     private String nameEn;
 
+    @NotBlank
     @Size(max = 150)
     private String nameAr;
 

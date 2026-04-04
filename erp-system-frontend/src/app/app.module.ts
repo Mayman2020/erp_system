@@ -24,6 +24,8 @@ import { ConfigurationComponent } from './theme/layout/admin/configuration/confi
 import { ToggleFullScreenDirective } from './theme/shared/full-screen/toggle-full-screen';
 
 import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { MatDialogModule } from '@angular/material/dialog';
+import { HttpNgZoneInterceptor } from './core/interceptors/http-ng-zone.interceptor';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 
 @NgModule({
@@ -51,12 +53,18 @@ import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
     SharedModule,
     ErpSharedModule,
     NgbDropdownModule,
-    NgbTooltipModule
+    NgbTooltipModule,
+    MatDialogModule
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: JwtInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpNgZoneInterceptor,
       multi: true
     }
   ],

@@ -1,12 +1,12 @@
 <ng-container *ngIf="!item.hidden">
-  <li *ngIf="themeLayout === 'horizontal'" (mouseenter)="navCollapse($event)" class="nav-item pcoded-hasmenu" [routerLinkActive]="['active']">
-    <a [routerLinkActive]="['active']" href="javascript:" class="nav-link">
+  <li *ngIf="themeLayout === 'horizontal'" (mouseenter)="navCollapse($event)" class="nav-item pcoded-hasmenu erp-nav-collapse" [routerLinkActive]="['active']">
+    <a [routerLinkActive]="['active']" href="javascript:" class="nav-link erp-nav-link">
       <ng-container *ngTemplateOutlet="itemContent"></ng-container>
     </a>
     <ng-container *ngTemplateOutlet="subMenuContent"></ng-container>
   </li>
-  <li *ngIf="themeLayout === 'vertical'" class="nav-item pcoded-hasmenu" [routerLinkActive]="['active']">
-    <a [routerLinkActive]="['active']" href="javascript:" class="nav-link" (click)="navCollapse($event)">
+  <li *ngIf="themeLayout === 'vertical'" class="nav-item pcoded-hasmenu erp-nav-collapse" [routerLinkActive]="['active']">
+    <a [routerLinkActive]="['active']" href="javascript:" class="nav-link erp-nav-link" (click)="navCollapse($event)">
       <ng-container *ngTemplateOutlet="itemContent"></ng-container>
     </a>
     <ng-container *ngTemplateOutlet="subMenuContent"></ng-container>
@@ -20,7 +20,6 @@
           {{item.badge.title}}
         </span>
       </span>
-      <span class="erp-nav-collapse__caret"><mat-icon aria-hidden="true">{{ themeLayout === 'vertical' ? 'expand_more' : 'chevron_right' }}</mat-icon></span>
       <span *ngIf="item.badge && themeLayout === 'vertical'" class="pcoded-badge badge" [ngClass]="item.badge.type">
         {{item.badge.title}}
       </span>

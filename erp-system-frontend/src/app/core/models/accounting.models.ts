@@ -1,5 +1,5 @@
-export type AccountingType = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE';
-export type DocumentStatus = 'DRAFT' | 'APPROVED' | 'POSTED' | 'REVERSED' | 'CANCELLED';
+export type AccountingType = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'REVENUE' | 'EXPENSE';
+export type DocumentStatus = 'DRAFT' | 'APPROVED' | 'REVERSED' | 'CANCELLED';
 export type BalanceSide = 'DEBIT' | 'CREDIT';
 
 export interface RecentDocument {
@@ -9,6 +9,10 @@ export interface RecentDocument {
   amount: number;
   status: DocumentStatus | string;
 }
+
+export type RecentActivityKind = 'journals' | 'payments' | 'receipts';
+export type SortDirection = 'asc' | 'desc';
+export interface RecentActivityItem extends RecentDocument {}
 
 export interface BudgetSnapshot {
   id: number;
@@ -33,10 +37,11 @@ export interface DashboardSummary {
   totalRevenue: number;
   totalExpenses: number;
   netProfit: number;
-  monthDebitTotal: number;
-  monthCreditTotal: number;
   weekDebitSeries: number[];
   weekCreditSeries: number[];
+  rollingMonthRevenueSeries: number[];
+  rollingMonthExpenseSeries: number[];
+  rollingMonthNetProfitSeries: number[];
   rollingMonthDebitSeries: number[];
   rollingMonthCreditSeries: number[];
   recentJournals: RecentDocument[];
@@ -55,13 +60,13 @@ export interface AccountDto {
   name: string;
   nameAr: string;
   nameEn: string;
+  financialStatement?: 'BALANCE_SHEET' | 'INCOME_STATEMENT';
   parentId: number | null;
   parentCode: string | null;
   accountType: AccountingType;
   level: number;
   fullPath: string;
   active: boolean;
-  postable: boolean;
   openingBalance: number;
   openingBalanceSide: BalanceSide | null;
 }
@@ -73,6 +78,7 @@ export interface AccountTreeDto {
   nameAr: string;
   nameEn: string;
   accountType: AccountingType;
+  financialStatement?: 'BALANCE_SHEET' | 'INCOME_STATEMENT';
   level: number;
   active: boolean;
   children: AccountTreeDto[];
@@ -86,7 +92,6 @@ export interface AccountFormDto {
   parentId?: number | null;
   accountType: AccountingType;
   active?: boolean;
-  postable?: boolean;
   openingBalance?: number;
   openingBalanceSide?: BalanceSide | null;
 }
@@ -120,8 +125,11 @@ export interface JournalEntry {
   reversedAt?: string;
   reversedBy?: string;
   reversalReference?: string;
+  sourceModule?: string;
+  sourceRecordId?: number;
   lines: JournalEntryLine[];
   createdBy?: string;
+  createdAt?: string;
 }
 
 export interface JournalEntryLineForm {
@@ -152,6 +160,8 @@ export interface BankAccountDto {
   linkedAccountId: number;
   linkedAccountCode?: string;
   linkedAccountName?: string;
+  linkedAccountNameEn?: string;
+  linkedAccountNameAr?: string;
 }
 
 export interface VoucherBase {
@@ -166,6 +176,8 @@ export interface VoucherBase {
   voucherType: string;
   partyName?: string;
   createdBy?: string;
+  /** Server audit: when the voucher row was created (ISO instant) */
+  createdAt?: string;
 }
 
 export interface PaymentVoucher extends VoucherBase {
@@ -174,9 +186,13 @@ export interface PaymentVoucher extends VoucherBase {
   cashAccountId: number;
   cashAccountCode?: string;
   cashAccountName?: string;
+  cashAccountNameEn?: string;
+  cashAccountNameAr?: string;
   expenseAccountId: number;
   expenseAccountCode?: string;
   expenseAccountName?: string;
+  expenseAccountNameEn?: string;
+  expenseAccountNameAr?: string;
 }
 
 export interface ReceiptVoucher extends VoucherBase {
@@ -184,9 +200,13 @@ export interface ReceiptVoucher extends VoucherBase {
   cashAccountId: number;
   cashAccountCode?: string;
   cashAccountName?: string;
+  cashAccountNameEn?: string;
+  cashAccountNameAr?: string;
   revenueAccountId: number;
   revenueAccountCode?: string;
   revenueAccountName?: string;
+  revenueAccountNameEn?: string;
+  revenueAccountNameAr?: string;
 }
 
 export interface PaymentVoucherForm {
@@ -305,17 +325,6 @@ export interface BalanceSheetReportDto {
   balanced: boolean;
 }
 
-export interface TransferDto {
-  id: number;
-  transferDate: string;
-  reference: string;
-  description?: string;
-  amount: number;
-  status: string;
-  sourceAccountName?: string;
-  destinationAccountName?: string;
-}
-
 export interface AccountingTransactionDto {
   id: number;
   transactionDate: string;
@@ -325,7 +334,11 @@ export interface AccountingTransactionDto {
   status: string;
   amount: number;
   debitAccountName?: string;
+  debitAccountNameEn?: string;
+  debitAccountNameAr?: string;
   creditAccountName?: string;
+  creditAccountNameEn?: string;
+  creditAccountNameAr?: string;
 }
 
 export interface CustomerInvoiceDto {
@@ -355,6 +368,8 @@ export interface LedgerLineDto {
   journalReference: string;
   entryDate: string;
   lineNumber: number;
+  transactionType?: string;
+  sourceReference?: string;
   description?: string;
   debit: number;
   credit: number;
@@ -365,6 +380,8 @@ export interface LedgerDto {
   accountId: number;
   accountCode: string;
   accountName: string;
+  accountNameAr?: string;
+  accountNameEn?: string;
   openingBalance: number;
   closingBalance: number;
   lines: LedgerLineDto[];

@@ -109,10 +109,6 @@ public class JournalEntryService {
                 throw new BusinessException("Cannot use inactive account: " + account.getCode());
             }
 
-            if (!account.isPostable()) {
-                throw new BusinessException("Cannot post to non-postable account: " + account.getCode());
-            }
-
             JournalEntryLine line = new JournalEntryLine();
             line.setJournalEntry(journalEntry);
             line.setAccount(account);
@@ -172,10 +168,6 @@ public class JournalEntryService {
                 throw new BusinessException("Cannot use inactive account: " + account.getCode());
             }
 
-            if (!account.isPostable()) {
-                throw new BusinessException("Cannot post to non-postable account: " + account.getCode());
-            }
-
             JournalEntryLine line = new JournalEntryLine();
             line.setJournalEntry(journalEntry);
             line.setAccount(account);
@@ -203,27 +195,32 @@ public class JournalEntryService {
     }
 
     @Transactional
-    public JournalEntryDisplayDto postJournalEntry(Long id, String postedBy) {
+    public JournalEntryDisplayDto approveJournalEntry(Long id, String approvedBy) {
         JournalEntry journalEntry = journalEntryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("JournalEntry", id));
 
         if (journalEntry.getStatus() != JournalEntryStatus.DRAFT) {
-            throw new BusinessException("Only draft journal entries can be posted");
+            throw new BusinessException("Only draft journal entries can be approved");
         }
 
         postingPeriodService.validatePostingDate(journalEntry.getEntryDate());
 
         if (journalEntry.getTotalDebit().compareTo(journalEntry.getTotalCredit()) != 0) {
-            throw new BusinessException("Cannot post unbalanced journal entry");
+            throw new BusinessException("Cannot approve unbalanced journal entry");
         }
 
-        journalEntry.setStatus(JournalEntryStatus.POSTED);
+        journalEntry.setStatus(JournalEntryStatus.APPROVED);
         journalEntry.setPostedAt(LocalDateTime.now());
-        journalEntry.setPostedBy(postedBy);
+        journalEntry.setPostedBy(approvedBy);
 
         JournalEntry saved = journalEntryRepository.save(journalEntry);
-        auditService.log("JournalEntry", saved.getId(), "POST", postedBy, "Posted journal " + saved.getReferenceNumber());
+        auditService.log("JournalEntry", saved.getId(), "APPROVE", approvedBy, "Approved journal " + saved.getReferenceNumber());
         return toDisplay(saved);
+    }
+
+    @Transactional
+    public JournalEntryDisplayDto postJournalEntry(Long id, String postedBy) {
+        return approveJournalEntry(id, postedBy);
     }
 
     @Transactional
@@ -231,8 +228,8 @@ public class JournalEntryService {
         JournalEntry originalEntry = journalEntryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("JournalEntry", id));
 
-        if (originalEntry.getStatus() != JournalEntryStatus.POSTED) {
-            throw new BusinessException("Only posted journal entries can be reversed");
+        if (originalEntry.getStatus() != JournalEntryStatus.APPROVED) {
+            throw new BusinessException("Only approved journal entries can be reversed");
         }
 
         // Create reversal entry
@@ -244,7 +241,7 @@ public class JournalEntryService {
         reversalEntry.setExternalReference(originalEntry.getExternalReference());
         reversalEntry.setCurrencyCode(originalEntry.getCurrencyCode());
         reversalEntry.setEntryType("REVERSAL");
-        reversalEntry.setStatus(JournalEntryStatus.POSTED);
+        reversalEntry.setStatus(JournalEntryStatus.APPROVED);
         reversalEntry.setPostedAt(LocalDateTime.now());
         reversalEntry.setPostedBy(reversedBy);
         reversalEntry.setLines(new ArrayList<>());

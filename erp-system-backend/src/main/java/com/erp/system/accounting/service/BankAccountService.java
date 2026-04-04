@@ -82,7 +82,7 @@ public class BankAccountService {
     private void applyForm(BankAccount bankAccount, BankAccountFormDto request) {
         Account linkedAccount = accountRepository.findById(request.getLinkedAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", request.getLinkedAccountId()));
-        if (!linkedAccount.isActive() || !linkedAccount.isPostable() || linkedAccount.getAccountType() != AccountingType.ASSET) {
+        if (!linkedAccount.isActive() || linkedAccount.getAccountType() != AccountingType.ASSET) {
             throw new BusinessException("Linked bank account must be an active asset account");
         }
 
@@ -120,6 +120,8 @@ public class BankAccountService {
                 .linkedAccountId(bankAccount.getLinkedAccount().getId())
                 .linkedAccountCode(bankAccount.getLinkedAccount().getCode())
                 .linkedAccountName(bankAccount.getLinkedAccount().getNameEn())
+                .linkedAccountNameEn(bankAccount.getLinkedAccount().getNameEn())
+                .linkedAccountNameAr(bankAccount.getLinkedAccount().getNameAr())
                 .createdAt(bankAccount.getCreatedAt())
                 .updatedAt(bankAccount.getUpdatedAt())
                 .build();

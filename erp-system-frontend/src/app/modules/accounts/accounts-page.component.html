@@ -41,6 +41,15 @@
       </label>
 
       <label class="accounts-page__filter">
+        <span class="accounts-page__filter-label">{{ 'ACCOUNTS.FINANCIAL_STATEMENT' | translate }}</span>
+        <select class="erp-input" [ngModel]="selectedFinancialStatement" (ngModelChange)="onFinancialStatementFilterChange($event)">
+          <option value="">{{ 'COMMON.ALL' | translate }}</option>
+          <option value="BALANCE_SHEET">{{ 'FINANCIAL_STATEMENT.BALANCE_SHEET' | translate }}</option>
+          <option value="INCOME_STATEMENT">{{ 'FINANCIAL_STATEMENT.INCOME_STATEMENT' | translate }}</option>
+        </select>
+      </label>
+
+      <label class="accounts-page__filter">
         <span class="accounts-page__filter-label">{{ 'COMMON.SORT_BY' | translate }}</span>
         <select class="erp-input" [ngModel]="sortBy" (ngModelChange)="setSort($event, sortDir)">
           <option value="code">{{ 'ACCOUNTS.CODE' | translate }}</option>
@@ -114,13 +123,16 @@
         <app-form-field [control]="form.controls.nameAr" labelKey="ACCOUNTS.NAME_AR" icon="translate"></app-form-field>
         <app-form-field [control]="form.controls.nameEn" labelKey="ACCOUNTS.NAME_EN" icon="translate"></app-form-field>
 
-        <label class="accounts-dialog__parent-field accounts-dialog__parent-field--full">
-          <span class="accounts-dialog__field-label">{{ 'ACCOUNTS.PARENT' | translate }}</span>
-          <select class="erp-input" formControlName="parentId">
-            <option [ngValue]="null">-</option>
-            <option *ngFor="let option of parentOptions" [ngValue]="option.id">{{ option.label }}</option>
-          </select>
-        </label>
+        <div class="accounts-dialog__parent-field accounts-dialog__parent-field--full">
+          <app-account-tree-picker
+            formControlName="parentId"
+            [accountTree]="treeRows"
+            labelKey="ACCOUNTS.PARENT"
+            icon="account_tree"
+            [nullable]="true"
+            [minSelectableLevel]="1"
+          ></app-account-tree-picker>
+        </div>
 
         <app-form-field
           [control]="form.controls.openingBalance"
@@ -149,11 +161,6 @@
           optionLabelField="code"
           optionLabelPrefix="STATUS."
         ></app-form-field>
-
-        <label class="accounts-dialog__toggle">
-          <input type="checkbox" formControlName="postable" />
-          <span>{{ 'ACCOUNTS.POSTABLE' | translate }}</span>
-        </label>
       </div>
     </form>
   </div>

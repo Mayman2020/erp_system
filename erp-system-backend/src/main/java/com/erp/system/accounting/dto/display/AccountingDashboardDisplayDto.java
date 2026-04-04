@@ -18,13 +18,14 @@ public class AccountingDashboardDisplayDto {
     private BigDecimal totalRevenue;
     private BigDecimal totalExpenses;
     private BigDecimal netProfit;
-    private BigDecimal monthDebitTotal;
-    private BigDecimal monthCreditTotal;
     /** Posted journal line debits per calendar day for the last 7 days (oldest → newest). */
     private List<BigDecimal> weekDebitSeries;
     /** Posted journal line credits per calendar day for the last 7 days (oldest → newest). */
     private List<BigDecimal> weekCreditSeries;
     /** Total debits per month for the rolling 12 months ending in the current month (oldest → newest). */
+    private List<BigDecimal> rollingMonthRevenueSeries;
+    private List<BigDecimal> rollingMonthExpenseSeries;
+    private List<BigDecimal> rollingMonthNetProfitSeries;
     private List<BigDecimal> rollingMonthDebitSeries;
     /** Total credits per month for the rolling 12 months ending in the current month (oldest → newest). */
     private List<BigDecimal> rollingMonthCreditSeries;

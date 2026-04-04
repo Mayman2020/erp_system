@@ -32,9 +32,13 @@ public class ReceiptVoucherDisplayDto {
     private Long cashAccountId;
     private String cashAccountCode;
     private String cashAccountName;
+    private String cashAccountNameEn;
+    private String cashAccountNameAr;
     private Long revenueAccountId;
     private String revenueAccountCode;
     private String revenueAccountName;
+    private String revenueAccountNameEn;
+    private String revenueAccountNameAr;
     private Long journalEntryId;
     private Long reversalJournalEntryId;
     private LocalDateTime approvedAt;
@@ -43,4 +47,6 @@ public class ReceiptVoucherDisplayDto {
     private String postedBy;
     private Instant createdAt;
     private Instant updatedAt;
+    private String createdBy;
+    private String updatedBy;
 }

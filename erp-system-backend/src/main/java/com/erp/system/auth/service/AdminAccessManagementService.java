@@ -111,6 +111,26 @@ public class AdminAccessManagementService {
     }
 
     @Transactional
+    public AdminUserDto setUserActive(Long userId, boolean active) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+        user.setActive(active);
+        return toUserDto(userRepository.save(user));
+    }
+
+    @Transactional
+    public void deleteRole(Long roleId) {
+        AccessRole role = accessRoleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("AccessRole", roleId));
+        if (role.isSystemRole()) {
+            throw new BusinessException("System roles cannot be deleted");
+        }
+        userAccessRoleRepository.deleteByRoleId(roleId);
+        roleMenuPermissionRepository.deleteByRoleId(roleId);
+        accessRoleRepository.delete(role);
+    }
+
+    @Transactional
     public AdminUserDto updateUser(Long userId, AdminUserFormDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
@@ -142,7 +162,7 @@ public class AdminAccessManagementService {
         AccessRole role = AccessRole.builder()
                 .code(normalizeRoleCode(request.getCode()))
                 .nameEn(normalize(request.getNameEn()))
-                .nameAr(normalizeOptional(request.getNameAr()))
+                .nameAr(normalize(request.getNameAr()))
                 .active(Boolean.TRUE.equals(request.getActive()))
                 .systemRole(false)
                 .build();
@@ -164,7 +184,7 @@ public class AdminAccessManagementService {
 
         role.setCode(requestedCode);
         role.setNameEn(normalize(request.getNameEn()));
-        role.setNameAr(normalizeOptional(request.getNameAr()));
+        role.setNameAr(normalize(request.getNameAr()));
         role.setActive(Boolean.TRUE.equals(request.getActive()));
 
         AccessRole saved = accessRoleRepository.save(role);

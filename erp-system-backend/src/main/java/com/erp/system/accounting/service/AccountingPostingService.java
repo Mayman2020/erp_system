@@ -47,7 +47,7 @@ public class AccountingPostingService {
                 .referenceNumber(generateReferenceNumber())
                 .entryDate(entryDate)
                 .description(description)
-                .status(JournalEntryStatus.POSTED)
+                .status(JournalEntryStatus.APPROVED)
                 .postedAt(LocalDateTime.now())
                 .postedBy(actor)
                 .sourceModule(sourceModule)
@@ -62,8 +62,8 @@ public class AccountingPostingService {
         for (JournalLineDraft draft : lines) {
             Account account = accountRepository.findById(draft.getAccountId())
                     .orElseThrow(() -> new ResourceNotFoundException("Account", draft.getAccountId()));
-            if (!account.isActive() || !account.isPostable()) {
-                throw new BusinessException("Account must be active and postable for journal posting");
+            if (!account.isActive()) {
+                throw new BusinessException("Account must be active for journal posting");
             }
 
             BigDecimal debit = normalize(draft.getDebit());
@@ -100,8 +100,8 @@ public class AccountingPostingService {
         if (originalEntry == null) {
             throw new BusinessException("Journal entry is required for reversal");
         }
-        if (originalEntry.getStatus() != JournalEntryStatus.POSTED) {
-            throw new BusinessException("Only posted journal entries can be reversed");
+        if (originalEntry.getStatus() != JournalEntryStatus.APPROVED) {
+            throw new BusinessException("Only approved journal entries can be reversed");
         }
 
         postingPeriodService.validatePostingDate(reversalDate);
@@ -110,7 +110,7 @@ public class AccountingPostingService {
                 .referenceNumber(generateReferenceNumber())
                 .entryDate(reversalDate)
                 .description("Reversal of " + originalEntry.getReferenceNumber() + (reason == null || reason.isBlank() ? "" : " - " + reason.trim()))
-                .status(JournalEntryStatus.POSTED)
+                .status(JournalEntryStatus.APPROVED)
                 .postedAt(LocalDateTime.now())
                 .postedBy(actor)
                 .sourceModule(originalEntry.getSourceModule())

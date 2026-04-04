@@ -17,4 +17,7 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
     Optional<Budget> findById(Long id);
 
     List<Budget> findByStatusOrderByBudgetYearDescBudgetMonthAscIdDesc(BudgetStatus status);
+
+    @EntityGraph(attributePaths = {"account"})
+    List<Budget> findTop6ByOrderByBudgetYearDescBudgetMonthAscIdDesc();
 }

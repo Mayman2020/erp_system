@@ -5,7 +5,6 @@
          [attr.aria-expanded]="expanded" [attr.aria-label]="item.title | translate">
         <span class="pcoded-micon" *ngIf="item.icon"><mat-icon aria-hidden="true">{{ item.icon }}</mat-icon></span>
         <span class="pcoded-mtext">{{ item.title | translate }}</span>
-        <span class="erp-nav-module-group__caret"><mat-icon aria-hidden="true">{{ expanded ? 'expand_more' : 'chevron_right' }}</mat-icon></span>
       </a>
       <ul class="pcoded-submenu erp-nav-module-group__children">
         <ng-container *ngFor="let child of item.children">

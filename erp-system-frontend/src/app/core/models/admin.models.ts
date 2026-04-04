@@ -34,7 +34,7 @@ export interface AdminRole {
 export interface AdminRoleForm {
   code: string;
   nameEn: string;
-  nameAr?: string | null;
+  nameAr: string;
   active: boolean;
   permissions: Array<{
     menuItemId: string;
@@ -95,7 +95,7 @@ export interface AdminLookupType {
 export interface AdminLookupTypeForm {
   code: string;
   nameEn: string;
-  nameAr?: string | null;
+  nameAr: string;
   sortOrder: number;
   active: boolean;
 }
@@ -113,8 +113,38 @@ export interface AdminLookupValue {
 export interface AdminLookupValueForm {
   typeCode: string;
   code: string;
-  nameEn?: string | null;
-  nameAr?: string | null;
+  nameEn: string;
+  nameAr: string;
   sortOrder: number;
   active: boolean;
+}
+
+export interface UiMenuItemAdmin {
+  id: string;
+  parentId?: string | null;
+  sortOrder: number;
+  itemType: string;
+  titleKey: string;
+  icon?: string | null;
+  url?: string | null;
+  external?: boolean;
+  targetBlank?: boolean;
+  rolesCsv?: string | null;
+  itemClasses?: string | null;
+  breadcrumbsFlag?: boolean | null;
+}
+
+export interface UiMenuItemAdminForm {
+  id: string;
+  parentId?: string | null;
+  sortOrder: number;
+  itemType: string;
+  titleKey: string;
+  icon?: string | null;
+  url?: string | null;
+  external?: boolean;
+  targetBlank?: boolean;
+  rolesCsv?: string | null;
+  itemClasses?: string | null;
+  breadcrumbsFlag?: boolean | null;
 }

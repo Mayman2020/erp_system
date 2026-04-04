@@ -1,0 +1,39 @@
+<div class="dash-chart-card dash-chart-card--activity">
+  <div class="dash-chart-card__header dash-chart-card__header--activity">
+    <div class="dash-chart-card__header-copy">
+      <h5>{{ titleKey | translate }}</h5>
+    </div>
+    <div class="dash-chart-card__header-actions">
+      <button
+        type="button"
+        class="erp-icon-button"
+        [attr.aria-label]="'COMMON.SORT_DIRECTION' | translate"
+        [attr.title]="'COMMON.SORT_DIRECTION' | translate"
+        (click)="toggleSortDirection()"
+      >
+        <mat-icon aria-hidden="true">{{ sortDirection === 'desc' ? 'south' : 'north' }}</mat-icon>
+      </button>
+      <a class="erp-button erp-button--ghost erp-button--sm" [routerLink]="viewAllLink">
+        <span>{{ 'COMMON.VIEW' | translate }}</span>
+        <mat-icon aria-hidden="true">arrow_outward</mat-icon>
+      </a>
+    </div>
+  </div>
+
+  <div class="dash-chart-card__body">
+    <app-data-table
+      [columns]="columns"
+      [data]="rows"
+      [loading]="loading"
+      [compact]="true"
+      [exportable]="false"
+      [pageSize]="pageSize"
+      [page]="page"
+      [totalItems]="totalItems"
+      paginationMode="server"
+      emptyTitleKey="COMMON.NO_DATA"
+      emptyDescriptionKey="COMMON.NO_RESULTS_HINT"
+      (pageChange)="onPageChange($event)"
+    ></app-data-table>
+  </div>
+</div>

@@ -1,23 +1,47 @@
 .erp-nav-module-group {
+  width: 100%;
+  min-width: 0;
+
   .erp-nav-module-group__head {
     position: relative;
-    padding-inline-end: 2rem;
+    display: flex;
+    align-items: center;
+    gap: var(--erp-space-2);
+    width: 100%;
+    min-height: 44px;
+    padding-inline-end: 14px;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  /* Hide theme default hasmenu arrow; keep only custom caret */
-  > .erp-nav-module-group__head:after {
+  > .erp-nav-module-group__head::after {
     display: none !important;
     content: none !important;
   }
 
-  .erp-nav-module-group__caret {
-    position: absolute;
-    inset-inline-end: 0.65rem;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.75;
-    font-size: 0.95rem;
-    pointer-events: none;
+  .pcoded-micon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+  }
+
+  .pcoded-mtext {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .erp-nav-module-group__children {
+    width: 100%;
+    min-width: 0;
+    margin: var(--erp-space-1) 0 0;
+    padding: 0;
+  }
+
+  > .erp-nav-module-group__head:hover,
+  &.pcoded-trigger > .erp-nav-module-group__head {
+    background: var(--bg-hover);
   }
 
   &:not(.pcoded-trigger) .erp-nav-module-group__children {

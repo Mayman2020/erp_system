@@ -25,3 +25,48 @@
 :host ::ng-deep .erp-nav-scroll .erp-navbar-content {
   padding-top: 0 !important;
 }
+
+:host ::ng-deep app-sidebar,
+:host ::ng-deep .erp-sidebar-layout,
+:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell,
+:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell__profile,
+:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell__menu,
+:host ::ng-deep .erp-sidebar-menu--root {
+  width: 100%;
+  min-width: 0;
+}
+
+:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell {
+  gap: var(--erp-space-1);
+}
+
+:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell__menu {
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .erp-sidebar-menu--root {
+  display: grid;
+  align-content: start;
+  gap: var(--erp-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:host ::ng-deep .erp-sidebar-menu--root > app-nav-group,
+:host ::ng-deep .erp-sidebar-menu--root > app-nav-collapse,
+:host ::ng-deep .erp-sidebar-menu--root > app-nav-item,
+:host ::ng-deep .erp-sidebar-menu--root > li {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:host ::ng-deep .erp-sidebar-menu--root > app-nav-group > li,
+:host ::ng-deep .erp-sidebar-menu--root > app-nav-collapse > li,
+:host ::ng-deep .erp-sidebar-menu--root > app-nav-item > li {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}

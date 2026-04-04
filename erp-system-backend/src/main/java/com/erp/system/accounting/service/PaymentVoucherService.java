@@ -104,22 +104,23 @@ public class PaymentVoucherService {
         voucher.setStatus(VoucherStatus.APPROVED);
         voucher.setApprovedAt(LocalDateTime.now());
         voucher.setApprovedBy(actor);
-        return paymentVoucherMapper.toDisplay(paymentVoucherRepository.save(voucher));
+        paymentVoucherRepository.save(voucher);
+        return postPaymentVoucher(voucherId, actor);
     }
 
     @Transactional
     public PaymentVoucherDisplayDto postPaymentVoucher(Long voucherId, String actor) {
         PaymentVoucher voucher = loadVoucher(voucherId);
-        if (voucher.getStatus() == VoucherStatus.POSTED) {
-            throw new BusinessException("Payment voucher is already posted");
+        if (voucher.getJournalEntry() != null) {
+            return paymentVoucherMapper.toDisplay(voucher);
         }
         if (voucher.getStatus() == VoucherStatus.CANCELLED) {
-            throw new BusinessException("Cancelled payment voucher cannot be posted");
+            throw new BusinessException("Cancelled payment voucher cannot be recorded");
         }
 
         boolean requiresApproval = accountingSettingsService.getBooleanSetting("REQUIRE_APPROVAL_FOR_PAYMENTS", true);
         if (requiresApproval && voucher.getStatus() != VoucherStatus.APPROVED) {
-            throw new BusinessException("Payment voucher must be approved before posting");
+            throw new BusinessException("Payment voucher must be approved before recording");
         }
 
         Bill linkedBill = resolveBill(voucher.getBillId());
@@ -155,7 +156,11 @@ public class PaymentVoucherService {
         );
 
         voucher.setJournalEntry(journalEntry);
-        voucher.setStatus(VoucherStatus.POSTED);
+        if (voucher.getApprovedAt() == null) {
+            voucher.setApprovedAt(LocalDateTime.now());
+            voucher.setApprovedBy(actor);
+        }
+        voucher.setStatus(VoucherStatus.APPROVED);
         voucher.setPostedAt(LocalDateTime.now());
         voucher.setPostedBy(actor);
         PaymentVoucher savedVoucher = paymentVoucherRepository.save(voucher);
@@ -173,7 +178,7 @@ public class PaymentVoucherService {
         }
 
         Bill linkedBill = resolveBill(voucher.getBillId());
-        if (voucher.getStatus() == VoucherStatus.POSTED) {
+        if (voucher.getJournalEntry() != null) {
             JournalEntry reversal = accountingPostingService.reverseJournal(
                     voucher.getJournalEntry(),
                     actor,
@@ -219,8 +224,8 @@ public class PaymentVoucherService {
     private Account resolveAccount(Long accountId, AccountingType expectedType, String label) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable()) {
-            throw new BusinessException(label + " must be active and postable");
+        if (!account.isActive()) {
+            throw new BusinessException(label + " must be active");
         }
         if (account.getAccountType() != expectedType) {
             throw new BusinessException(label + " must be of type " + expectedType);
@@ -231,8 +236,8 @@ public class PaymentVoucherService {
     private Account resolveOffsetAccount(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable()) {
-            throw new BusinessException("Offset account must be active and postable");
+        if (!account.isActive()) {
+            throw new BusinessException("Offset account must be active");
         }
         if (account.getAccountType() != AccountingType.EXPENSE && account.getAccountType() != AccountingType.LIABILITY) {
             throw new BusinessException("Offset account must be an expense or payable account");
@@ -250,7 +255,7 @@ public class PaymentVoucherService {
 
     private void recalculateBillBalances(Bill bill) {
         BigDecimal paidAmount = paymentVoucherRepository.findByBillIdOrderByVoucherDateAscIdAsc(bill.getId()).stream()
-                .filter(voucher -> voucher.getStatus() == VoucherStatus.POSTED)
+                .filter(v -> v.getJournalEntry() != null && v.getStatus() != VoucherStatus.CANCELLED)
                 .map(PaymentVoucher::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -267,8 +272,8 @@ public class PaymentVoucherService {
     }
 
     private void ensureEditable(PaymentVoucher voucher) {
-        if (voucher.getStatus() == VoucherStatus.POSTED || voucher.getStatus() == VoucherStatus.CANCELLED) {
-            throw new BusinessException("Only draft or approved payment vouchers can be edited");
+        if (voucher.getJournalEntry() != null || voucher.getStatus() == VoucherStatus.CANCELLED) {
+            throw new BusinessException("Only draft or approved payment vouchers without a journal entry can be edited");
         }
     }
 

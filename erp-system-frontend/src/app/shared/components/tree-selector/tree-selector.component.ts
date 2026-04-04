@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({ standalone: false,
   selector: 'app-tree-selector',
@@ -13,6 +14,8 @@ export class TreeSelectorComponent implements OnChanges {
   @Input() minSelectableLevel = 1;
   @Output() selected = new EventEmitter<any>();
   expanded = new Set<number>();
+
+  constructor(private translationService: TranslationService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['nodes']) {
@@ -38,10 +41,17 @@ export class TreeSelectorComponent implements OnChanges {
       ASSET: 'account_balance_wallet',
       LIABILITY: 'security',
       EQUITY: 'stacked_bar_chart',
-      INCOME: 'trending_up',
+      REVENUE: 'trending_up',
       EXPENSE: 'trending_down'
     };
     return map[type] || 'circle';
+  }
+
+  label(node: any): string {
+    if (this.translationService.currentLanguage === 'ar') {
+      return node?.nameAr || node?.name || node?.nameEn || node?.accountName || '';
+    }
+    return node?.nameEn || node?.name || node?.nameAr || node?.accountName || '';
   }
 
   isSelectable(node: any): boolean {

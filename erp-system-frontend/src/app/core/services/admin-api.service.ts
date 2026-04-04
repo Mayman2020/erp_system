@@ -14,6 +14,8 @@ import {
   AdminRoleForm,
   AdminUser,
   AdminUserForm,
+  UiMenuItemAdmin,
+  UiMenuItemAdminForm,
   UiPermission
 } from '../models/admin.models';
 
@@ -41,6 +43,12 @@ export class AdminApiService {
     return this.http.put<ApiResponse<AdminUser>>(`${this.accessBase}/users/${userId}`, payload).pipe(map((res) => res.data));
   }
 
+  setUserActive(userId: number, active: boolean): Observable<AdminUser> {
+    return this.http
+      .patch<ApiResponse<AdminUser>>(`${this.accessBase}/users/${userId}/active`, { active })
+      .pipe(map((res) => res.data));
+  }
+
   getRoles(): Observable<AdminRole[]> {
     return this.http.get<ApiResponse<AdminRole[]>>(`${this.accessBase}/roles`).pipe(map((res) => res.data || []));
   }
@@ -51,6 +59,30 @@ export class AdminApiService {
 
   updateRole(roleId: number, payload: AdminRoleForm): Observable<AdminRole> {
     return this.http.put<ApiResponse<AdminRole>>(`${this.accessBase}/roles/${roleId}`, payload).pipe(map((res) => res.data));
+  }
+
+  deleteRole(roleId: number): Observable<void> {
+    return this.http.delete<ApiResponse<unknown>>(`${this.accessBase}/roles/${roleId}`).pipe(map(() => undefined));
+  }
+
+  listMenuItems(): Observable<UiMenuItemAdmin[]> {
+    return this.http.get<ApiResponse<UiMenuItemAdmin[]>>(`${environment.apiBaseUrl}/admin/ui/menu-items`).pipe(map((res) => res.data || []));
+  }
+
+  createMenuItem(payload: UiMenuItemAdminForm): Observable<UiMenuItemAdmin> {
+    return this.http.post<ApiResponse<UiMenuItemAdmin>>(`${environment.apiBaseUrl}/admin/ui/menu-items`, payload).pipe(map((res) => res.data));
+  }
+
+  updateMenuItem(menuItemId: string, payload: UiMenuItemAdminForm): Observable<UiMenuItemAdmin> {
+    return this.http
+      .put<ApiResponse<UiMenuItemAdmin>>(`${environment.apiBaseUrl}/admin/ui/menu-items/${encodeURIComponent(menuItemId)}`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  deleteMenuItem(menuItemId: string): Observable<void> {
+    return this.http
+      .delete<ApiResponse<unknown>>(`${environment.apiBaseUrl}/admin/ui/menu-items/${encodeURIComponent(menuItemId)}`)
+      .pipe(map(() => undefined));
   }
 
   getUiPermissions(): Observable<UiPermission[]> {

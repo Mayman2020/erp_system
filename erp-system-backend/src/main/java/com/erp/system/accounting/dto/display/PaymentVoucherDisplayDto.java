@@ -33,9 +33,13 @@ public class PaymentVoucherDisplayDto {
     private Long cashAccountId;
     private String cashAccountCode;
     private String cashAccountName;
+    private String cashAccountNameEn;
+    private String cashAccountNameAr;
     private Long expenseAccountId;
     private String expenseAccountCode;
     private String expenseAccountName;
+    private String expenseAccountNameEn;
+    private String expenseAccountNameAr;
     private Long journalEntryId;
     private Long reversalJournalEntryId;
     private LocalDateTime approvedAt;
@@ -44,4 +48,6 @@ public class PaymentVoucherDisplayDto {
     private String postedBy;
     private Instant createdAt;
     private Instant updatedAt;
+    private String createdBy;
+    private String updatedBy;
 }

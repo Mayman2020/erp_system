@@ -1,0 +1,7 @@
+{
+  "name": "erp-docs-build",
+  "private": true,
+  "dependencies": {
+    "marked": "^15.0.0"
+  }
+}

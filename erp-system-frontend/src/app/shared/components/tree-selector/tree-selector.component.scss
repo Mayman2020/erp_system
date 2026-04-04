@@ -145,6 +145,31 @@
   white-space: nowrap;
 }
 
+.erp-tree__meta--badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  max-width: 52%;
+}
+
+.erp-tree__badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--erp-bg-muted);
+  color: var(--erp-text-secondary);
+  border: 1px solid var(--erp-border);
+}
+
+.erp-tree__badge--fs {
+  background: color-mix(in srgb, var(--erp-primary) 12%, transparent);
+  color: var(--erp-primary);
+  border-color: color-mix(in srgb, var(--erp-primary) 28%, var(--erp-border));
+}
+
 @media (max-width: 767px) {
   .erp-tree__row {
     align-items: flex-start;

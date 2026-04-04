@@ -61,10 +61,6 @@ public class Account extends BaseEntity {
     private boolean active = true;
 
     @Builder.Default
-    @Column(name = "is_postable", nullable = false)
-    private boolean postable = true;
-
-    @Builder.Default
     @Column(name = "opening_balance", precision = 19, scale = 2)
     private BigDecimal openingBalance = BigDecimal.ZERO;
 
@@ -117,7 +113,7 @@ public class Account extends BaseEntity {
     }
 
     public boolean isCreditBalance() {
-        return accountType == AccountingType.LIABILITY || accountType == AccountingType.EQUITY || accountType == AccountingType.INCOME;
+        return accountType == AccountingType.LIABILITY || accountType == AccountingType.EQUITY || accountType == AccountingType.REVENUE;
     }
 
     public BalanceSide normalBalanceSide() {

@@ -1,0 +1,142 @@
+/* تنسيق طباعة PDF للوثيقة العربية */
+@page {
+  margin: 18mm 16mm 22mm 16mm;
+}
+
+html {
+  font-size: 11pt;
+}
+
+body {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+  line-height: 1.55;
+  color: #1e293b;
+  max-width: 100%;
+}
+
+h1 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 2px solid #22c55e;
+  padding-bottom: 0.35em;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 1.75rem;
+  margin-bottom: 0.65rem;
+  padding-right: 0.5rem;
+  border-right: 4px solid #2563eb;
+}
+
+h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #334155;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+p, li {
+  margin: 0.35em 0;
+}
+
+blockquote {
+  margin: 0.75rem 0;
+  padding: 0.65rem 1rem;
+  background: #f8fafc;
+  border-right: 4px solid #94a3b8;
+  border-radius: 0 8px 8px 0;
+  color: #475569;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 9.5pt;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+}
+
+th {
+  text-align: right;
+  padding: 0.55rem 0.65rem;
+  font-weight: 700;
+  color: #334155;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+td {
+  text-align: right;
+  vertical-align: top;
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.88em;
+  background: #f1f5f9;
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+  direction: ltr;
+  display: inline-block;
+  unicode-bidi: embed;
+}
+
+pre {
+  direction: ltr;
+  text-align: left;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 9pt;
+}
+
+pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+}
+
+ul, ol {
+  padding-right: 1.35rem;
+  padding-left: 0;
+}
+
+strong {
+  color: #0f172a;
+}

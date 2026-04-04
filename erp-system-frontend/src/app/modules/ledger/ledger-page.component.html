@@ -5,15 +5,13 @@
     <div class="card-body">
       <form [formGroup]="form" class="row mb-4">
         <div class="col-lg-4 col-md-6">
-          <app-form-field
-            [control]="form.controls.accountId"
+          <app-account-tree-picker
+            formControlName="accountId"
+            [accountTree]="accountTree"
             labelKey="LEDGER.ACCOUNT"
             icon="account_balance"
-            type="select"
-            [options]="accountOptions"
-            optionValueField="id"
-            optionLabelField="label"
-          ></app-form-field>
+            [minSelectableLevel]="2"
+          ></app-account-tree-picker>
         </div>
         <div class="col-lg-3 col-md-6">
           <app-form-field [control]="form.controls.fromDate" labelKey="REPORTS.FILTER.FROM_DATE" icon="calendar_month" type="date"></app-form-field>
@@ -57,7 +55,11 @@
         <div class="col-lg-2 col-md-6">
           <div class="report-card">
             <div class="text-muted small">{{ 'LEDGER.PERIOD' | translate }}</div>
-            <div class="h6 mb-0">{{ form.controls.fromDate.value || '-' }} - {{ form.controls.toDate.value || '-' }}</div>
+            <div class="h6 mb-0">
+              <ng-container *ngIf="form.controls.fromDate.value">{{ form.controls.fromDate.value }}</ng-container>
+              <ng-container *ngIf="form.controls.fromDate.value && form.controls.toDate.value"> — </ng-container>
+              <ng-container *ngIf="form.controls.toDate.value">{{ form.controls.toDate.value }}</ng-container>
+            </div>
           </div>
         </div>
       </div>

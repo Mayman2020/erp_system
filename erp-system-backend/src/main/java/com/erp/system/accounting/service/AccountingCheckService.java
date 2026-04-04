@@ -191,8 +191,8 @@ public class AccountingCheckService {
                 .orElseThrow(() -> new ResourceNotFoundException("BankAccount", request.getBankAccountId()));
         Account holdingAccount = accountRepository.findById(request.getHoldingAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", request.getHoldingAccountId()));
-        if (!holdingAccount.isActive() || !holdingAccount.isPostable()) {
-            throw new BusinessException("Holding account must be active and postable");
+        if (!holdingAccount.isActive()) {
+            throw new BusinessException("Holding account must be active");
         }
         if (holdingAccount.getAccountType() != AccountingType.ASSET && holdingAccount.getAccountType() != AccountingType.LIABILITY) {
             throw new BusinessException("Holding account must be an asset or liability account");

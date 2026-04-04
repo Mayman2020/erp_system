@@ -1,6 +1,7 @@
 package com.erp.system.accounting.repository;
 
 import com.erp.system.accounting.domain.Account;
+import com.erp.system.accounting.dto.display.AccountTypeAmountDto;
 import com.erp.system.common.enums.AccountingType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,6 +36,23 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT a FROM Account a WHERE a.accountType = :type AND a.active = true ORDER BY a.code")
     List<Account> findByTypeAndActive(@Param("type") AccountingType type);
+
+    @Query("""
+            select new com.erp.system.accounting.dto.display.AccountTypeAmountDto(
+                a.accountType,
+                coalesce(sum(
+                    case
+                        when a.openingBalanceSide = com.erp.system.accounting.domain.Account$BalanceSide.CREDIT
+                            then -coalesce(a.openingBalance, 0)
+                        else coalesce(a.openingBalance, 0)
+                    end
+                ), 0)
+            )
+            from Account a
+            where a.active = true
+            group by a.accountType
+            """)
+    List<AccountTypeAmountDto> aggregateSignedOpeningBalancesByType();
 
     Optional<Account> findByCode(String code);
 }

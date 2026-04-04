@@ -21,10 +21,12 @@ import {
   JournalEntryForm,
   PaymentVoucher,
   PaymentVoucherForm,
+  RecentActivityItem,
+  RecentActivityKind,
   ProfitLossReportDto,
   ReceiptVoucher,
   ReceiptVoucherForm,
-  TransferDto,
+  SortDirection,
   LedgerDto,
   CustomerInvoiceDto,
   ReconciliationBankAccountDto,
@@ -33,7 +35,7 @@ import {
   ReconciliationSummaryDto,
   AccountingSettingsUpdateDto
 } from '../models/accounting.models';
-import { ApiResponse } from '../models/api.models';
+import { ApiResponse, PagedResult } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
 export class AccountingApiService {
@@ -41,8 +43,24 @@ export class AccountingApiService {
 
   constructor(private http: HttpClient) {}
 
-  getDashboardSummary(): Observable<DashboardSummary> {
-    return this.http.get<ApiResponse<DashboardSummary>>(`${this.base}/dashboard/financial-stats`).pipe(map((res) => res.data));
+  getDashboardSummary(filters: { fromDate?: string; toDate?: string } = {}): Observable<DashboardSummary> {
+    return this.http
+      .get<ApiResponse<DashboardSummary>>(`${this.base}/dashboard`, { params: this.toParams(filters) })
+      .pipe(map((res) => res.data));
+  }
+
+  getRecentActivity(
+    kind: RecentActivityKind,
+    page = 0,
+    size = 5,
+    sortBy = 'date',
+    sortDirection: SortDirection = 'desc'
+  ): Observable<PagedResult<RecentActivityItem>> {
+    return this.http
+      .get<ApiResponse<PagedResult<RecentActivityItem>>>(`${this.base}/dashboard/recent-activity/${kind}`, {
+        params: this.toParams({ page, size, sortBy, sortDirection })
+      })
+      .pipe(map((res) => res.data));
   }
 
   getAccounts(filters: { search?: string; type?: string; active?: boolean | '' } = {}): Observable<AccountDto[]> {
@@ -93,9 +111,14 @@ export class AccountingApiService {
     return this.http.put<ApiResponse<JournalEntry>>(`${this.base}/journal-entries/${id}`, payload).pipe(map((res) => res.data));
   }
 
+  approveJournalEntry(id: number, approvedBy: string): Observable<JournalEntry> {
+    const params = new HttpParams().set('approvedBy', approvedBy);
+    return this.http.post<ApiResponse<JournalEntry>>(`${this.base}/journal-entries/${id}/approve`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  /** @deprecated Use approveJournalEntry; kept for API compatibility. */
   postJournalEntry(id: number, postedBy: string): Observable<JournalEntry> {
-    const params = new HttpParams().set('postedBy', postedBy);
-    return this.http.post<ApiResponse<JournalEntry>>(`${this.base}/journal-entries/${id}/post`, {}, { params }).pipe(map((res) => res.data));
+    return this.approveJournalEntry(id, postedBy);
   }
 
   reverseJournalEntry(id: number, reversedBy: string, reason: string): Observable<JournalEntry> {
@@ -176,10 +199,6 @@ export class AccountingApiService {
       params = params.set('reason', reason);
     }
     return this.http.post<ApiResponse<ReceiptVoucher>>(`${this.base}/receipt-vouchers/${id}/cancel`, {}, { params }).pipe(map((res) => res.data));
-  }
-
-  getTransfers(filters: Record<string, string | number | boolean> = {}): Observable<TransferDto[]> {
-    return this.http.get<ApiResponse<TransferDto[]>>(`${this.base}/transfers`, { params: this.toParams(filters) }).pipe(map((res) => res.data || []));
   }
 
   getTransactions(filters: Record<string, string | number | boolean> = {}): Observable<AccountingTransactionDto[]> {

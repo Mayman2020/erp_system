@@ -86,8 +86,14 @@
       <app-form-field [control]="form.controls.voucherDate" labelKey="VOUCHERS.FORM.DATE" icon="calendar_month" type="date" [readonly]="readOnlyMode"></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ 'VOUCHERS.FORM.NUMBER' | translate }}</label>
-      <input class="form-control" formControlName="reference" readonly />
+      <app-form-field
+        [control]="form.controls.reference"
+        labelKey="VOUCHERS.FORM.NUMBER"
+        placeholderKey="VOUCHERS.FORM.NUMBER_PLACEHOLDER"
+        hintKey="VOUCHERS.FORM.NUMBER_HINT"
+        type="text"
+        [readonly]="true"
+      ></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
       <label class="form-label">{{ activeVoucherType === 'payment' ? ('VOUCHERS.FORM.BENEFICIARY' | translate) : ('VOUCHERS.FORM.PAYER' | translate) }}</label>
@@ -118,10 +124,13 @@
       </select>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ activeVoucherType === 'payment' ? ('VOUCHERS.FORM.TARGET_ACCOUNT_PAYMENT' | translate) : ('VOUCHERS.FORM.TARGET_ACCOUNT_RECEIPT' | translate) }}</label>
-      <select class="form-control" formControlName="targetAccountId" [disabled]="readOnlyMode">
-        <option *ngFor="let account of accountOptions" [value]="account.id">{{ account.code }} - {{ account.name }}</option>
-      </select>
+      <app-account-tree-picker
+        formControlName="targetAccountId"
+        [accountTree]="accountTree"
+        [labelKey]="activeVoucherType === 'payment' ? 'VOUCHERS.FORM.TARGET_ACCOUNT_PAYMENT' : 'VOUCHERS.FORM.TARGET_ACCOUNT_RECEIPT'"
+        icon="account_tree"
+        [minSelectableLevel]="2"
+      ></app-account-tree-picker>
     </div>
     <div class="col-md-6 mb-3">
       <label class="form-label">{{ 'VOUCHERS.FORM.AMOUNT' | translate }}</label>

@@ -26,7 +26,7 @@ public class AccountDisplayDto {
     private Integer level;
     private String fullPath;
     private boolean active;
-    private boolean postable;
     private BigDecimal openingBalance;
     private Account.BalanceSide openingBalanceSide;
+    private String financialStatement;
 }

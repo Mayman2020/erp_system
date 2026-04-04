@@ -25,6 +25,8 @@ public class BankAccountDisplayDto {
     private Long linkedAccountId;
     private String linkedAccountCode;
     private String linkedAccountName;
+    private String linkedAccountNameEn;
+    private String linkedAccountNameAr;
     private Instant createdAt;
     private Instant updatedAt;
 }

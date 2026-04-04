@@ -16,7 +16,7 @@ import { DateFormatService } from '../../../core/services/date-format.service';
       <label class="erp-form-field__label" [for]="inputId">{{ labelKey | translate }}</label>
 
       <div class="erp-form-field__control">
-        <mat-icon class="erp-form-field__icon" *ngIf="icon" aria-hidden="true">{{ icon }}</mat-icon>
+        <mat-icon class="erp-form-field__icon" *ngIf="icon && type !== 'date'" aria-hidden="true">{{ icon }}</mat-icon>
 
         <ng-container [ngSwitch]="type">
           <textarea
@@ -39,20 +39,41 @@ import { DateFormatService } from '../../../core/services/date-format.service';
             <option *ngFor="let option of options" [ngValue]="optionValue(option)">{{ optionLabel(option) }}</option>
           </select>
 
-          <input
-            *ngSwitchCase="'date'"
-            class="erp-input"
-            [id]="inputId"
-            type="text"
-            [value]="dateDisplayValue"
-            [readonly]="readonly"
-            [disabled]="isDisabled"
-            [attr.placeholder]="datePlaceholder"
-            inputmode="numeric"
-            maxlength="10"
-            (input)="onDateInput($event)"
-            (blur)="onDateBlur()"
-          />
+          <ng-container *ngSwitchCase="'date'">
+            <input
+              class="erp-input erp-input--date"
+              [id]="inputId"
+              type="text"
+              [value]="dateDisplayValue"
+              [readonly]="readonly"
+              [disabled]="isDisabled"
+              [attr.placeholder]="''"
+              inputmode="numeric"
+              maxlength="10"
+              (input)="onDateInput($event)"
+              (blur)="onDateBlur()"
+            />
+            <button
+              *ngIf="icon"
+              type="button"
+              class="erp-form-field__date-button"
+              [disabled]="isDisabled || readonly"
+              (click)="openNativeDatePicker(nativeDateInput)"
+            >
+              <mat-icon aria-hidden="true">{{ icon }}</mat-icon>
+            </button>
+            <input
+              #nativeDateInput
+              class="erp-form-field__native-date"
+              type="date"
+              [value]="control?.value || ''"
+              [disabled]="isDisabled || readonly"
+              tabindex="-1"
+              aria-hidden="true"
+              (input)="onNativeDateChange($event)"
+              (change)="onNativeDateChange($event)"
+            />
+          </ng-container>
 
           <input
             *ngSwitchDefault
@@ -61,6 +82,7 @@ import { DateFormatService } from '../../../core/services/date-format.service';
             [type]="type"
             [formControl]="control"
             [readonly]="readonly"
+            [attr.placeholder]="placeholderKey ? (placeholderKey | translate) : null"
             [attr.min]="min !== null ? min : null"
             [attr.max]="max !== null ? max : null"
             [attr.step]="step || null"
@@ -82,6 +104,7 @@ export class FormFieldComponent implements OnInit, OnChanges, OnDestroy {
   @Input() disabled = false;
   @Input() rows = 4;
   @Input() hintKey = '';
+  @Input() placeholderKey = '';
   @Input() step = '';
   @Input() min: number | null = null;
   @Input() max: number | null = null;
@@ -170,6 +193,10 @@ export class FormFieldComponent implements OnInit, OnChanges, OnDestroy {
       if (option['labelKey']) {
         return this.translationService.instant(option['labelKey']);
       }
+      const localizedLabel = this.resolveLocalizedOptionLabel(option);
+      if (localizedLabel) {
+        return localizedLabel;
+      }
       const raw = option[this.optionLabelField] !== undefined ? option[this.optionLabelField] : option['label'];
       if (this.optionLabelPrefix) {
         return this.translationService.instant(`${this.optionLabelPrefix}${raw}`);
@@ -180,6 +207,23 @@ export class FormFieldComponent implements OnInit, OnChanges, OnDestroy {
       return this.translationService.instant(`${this.optionLabelPrefix}${option}`);
     }
     return `${option}`;
+  }
+
+  private resolveLocalizedOptionLabel(option: Record<string, unknown>): string {
+    const language = this.translationService.currentLanguage === 'ar' ? 'Ar' : 'En';
+    const alternate = language === 'Ar' ? 'En' : 'Ar';
+    const normalizedField = this.optionLabelField.replace(/(Ar|En)$/i, '');
+    const preferredField = `${normalizedField}${language}`;
+    const alternateField = `${normalizedField}${alternate}`;
+    const preferred = option[preferredField];
+    const fallback = option[alternateField];
+    if (typeof preferred === 'string' && preferred.trim()) {
+      return preferred;
+    }
+    if (typeof fallback === 'string' && fallback.trim()) {
+      return fallback;
+    }
+    return '';
   }
 
   onDateInput(event: Event): void {
@@ -227,6 +271,31 @@ export class FormFieldComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.applyInvalidDateError();
+  }
+
+  onNativeDateChange(event: Event): void {
+    if (!this.control) {
+      return;
+    }
+
+    const value = (event.target as HTMLInputElement).value || '';
+    this.control.setValue(value, { emitEvent: false });
+    this.syncDateDisplayFromControl(value);
+    this.clearInvalidDateError();
+    this.control.markAsTouched();
+  }
+
+  openNativeDatePicker(input: HTMLInputElement): void {
+    if (!input || this.isDisabled || this.readonly) {
+      return;
+    }
+
+    input.focus();
+    const pickerCapable = input as HTMLInputElement & { showPicker?: () => void };
+    pickerCapable.showPicker?.();
+    if (!pickerCapable.showPicker) {
+      input.click();
+    }
   }
 
   private bindDateControl(): void {

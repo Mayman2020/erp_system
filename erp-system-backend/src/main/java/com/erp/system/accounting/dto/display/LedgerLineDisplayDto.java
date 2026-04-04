@@ -18,6 +18,8 @@ public class LedgerLineDisplayDto {
     private String journalReference;
     private LocalDate entryDate;
     private Integer lineNumber;
+    private String transactionType;
+    private String sourceReference;
     private String description;
     private BigDecimal debit;
     private BigDecimal credit;

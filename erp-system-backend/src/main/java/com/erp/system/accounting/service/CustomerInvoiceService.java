@@ -88,30 +88,29 @@ public class CustomerInvoiceService {
         }
 
         List<AccountingPostingService.JournalLineDraft> journalLines = new ArrayList<>();
-        for (CustomerInvoiceLine line : invoice.getLines()) {
-            journalLines.add(AccountingPostingService.JournalLineDraft.builder()
-                    .accountId(line.getAccount().getId())
-                    .description(line.getDescription())
-                    .debit(line.getLineTotal())
-                    .credit(BigDecimal.ZERO)
-                    .build());
-        }
-        if (invoice.getTaxAmount().compareTo(BigDecimal.ZERO) > 0) {
-            // if there's a tax account in expense/revenue account, entry is net to receivable in tax omitted for simplicity
-            // in real system add separate tax line if needed.
-        }
         journalLines.add(AccountingPostingService.JournalLineDraft.builder()
                 .accountId(invoice.getReceivableAccount().getId())
                 .description("Customer receivable")
                 .debit(invoice.getTotalAmount())
                 .credit(BigDecimal.ZERO)
                 .build());
-        journalLines.add(AccountingPostingService.JournalLineDraft.builder()
-                .accountId(invoice.getRevenueAccount().getId())
-                .description("Revenue from invoice")
-                .debit(BigDecimal.ZERO)
-                .credit(invoice.getTotalAmount())
-                .build());
+
+        for (CustomerInvoiceLine line : invoice.getLines()) {
+            journalLines.add(AccountingPostingService.JournalLineDraft.builder()
+                    .accountId(line.getAccount().getId())
+                    .description(line.getDescription())
+                    .debit(BigDecimal.ZERO)
+                    .credit(line.getLineTotal())
+                    .build());
+        }
+        if (invoice.getTaxAmount().compareTo(BigDecimal.ZERO) > 0) {
+            journalLines.add(AccountingPostingService.JournalLineDraft.builder()
+                    .accountId(invoice.getRevenueAccount().getId())
+                    .description("Invoice tax allocation")
+                    .debit(BigDecimal.ZERO)
+                    .credit(invoice.getTaxAmount())
+                    .build());
+        }
 
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 invoice.getInvoiceDate(),
@@ -162,7 +161,7 @@ public class CustomerInvoiceService {
         }
 
         BigDecimal paidAmount = receiptVoucherRepository.findByInvoiceReferenceOrderByVoucherDateDescIdDesc(invoice.getInvoiceNumber()).stream()
-                .filter(voucher -> voucher.getStatus() == VoucherStatus.POSTED)
+                .filter(v -> v.getJournalEntry() != null && v.getStatus() != VoucherStatus.CANCELLED)
                 .map(voucher -> voucher.getAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -226,7 +225,7 @@ public class CustomerInvoiceService {
     private Account resolveReceivableAccount(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable() || account.getAccountType() != AccountingType.ASSET) {
+        if (!account.isActive() || account.getAccountType() != AccountingType.ASSET) {
             throw new BusinessException("Receivable account must be an active asset account");
         }
         return account;
@@ -235,8 +234,8 @@ public class CustomerInvoiceService {
     private Account resolveRevenueAccount(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable() || account.getAccountType() != AccountingType.INCOME) {
-            throw new BusinessException("Revenue account must be an active income account");
+        if (!account.isActive() || account.getAccountType() != AccountingType.REVENUE) {
+            throw new BusinessException("Revenue account must be an active revenue account");
         }
         return account;
     }

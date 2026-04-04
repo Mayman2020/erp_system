@@ -34,6 +34,8 @@ public class JournalEntryDisplayDto {
     private LocalDateTime reversedAt;
     private String reversedBy;
     private String reversalReference;
+    private String sourceModule;
+    private Long sourceRecordId;
     private List<JournalEntryLineDisplayDto> lines;
     private Instant createdAt;
     private Instant updatedAt;

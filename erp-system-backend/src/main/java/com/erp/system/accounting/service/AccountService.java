@@ -49,6 +49,7 @@ public class AccountService {
                     .nameAr(account.getNameAr())
                     .nameEn(account.getNameEn())
                     .accountType(account.getAccountType())
+                    .financialStatement(account.getAccountType().financialStatement())
                     .level(account.getLevel())
                     .active(account.isActive())
                     .children(new ArrayList<>())
@@ -189,6 +190,10 @@ public class AccountService {
                 throw new BusinessException("Parent account must be active");
             }
 
+            if (!parent.getAccountType().financialStatement().equals(request.getAccountType().financialStatement())) {
+                throw new BusinessException("Child account must remain within the same financial statement classification as the parent");
+            }
+
             if (parent.getAccountType() != request.getAccountType()) {
                 throw new BusinessException("Child account type must match parent account type");
             }
@@ -246,7 +251,6 @@ public class AccountService {
         account.setAccountType(request.getAccountType());
         account.setLevel(parent == null ? 1 : parent.getLevel() + 1);
         account.setActive(request.getActive() != null ? request.getActive() : true);
-        account.setPostable(request.getPostable() != null ? request.getPostable() : true);
         account.setOpeningBalance(request.getOpeningBalance() != null ? request.getOpeningBalance() : BigDecimal.ZERO);
         account.setOpeningBalanceSide(request.getOpeningBalanceSide());
     }
@@ -285,6 +289,7 @@ public class AccountService {
         dto.setName(resolveLocalizedName(account));
         dto.setNameAr(account.getNameAr());
         dto.setNameEn(account.getNameEn());
+        dto.setFinancialStatement(account.getAccountType().financialStatement());
         return dto;
     }
 

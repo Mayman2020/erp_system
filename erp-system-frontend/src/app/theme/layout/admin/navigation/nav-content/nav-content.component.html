@@ -1,48 +1,20 @@
 <div *ngIf="this.flatConfig['layout'] === 'vertical'" (clickOutside)="navMob()" [excludeBeforeClick]="true" [exclude]="'#mobile-collapse'" id="nav-ps-flat-able" class="flat-able-scroll erp-nav-scroll" [style.max-width]="'100%'">
   <div class="navbar-content erp-navbar-content">
-    <section class="erp-sidebar-panel">
-      <div class="erp-sidebar-profile" [class.erp-sidebar-profile--open]="profileMenuOpen" (clickOutside)="closeProfileMenu()" [excludeBeforeClick]="true">
-        <button
-          type="button"
-          class="erp-sidebar-profile__toggle"
-          (click)="toggleProfileMenu()"
-          [attr.aria-label]="displayName || ('PROFILE.TITLE' | translate)"
-          [attr.aria-expanded]="profileMenuOpen"
-          *ngIf="!loadingUser; else profileSkeleton"
-        >
-          <img [src]="avatarUrl" class="erp-sidebar-profile__avatar" [attr.alt]="'PROFILE.AVATAR_ALT' | translate" />
-          <span class="erp-sidebar-profile__info">
-            <strong>{{ displayName || ('NAV.HESABATY' | translate) | slice:0:18 }}</strong>
-            <small>{{ roleKey | translate }}</small>
-          </span>
-          <mat-icon aria-hidden="true" class="erp-sidebar-profile__caret">{{ profileMenuOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
-        </button>
+    <app-sidebar class="erp-sidebar-layout">
+      <app-profile-card
+        sidebar-profile
+        [displayName]="displayName"
+        [roleKey]="roleKey"
+        [avatarUrl]="avatarUrl"
+        [loading]="loadingUser"
+        [menuOpen]="profileMenuOpen"
+        (toggleMenu)="toggleProfileMenu()"
+        (closeMenu)="closeProfileMenu()"
+        (profileClick)="closeProfileMenu()"
+        (logoutClick)="logout()"
+      ></app-profile-card>
 
-        <ng-template #profileSkeleton>
-          <div class="erp-sidebar-profile__toggle erp-sidebar-profile__skeleton">
-            <div class="erp-sidebar-profile__avatar skeleton-pulse"></div>
-            <div class="erp-sidebar-profile__info">
-              <div class="skeleton-line skeleton-line--primary skeleton-pulse"></div>
-              <div class="skeleton-line skeleton-line--secondary skeleton-pulse"></div>
-            </div>
-          </div>
-        </ng-template>
-
-        <div class="erp-sidebar-profile__menu" *ngIf="profileMenuOpen" role="menu">
-          <a class="erp-sidebar-profile__menu-link" [routerLink]="['/settings']" title="{{ 'PROFILE.TITLE' | translate }}" (click)="closeProfileMenu()" role="menuitem">
-            <mat-icon aria-hidden="true">person</mat-icon>
-            <span>{{ 'PROFILE.TITLE' | translate }}</span>
-          </a>
-          <button type="button" class="erp-sidebar-profile__menu-link erp-sidebar-profile__menu-link--danger" (click)="logout()" role="menuitem">
-            <mat-icon aria-hidden="true">logout</mat-icon>
-            <span>{{ 'AUTH.LOGOUT' | translate }}</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="erp-sidebar-panel__divider"></div>
-
-      <ul class="nav pcoded-inner-navbar erp-sidebar-menu" (clickOutside)="fireOutClick()">
+      <ul sidebar-menu class="nav pcoded-inner-navbar erp-sidebar-menu erp-sidebar-menu--root" (clickOutside)="fireOutClick()">
         <li class="nav-item pcoded-menu-caption" *ngIf="menuLoading"><label>{{ 'COMMON.LOADING' | translate }}</label></li>
         <ng-container *ngFor="let item of navigation">
           <app-nav-group *ngIf="item.type=='group'" [item]="item"></app-nav-group>
@@ -50,7 +22,7 @@
           <app-nav-item *ngIf="item.type=='item'" [item]="item"></app-nav-item>
         </ng-container>
       </ul>
-    </section>
+    </app-sidebar>
   </div>
 </div>
 

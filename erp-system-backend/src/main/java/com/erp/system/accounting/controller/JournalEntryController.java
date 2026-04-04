@@ -63,6 +63,14 @@ public class JournalEntryController {
         return ApiResponse.success(journalEntryService.updateJournalEntry(id, request));
     }
 
+    @PostMapping("/{id}/approve")
+    public ApiResponse<JournalEntryDisplayDto> approveJournalEntry(
+            @PathVariable Long id,
+            @RequestParam String approvedBy
+    ) {
+        return ApiResponse.success(journalEntryService.approveJournalEntry(id, approvedBy));
+    }
+
     @PostMapping("/{id}/post")
     public ApiResponse<JournalEntryDisplayDto> postJournalEntry(
             @PathVariable Long id,

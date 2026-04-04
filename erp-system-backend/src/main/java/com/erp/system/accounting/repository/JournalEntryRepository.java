@@ -1,6 +1,7 @@
 package com.erp.system.accounting.repository;
 
 import com.erp.system.accounting.domain.JournalEntry;
+import com.erp.system.accounting.dto.display.AccountingDashboardDisplayDto;
 import com.erp.system.common.enums.JournalEntryStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,4 +52,16 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
     long countByEntryDateBetween(LocalDate fromDate, LocalDate toDate);
 
     long countByStatus(JournalEntryStatus status);
+
+    @Query("""
+            select new com.erp.system.accounting.dto.display.AccountingDashboardDisplayDto$RecentDocument(
+                j.id,
+                j.referenceNumber,
+                j.entryDate,
+                j.totalDebit,
+                cast(j.status as string))
+            from JournalEntry j
+            where j.status = com.erp.system.common.enums.JournalEntryStatus.APPROVED
+            """)
+    Page<AccountingDashboardDisplayDto.RecentDocument> pageDashboardRecentJournals(Pageable pageable);
 }

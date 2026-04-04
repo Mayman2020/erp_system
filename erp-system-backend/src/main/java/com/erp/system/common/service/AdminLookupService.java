@@ -48,7 +48,7 @@ public class AdminLookupService {
         LookupType type = LookupType.builder()
                 .code(code)
                 .nameEn(normalize(request.getNameEn()))
-                .nameAr(normalizeOptional(request.getNameAr()))
+                .nameAr(normalize(request.getNameAr()))
                 .sortOrder(request.getSortOrder() == null ? 0 : request.getSortOrder())
                 .active(Boolean.TRUE.equals(request.getActive()))
                 .build();
@@ -68,7 +68,7 @@ public class AdminLookupService {
         String oldCode = type.getCode();
         type.setCode(code);
         type.setNameEn(normalize(request.getNameEn()));
-        type.setNameAr(normalizeOptional(request.getNameAr()));
+        type.setNameAr(normalize(request.getNameAr()));
         type.setSortOrder(request.getSortOrder() == null ? 0 : request.getSortOrder());
         type.setActive(Boolean.TRUE.equals(request.getActive()));
         LookupType saved = lookupTypeRepository.save(type);
@@ -105,8 +105,8 @@ public class AdminLookupService {
         LookupValue value = LookupValue.builder()
                 .typeCode(typeCode)
                 .code(code)
-                .nameEn(resolveValueNameEn(request, code))
-                .nameAr(normalizeOptional(request.getNameAr()))
+                .nameEn(normalize(request.getNameEn()))
+                .nameAr(normalize(request.getNameAr()))
                 .sortOrder(request.getSortOrder() == null ? 0 : request.getSortOrder())
                 .active(Boolean.TRUE.equals(request.getActive()))
                 .build();
@@ -127,8 +127,8 @@ public class AdminLookupService {
 
         value.setTypeCode(typeCode);
         value.setCode(code);
-        value.setNameEn(resolveValueNameEn(request, code));
-        value.setNameAr(normalizeOptional(request.getNameAr()));
+        value.setNameEn(normalize(request.getNameEn()));
+        value.setNameAr(normalize(request.getNameAr()));
         value.setSortOrder(request.getSortOrder() == null ? 0 : request.getSortOrder());
         value.setActive(Boolean.TRUE.equals(request.getActive()));
         return toValueDto(lookupValueRepository.save(value));
@@ -194,8 +194,4 @@ public class AdminLookupService {
         return normalize(value).trim().toUpperCase(Locale.ROOT);
     }
 
-    private String resolveValueNameEn(AdminLookupValueFormDto request, String fallbackCode) {
-        String normalized = normalizeOptional(request.getNameEn());
-        return normalized != null ? normalized : fallbackCode;
-    }
 }

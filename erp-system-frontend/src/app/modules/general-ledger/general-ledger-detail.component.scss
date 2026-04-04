@@ -1,0 +1,86 @@
+.gl-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--erp-space-3);
+}
+
+.gl-detail__header-card .row {
+  row-gap: var(--erp-space-3);
+}
+
+.gl-detail__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gl-detail__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--erp-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.gl-detail__value {
+  font-size: 15px;
+  color: var(--erp-text);
+}
+
+.gl-detail__totals {
+  display: flex;
+  gap: var(--erp-space-3);
+  flex-wrap: wrap;
+}
+
+.gl-detail__total-card {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--erp-space-3) var(--erp-space-4);
+  border-radius: 14px;
+  background: var(--erp-bg-card);
+  border: 1px solid var(--erp-border);
+  box-shadow: var(--erp-shadow-sm);
+}
+
+.gl-detail__total-card--debit {
+  border-inline-start: 4px solid var(--erp-warning, #f59e0b);
+}
+
+.gl-detail__total-card--credit {
+  border-inline-start: 4px solid var(--erp-success, #10b981);
+}
+
+.gl-detail__total-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--erp-text-secondary);
+  text-transform: uppercase;
+}
+
+.gl-detail__total-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--erp-text);
+}
+
+.gl-detail__lines-table {
+  th {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--erp-text-secondary);
+    border-bottom: 2px solid var(--erp-border);
+    padding: var(--erp-space-2) var(--erp-space-3);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: var(--erp-space-2) var(--erp-space-3);
+    vertical-align: middle;
+    font-size: 14px;
+  }
+}

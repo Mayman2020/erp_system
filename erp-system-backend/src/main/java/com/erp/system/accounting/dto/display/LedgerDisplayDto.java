@@ -17,6 +17,8 @@ public class LedgerDisplayDto {
     private Long accountId;
     private String accountCode;
     private String accountName;
+    private String accountNameAr;
+    private String accountNameEn;
     private BigDecimal openingBalance;
     private BigDecimal closingBalance;
     private List<LedgerLineDisplayDto> lines;

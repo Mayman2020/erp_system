@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { AccountDto, LedgerDto } from '../../core/models/accounting.models';
+import { AccountDto, AccountTreeDto, LedgerDto } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 @Component({
@@ -16,9 +16,12 @@ export class LedgerPageComponent implements OnInit {
   errorKey = '';
   rows: Array<Record<string, unknown>> = [];
   accounts: AccountDto[] = [];
+  accountTree: AccountTreeDto[] = [];
   ledger: LedgerDto | null = null;
   columns = [
+    { key: 'transactionType', title: 'LEDGER.TRANSACTION_TYPE', align: 'start' as 'start' },
     { key: 'journalReference', title: 'LEDGER.REFERENCE', align: 'start' as 'start' },
+    { key: 'sourceReference', title: 'LEDGER.SOURCE_REFERENCE', align: 'start' as 'start' },
     { key: 'entryDate', title: 'LEDGER.DATE', kind: 'date' as 'date' },
     { key: 'description', title: 'LEDGER.DESCRIPTION', align: 'start' as 'start' },
     { key: 'debit', title: 'LEDGER.DEBIT', align: 'end' as 'end' },
@@ -46,7 +49,7 @@ export class LedgerPageComponent implements OnInit {
 
     this.api.getAccounts({ active: true }).subscribe(
       (accounts) => {
-        this.accounts = accounts.filter((account) => account.postable);
+        this.accounts = accounts;
         if (this.accounts.length) {
           this.form.patchValue({ accountId: this.accounts[0].id });
           this.load();
@@ -54,6 +57,7 @@ export class LedgerPageComponent implements OnInit {
       },
       () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
     );
+    this.api.getAccountTree().subscribe((tree) => (this.accountTree = tree));
   }
 
   get selectedAccount(): AccountDto | null {
@@ -109,6 +113,7 @@ export class LedgerPageComponent implements OnInit {
           this.ledger = ledger;
           this.rows = (ledger.lines || []).map((line) => ({
             ...line,
+            transactionType: this.translationService.instant(`LEDGER.TRANSACTION_TYPE_${line.transactionType || 'JOURNAL_VOUCHER'}`),
             description: line.description || this.translationService.instant('LEDGER.NO_DESCRIPTION'),
             debit: Number(line.debit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             credit: Number(line.credit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -123,4 +128,3 @@ export class LedgerPageComponent implements OnInit {
       );
   }
 }
-

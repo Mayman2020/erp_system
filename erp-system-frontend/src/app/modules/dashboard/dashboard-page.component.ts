@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { finalize } from 'rxjs/operators';
-import { DashboardSummary, RecentDocument } from '../../core/models/accounting.models';
+import { DashboardSummary } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 
@@ -14,6 +14,9 @@ export class DashboardPageComponent implements OnInit {
   errorKey = '';
   summary: DashboardSummary | null = null;
   monthlySummaries: Array<{ label: string; debit: number; credit: number; cashFlow: number }> = [];
+
+  filterFromDate = '';
+  filterToDate = '';
 
   revenueExpenseChartId = 'revenue-expense-chart';
   cashFlowChartId = 'cash-flow-chart';
@@ -31,12 +34,6 @@ export class DashboardPageComponent implements OnInit {
   budgetChartConfig: Record<string, unknown> = {};
   weeklyActivityChartConfig: Record<string, unknown> = {};
 
-  documentColumns = [
-    { key: 'reference', title: 'DASHBOARD.DOC_REFERENCE', className: 'erp-table__col--compact' },
-    { key: 'date', title: 'DASHBOARD.DOC_DATE', kind: 'date' as 'date', className: 'erp-table__col--compact' },
-    { key: 'amount', title: 'DASHBOARD.DOC_AMOUNT', className: 'erp-table__col--compact' },
-    { key: 'status', title: 'COMMON.STATUS', kind: 'status' as 'status' }
-  ];
   monthlySummaryColumns = [
     { key: 'month', title: 'DASHBOARD.MONTH', className: 'erp-table__col--compact' },
     { key: 'debit', title: 'DASHBOARD.DEBIT', className: 'erp-table__col--compact' },
@@ -65,12 +62,26 @@ export class DashboardPageComponent implements OnInit {
     });
   }
 
+  applyFilter(): void {
+    this.fetchDashboard();
+  }
+
+  resetFilter(): void {
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.fetchDashboard();
+  }
+
   fetchDashboard(): void {
     this.loading = true;
     this.errorKey = '';
 
+    const filters: { fromDate?: string; toDate?: string } = {};
+    if (this.filterFromDate) { filters.fromDate = this.filterFromDate; }
+    if (this.filterToDate) { filters.toDate = this.filterToDate; }
+
     this.api
-      .getDashboardSummary()
+      .getDashboardSummary(filters)
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -94,15 +105,6 @@ export class DashboardPageComponent implements OnInit {
       });
   }
 
-  toDocumentRows(items: RecentDocument[]): Array<Record<string, unknown>> {
-    return (items || []).map((item) => ({
-      reference: item.reference,
-      date: item.date,
-      amount: this.formatAmount(item.amount),
-      status: item.status
-    }));
-  }
-
   toMonthlySummaryRows(): Array<Record<string, unknown>> {
     return (this.monthlySummaries || []).map((month) => ({
       month: month.label,
@@ -120,6 +122,12 @@ export class DashboardPageComponent implements OnInit {
       currency: item.currency
     }));
   }
+
+  recentActivityConfig = [
+    { titleKey: 'DASHBOARD.LATEST_JOURNAL_VOUCHERS', kind: 'journals' as const, viewAllLink: ['/journal-entries'] },
+    { titleKey: 'DASHBOARD.LATEST_PAYMENTS', kind: 'payments' as const, viewAllLink: ['/vouchers', 'payment'] },
+    { titleKey: 'DASHBOARD.LATEST_RECEIPTS', kind: 'receipts' as const, viewAllLink: ['/vouchers', 'receipt'] }
+  ];
 
   formatAmount(value: number): string {
     return Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -168,8 +176,8 @@ export class DashboardPageComponent implements OnInit {
         gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] }
       },
       series: [
-        { name: t('DASHBOARD.TOTAL_REVENUE'), data: summary.rollingMonthCreditSeries },
-        { name: t('DASHBOARD.TOTAL_EXPENSES'), data: summary.rollingMonthDebitSeries }
+        { name: t('DASHBOARD.TOTAL_REVENUE'), data: summary.rollingMonthRevenueSeries || [] },
+        { name: t('DASHBOARD.TOTAL_EXPENSES'), data: summary.rollingMonthExpenseSeries || [] }
       ],
       xaxis: { categories: labels, labels: { style: { fontSize: '11px' } } },
       yaxis: { labels: { formatter: (val: number) => this.compactNumber(val), style: { fontSize: '11px' } } },
@@ -238,10 +246,6 @@ export class DashboardPageComponent implements OnInit {
   }
 
   private buildNetProfitTrendChart(summary: DashboardSummary, labels: string[], t: (k: string) => string): void {
-    const netProfitSeries = summary.rollingMonthCreditSeries.map(
-      (credit, i) => (credit || 0) - (summary.rollingMonthDebitSeries[i] || 0)
-    );
-
     this.netProfitTrendChartConfig = {
       chart: { type: 'area', height: 310, toolbar: { show: false }, fontFamily: 'inherit', sparkline: { enabled: false } },
       stroke: { width: 3, curve: 'smooth' },
@@ -249,7 +253,7 @@ export class DashboardPageComponent implements OnInit {
         type: 'gradient',
         gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05, stops: [0, 100] }
       },
-      series: [{ name: t('DASHBOARD.NET_PROFIT'), data: netProfitSeries }],
+      series: [{ name: t('DASHBOARD.NET_PROFIT'), data: summary.rollingMonthNetProfitSeries || [] }],
       xaxis: { categories: labels, labels: { style: { fontSize: '11px' } } },
       yaxis: { labels: { formatter: (val: number) => this.compactNumber(val), style: { fontSize: '11px' } } },
       colors: ['#6366f1'],

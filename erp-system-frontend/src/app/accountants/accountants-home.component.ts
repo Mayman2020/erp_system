@@ -1,7 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import { forkJoin, Observable, Subject } from 'rxjs';
+import { distinctUntilChanged, filter, finalize, map, takeUntil } from 'rxjs/operators';
 import {
   AdminAccessContext,
   AdminLookupType,
@@ -12,7 +13,9 @@ import {
   AdminRoleForm,
   AdminRolePermission,
   AdminUser,
-  AdminUserForm
+  AdminUserForm,
+  UiMenuItemAdmin,
+  UiMenuItemAdminForm
 } from '../core/models/admin.models';
 import { TranslationService } from '../core/i18n/translation.service';
 import { AdminApiService } from '../core/services/admin-api.service';
@@ -20,7 +23,7 @@ import { DataTableAction, DataTableColumn } from '../shared/components/data-tabl
 
 type PrimaryRole = 'ADMIN' | 'ACCOUNTANT';
 type DialogMode = 'create' | 'edit';
-type DeleteTargetKind = 'lookupType' | 'lookupValue';
+type DeleteTargetKind = 'lookupType' | 'lookupValue' | 'role' | 'menuScreen';
 
 interface PermissionDraft {
   menuItemId: string;
@@ -39,7 +42,8 @@ interface PermissionDraft {
   templateUrl: './accountants-home.component.html',
   styleUrls: ['./accountants-home.component.scss']
 })
-export class AccountantsHomeComponent implements OnInit {
+export class AccountantsHomeComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
   readonly titleKey = 'ACCESS_MANAGEMENT.TITLE';
   readonly subtitleKey = 'ACCESS_MANAGEMENT.SUBTITLE';
   activeTabId = 'users';
@@ -50,6 +54,7 @@ export class AccountantsHomeComponent implements OnInit {
   roleSaving = false;
   lookupTypeSaving = false;
   lookupValueSaving = false;
+  screenSaving = false;
   deleteSubmitting = false;
   accessErrorKey = '';
   accessSuccessKey = '';
@@ -59,50 +64,59 @@ export class AccountantsHomeComponent implements OnInit {
   roleQuery = '';
   lookupTypeQuery = '';
   lookupValueQuery = '';
+  screenQuery = '';
   permissionQuery = '';
   users: AdminUser[] = [];
   roles: AdminRole[] = [];
   menuItems = new Map<string, { titleKey: string; parentId?: string | null; url?: string | null }>();
   lookupTypes: AdminLookupType[] = [];
   lookupValues: AdminLookupValue[] = [];
+  menuScreens: UiMenuItemAdmin[] = [];
   selectedRoleId: number | null = null;
   selectedLookupTypeId: number | null = null;
   userDialogVisible = false;
   roleDialogVisible = false;
   lookupTypeDialogVisible = false;
   lookupValueDialogVisible = false;
+  screenDialogVisible = false;
   confirmDialogVisible = false;
   userDialogMode: DialogMode = 'create';
   roleDialogMode: DialogMode = 'create';
   lookupTypeDialogMode: DialogMode = 'create';
   lookupValueDialogMode: DialogMode = 'create';
+  screenDialogMode: DialogMode = 'create';
   editingUserId: number | null = null;
   editingRoleId: number | null = null;
   editingLookupTypeId: number | null = null;
   editingLookupValueId: number | null = null;
-  confirmTarget: { kind: DeleteTargetKind; id: number; label: string } | null = null;
+  editingScreenId: string | null = null;
+  confirmTarget: { kind: DeleteTargetKind; id: number | string; label: string } | null = null;
   rolePermissionDraft: PermissionDraft[] = [];
 
   readonly userColumns: DataTableColumn[] = [
     { key: 'fullName', title: 'ACCESS_MANAGEMENT.FULL_NAME', clickable: true },
     { key: 'username', title: 'PROFILE.USERNAME' },
     { key: 'email', title: 'PROFILE.EMAIL' },
+    { key: 'passwordMasked', title: 'AUTH.PASSWORD' },
     { key: 'primaryRole', title: 'ACCESS_MANAGEMENT.PRIMARY_ROLE', kind: 'type', prefix: 'ROLE.' },
-    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' },
-    { key: 'roleSummary', title: 'ACCESS_MANAGEMENT.ASSIGNED_ROLES' }
+    { key: 'roleSummary', title: 'ACCESS_MANAGEMENT.ASSIGNED_ROLES', align: 'start' },
+    { key: 'active', title: 'ACCESS_MANAGEMENT.ACTIVE_USER', kind: 'booleanToggle' }
   ];
-  readonly userActions: DataTableAction[] = [{ id: 'edit', labelKey: 'COMMON.EDIT', className: 'erp-action-btn--info' }];
+  readonly userActions: DataTableAction[] = [];
   readonly roleColumns: DataTableColumn[] = [
-    { key: 'name', title: 'COMMON.NAME', clickable: true },
+    { key: 'displayName', title: 'COMMON.NAME', clickable: true, align: 'start' },
     { key: 'code', title: 'ACCESS_MANAGEMENT.ROLE_CODE' },
     { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' },
     { key: 'systemRole', title: 'ACCESS_MANAGEMENT.SYSTEM_ROLE', kind: 'boolean' },
     { key: 'grantedScreens', title: 'ACCESS_MANAGEMENT.VISIBLE_SCREENS' }
   ];
-  readonly roleActions: DataTableAction[] = [{ id: 'edit', labelKey: 'COMMON.EDIT', className: 'erp-action-btn--info' }];
+  readonly roleActions: DataTableAction[] = [
+    { id: 'edit', labelKey: 'COMMON.EDIT', className: 'erp-action-btn--info' },
+    { id: 'delete', labelKey: 'COMMON.DELETE', className: 'erp-action-btn--danger' }
+  ];
   readonly lookupTypeColumns: DataTableColumn[] = [
-    { key: 'name', title: 'COMMON.NAME', clickable: true },
-    { key: 'code', title: 'ACCESS_MANAGEMENT.TYPE_CODE' },
+    { key: 'code', title: 'ACCESS_MANAGEMENT.TYPE_CODE', clickable: true },
+    { key: 'displayName', title: 'COMMON.NAME', align: 'start' },
     { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER' },
     { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' }
   ];
@@ -111,10 +125,29 @@ export class AccountantsHomeComponent implements OnInit {
     { id: 'delete', labelKey: 'COMMON.DELETE', className: 'erp-action-btn--danger' }
   ];
   readonly lookupValueColumns: DataTableColumn[] = [
-    { key: 'name', title: 'COMMON.NAME' },
     { key: 'code', title: 'ACCESS_MANAGEMENT.VALUE_CODE' },
+    { key: 'displayName', title: 'COMMON.NAME', align: 'start' },
     { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER' },
     { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' }
+  ];
+  readonly screenItemTypeOptions = [
+    { value: 'item', labelKey: 'ACCESS_MANAGEMENT.MENU_ITEM_TYPE_ITEM' },
+    { value: 'group', labelKey: 'ACCESS_MANAGEMENT.MENU_ITEM_TYPE_GROUP' },
+    { value: 'collapse', labelKey: 'ACCESS_MANAGEMENT.MENU_ITEM_TYPE_COLLAPSE' }
+  ];
+  readonly screenColumns: DataTableColumn[] = [
+    { key: 'id', title: 'ACCESS_MANAGEMENT.SCREEN_ID', align: 'start' },
+    { key: 'titleKey', title: 'ACCESS_MANAGEMENT.TITLE_KEY', align: 'start' },
+    { key: 'titlePreview', title: 'ACCESS_MANAGEMENT.SCREEN_TITLE_PREVIEW', align: 'start' },
+    { key: 'itemTypeDisplay', title: 'ACCESS_MANAGEMENT.ITEM_TYPE' },
+    { key: 'parentId', title: 'ACCESS_MANAGEMENT.PARENT_ID', align: 'start' },
+    { key: 'url', title: 'ACCESS_MANAGEMENT.MENU_ROUTE', align: 'start' },
+    { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER' },
+    { key: 'rolesCsv', title: 'ACCESS_MANAGEMENT.ROLES_CSV', align: 'start' }
+  ];
+  readonly screenActions: DataTableAction[] = [
+    { id: 'edit', labelKey: 'COMMON.EDIT', className: 'erp-action-btn--info' },
+    { id: 'delete', labelKey: 'COMMON.DELETE', className: 'erp-action-btn--danger' }
   ];
   readonly lookupValueActions: DataTableAction[] = [
     { id: 'edit', labelKey: 'COMMON.EDIT', className: 'erp-action-btn--info' },
@@ -134,34 +167,68 @@ export class AccountantsHomeComponent implements OnInit {
   readonly roleForm = this.fb.group({
     code: ['', [Validators.required, Validators.maxLength(60)]],
     nameEn: ['', [Validators.required, Validators.maxLength(150)]],
-    nameAr: ['', [Validators.maxLength(150)]],
+    nameAr: ['', [Validators.required, Validators.maxLength(150)]],
     active: [true, Validators.required]
   });
   readonly lookupTypeForm = this.fb.group({
     code: ['', [Validators.required, Validators.maxLength(60)]],
     nameEn: ['', [Validators.required, Validators.maxLength(150)]],
-    nameAr: ['', [Validators.maxLength(150)]],
+    nameAr: ['', [Validators.required, Validators.maxLength(150)]],
     sortOrder: [0, [Validators.required, Validators.min(0)]],
     active: [true, Validators.required]
   });
   readonly lookupValueForm = this.fb.group({
     typeCode: ['', [Validators.required, Validators.maxLength(60)]],
     code: ['', [Validators.required, Validators.maxLength(80)]],
-    nameEn: ['', [Validators.maxLength(150)]],
-    nameAr: ['', [Validators.maxLength(150)]],
+    nameEn: ['', [Validators.required, Validators.maxLength(150)]],
+    nameAr: ['', [Validators.required, Validators.maxLength(150)]],
     sortOrder: [0, [Validators.required, Validators.min(0)]],
     active: [true, Validators.required]
+  });
+  readonly screenForm = this.fb.group({
+    id: ['', [Validators.required, Validators.maxLength(64)]],
+    parentId: [''],
+    sortOrder: [0, [Validators.required, Validators.min(0)]],
+    itemType: ['item', [Validators.required, Validators.maxLength(16)]],
+    titleKey: ['', [Validators.required, Validators.maxLength(128)]],
+    icon: ['', Validators.maxLength(64)],
+    url: ['', Validators.maxLength(512)],
+    rolesCsv: ['', Validators.maxLength(256)],
+    external: [false],
+    targetBlank: [false],
+    itemClasses: ['', Validators.maxLength(128)],
+    breadcrumbsFlag: [false]
   });
 
   constructor(
     private readonly adminApi: AdminApiService,
     private readonly fb: FormBuilder,
     public readonly translationService: TranslationService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    const tab = this.route.snapshot.data['tab'];
+    if (tab) {
+      this.activeTabId = tab;
+    }
+    this.route.data
+      .pipe(
+        map((data) => data['tab'] as string | undefined),
+        filter((t): t is string => !!t),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((t) => {
+        this.activeTabId = t;
+      });
     this.loadPage();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get selectedRole(): AdminRole | null {
@@ -179,22 +246,59 @@ export class AccountantsHomeComponent implements OnInit {
 
   get filteredUsers(): Array<Record<string, unknown>> {
     const query = this.userQuery.trim().toLowerCase();
-    return this.users.filter((user) => !query || [user.fullName, user.username, user.email, user.phone, user.primaryRole, ...(user.roleCodes || [])].filter(Boolean).join(' ').toLowerCase().includes(query)).map((user) => ({ ...user, roleSummary: (user.roleCodes || []).join(', ') || '-' }));
+    const masked = this.translationService.instant('ACCESS_MANAGEMENT.PASSWORD_MASKED');
+    return this.users
+      .filter((user) => !query || [user.fullName, user.username, user.email, user.phone, user.primaryRole, ...(user.roleCodes || [])].filter(Boolean).join(' ').toLowerCase().includes(query))
+      .map((user) => ({
+        ...user,
+        passwordMasked: masked,
+        roleSummary: (user.roleCodes || []).join(', ') || ''
+      }));
   }
 
   get filteredRoles(): Array<Record<string, unknown>> {
     const query = this.roleQuery.trim().toLowerCase();
-    return this.roles.filter((role) => !query || [role.code, role.nameEn, role.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query)).map((role) => ({ ...role, name: this.displayName(role.nameEn, role.nameAr, role.code), grantedScreens: role.permissions.filter((permission) => permission.canView).length }));
+    return this.roles
+      .filter((role) => !query || [role.code, role.nameEn, role.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query))
+      .map((role) => ({
+        ...role,
+        displayName: this.displayName(role.nameEn, role.nameAr, role.code),
+        grantedScreens: role.permissions.filter((permission) => permission.canView).length
+      }));
   }
 
   get filteredLookupTypes(): Array<Record<string, unknown>> {
     const query = this.lookupTypeQuery.trim().toLowerCase();
-    return this.lookupTypes.filter((type) => !query || [type.code, type.nameEn, type.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query)).map((type) => ({ ...type, name: this.displayName(type.nameEn, type.nameAr, type.code) }));
+    return this.lookupTypes
+      .filter((type) => !query || [type.code, type.nameEn, type.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query))
+      .map((type) => ({
+        ...type,
+        displayName: this.displayName(type.nameEn, type.nameAr, type.code)
+      }));
   }
 
   get filteredLookupValues(): Array<Record<string, unknown>> {
     const query = this.lookupValueQuery.trim().toLowerCase();
-    return this.lookupValues.filter((value) => !query || [value.code, value.nameEn, value.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query)).map((value) => ({ ...value, name: this.displayName(value.nameEn, value.nameAr, value.code) }));
+    return this.lookupValues
+      .filter((value) => !query || [value.code, value.nameEn, value.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query))
+      .map((value) => ({
+        ...value,
+        displayName: this.displayName(value.nameEn, value.nameAr, value.code)
+      }));
+  }
+
+  get filteredScreens(): Array<Record<string, unknown>> {
+    const query = this.screenQuery.trim().toLowerCase();
+    return (this.menuScreens || [])
+      .filter((row) =>
+        !query ||
+        [row.id, row.titleKey, row.url, row.itemType, row.parentId, row.rolesCsv].filter(Boolean).join(' ').toLowerCase().includes(query)
+      )
+      .map((row) => ({
+        ...row,
+        titlePreview: this.translationService.instant(row.titleKey),
+        itemTypeDisplay: this.screenItemTypeLabel(row.itemType)
+      }));
   }
 
   get selectedRolePermissions(): AdminRolePermission[] {
@@ -213,7 +317,11 @@ export class AccountantsHomeComponent implements OnInit {
     this.lookupTypesLoading = true;
     this.accessErrorKey = '';
     this.lookupErrorKey = '';
-    forkJoin({ access: this.adminApi.getAccessContext(), lookupTypes: this.adminApi.getLookupTypes() })
+    forkJoin({
+      access: this.adminApi.getAccessContext(),
+      lookupTypes: this.adminApi.getLookupTypes(),
+      menuScreens: this.adminApi.listMenuItems()
+    })
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -222,9 +330,10 @@ export class AccountantsHomeComponent implements OnInit {
         })
       )
       .subscribe({
-        next: ({ access, lookupTypes }) => {
+        next: ({ access, lookupTypes, menuScreens }) => {
           this.applyAccessContext(access);
           this.applyLookupTypes(lookupTypes);
+          this.menuScreens = menuScreens || [];
         },
         error: () => {
           this.accessErrorKey = 'ACCESS_MANAGEMENT.LOAD_ERROR';
@@ -296,8 +405,32 @@ export class AccountantsHomeComponent implements OnInit {
     return (this.userForm.value.roleIds || []).includes(roleId);
   }
 
-  onUserAction(event: { actionId: string; row: Record<string, unknown> }): void {
-    if (event.actionId === 'edit') { this.openEditUserDialog(Number(event.row['id'])); }
+  onUserAction(_event: { actionId: string; row: Record<string, unknown> }): void {}
+
+  onUserActiveToggle(event: { key: string; row: Record<string, unknown>; checked: boolean }): void {
+    if (event.key !== 'active') {
+      return;
+    }
+    const id = Number(event.row['id']);
+    if (!id) {
+      return;
+    }
+    const user = this.users.find((u) => u.id === id);
+    const previousActive = !!user?.active;
+    this.accessErrorKey = '';
+    this.accessSuccessKey = '';
+    this.patchUserActive(id, event.checked);
+    this.adminApi.setUserActive(id, event.checked).subscribe({
+      next: () => {
+        this.accessSuccessKey = 'ACCESS_MANAGEMENT.USER_ACTIVE_UPDATED';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.patchUserActive(id, previousActive);
+        this.accessErrorKey = 'ACCESS_MANAGEMENT.USER_ACTIVE_ERROR';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   onUserCellClick(event: { key: string; row: Record<string, unknown> }): void {
@@ -377,11 +510,30 @@ export class AccountantsHomeComponent implements OnInit {
   setSelectedRole(roleId: number): void { this.selectedRoleId = roleId; }
 
   onRoleAction(event: { actionId: string; row: Record<string, unknown> }): void {
-    if (event.actionId === 'edit') { this.openEditRoleDialog(Number(event.row['id'])); }
+    const id = Number(event.row['id']);
+    if (event.actionId === 'edit') {
+      this.openEditRoleDialog(id);
+      return;
+    }
+    if (event.actionId === 'delete') {
+      if (event.row['systemRole']) {
+        this.accessErrorKey = 'ACCESS_MANAGEMENT.ROLE_DELETE_SYSTEM';
+        return;
+      }
+      const role = this.roles.find((r) => r.id === id);
+      this.confirmTarget = {
+        kind: 'role',
+        id,
+        label: role ? this.displayName(role.nameEn, role.nameAr, role.code) : String(id)
+      };
+      this.confirmDialogVisible = true;
+    }
   }
 
   onRoleCellClick(event: { key: string; row: Record<string, unknown> }): void {
-    if (event.key === 'name') { this.setSelectedRole(Number(event.row['id'])); }
+    if (event.key === 'displayName') {
+      this.setSelectedRole(Number(event.row['id']));
+    }
   }
 
   permissionEnabledCount(role: AdminRole | null): number {
@@ -511,16 +663,48 @@ export class AccountantsHomeComponent implements OnInit {
     this.deleteSubmitting = true;
     this.lookupErrorKey = '';
     this.lookupSuccessKey = '';
+    this.accessErrorKey = '';
+    this.accessSuccessKey = '';
     const target = this.confirmTarget;
-    const request$ = target.kind === 'lookupType' ? this.adminApi.deleteLookupType(target.id) : this.adminApi.deleteLookupValue(target.id);
+    const request$: Observable<unknown> =
+      target.kind === 'lookupType'
+        ? this.adminApi.deleteLookupType(target.id as number)
+        : target.kind === 'lookupValue'
+          ? this.adminApi.deleteLookupValue(target.id as number)
+          : target.kind === 'role'
+            ? this.adminApi.deleteRole(target.id as number)
+            : this.adminApi.deleteMenuItem(String(target.id));
     request$.pipe(finalize(() => (this.deleteSubmitting = false))).subscribe({
       next: () => {
-        this.lookupSuccessKey = target.kind === 'lookupType' ? 'ACCESS_MANAGEMENT.LOOKUP_TYPE_DELETE_SUCCESS' : 'ACCESS_MANAGEMENT.LOOKUP_VALUE_DELETE_SUCCESS';
-        this.closeConfirmDialog();
-        if (target.kind === 'lookupType') { this.refreshLookupTypes(null); } else if (this.selectedLookupType) { this.loadLookupValues(this.selectedLookupType.code); }
+        if (target.kind === 'lookupType') {
+          this.lookupSuccessKey = 'ACCESS_MANAGEMENT.LOOKUP_TYPE_DELETE_SUCCESS';
+          this.closeConfirmDialog();
+          this.refreshLookupTypes(null);
+        } else if (target.kind === 'lookupValue') {
+          this.lookupSuccessKey = 'ACCESS_MANAGEMENT.LOOKUP_VALUE_DELETE_SUCCESS';
+          this.closeConfirmDialog();
+          if (this.selectedLookupType) { this.loadLookupValues(this.selectedLookupType.code); }
+        } else if (target.kind === 'role') {
+          this.accessSuccessKey = 'ACCESS_MANAGEMENT.ROLE_DELETE_SUCCESS';
+          this.closeConfirmDialog();
+          this.refreshAccessContext();
+        } else {
+          this.accessSuccessKey = 'ACCESS_MANAGEMENT.SCREEN_DELETE_SUCCESS';
+          this.closeConfirmDialog();
+          this.refreshMenuScreens();
+          this.refreshMenuItemsOnly();
+        }
       },
       error: () => {
-        this.lookupErrorKey = target.kind === 'lookupType' ? 'ACCESS_MANAGEMENT.LOOKUP_TYPE_DELETE_ERROR' : 'ACCESS_MANAGEMENT.LOOKUP_VALUE_DELETE_ERROR';
+        if (target.kind === 'lookupType') {
+          this.lookupErrorKey = 'ACCESS_MANAGEMENT.LOOKUP_TYPE_DELETE_ERROR';
+        } else if (target.kind === 'lookupValue') {
+          this.lookupErrorKey = 'ACCESS_MANAGEMENT.LOOKUP_VALUE_DELETE_ERROR';
+        } else if (target.kind === 'role') {
+          this.accessErrorKey = 'ACCESS_MANAGEMENT.ROLE_DELETE_ERROR';
+        } else {
+          this.accessErrorKey = 'ACCESS_MANAGEMENT.SCREEN_DELETE_ERROR';
+        }
       }
     });
   }
@@ -532,7 +716,7 @@ export class AccountantsHomeComponent implements OnInit {
   }
 
   onLookupTypeCellClick(event: { key: string; row: Record<string, unknown> }): void {
-    if (event.key !== 'name') { return; }
+    if (event.key !== 'code') { return; }
     const type = this.lookupTypes.find((item) => item.id === Number(event.row['id']));
     if (!type) { return; }
     this.selectedLookupTypeId = type.id;
@@ -545,14 +729,144 @@ export class AccountantsHomeComponent implements OnInit {
     if (event.actionId === 'delete') { this.confirmDeleteLookupValue(id); }
   }
 
-  displayName(nameEn?: string | null, nameAr?: string | null, fallback?: string | null): string {
-    return this.translationService.currentLanguage === 'ar' ? nameAr || nameEn || fallback || '-' : nameEn || nameAr || fallback || '-';
+  openCreateScreenDialog(): void {
+    this.screenDialogMode = 'create';
+    this.editingScreenId = null;
+    this.screenForm.reset({
+      id: '',
+      parentId: '',
+      sortOrder: this.menuScreens.length,
+      itemType: 'item',
+      titleKey: '',
+      icon: 'link',
+      url: '',
+      rolesCsv: 'ADMIN',
+      external: false,
+      targetBlank: false,
+      itemClasses: 'nav-item',
+      breadcrumbsFlag: false
+    });
+    this.screenForm.controls.id.enable({ emitEvent: false });
+    this.screenDialogVisible = true;
   }
 
-  permissionRouteLabel(url?: string | null): string { return url || '-'; }
+  openEditScreenDialog(screenId: string): void {
+    const row = this.menuScreens.find((s) => s.id === screenId);
+    if (!row) {
+      return;
+    }
+    this.screenDialogMode = 'edit';
+    this.editingScreenId = row.id;
+    this.screenForm.reset({
+      id: row.id,
+      parentId: row.parentId || '',
+      sortOrder: row.sortOrder ?? 0,
+      itemType: row.itemType || 'item',
+      titleKey: row.titleKey,
+      icon: row.icon || '',
+      url: row.url || '',
+      rolesCsv: row.rolesCsv || '',
+      external: !!row.external,
+      targetBlank: !!row.targetBlank,
+      itemClasses: row.itemClasses || '',
+      breadcrumbsFlag: !!row.breadcrumbsFlag
+    });
+    this.screenForm.controls.id.disable({ emitEvent: false });
+    this.screenDialogVisible = true;
+  }
+
+  closeScreenDialog(): void {
+    this.screenDialogVisible = false;
+  }
+
+  saveScreen(): void {
+    if (this.screenForm.invalid || this.screenSaving) {
+      this.screenForm.markAllAsTouched();
+      return;
+    }
+    this.screenSaving = true;
+    this.accessErrorKey = '';
+    const raw = this.screenForm.getRawValue();
+    const parentRaw = String(raw.parentId || '').trim();
+    const payload: UiMenuItemAdminForm = {
+      id: String(raw.id || '').trim(),
+      parentId: parentRaw ? parentRaw : null,
+      sortOrder: Number(raw.sortOrder || 0),
+      itemType: String(raw.itemType || 'item').trim(),
+      titleKey: String(raw.titleKey || '').trim(),
+      icon: raw.icon ? String(raw.icon).trim() : null,
+      url: raw.url ? String(raw.url).trim() : null,
+      rolesCsv: raw.rolesCsv ? String(raw.rolesCsv).trim() : null,
+      external: !!raw.external,
+      targetBlank: !!raw.targetBlank,
+      itemClasses: raw.itemClasses ? String(raw.itemClasses).trim() : null,
+      breadcrumbsFlag: !!raw.breadcrumbsFlag
+    };
+    const request$ =
+      this.screenDialogMode === 'create'
+        ? this.adminApi.createMenuItem(payload)
+        : this.adminApi.updateMenuItem(this.editingScreenId as string, payload);
+    request$.pipe(finalize(() => (this.screenSaving = false))).subscribe({
+      next: () => {
+        this.accessSuccessKey =
+          this.screenDialogMode === 'create' ? 'ACCESS_MANAGEMENT.SCREEN_CREATE_SUCCESS' : 'ACCESS_MANAGEMENT.SCREEN_UPDATE_SUCCESS';
+        this.screenDialogVisible = false;
+        this.refreshMenuScreens();
+        this.refreshMenuItemsOnly();
+      },
+      error: () => {
+        this.accessErrorKey = 'ACCESS_MANAGEMENT.SCREEN_SAVE_ERROR';
+      }
+    });
+  }
+
+  onScreenAction(event: { actionId: string; row: Record<string, unknown> }): void {
+    const id = String(event.row['id'] || '');
+    if (event.actionId === 'edit') {
+      this.openEditScreenDialog(id);
+      return;
+    }
+    if (event.actionId === 'delete') {
+      this.confirmTarget = { kind: 'menuScreen', id, label: id };
+      this.confirmDialogVisible = true;
+    }
+  }
+
+  refreshMenuScreens(): void {
+    this.adminApi.listMenuItems().subscribe({
+      next: (rows) => {
+        this.menuScreens = rows || [];
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.accessErrorKey = 'ACCESS_MANAGEMENT.SCREEN_LOAD_ERROR';
+      }
+    });
+  }
+
+  /** Keeps role permission matrix in sync after menu CRUD without toggling the full-page loading flag. */
+  private refreshMenuItemsOnly(): void {
+    this.adminApi.getAccessContext().subscribe({
+      next: (context) => {
+        this.menuItems = new Map(
+          (context.menuItems || []).map((item) => [item.id, { titleKey: item.titleKey, parentId: item.parentId, url: item.url }])
+        );
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.accessErrorKey = 'ACCESS_MANAGEMENT.LOAD_ERROR';
+      }
+    });
+  }
+
+  displayName(nameEn?: string | null, nameAr?: string | null, fallback?: string | null): string {
+    return this.translationService.currentLanguage === 'ar' ? nameAr || nameEn || fallback || '' : nameEn || nameAr || fallback || '';
+  }
+
+  permissionRouteLabel(url?: string | null): string { return url || ''; }
 
   permissionPathLabel(parentId?: string | null): string {
-    if (!parentId) { return '-'; }
+    if (!parentId) { return ''; }
     const parent = this.menuItems.get(parentId);
     return parent ? this.translationService.instant(parent.titleKey) : parentId;
   }
@@ -605,6 +919,13 @@ export class AccountantsHomeComponent implements OnInit {
     });
   }
 
+  private patchUserActive(userId: number, active: boolean): void {
+    const target = this.users.find((u) => u.id === userId);
+    if (target) {
+      target.active = active;
+    }
+  }
+
   private applyAccessContext(context: AdminAccessContext, preferredRoleId: number | null = null): void {
     this.users = context.users || [];
     this.roles = context.roles || [];
@@ -625,6 +946,16 @@ export class AccountantsHomeComponent implements OnInit {
     this.selectedLookupTypeId = nextTypeId;
     const selectedType = this.lookupTypes.find((type) => type.id === this.selectedLookupTypeId) || null;
     if (selectedType) { this.loadLookupValues(selectedType.code); } else { this.lookupValues = []; }
+  }
+
+  private screenItemTypeLabel(itemType?: string | null): string {
+    const keys: Record<string, string> = {
+      item: 'ACCESS_MANAGEMENT.MENU_ITEM_TYPE_ITEM',
+      group: 'ACCESS_MANAGEMENT.MENU_ITEM_TYPE_GROUP',
+      collapse: 'ACCESS_MANAGEMENT.MENU_ITEM_TYPE_COLLAPSE'
+    };
+    const k = keys[itemType || 'item'];
+    return k ? this.translationService.instant(k) : itemType || '';
   }
 
   private buildPermissionDraft(permissions: AdminRolePermission[] = []): PermissionDraft[] {

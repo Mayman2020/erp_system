@@ -2,10 +2,11 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { distinctUntilChanged, finalize, map } from 'rxjs/operators';
-import { AccountDto, BankAccountDto, PaymentVoucher, PaymentVoucherForm, ReceiptVoucher, ReceiptVoucherForm } from '../../core/models/accounting.models';
+import { AccountDto, AccountTreeDto, BankAccountDto, PaymentVoucher, PaymentVoucherForm, ReceiptVoucher, ReceiptVoucherForm } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { LookupService } from '../../core/services/lookup.service';
 import { DataTableAction, DataTableColumn } from '../../shared/components/data-table/data-table.component';
 
@@ -25,14 +26,29 @@ export class VouchersPageComponent implements OnInit {
     { key: 'amountDisplay', title: 'VOUCHERS.LIST.AMOUNT', align: 'end' },
     { key: 'currencyCode', title: 'VOUCHERS.LIST.CURRENCY' },
     { key: 'status', title: 'COMMON.STATUS', kind: 'status' },
+    { key: 'createdAt', title: 'VOUCHERS.LIST.CREATED_AT', kind: 'date' },
     { key: 'createdBy', title: 'VOUCHERS.LIST.CREATED_BY', align: 'start' }
   ];
   readonly actions: DataTableAction[] = [
-    { id: 'view', labelKey: 'COMMON.VIEW', className: 'btn-outline-secondary' },
-    { id: 'edit', labelKey: 'COMMON.EDIT', className: 'btn-outline-primary' },
-    { id: 'approve', labelKey: 'COMMON.APPROVE', className: 'btn-outline-info' },
-    { id: 'post', labelKey: 'COMMON.POST', className: 'btn-outline-success' },
-    { id: 'cancel', labelKey: 'COMMON.CANCEL', className: 'btn-outline-danger' }
+    { id: 'view', labelKey: 'COMMON.VIEW', className: 'erp-action-secondary' },
+    {
+      id: 'edit',
+      labelKey: 'COMMON.EDIT',
+      className: 'erp-action-info',
+      disabledWhen: (row) => String(row['status'] || '') !== 'DRAFT'
+    },
+    {
+      id: 'approve',
+      labelKey: 'COMMON.APPROVE',
+      className: 'erp-action-success',
+      disabledWhen: (row) => String(row['status'] || '') !== 'DRAFT'
+    },
+    {
+      id: 'cancel',
+      labelKey: 'COMMON.CANCEL',
+      className: 'erp-action-danger',
+      disabledWhen: (row) => String(row['status'] || '') === 'CANCELLED'
+    }
   ];
 
   activeVoucherType: 'payment' | 'receipt' = 'payment';
@@ -50,6 +66,7 @@ export class VouchersPageComponent implements OnInit {
   voucherTypes: string[] = [];
   bankAccounts: BankAccountDto[] = [];
   accountOptions: AccountDto[] = [];
+  accountTree: AccountTreeDto[] = [];
 
   selectedId: number | null = null;
   dialogVisible = false;
@@ -87,6 +104,7 @@ export class VouchersPageComponent implements OnInit {
     private lookupService: LookupService,
     private fb: FormBuilder,
     private i18n: TranslationService,
+    private confirmDialog: ConfirmDialogService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
@@ -136,9 +154,16 @@ export class VouchersPageComponent implements OnInit {
     this.form.enable();
     this.form.reset({
       voucherDate: new Date().toISOString().slice(0, 10),
+      reference: '',
+      description: '',
+      partyName: '',
       paymentMethod: this.paymentMethods[0] || '',
       currencyCode: this.currencies[0] || '',
-      voucherType: this.voucherTypes[0] || ''
+      voucherType: this.voucherTypes[0] || '',
+      cashAccountId: null,
+      targetAccountId: null,
+      amount: null,
+      linkedReference: ''
     });
     this.dialogVisible = true;
   }
@@ -154,7 +179,7 @@ export class VouchersPageComponent implements OnInit {
     }
     const status = String(event.row['status'] || '');
     if (event.actionId === 'edit') {
-      if (status !== 'DRAFT' && status !== 'APPROVED') {
+      if (status !== 'DRAFT') {
         return;
       }
       this.openEdit(id, false);
@@ -165,31 +190,22 @@ export class VouchersPageComponent implements OnInit {
         this.errorKey = 'VOUCHERS.ONLY_DRAFT_CAN_APPROVE';
         return;
       }
-      if (!confirm(this.i18n.instant('VOUCHERS.CONFIRM_APPROVE'))) {
-        return;
-      }
-      this.runWorkflow(id, 'approve');
-      return;
-    }
-    if (event.actionId === 'post') {
-      if (status === 'POSTED' || status === 'CANCELLED') {
-        this.errorKey = 'VOUCHERS.CANNOT_POST_STATUS';
-        return;
-      }
-      if (!confirm(this.i18n.instant('VOUCHERS.CONFIRM_POST'))) {
-        return;
-      }
-      this.runWorkflow(id, 'post');
+      this.confirmDialog.confirmByKey({ messageKey: 'VOUCHERS.CONFIRM_APPROVE' }).subscribe((ok) => {
+        if (ok) {
+          this.runWorkflow(id, 'approve');
+        }
+      });
       return;
     }
     if (event.actionId === 'cancel') {
       if (status === 'CANCELLED') {
         return;
       }
-      if (!confirm(this.i18n.instant('VOUCHERS.CONFIRM_CANCEL'))) {
-        return;
-      }
-      this.runWorkflow(id, 'cancel');
+      this.confirmDialog.confirmByKey({ messageKey: 'VOUCHERS.CONFIRM_CANCEL', danger: true }).subscribe((ok) => {
+        if (ok) {
+          this.runWorkflow(id, 'cancel');
+        }
+      });
     }
   }
 
@@ -329,16 +345,11 @@ export class VouchersPageComponent implements OnInit {
     );
   }
 
-  private runWorkflow(id: number, action: 'approve' | 'post' | 'cancel'): void {
+  private runWorkflow(id: number, action: 'approve' | 'cancel'): void {
     const actor = this.currentUser();
     if (this.activeVoucherType === 'payment') {
       if (action === 'approve') {
         this.api.approvePaymentVoucher(id, actor).subscribe(
-          () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
-          (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
-        );
-      } else if (action === 'post') {
-        this.api.postPaymentVoucher(id, actor).subscribe(
           () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
           (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
         );
@@ -352,11 +363,6 @@ export class VouchersPageComponent implements OnInit {
     }
     if (action === 'approve') {
       this.api.approveReceiptVoucher(id, actor).subscribe(
-        () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
-        (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
-      );
-    } else if (action === 'post') {
-      this.api.postReceiptVoucher(id, actor).subscribe(
         () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
         (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
       );
@@ -374,7 +380,8 @@ export class VouchersPageComponent implements OnInit {
     this.lookupService.getLookup('currencies').subscribe((items) => (this.currencies = items.map((item) => item.code)), () => { /* lookup fallback */ });
     this.lookupService.getLookup('voucher-types').subscribe((items) => (this.voucherTypes = items.map((item) => item.code)), () => { /* lookup fallback */ });
     this.api.getBankAccounts({ active: true }).subscribe((items) => (this.bankAccounts = items), () => { /* lookup fallback */ });
-    this.api.getAccounts({ active: true }).subscribe((items) => (this.accountOptions = items.filter((item) => item.postable)), () => { /* lookup fallback */ });
+    this.api.getAccounts({ active: true }).subscribe((items) => (this.accountOptions = items), () => { /* lookup fallback */ });
+    this.api.getAccountTree().subscribe((tree) => (this.accountTree = tree), () => {});
   }
 
   private currentUser(): string {
@@ -386,13 +393,16 @@ export class VouchersPageComponent implements OnInit {
       id: voucher.id,
       reference: voucher.reference,
       voucherDate: voucher.voucherDate,
-      partyName: voucher.partyName || '-',
+      partyName: voucher.partyName || '',
       paymentMethod: voucher.paymentMethod,
-      cashAccountName: voucher.cashAccountName || '-',
+      cashAccountName: voucher.cashAccountName || '',
+      cashAccountNameEn: voucher.cashAccountNameEn || voucher.cashAccountName || '',
+      cashAccountNameAr: voucher.cashAccountNameAr || voucher.cashAccountNameEn || voucher.cashAccountName || '',
       amountDisplay: `${Number(voucher.amount || 0).toLocaleString()} ${voucher.currencyCode || ''}`.trim(),
       currencyCode: voucher.currencyCode,
       status: voucher.status,
-      createdBy: voucher.createdBy || '-'
+      createdAt: voucher.createdAt || '',
+      createdBy: voucher.createdBy || ''
     };
   }
 

@@ -1,0 +1,8 @@
+:host ::ng-deep .erp-table__row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--bg-hover);
+  }
+}

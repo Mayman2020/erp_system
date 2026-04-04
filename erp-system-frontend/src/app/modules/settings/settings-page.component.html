@@ -12,8 +12,8 @@
               <div class="avatar-wrap">
                 <img [src]="imagePreview || 'assets/images/user/avatar-1.jpg'" class="profile-avatar" [attr.alt]="'PROFILE.AVATAR_ALT' | translate" />
               </div>
-              <h6 class="mb-1">{{ form.value.fullName || '-' }}</h6>
-              <p class="text-muted mb-2">{{ form.value.email || '-' }}</p>
+              <h6 class="mb-1">{{ form.value.fullName || '' }}</h6>
+              <p class="text-muted mb-2">{{ form.value.email || '' }}</p>
               <p class="text-muted mb-3">{{ ('ROLE.' + (user?.role || '')) | translate }}</p>
               <label class="erp-button erp-button--ghost mb-0">
                 <mat-icon aria-hidden="true">photo_camera</mat-icon>
@@ -24,6 +24,7 @@
           </div>
 
           <div class="col-lg-8">
+            <app-tabs>
             <ul ngbNav #settingsNav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs erp-settings-tabs">
               <li [ngbNavItem]="'accounting'">
                 <button ngbNavLink>{{ 'SETTINGS.ACCOUNTING_TAB' | translate }}</button>
@@ -38,13 +39,13 @@
                         <div class="col-md-6 col-xl-3 mb-3">
                           <div class="erp-settings-card">
                             <div class="erp-settings-card__label">{{ 'SETTINGS.ACCOUNTING_METHOD' | translate }}</div>
-                            <div class="erp-settings-card__value">{{ ('ACCOUNTING_METHOD_OPTION.' + (accountingForm.value.accountingMethod || '-')) | translate }}</div>
+                            <div class="erp-settings-card__value">{{ accountingForm.value.accountingMethod ? (('ACCOUNTING_METHOD_OPTION.' + accountingForm.value.accountingMethod) | translate) : '' }}</div>
                           </div>
                         </div>
                         <div class="col-md-6 col-xl-3 mb-3">
                           <div class="erp-settings-card">
                             <div class="erp-settings-card__label">{{ 'SETTINGS.BASE_CURRENCY' | translate }}</div>
-                            <div class="erp-settings-card__value">{{ accountingForm.value.baseCurrency || '-' }}</div>
+                            <div class="erp-settings-card__value">{{ accountingForm.value.baseCurrency || '' }}</div>
                           </div>
                         </div>
                         <div class="col-md-6 col-xl-3 mb-3">
@@ -279,7 +280,7 @@
                       <div class="card">
                         <div class="card-body">
                           <h6>{{ 'PROFILE.EMAIL' | translate }}</h6>
-                          <p class="text-muted mb-0">{{ form.value.email || '-' }}</p>
+                          <p class="text-muted mb-0">{{ form.value.email || '' }}</p>
                         </div>
                       </div>
                     </div>
@@ -333,6 +334,7 @@
               </li>
             </ul>
             <div [ngbNavOutlet]="settingsNav"></div>
+            </app-tabs>
           </div>
         </div>
       </div>

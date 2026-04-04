@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // =======================================
 //     List of variables for layout
 // =======================================
@@ -59,7 +61,7 @@ $menu-light-background: #fff;
 $menu-light-text-color: #535763;
 $menu-active-color: $primary-color;
 
-$dark-layout: darken(#2c3e50,8%);
+$dark-layout: color.adjust(#2c3e50, $lightness: -8%);
 $dark-layout-font: #adb7be;
 
 
@@ -67,7 +69,7 @@ $dark-layout-font: #adb7be;
 $menu-icon-color: #1abc9c, #e74c3c, #01a9ac ,#536dfe , #3498db, $warning-color;
 
 // Header background
-$color-header-name: blue, red, purple, info, green, dark;
+$color-header-name: "blue", "red", "purple", "info", "green", "dark";
 $color-header-color: $primary-color, $danger-color, $purple-color ,$info-color, $success-color,#2c3e50;
 // Header gradient
 $color-header-grd-name: grd-blue, grd-red, grd-purple, grd-info, grd-green, grd-dark;
@@ -80,11 +82,11 @@ linear-gradient(to right, #2c3e50 0%, #1f3054 100%);
 
 
 // Active background color
-$color-active-name: blue, red, purple, info, dark;
+$color-active-name: "blue", "red", "purple", "info", "dark";
 $color-active-color: #1abc9c, #e74c3c, #536dfe ,#3498db,$dark-color;
 
  // Menu title color
-$color-title-name: blue, red, purple, info, dark;
+$color-title-name: "blue", "red", "purple", "info", "dark";
 $color-title-color: #1abc9c, #e74c3c, #536dfe ,#3498db,$dark-color;
 
 $theme-font-family: 'Open Sans', sans-serif;
@@ -95,7 +97,7 @@ $theme-heading-color: #37474f;
 
 $color-name: c-blue,c-red,c-green,c-yellow,c-purple;
 $color-color: $primary-color,$danger-color,$success-color ,$warning-color ,$purple-color;
-$color-bt-name: primary,danger,success,warning,info,purple;
+$color-bt-name: "primary", "danger", "success", "warning", "info", "purple";
 $color-bt-color: $primary-color,$danger-color,$success-color ,$warning-color ,$info-color,$purple-color;
 
 // form-control variables

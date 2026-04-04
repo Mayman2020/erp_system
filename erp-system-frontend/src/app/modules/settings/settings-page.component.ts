@@ -16,6 +16,7 @@ import { LookupItem } from '../../core/models/lookup.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 import { LookupService } from '../../core/services/lookup.service';
 import { ThemeMode, ThemeService } from '../../core/services/theme.service';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 
 @Component({ standalone: false,
   selector: 'app-settings-page',
@@ -78,7 +79,8 @@ export class SettingsPageComponent implements OnInit {
     private fb: FormBuilder,
     private lookupService: LookupService,
     private themeService: ThemeService,
-    public translationService: TranslationService
+    public translationService: TranslationService,
+    private confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -284,57 +286,61 @@ export class SettingsPageComponent implements OnInit {
   toggleFiscalYear(year: FiscalYearDto): void {
     if (this.fiscalToggling) { return; }
     const confirmKey = year.open ? 'SETTINGS.CONFIRM_CLOSE_FISCAL_YEAR' : 'SETTINGS.CONFIRM_OPEN_FISCAL_YEAR';
-    if (!window.confirm(this.translationService.instant(confirmKey))) {
-      return;
-    }
-
-    this.accountingErrorKey = '';
-    this.accountingSuccessKey = '';
-    this.fiscalToggling = true;
-    const request$ = year.open
-      ? this.accountingApi.closeFiscalYear(year.id, this.actorEmail)
-      : this.accountingApi.openFiscalYear(year.id);
-
-    request$.pipe(finalize(() => (this.fiscalToggling = false))).subscribe(
-      () => {
-        this.accountingSuccessKey = 'SETTINGS.ACTION_SUCCESS';
-        this.refreshAccountingSettings();
-      },
-      (err) => {
-        const msg = err?.error?.message;
-        this.accountingErrorKey = msg && msg !== 'COMMON.OK' ? msg : 'SETTINGS.ACTION_ERROR';
+    this.confirmDialog.confirmByKey({ messageKey: confirmKey }).subscribe((ok) => {
+      if (!ok) {
+        return;
       }
-    );
+
+      this.accountingErrorKey = '';
+      this.accountingSuccessKey = '';
+      this.fiscalToggling = true;
+      const request$ = year.open
+        ? this.accountingApi.closeFiscalYear(year.id, this.actorEmail)
+        : this.accountingApi.openFiscalYear(year.id);
+
+      request$.pipe(finalize(() => (this.fiscalToggling = false))).subscribe(
+        () => {
+          this.accountingSuccessKey = 'SETTINGS.ACTION_SUCCESS';
+          this.refreshAccountingSettings();
+        },
+        (err) => {
+          const msg = err?.error?.message;
+          this.accountingErrorKey = msg && msg !== 'COMMON.OK' ? msg : 'SETTINGS.ACTION_ERROR';
+        }
+      );
+    });
   }
 
   toggleFiscalPeriod(period: FiscalPeriodDto): void {
     if (this.fiscalToggling) { return; }
     const confirmKey = period.open ? 'SETTINGS.CONFIRM_CLOSE_FISCAL_PERIOD' : 'SETTINGS.CONFIRM_OPEN_FISCAL_PERIOD';
-    if (!window.confirm(this.translationService.instant(confirmKey))) {
-      return;
-    }
-
-    this.accountingErrorKey = '';
-    this.accountingSuccessKey = '';
-    this.fiscalToggling = true;
-    const request$ = period.open
-      ? this.accountingApi.closeFiscalPeriod(period.id, this.actorEmail)
-      : this.accountingApi.openFiscalPeriod(period.id);
-
-    request$.pipe(finalize(() => (this.fiscalToggling = false))).subscribe(
-      () => {
-        this.accountingSuccessKey = 'SETTINGS.ACTION_SUCCESS';
-        this.refreshAccountingSettings();
-      },
-      (err) => {
-        const msg = err?.error?.message;
-        this.accountingErrorKey = msg && msg !== 'COMMON.OK' ? msg : 'SETTINGS.ACTION_ERROR';
+    this.confirmDialog.confirmByKey({ messageKey: confirmKey }).subscribe((ok) => {
+      if (!ok) {
+        return;
       }
-    );
+
+      this.accountingErrorKey = '';
+      this.accountingSuccessKey = '';
+      this.fiscalToggling = true;
+      const request$ = period.open
+        ? this.accountingApi.closeFiscalPeriod(period.id, this.actorEmail)
+        : this.accountingApi.openFiscalPeriod(period.id);
+
+      request$.pipe(finalize(() => (this.fiscalToggling = false))).subscribe(
+        () => {
+          this.accountingSuccessKey = 'SETTINGS.ACTION_SUCCESS';
+          this.refreshAccountingSettings();
+        },
+        (err) => {
+          const msg = err?.error?.message;
+          this.accountingErrorKey = msg && msg !== 'COMMON.OK' ? msg : 'SETTINGS.ACTION_ERROR';
+        }
+      );
+    });
   }
 
   allowedCurrenciesLabel(): string {
-    return this.selectedAllowedCurrencies.join(', ') || '-';
+    return this.selectedAllowedCurrencies.join(', ') || '';
   }
 
   get fiscalYears(): FiscalYearDto[] {

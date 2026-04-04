@@ -3,10 +3,12 @@ package com.erp.system.accounting.service;
 import com.erp.system.accounting.domain.Account;
 import com.erp.system.accounting.domain.JournalEntry;
 import com.erp.system.accounting.domain.ReceiptVoucher;
+import com.erp.system.accounting.domain.CustomerInvoice;
 import com.erp.system.accounting.dto.display.ReceiptVoucherDisplayDto;
 import com.erp.system.accounting.dto.form.ReceiptVoucherFormDto;
 import com.erp.system.accounting.mapper.ReceiptVoucherMapper;
 import com.erp.system.accounting.repository.AccountRepository;
+import com.erp.system.accounting.repository.CustomerInvoiceRepository;
 import com.erp.system.accounting.repository.ReceiptVoucherRepository;
 import com.erp.system.common.enums.AccountingType;
 import com.erp.system.common.enums.PaymentMethod;
@@ -37,6 +39,7 @@ public class ReceiptVoucherService {
     private final AccountingSettingsService accountingSettingsService;
     private final AccountingPostingService accountingPostingService;
     private final CustomerInvoiceService customerInvoiceService;
+    private final CustomerInvoiceRepository customerInvoiceRepository;
 
     @Transactional(readOnly = true)
     public List<ReceiptVoucherDisplayDto> getReceiptVouchers(VoucherStatus status,
@@ -103,24 +106,26 @@ public class ReceiptVoucherService {
         voucher.setStatus(VoucherStatus.APPROVED);
         voucher.setApprovedAt(LocalDateTime.now());
         voucher.setApprovedBy(actor);
-        return receiptVoucherMapper.toDisplay(receiptVoucherRepository.save(voucher));
+        receiptVoucherRepository.save(voucher);
+        return postReceiptVoucher(voucherId, actor);
     }
 
     @Transactional
     public ReceiptVoucherDisplayDto postReceiptVoucher(Long voucherId, String actor) {
         ReceiptVoucher voucher = loadVoucher(voucherId);
-        if (voucher.getStatus() == VoucherStatus.POSTED) {
-            throw new BusinessException("Receipt voucher is already posted");
+        if (voucher.getJournalEntry() != null) {
+            return receiptVoucherMapper.toDisplay(voucher);
         }
         if (voucher.getStatus() == VoucherStatus.CANCELLED) {
-            throw new BusinessException("Cancelled receipt voucher cannot be posted");
+            throw new BusinessException("Cancelled receipt voucher cannot be recorded");
         }
 
         boolean requiresApproval = accountingSettingsService.getBooleanSetting("REQUIRE_APPROVAL_FOR_RECEIPTS", true);
         if (requiresApproval && voucher.getStatus() != VoucherStatus.APPROVED) {
-            throw new BusinessException("Receipt voucher must be approved before posting");
+            throw new BusinessException("Receipt voucher must be approved before recording");
         }
 
+        Account offsetAccount = resolvePostingOffsetAccount(voucher);
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 voucher.getVoucherDate(),
                 voucher.getDescription(),
@@ -135,8 +140,10 @@ public class ReceiptVoucherService {
                                 .credit(BigDecimal.ZERO)
                                 .build(),
                         AccountingPostingService.JournalLineDraft.builder()
-                                .accountId(voucher.getRevenueAccount().getId())
-                                .description("Receipt voucher credit")
+                                .accountId(offsetAccount.getId())
+                                .description(voucher.getInvoiceReference() != null && !voucher.getInvoiceReference().isBlank()
+                                        ? "Receipt voucher credit - invoice settlement"
+                                        : "Receipt voucher credit - revenue")
                                 .debit(BigDecimal.ZERO)
                                 .credit(voucher.getAmount())
                                 .build()
@@ -144,10 +151,16 @@ public class ReceiptVoucherService {
         );
 
         voucher.setJournalEntry(journalEntry);
-        voucher.setStatus(VoucherStatus.POSTED);
+        if (voucher.getApprovedAt() == null) {
+            voucher.setApprovedAt(LocalDateTime.now());
+            voucher.setApprovedBy(actor);
+        }
+        voucher.setStatus(VoucherStatus.APPROVED);
         voucher.setPostedAt(LocalDateTime.now());
         voucher.setPostedBy(actor);
-        return receiptVoucherMapper.toDisplay(receiptVoucherRepository.save(voucher));
+        ReceiptVoucher savedVoucher = receiptVoucherRepository.save(voucher);
+        refreshLinkedInvoice(voucher.getInvoiceReference());
+        return receiptVoucherMapper.toDisplay(savedVoucher);
     }
 
     @Transactional
@@ -156,12 +169,14 @@ public class ReceiptVoucherService {
         if (voucher.getStatus() == VoucherStatus.CANCELLED) {
             throw new BusinessException("Receipt voucher is already cancelled");
         }
-        if (voucher.getStatus() == VoucherStatus.POSTED) {
+        if (voucher.getJournalEntry() != null) {
             JournalEntry reversal = accountingPostingService.reverseJournal(voucher.getJournalEntry(), actor, reason, LocalDate.now());
             voucher.setReversalJournalEntry(reversal);
         }
         voucher.setStatus(VoucherStatus.CANCELLED);
-        return receiptVoucherMapper.toDisplay(receiptVoucherRepository.save(voucher));
+        ReceiptVoucher savedVoucher = receiptVoucherRepository.save(voucher);
+        refreshLinkedInvoice(voucher.getInvoiceReference());
+        return receiptVoucherMapper.toDisplay(savedVoucher);
     }
 
     private void applyForm(ReceiptVoucher voucher, ReceiptVoucherFormDto request) {
@@ -186,8 +201,8 @@ public class ReceiptVoucherService {
     private Account resolveSettlementAccount(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable()) {
-            throw new BusinessException("Settlement account must be active and postable");
+        if (!account.isActive()) {
+            throw new BusinessException("Settlement account must be active");
         }
         if (account.getAccountType() != AccountingType.ASSET) {
             throw new BusinessException("Settlement account must be an asset account");
@@ -198,18 +213,43 @@ public class ReceiptVoucherService {
     private Account resolveOffsetAccount(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
-        if (!account.isActive() || !account.isPostable()) {
-            throw new BusinessException("Offset account must be active and postable");
+        if (!account.isActive()) {
+            throw new BusinessException("Offset account must be active");
         }
-        if (account.getAccountType() != AccountingType.INCOME && account.getAccountType() != AccountingType.ASSET) {
-            throw new BusinessException("Offset account must be a revenue or receivable account");
+        if (account.getAccountType() != AccountingType.REVENUE) {
+            throw new BusinessException("Offset account must be a revenue account");
         }
         return account;
     }
 
+    private Account resolvePostingOffsetAccount(ReceiptVoucher voucher) {
+        String invoiceReference = voucher.getInvoiceReference();
+        if (invoiceReference == null || invoiceReference.isBlank()) {
+            return voucher.getRevenueAccount();
+        }
+
+        CustomerInvoice invoice = customerInvoiceRepository.findByInvoiceNumber(invoiceReference.trim());
+        if (invoice == null) {
+            return voucher.getRevenueAccount();
+        }
+
+        if (invoice.getReceivableAccount() == null) {
+            throw new BusinessException("Invoice receivable account is required before posting receipt against invoice");
+        }
+
+        return invoice.getReceivableAccount();
+    }
+
+    private void refreshLinkedInvoice(String invoiceReference) {
+        if (invoiceReference == null || invoiceReference.isBlank()) {
+            return;
+        }
+        customerInvoiceService.refreshInvoicePaymentStatus(invoiceReference.trim());
+    }
+
     private void ensureEditable(ReceiptVoucher voucher) {
-        if (voucher.getStatus() == VoucherStatus.POSTED || voucher.getStatus() == VoucherStatus.CANCELLED) {
-            throw new BusinessException("Only draft or approved receipt vouchers can be edited");
+        if (voucher.getJournalEntry() != null || voucher.getStatus() == VoucherStatus.CANCELLED) {
+            throw new BusinessException("Only draft or approved receipt vouchers without a journal entry can be edited");
         }
     }
 

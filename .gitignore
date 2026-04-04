@@ -16,6 +16,7 @@ yarn-error.log*
 
 # Frontend dependencies and build output
 erp-system-frontend/node_modules/
+docs/node_modules/
 erp-system-frontend/dist/
 erp-system-frontend/.angular/
 

@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
+import * as XLSX from 'xlsx';
 import { BalanceSheetReportDto, ProfitLossReportDto } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { LookupItem } from '../../core/models/lookup.models';
@@ -104,6 +105,71 @@ export class ReportsPageComponent implements OnInit {
       return line.accountNameAr || line.accountNameEn;
     }
     return line.accountNameEn || line.accountNameAr || '';
+  }
+
+  /** Account column: no lone " - " when code or name is missing. */
+  formatReportAccountCell(line: { accountCode?: string; accountNameAr?: string; accountNameEn: string }): string {
+    const code = String(line.accountCode ?? '').trim();
+    const name = String(this.displayAccountName(line) ?? '').trim();
+    if (code && name) {
+      return `${code} - ${name}`;
+    }
+    return code || name || '';
+  }
+
+  exportProfitLoss(): void {
+    if (!this.profitLoss) return;
+    const headers = [
+      this.translationService.instant('ACCOUNTS.CODE') + ' - ' + this.translationService.instant('COMMON.NAME'),
+      this.translationService.instant('VOUCHERS.FORM.AMOUNT')
+    ];
+    const revenueRows = this.profitLoss.revenues.map((l) => [this.formatReportAccountCell(l), l.amount]);
+    const expenseRows = this.profitLoss.expenses.map((l) => [this.formatReportAccountCell(l), l.amount]);
+    const data: any[][] = [
+      headers,
+      [this.translationService.instant('REPORTS.PROFIT_LOSS.REVENUE_SECTION'), ''],
+      ...revenueRows,
+      [this.translationService.instant('REPORTS.PROFIT_LOSS.TOTAL_REVENUE'), this.profitLoss.totalRevenue],
+      ['', ''],
+      [this.translationService.instant('REPORTS.PROFIT_LOSS.EXPENSE_SECTION'), ''],
+      ...expenseRows,
+      [this.translationService.instant('REPORTS.PROFIT_LOSS.TOTAL_EXPENSES'), this.profitLoss.totalExpenses],
+      ['', ''],
+      [this.translationService.instant('REPORTS.PROFIT_LOSS.NET_RESULT'), this.profitLoss.netProfit]
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Profit & Loss');
+    XLSX.writeFile(wb, 'profit-loss.xlsx');
+  }
+
+  exportBalanceSheet(): void {
+    if (!this.balanceSheet) return;
+    const headers = [
+      this.translationService.instant('ACCOUNTS.CODE') + ' - ' + this.translationService.instant('COMMON.NAME'),
+      this.translationService.instant('DASHBOARD.BALANCE')
+    ];
+    const assetRows = this.balanceSheet.assets.map((l) => [this.formatReportAccountCell(l), l.balance]);
+    const liabilityRows = this.balanceSheet.liabilities.map((l) => [this.formatReportAccountCell(l), l.balance]);
+    const equityRows = this.balanceSheet.equity.map((l) => [this.formatReportAccountCell(l), l.balance]);
+    const data: any[][] = [
+      headers,
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.ASSETS'), ''],
+      ...assetRows,
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_ASSETS'), this.balanceSheet.totalAssets],
+      ['', ''],
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.LIABILITIES'), ''],
+      ...liabilityRows,
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES'), this.balanceSheet.totalLiabilities],
+      ['', ''],
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.EQUITY'), ''],
+      ...equityRows,
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_EQUITY'), this.balanceSheet.totalEquity]
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Balance Sheet');
+    XLSX.writeFile(wb, 'balance-sheet.xlsx');
   }
 
   private isRangeValid(): boolean {

@@ -1,0 +1,18 @@
+<div class="erp-confirm-dialog">
+  <h2 class="erp-confirm-dialog__title" id="erp-confirm-title">{{ data.title }}</h2>
+  <p class="erp-confirm-dialog__message" id="erp-confirm-message">{{ data.message }}</p>
+  <div class="erp-confirm-dialog__actions">
+    <button type="button" class="btn btn-outline-secondary erp-confirm-dialog__btn" (click)="cancel()">
+      {{ data.cancelText }}
+    </button>
+    <button
+      type="button"
+      class="btn erp-confirm-dialog__btn"
+      [class.btn-danger]="data.danger"
+      [class.btn-primary]="!data.danger"
+      (click)="confirm()"
+    >
+      {{ data.confirmText }}
+    </button>
+  </div>
+</div>

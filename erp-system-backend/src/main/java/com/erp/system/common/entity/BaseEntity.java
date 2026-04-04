@@ -1,11 +1,13 @@
 package com.erp.system.common.entity;
 
+import com.erp.system.common.security.SecurityUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 
@@ -29,15 +31,24 @@ public abstract class BaseEntity {
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();
-        this.createdAt = now;
+        if (this.createdAt == null) {
+            this.createdAt = now;
+        }
         this.updatedAt = now;
-        // Set createdBy from security context if available
-        // this.createdBy = getCurrentUser();
+        if (!StringUtils.hasText(this.createdBy)) {
+            String user = SecurityUtils.currentUsername();
+            if (StringUtils.hasText(user)) {
+                this.createdBy = user;
+            }
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
-        // this.updatedBy = getCurrentUser();
+        String user = SecurityUtils.currentUsername();
+        if (StringUtils.hasText(user)) {
+            this.updatedBy = user;
+        }
     }
 }

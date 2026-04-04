@@ -21,6 +21,9 @@ export class TypeBadgeComponent {
   }
 
   get typeClass(): string {
+    if (this.labelPrefix === 'PAYMENT_METHOD.') {
+      return 'erp-badge--neutral';
+    }
     switch ((this.type || '').toUpperCase()) {
       case 'ASSET':
       case 'CASH':
@@ -32,7 +35,7 @@ export class TypeBadgeComponent {
       case 'ADVANCE':
         return 'erp-badge--warning';
       case 'EQUITY':
-      case 'INCOME':
+      case 'REVENUE':
       case 'INVOICE_COLLECTION':
         return 'erp-badge--success';
       case 'EXPENSE':

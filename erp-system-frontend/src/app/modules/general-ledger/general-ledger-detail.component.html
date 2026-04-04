@@ -1,0 +1,136 @@
+<section class="erp-page">
+  <app-page-header titleKey="GENERAL_LEDGER.DETAIL_TITLE">
+    <div header-actions>
+      <button type="button" class="erp-button erp-button--ghost" (click)="goBack()">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
+        <span>{{ 'GENERAL_LEDGER.BACK_TO_LIST' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="card" *ngIf="loading"><app-loading-state></app-loading-state></div>
+
+  <div class="card" *ngIf="!loading && errorKey">
+    <div class="card-body text-center text-danger">
+      {{ errorKey | translate }}
+      <button class="erp-icon-button ms-2" type="button" (click)="goBack()">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !errorKey && entry" class="gl-detail">
+    <!-- Header Info Card -->
+    <div class="card gl-detail__header-card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 gl-detail__field">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.REFERENCE' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.referenceNumber }}</strong>
+          </div>
+          <div class="col-md-4 gl-detail__field">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.DATE' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.entryDate }}</strong>
+          </div>
+          <div class="col-md-4 gl-detail__field">
+            <span class="gl-detail__label">{{ 'COMMON.STATUS' | translate }}</span>
+            <app-type-badge [type]="entry.status" labelPrefix="STATUS."></app-type-badge>
+          </div>
+          <div class="col-md-4 gl-detail__field">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.SOURCE_TYPE' | translate }}</span>
+            <strong class="gl-detail__value">{{ sourceLabel }}</strong>
+          </div>
+          <div class="col-md-4 gl-detail__field">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.ENTRY_TYPE' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.entryType || '' }}</strong>
+          </div>
+          <div class="col-md-4 gl-detail__field">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.CURRENCY' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.currencyCode || '' }}</strong>
+          </div>
+          <div class="col-md-6 gl-detail__field" *ngIf="entry.description">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.DESCRIPTION' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.description }}</strong>
+          </div>
+          <div class="col-md-3 gl-detail__field" *ngIf="entry.externalReference">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.EXTERNAL_REF' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.externalReference }}</strong>
+          </div>
+          <div class="col-md-3 gl-detail__field">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.CREATED_BY' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.createdBy || '' }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Totals Bar -->
+    <div class="gl-detail__totals">
+      <div class="gl-detail__total-card gl-detail__total-card--debit">
+        <span class="gl-detail__total-label">{{ 'GENERAL_LEDGER.TOTAL_DEBIT' | translate }}</span>
+        <strong class="gl-detail__total-value">{{ formatAmount(entry.totalDebit) }}</strong>
+      </div>
+      <div class="gl-detail__total-card gl-detail__total-card--credit">
+        <span class="gl-detail__total-label">{{ 'GENERAL_LEDGER.TOTAL_CREDIT' | translate }}</span>
+        <strong class="gl-detail__total-value">{{ formatAmount(entry.totalCredit) }}</strong>
+      </div>
+    </div>
+
+    <!-- Lines Table -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{{ 'GENERAL_LEDGER.LINES' | translate }}</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 gl-detail__lines-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>{{ 'GENERAL_LEDGER.ACCOUNT_CODE' | translate }}</th>
+                <th>{{ 'GENERAL_LEDGER.ACCOUNT_NAME' | translate }}</th>
+                <th>{{ 'GENERAL_LEDGER.LINE_DESCRIPTION' | translate }}</th>
+                <th class="text-end">{{ 'GENERAL_LEDGER.DEBIT' | translate }}</th>
+                <th class="text-end">{{ 'GENERAL_LEDGER.CREDIT' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let line of entry.lines; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ line.accountCode }}</td>
+                <td>{{ line.accountNameAr || line.accountNameEn || '' }}</td>
+                <td>{{ line.description || '' }}</td>
+                <td class="text-end">{{ formatAmount(line.debit) }}</td>
+                <td class="text-end">{{ formatAmount(line.credit) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posting / Reversal Info -->
+    <div class="card" *ngIf="entry.postedAt || entry.reversedAt">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 gl-detail__field" *ngIf="entry.postedAt">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.POSTED_AT' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.postedAt }}</strong>
+          </div>
+          <div class="col-md-3 gl-detail__field" *ngIf="entry.postedBy">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.POSTED_BY' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.postedBy }}</strong>
+          </div>
+          <div class="col-md-3 gl-detail__field" *ngIf="entry.reversedAt">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.REVERSED_AT' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.reversedAt }}</strong>
+          </div>
+          <div class="col-md-3 gl-detail__field" *ngIf="entry.reversedBy">
+            <span class="gl-detail__label">{{ 'GENERAL_LEDGER.REVERSED_BY' | translate }}</span>
+            <strong class="gl-detail__value">{{ entry.reversedBy }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

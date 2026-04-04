@@ -225,7 +225,7 @@ public class AccountingReportService {
     private BigDecimal normalizeForDisplay(Account account, BigDecimal signedBalance) {
         return switch (account.getAccountType()) {
             case ASSET, EXPENSE -> signedBalance;
-            case LIABILITY, EQUITY, INCOME -> signedBalance.negate();
+            case LIABILITY, EQUITY, REVENUE -> signedBalance.negate();
         };
     }
 

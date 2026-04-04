@@ -1,0 +1,51 @@
+:host {
+  display: contents;
+}
+
+:host ::ng-deep li.erp-nav-item {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+:host ::ng-deep li.erp-nav-item > a,
+:host ::ng-deep li.erp-nav-item > .nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--erp-space-2);
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px !important;
+  border-radius: 10px;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+:host ::ng-deep li.erp-nav-item > a::after,
+:host ::ng-deep li.erp-nav-item > .nav-link::after {
+  display: none !important;
+  content: none !important;
+}
+
+:host ::ng-deep .pcoded-micon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+}
+
+:host ::ng-deep .pcoded-mtext {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+:host ::ng-deep li.erp-nav-item > a:hover,
+:host ::ng-deep li.erp-nav-item > .nav-link:hover,
+:host ::ng-deep li.erp-nav-item.active > a,
+:host ::ng-deep li.erp-nav-item.active > .nav-link {
+  background: var(--bg-hover);
+}

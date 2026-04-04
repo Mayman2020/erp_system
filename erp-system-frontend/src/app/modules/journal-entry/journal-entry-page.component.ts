@@ -7,6 +7,7 @@ import { LookupItem } from '../../core/models/lookup.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { LookupService } from '../../core/services/lookup.service';
 
 @Component({ standalone: false,
@@ -47,13 +48,15 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     { key: 'description', title: 'JOURNAL.DESCRIPTION', kind: 'text' as 'text', align: 'start' as 'start' },
     { key: 'status', title: 'COMMON.STATUS', kind: 'status' as 'status', prefix: 'STATUS.' },
     { key: 'totalDebit', title: 'JOURNAL.TOTAL_DEBIT', kind: 'text' as 'text', align: 'end' as 'end' },
-    { key: 'totalCredit', title: 'JOURNAL.TOTAL_CREDIT', kind: 'text' as 'text', align: 'end' as 'end' }
+    { key: 'totalCredit', title: 'JOURNAL.TOTAL_CREDIT', kind: 'text' as 'text', align: 'end' as 'end' },
+    { key: 'createdAt', title: 'JOURNAL.CREATED_AT', kind: 'date' as 'date' },
+    { key: 'createdBy', title: 'JOURNAL.CREATED_BY', kind: 'text' as 'text', align: 'start' as 'start' }
   ];
 
   readonly actions = [
     { id: 'view', labelKey: 'COMMON.VIEW', className: 'btn-outline-info' },
     { id: 'edit', labelKey: 'COMMON.EDIT', className: 'btn-outline-primary' },
-    { id: 'post', labelKey: 'JOURNAL.POST', className: 'btn-outline-success' },
+    { id: 'approve', labelKey: 'COMMON.APPROVE', className: 'btn-outline-success' },
     { id: 'reverse', labelKey: 'JOURNAL.REVERSE', className: 'btn-outline-warning' }
   ];
 
@@ -70,6 +73,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     private api: AccountingApiService,
     private lookupService: LookupService,
     private translationService: TranslationService,
+    private confirmDialog: ConfirmDialogService,
     private authService: AuthService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
@@ -140,8 +144,8 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
       this.openEdit(entry.id);
       return;
     }
-    if (event.actionId === 'post') {
-      this.postEntry(entry);
+    if (event.actionId === 'approve') {
+      this.approveEntry(entry);
       return;
     }
     if (event.actionId === 'reverse') {
@@ -231,11 +235,11 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     this.formVisible = false;
   }
 
-  postCurrent(): void {
+  approveCurrent(): void {
     if (!this.selectedEntry) {
       return;
     }
-    this.postEntry(this.selectedEntry);
+    this.approveEntry(this.selectedEntry);
   }
 
   totalDebit(): number {
@@ -264,7 +268,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     return !(debit > 0 || credit > 0) || (debit > 0 && credit > 0);
   }
 
-  canPostSelected(): boolean {
+  canApproveSelected(): boolean {
     return !!this.selectedEntry && this.selectedEntry.status === 'DRAFT' && this.selectedEntry.balanced;
   }
 
@@ -324,6 +328,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
         totalDebit: Number(entry.totalDebit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
         totalCredit: Number(entry.totalCredit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
         status: entry.status,
+        createdAt: entry.createdAt || '',
         createdBy: entry.createdBy || '',
         balanced: entry.balanced
       }));
@@ -449,53 +454,57 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
     };
   }
 
-  private postEntry(entry: JournalEntry): void {
+  private approveEntry(entry: JournalEntry): void {
     if (entry.status !== 'DRAFT') {
-      this.showError('JOURNAL.POST_ONLY_DRAFT');
+      this.showError('JOURNAL.APPROVE_ONLY_DRAFT');
       return;
     }
-    if (!window.confirm(this.translationService.instant('JOURNAL.CONFIRM_POST'))) {
-      return;
-    }
-    this.saving = true;
-    this.api
-      .postJournalEntry(entry.id, this.currentUser())
-      .pipe(finalize(() => (this.saving = false)))
-      .subscribe({
-        next: () => {
-          this.showSuccess('JOURNAL.POST_SUCCESS');
-          this.formVisible = false;
-          this.loadEntries();
-        },
-        error: (err) => {
-          const msg = err?.error?.message;
-          this.showError(msg && msg !== 'COMMON.OK' ? msg : 'JOURNAL.POST_ERROR');
-        }
-      });
+    this.confirmDialog.confirmByKey({ messageKey: 'JOURNAL.CONFIRM_APPROVE' }).subscribe((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.saving = true;
+      this.api
+        .approveJournalEntry(entry.id, this.currentUser())
+        .pipe(finalize(() => (this.saving = false)))
+        .subscribe({
+          next: () => {
+            this.showSuccess('JOURNAL.APPROVE_SUCCESS');
+            this.formVisible = false;
+            this.loadEntries();
+          },
+          error: (err) => {
+            const msg = err?.error?.message;
+            this.showError(msg && msg !== 'COMMON.OK' ? msg : 'JOURNAL.APPROVE_ERROR');
+          }
+        });
+    });
   }
 
   private reverseEntry(entry: JournalEntry): void {
-    if (entry.status !== 'POSTED') {
-      this.showError('JOURNAL.REVERSE_ONLY_POSTED');
+    if (entry.status !== 'APPROVED') {
+      this.showError('JOURNAL.REVERSE_ONLY_APPROVED');
       return;
     }
-    if (!window.confirm(this.translationService.instant('JOURNAL.CONFIRM_REVERSE'))) {
-      return;
-    }
-    this.saving = true;
-    this.api
-      .reverseJournalEntry(entry.id, this.currentUser(), this.translationService.instant('JOURNAL.REVERSE_REASON_DEFAULT'))
-      .pipe(finalize(() => (this.saving = false)))
-      .subscribe({
-        next: () => {
-          this.showSuccess('JOURNAL.REVERSE_SUCCESS');
-          this.loadEntries();
-        },
-        error: (err) => {
-          const msg = err?.error?.message;
-          this.showError(msg && msg !== 'COMMON.OK' ? msg : 'JOURNAL.REVERSE_ERROR');
-        }
-      });
+    this.confirmDialog.confirmByKey({ messageKey: 'JOURNAL.CONFIRM_REVERSE', danger: true }).subscribe((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.saving = true;
+      this.api
+        .reverseJournalEntry(entry.id, this.currentUser(), this.translationService.instant('JOURNAL.REVERSE_REASON_DEFAULT'))
+        .pipe(finalize(() => (this.saving = false)))
+        .subscribe({
+          next: () => {
+            this.showSuccess('JOURNAL.REVERSE_SUCCESS');
+            this.loadEntries();
+          },
+          error: (err) => {
+            const msg = err?.error?.message;
+            this.showError(msg && msg !== 'COMMON.OK' ? msg : 'JOURNAL.REVERSE_ERROR');
+          }
+        });
+    });
   }
 
   private showError(key: string): void {

@@ -185,7 +185,7 @@ public class AccountingTransactionService {
         if (account == null) {
             throw new BusinessException("Credit account is required");
         }
-        if (transaction.getTransactionType() == TransactionType.SALE && account.getAccountType() != AccountingType.INCOME) {
+        if (transaction.getTransactionType() == TransactionType.SALE && account.getAccountType() != AccountingType.REVENUE) {
             throw new BusinessException("Sale transactions must credit a revenue account");
         }
         if (transaction.getTransactionType() == TransactionType.PURCHASE
@@ -204,8 +204,8 @@ public class AccountingTransactionService {
     private Account loadAccount(Long id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", id));
-        if (!account.isActive() || !account.isPostable()) {
-            throw new BusinessException("Transaction account must be active and postable");
+        if (!account.isActive()) {
+            throw new BusinessException("Transaction account must be active");
         }
         return account;
     }
@@ -252,9 +252,13 @@ public class AccountingTransactionService {
                 .debitAccountId(transaction.getDebitAccount() != null ? transaction.getDebitAccount().getId() : null)
                 .debitAccountCode(transaction.getDebitAccount() != null ? transaction.getDebitAccount().getCode() : null)
                 .debitAccountName(transaction.getDebitAccount() != null ? transaction.getDebitAccount().getNameEn() : null)
+                .debitAccountNameEn(transaction.getDebitAccount() != null ? transaction.getDebitAccount().getNameEn() : null)
+                .debitAccountNameAr(transaction.getDebitAccount() != null ? transaction.getDebitAccount().getNameAr() : null)
                 .creditAccountId(transaction.getCreditAccount() != null ? transaction.getCreditAccount().getId() : null)
                 .creditAccountCode(transaction.getCreditAccount() != null ? transaction.getCreditAccount().getCode() : null)
                 .creditAccountName(transaction.getCreditAccount() != null ? transaction.getCreditAccount().getNameEn() : null)
+                .creditAccountNameEn(transaction.getCreditAccount() != null ? transaction.getCreditAccount().getNameEn() : null)
+                .creditAccountNameAr(transaction.getCreditAccount() != null ? transaction.getCreditAccount().getNameAr() : null)
                 .originalTransactionId(transaction.getOriginalTransaction() != null ? transaction.getOriginalTransaction().getId() : null)
                 .relatedDocumentReference(transaction.getRelatedDocumentReference())
                 .journalEntryId(transaction.getJournalEntry() != null ? transaction.getJournalEntry().getId() : null)
