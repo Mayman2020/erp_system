@@ -1,7 +1,10 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {NavigationItem} from '../../navigation';
+import {NavigationEnd, Router} from '@angular/router';
 import {animate, style, transition, trigger} from '@angular/animations';
 import {NextConfig} from '../../../../../../app-config';
+import {Subscription} from 'rxjs';
+import {filter} from 'rxjs/operators';
 
 @Component({ standalone: false,
   selector: 'app-nav-collapse',
@@ -19,19 +22,43 @@ import {NextConfig} from '../../../../../../app-config';
     ])
   ],
 })
-export class NavCollapseComponent implements OnInit {
+export class NavCollapseComponent implements OnInit, OnDestroy {
   public visible;
+  public isActive = false;
   @Input() item: NavigationItem;
   public flatConfig: any;
   public themeLayout: string;
+  private routerSub: Subscription;
 
-  constructor() {
+  constructor(private router: Router) {
     this.visible = false;
     this.flatConfig = NextConfig.config;
     this.themeLayout = this.flatConfig.layout;
   }
 
   ngOnInit() {
+    this.checkActive(this.router.url);
+    this.routerSub = this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe((e) => this.checkActive(e.urlAfterRedirects || e.url));
+  }
+
+  ngOnDestroy() {
+    this.routerSub?.unsubscribe();
+  }
+
+  private checkActive(url: string): void {
+    this.isActive = this.hasActiveChild(this.item, url);
+    if (this.isActive) {
+      this.visible = true;
+    }
+  }
+
+  private hasActiveChild(item: NavigationItem, url: string): boolean {
+    if (!item.children) { return false; }
+    return item.children.some((child) =>
+      (child.url && url.startsWith(child.url)) || this.hasActiveChild(child, url)
+    );
   }
 
   navCollapse(e) {

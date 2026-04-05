@@ -54,10 +54,25 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   ];
 
   readonly actions = [
-    { id: 'view', labelKey: 'COMMON.VIEW', className: 'btn-outline-info' },
-    { id: 'edit', labelKey: 'COMMON.EDIT', className: 'btn-outline-primary' },
-    { id: 'approve', labelKey: 'COMMON.APPROVE', className: 'btn-outline-success' },
-    { id: 'reverse', labelKey: 'JOURNAL.REVERSE', className: 'btn-outline-warning' }
+    { id: 'view', labelKey: 'COMMON.VIEW', className: 'erp-action-secondary' },
+    {
+      id: 'edit',
+      labelKey: 'COMMON.EDIT',
+      className: 'erp-action-info',
+      disabledWhen: (row: Record<string, unknown>) => String(row['status'] || '') !== 'DRAFT'
+    },
+    {
+      id: 'approve',
+      labelKey: 'COMMON.APPROVE',
+      className: 'erp-action-success',
+      disabledWhen: (row: Record<string, unknown>) => String(row['status'] || '') !== 'DRAFT'
+    },
+    {
+      id: 'reverse',
+      labelKey: 'JOURNAL.REVERSE',
+      className: 'erp-action-warning',
+      disabledWhen: (row: Record<string, unknown>) => String(row['status'] || '') !== 'APPROVED'
+    }
   ];
 
   readonly form: FormGroup = this.fb.group({
@@ -460,7 +475,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
       return;
     }
     this.confirmDialog.confirmByKey({ messageKey: 'JOURNAL.CONFIRM_APPROVE' }).subscribe((ok) => {
-      if (!ok) {
+      if (ok !== true) {
         return;
       }
       this.saving = true;
@@ -487,7 +502,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
       return;
     }
     this.confirmDialog.confirmByKey({ messageKey: 'JOURNAL.CONFIRM_REVERSE', danger: true }).subscribe((ok) => {
-      if (!ok) {
+      if (ok !== true) {
         return;
       }
       this.saving = true;

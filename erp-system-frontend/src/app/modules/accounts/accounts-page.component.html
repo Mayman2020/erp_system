@@ -12,8 +12,14 @@
     </div>
   </app-page-header>
 
-  <div class="alert alert-success" *ngIf="successKey">{{ successKey | translate }}</div>
-  <div class="alert alert-danger" *ngIf="errorKey">{{ errorKey | translate }}</div>
+  <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
+    {{ successKey | translate }}
+    <button type="button" class="btn-close" (click)="successKey = ''"></button>
+  </div>
+  <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
+    {{ errorKey | translate }}
+    <button type="button" class="btn-close" (click)="errorKey = ''"></button>
+  </div>
 
   <section class="accounts-page__controls erp-surface" *ngIf="viewMode === 'table'">
     <app-advanced-search-bar
@@ -102,8 +108,14 @@
   (close)="closeDialog()"
 >
   <div dialog-body>
-    <div class="alert alert-success" *ngIf="successKey">{{ successKey | translate }}</div>
-    <div class="alert alert-danger" *ngIf="errorKey">{{ errorKey | translate }}</div>
+    <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
+      {{ successKey | translate }}
+      <button type="button" class="btn-close" (click)="successKey = ''"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
+      {{ errorKey | translate }}
+      <button type="button" class="btn-close" (click)="errorKey = ''"></button>
+    </div>
 
     <form [formGroup]="form" class="accounts-dialog__form">
       <div class="accounts-dialog__grid">

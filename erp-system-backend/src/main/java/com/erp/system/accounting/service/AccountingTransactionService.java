@@ -35,7 +35,9 @@ public class AccountingTransactionService {
     @Transactional(readOnly = true)
     public List<AccountingTransactionDisplayDto> getTransactions(TransactionType type,
                                                                  TransactionStatus status,
-                                                                 String search) {
+                                                                 String search,
+                                                                 LocalDate fromDate,
+                                                                 LocalDate toDate) {
         List<AccountingTransaction> transactions = status != null
                 ? transactionRepository.findByStatusOrderByTransactionDateDescIdDesc(status)
                 : type != null
@@ -45,6 +47,8 @@ public class AccountingTransactionService {
         String normalizedSearch = search == null || search.isBlank() ? null : search.trim().toLowerCase();
         return transactions.stream()
                 .filter(transaction -> type == null || transaction.getTransactionType() == type)
+                .filter(transaction -> fromDate == null || !transaction.getTransactionDate().isBefore(fromDate))
+                .filter(transaction -> toDate == null || !transaction.getTransactionDate().isAfter(toDate))
                 .filter(transaction -> normalizedSearch == null
                         || transaction.getReference().toLowerCase().contains(normalizedSearch)
                         || (transaction.getDescription() != null && transaction.getDescription().toLowerCase().contains(normalizedSearch))

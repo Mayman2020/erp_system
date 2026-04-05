@@ -47,17 +47,17 @@ export class LedgerPageComponent implements OnInit {
     const monthStart = `${today.slice(0, 8)}01`;
     this.form.patchValue({ fromDate: monthStart, toDate: today });
 
-    this.api.getAccounts({ active: true }).subscribe(
-      (accounts) => {
+    this.api.getAccounts({ active: true }).subscribe({
+      next: (accounts) => {
         this.accounts = accounts;
         if (this.accounts.length) {
           this.form.patchValue({ accountId: this.accounts[0].id });
           this.load();
         }
       },
-      () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
-    );
-    this.api.getAccountTree().subscribe((tree) => (this.accountTree = tree));
+      error: () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
+    });
+    this.api.getAccountTree().subscribe({ next: (tree) => (this.accountTree = tree) });
   }
 
   get selectedAccount(): AccountDto | null {
@@ -108,8 +108,8 @@ export class LedgerPageComponent implements OnInit {
           this.cdr.detectChanges();
         })
       )
-      .subscribe(
-        (ledger: LedgerDto) => {
+      .subscribe({
+        next: (ledger: LedgerDto) => {
           this.ledger = ledger;
           this.rows = (ledger.lines || []).map((line) => ({
             ...line,
@@ -120,11 +120,11 @@ export class LedgerPageComponent implements OnInit {
             runningBalance: Number(line.runningBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           }));
         },
-        () => {
+        error: () => {
           this.ledger = null;
           this.errorKey = 'COMMON.ERROR_LOADING';
           this.rows = [];
         }
-      );
+      });
   }
 }

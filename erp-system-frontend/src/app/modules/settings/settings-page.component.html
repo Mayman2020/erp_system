@@ -1,7 +1,7 @@
 <section class="erp-page">
   <app-page-header [titleKey]="titleKey"></app-page-header>
 
-  <div class="card">
+  <div class="card erp-unified-card">
     <div class="card-body">
       <app-loading-state *ngIf="loading && accountingLoading"></app-loading-state>
 
@@ -31,8 +31,14 @@
                 <ng-template ngbNavContent>
                   <div class="mt-4">
                     <app-loading-state *ngIf="accountingLoading"></app-loading-state>
-                    <div *ngIf="!accountingLoading && accountingErrorKey" class="alert alert-danger mb-3">{{ accountingErrorKey | translate }}</div>
-                    <div *ngIf="!accountingLoading && accountingSuccessKey" class="alert alert-success mb-3">{{ accountingSuccessKey | translate }}</div>
+                    <div *ngIf="!accountingLoading && accountingErrorKey" class="alert alert-danger alert-dismissible fade show mb-3">
+                      {{ accountingErrorKey | translate }}
+                      <button type="button" class="btn-close" (click)="accountingErrorKey = ''"></button>
+                    </div>
+                    <div *ngIf="!accountingLoading && accountingSuccessKey" class="alert alert-success alert-dismissible fade show mb-3">
+                      {{ accountingSuccessKey | translate }}
+                      <button type="button" class="btn-close" (click)="accountingSuccessKey = ''"></button>
+                    </div>
 
                     <div *ngIf="!accountingLoading" class="erp-settings">
                       <div class="row">
@@ -233,8 +239,14 @@
               <li [ngbNavItem]="'profile'">
                 <button ngbNavLink>{{ 'PROFILE.PERSONAL_INFO' | translate }}</button>
                 <ng-template ngbNavContent>
-                  <div *ngIf="errorKey" class="alert alert-danger mb-3 mt-4">{{ errorKey | translate }}</div>
-                  <div *ngIf="successKey" class="alert alert-success mb-3 mt-4">{{ successKey | translate }}</div>
+                  <div *ngIf="errorKey" class="alert alert-danger alert-dismissible fade show mb-3 mt-4">
+                    {{ errorKey | translate }}
+                    <button type="button" class="btn-close" (click)="errorKey = ''"></button>
+                  </div>
+                  <div *ngIf="successKey" class="alert alert-success alert-dismissible fade show mb-3 mt-4">
+                    {{ successKey | translate }}
+                    <button type="button" class="btn-close" (click)="successKey = ''"></button>
+                  </div>
                   <form [formGroup]="form" class="row mt-4">
                     <div class="col-md-6 mb-3">
                       <app-form-field [control]="form.controls.fullName" labelKey="PROFILE.FULL_NAME" icon="badge"></app-form-field>

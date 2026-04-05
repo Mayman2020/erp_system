@@ -39,13 +39,16 @@ public class CustomerInvoiceService {
     private final AccountingPostingService accountingPostingService;
 
     @Transactional(readOnly = true)
-    public List<CustomerInvoiceDisplayDto> getInvoices(InvoiceStatus status, String search) {
+    public List<CustomerInvoiceDisplayDto> getInvoices(InvoiceStatus status, String search,
+                                                       LocalDate fromDate, LocalDate toDate) {
         List<CustomerInvoice> invoices = status == null
                 ? invoiceRepository.findAllByOrderByInvoiceDateDescIdDesc()
                 : invoiceRepository.findByStatusOrderByInvoiceDateDescIdDesc(status);
 
         String normalizedSearch = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
         return invoices.stream()
+                .filter(invoice -> fromDate == null || !invoice.getInvoiceDate().isBefore(fromDate))
+                .filter(invoice -> toDate == null || !invoice.getInvoiceDate().isAfter(toDate))
                 .filter(invoice -> normalizedSearch == null
                         || invoice.getInvoiceNumber().toLowerCase().contains(normalizedSearch)
                         || (invoice.getCustomerName() != null && invoice.getCustomerName().toLowerCase().contains(normalizedSearch))

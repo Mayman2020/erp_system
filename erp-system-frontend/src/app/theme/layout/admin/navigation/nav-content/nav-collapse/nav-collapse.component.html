@@ -1,12 +1,12 @@
 <ng-container *ngIf="!item.hidden">
-  <li *ngIf="themeLayout === 'horizontal'" (mouseenter)="navCollapse($event)" class="nav-item pcoded-hasmenu erp-nav-collapse" [routerLinkActive]="['active']">
-    <a [routerLinkActive]="['active']" href="javascript:" class="nav-link erp-nav-link">
+  <li *ngIf="themeLayout === 'horizontal'" (mouseenter)="navCollapse($event)" class="nav-item pcoded-hasmenu erp-nav-collapse" [class.active]="isActive">
+    <a href="javascript:" class="nav-link erp-nav-link" [class.active]="isActive">
       <ng-container *ngTemplateOutlet="itemContent"></ng-container>
     </a>
     <ng-container *ngTemplateOutlet="subMenuContent"></ng-container>
   </li>
-  <li *ngIf="themeLayout === 'vertical'" class="nav-item pcoded-hasmenu erp-nav-collapse" [routerLinkActive]="['active']">
-    <a [routerLinkActive]="['active']" href="javascript:" class="nav-link erp-nav-link" (click)="navCollapse($event)">
+  <li *ngIf="themeLayout === 'vertical'" class="nav-item pcoded-hasmenu erp-nav-collapse" [class.active]="isActive">
+    <a href="javascript:" class="nav-link erp-nav-link" [class.active]="isActive" (click)="navCollapse($event)">
       <ng-container *ngTemplateOutlet="itemContent"></ng-container>
     </a>
     <ng-container *ngTemplateOutlet="subMenuContent"></ng-container>
@@ -34,3 +34,4 @@
     </ul>
   </ng-template>
 </ng-container>
+

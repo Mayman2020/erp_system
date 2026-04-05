@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 import { BankAccountDto } from '../../core/models/accounting.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 
@@ -11,6 +12,7 @@ export class BanksPageComponent implements OnInit {
   loading = false;
   errorKey = '';
   rows: Array<Record<string, unknown>> = [];
+  statusOptions = ['YES', 'NO'];
   columns = [
     { key: 'bankName', title: 'BANKS.BANK_NAME', align: 'start' as 'start' },
     { key: 'accountNumber', title: 'BANKS.ACCOUNT_NUMBER', align: 'start' as 'start' },
@@ -22,7 +24,7 @@ export class BanksPageComponent implements OnInit {
   ];
   private filters: Record<string, string> = {};
 
-  constructor(private api: AccountingApiService) {}
+  constructor(private api: AccountingApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.load();
@@ -36,15 +38,24 @@ export class BanksPageComponent implements OnInit {
   private load(): void {
     this.loading = true;
     this.errorKey = '';
+    const params: Record<string, string> = { search: this.filters.query || '' };
+    if (this.filters.status === 'YES') { params['active'] = 'true'; }
+    if (this.filters.status === 'NO') { params['active'] = 'false'; }
     this.api
-      .getBankAccounts({ search: this.filters.query || '' })
-      .subscribe((rows: BankAccountDto[]) => {
-        this.loading = false;
-        this.rows = rows.map((row) => ({ ...row }));
-      }, () => {
-        this.loading = false;
-        this.errorKey = 'COMMON.ERROR_LOADING';
-        this.rows = [];
+      .getBankAccounts(params)
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (rows: BankAccountDto[]) => {
+          this.rows = rows.map((row) => ({
+            ...row,
+            openingBalance: Number(row.openingBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            currentBalance: Number(row.currentBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          }));
+        },
+        error: () => {
+          this.errorKey = 'COMMON.ERROR_LOADING';
+          this.rows = [];
+        }
       });
   }
 }

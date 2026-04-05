@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:production": "node scripts/write-env.cjs && ng build --configuration production",
     "test": "ng test"
   },
   "engines": {

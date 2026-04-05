@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { ReconciliationBankAccountDto, ReconciliationDto, ReconciliationLineDto, ReconciliationSummaryDto } from '../../core/models/accounting.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { LookupService } from '../../core/services/lookup.service';
 
 @Component({ standalone: false,
@@ -39,22 +40,22 @@ export class ReconciliationPageComponent implements OnInit {
   constructor(
     private api: AccountingApiService,
     private lookupService: LookupService,
+    private confirmDialog: ConfirmDialogService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.lookupService.getLookup('reconciliation-statuses').subscribe(
-      (items) => (this.statuses = items.map((item) => item.code)),
-      () => undefined
-    );
-    this.api.getReconciliationBankAccounts().subscribe(
-      (items) => {
+    this.lookupService.getLookup('reconciliation-statuses').subscribe({
+      next: (items) => (this.statuses = items.map((item) => item.code))
+    });
+    this.api.getReconciliationBankAccounts().subscribe({
+      next: (items) => {
         this.bankAccounts = items;
         this.bankAccountOptions = items.map((item) => ({ id: item.id, label: `${item.bankName} - ${item.accountNumber}` }));
       },
-      () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
-    );
+      error: () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
+    });
     this.load();
   }
 
@@ -186,29 +187,41 @@ export class ReconciliationPageComponent implements OnInit {
 
   finalizeReconciliation(): void {
     if (!this.selectedReconciliation) return;
-    this.errorKey = '';
-    this.api.finalizeReconciliation(this.selectedReconciliation.id, this.currentUser()).subscribe({
-      next: (updated) => {
-        this.selectedReconciliation = updated;
-        this.selectReconciliation(updated.id);
-        this.successKey = 'RECONCILIATION.FINALIZE_SUCCESS';
-        this.load();
-      },
-      error: () => { this.errorKey = 'RECONCILIATION.FINALIZE_ERROR'; }
+    this.confirmDialog.confirmByKey({ messageKey: 'RECONCILIATION.CONFIRM_FINALIZE' }).subscribe((ok) => {
+      if (ok !== true || !this.selectedReconciliation) return;
+      this.errorKey = '';
+      this.saving = true;
+      this.api.finalizeReconciliation(this.selectedReconciliation.id, this.currentUser())
+        .pipe(finalize(() => { this.saving = false; this.cdr.detectChanges(); }))
+        .subscribe({
+          next: (updated) => {
+            this.selectedReconciliation = updated;
+            this.selectReconciliation(updated.id);
+            this.successKey = 'RECONCILIATION.FINALIZE_SUCCESS';
+            this.load();
+          },
+          error: () => { this.errorKey = 'RECONCILIATION.FINALIZE_ERROR'; }
+        });
     });
   }
 
   cancelReconciliation(): void {
     if (!this.selectedReconciliation) return;
-    this.errorKey = '';
-    this.api.cancelReconciliation(this.selectedReconciliation.id, this.currentUser()).subscribe({
-      next: (updated) => {
-        this.selectedReconciliation = updated;
-        this.selectReconciliation(updated.id);
-        this.successKey = 'RECONCILIATION.CANCEL_SUCCESS';
-        this.load();
-      },
-      error: () => { this.errorKey = 'RECONCILIATION.CANCEL_ERROR'; }
+    this.confirmDialog.confirmByKey({ messageKey: 'RECONCILIATION.CONFIRM_CANCEL', danger: true }).subscribe((ok) => {
+      if (ok !== true || !this.selectedReconciliation) return;
+      this.errorKey = '';
+      this.saving = true;
+      this.api.cancelReconciliation(this.selectedReconciliation.id, this.currentUser())
+        .pipe(finalize(() => { this.saving = false; this.cdr.detectChanges(); }))
+        .subscribe({
+          next: (updated) => {
+            this.selectedReconciliation = updated;
+            this.selectReconciliation(updated.id);
+            this.successKey = 'RECONCILIATION.CANCEL_SUCCESS';
+            this.load();
+          },
+          error: () => { this.errorKey = 'RECONCILIATION.CANCEL_ERROR'; }
+        });
     });
   }
 

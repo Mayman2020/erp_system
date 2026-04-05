@@ -34,6 +34,7 @@ public interface ReceiptVoucherRepository extends JpaRepository<ReceiptVoucher, 
             from ReceiptVoucher rv
             join rv.revenueAccount acc
             where acc.accountType = com.erp.system.common.enums.AccountingType.ASSET
+              and rv.status = com.erp.system.common.enums.VoucherStatus.APPROVED
             group by rv.revenueAccount.id
             """)
     List<Object[]> countReceiptsGroupedByAssetRevenueAccountId();

@@ -299,6 +299,35 @@ a:hover {
   color: var(--erp-text);
 }
 
+.erp-button--outline,
+.erp-button--outline.erp-button--sm {
+  background: transparent;
+  border: 1px solid var(--erp-border-strong);
+  color: var(--erp-text);
+  box-shadow: none;
+}
+
+.erp-button--outline:hover {
+  background: var(--bg-hover);
+  border-color: var(--erp-border-strong);
+  color: var(--erp-text);
+}
+
+.erp-button--sm {
+  min-height: 36px;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.erp-input--sm {
+  min-height: 40px;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
 .erp-icon-button,
 .erp-action-btn,
 .erp-icon-toolbtn {
@@ -945,8 +974,17 @@ body.rtl .erp-table-actions__dropdown {
   border-top: 1px solid var(--erp-border);
   border-bottom: 0;
   justify-content: center;
-  gap: 12px;
+  gap: 16px;
   padding: 16px 24px;
+}
+
+.erp-dialog__footer > *:not(.erp-dialog-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
 }
 
 body.rtl .erp-dialog__footer {
@@ -2040,13 +2078,16 @@ body.rtl app-navigation.pcoded-navbar.navbar-collapsed:not(.theme-horizontal) ~ 
   --erp-space-3: 16px;
   --erp-space-4: 24px;
   --erp-space-5: 32px;
+  --erp-content-max: 1680px;
   --erp-bg: var(--bg-primary);
   --erp-bg-elevated: var(--bg-card);
   --erp-bg-card: var(--bg-card);
   --erp-bg-muted: #f8fafc;
+  --erp-bg-soft: #eef2f7;
   --erp-text: var(--text-primary);
   --erp-text-muted: var(--text-secondary);
   --erp-text-secondary: var(--text-secondary);
+  --erp-text-soft: #94a3b8;
   --erp-border: var(--border-color);
   --erp-border-strong: rgba(15, 23, 42, 0.14);
   --erp-primary: #22c55e;
@@ -2089,9 +2130,11 @@ body.rtl app-navigation.pcoded-navbar.navbar-collapsed:not(.theme-horizontal) ~ 
   --erp-bg-elevated: var(--bg-card);
   --erp-bg-card: var(--bg-card);
   --erp-bg-muted: #101827;
+  --erp-bg-soft: #1c2940;
   --erp-text: var(--text-primary);
   --erp-text-muted: var(--text-secondary);
   --erp-text-secondary: var(--text-secondary);
+  --erp-text-soft: #64748b;
   --erp-border: var(--border-color);
   --erp-border-strong: rgba(255, 255, 255, 0.14);
   --erp-primary: #22c55e;
@@ -2612,4 +2655,181 @@ body.rtl .erp-search-panel__actions {
   background: var(--erp-bg-elevated, #fff);
   border: 1px solid var(--erp-border, rgba(148, 163, 184, 0.22));
   box-shadow: var(--erp-shadow-lg, 0 28px 80px rgba(15, 23, 42, 0.14));
+}
+
+/* ── App shell: consistent page width & primary cards ───────────────────── */
+.erp-page {
+  width: 100%;
+  max-width: var(--erp-content-max);
+  margin: 0 auto;
+  padding-bottom: var(--erp-space-4);
+}
+
+.erp-unified-card {
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius-card);
+  background: var(--erp-bg-card);
+  box-shadow: var(--erp-shadow-sm);
+  overflow: hidden;
+}
+
+.erp-unified-card .card-body {
+  background: transparent;
+}
+
+/* Forms & labels */
+.form-label,
+label.form-label {
+  color: var(--erp-text);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.form-control::placeholder,
+.erp-input::placeholder {
+  color: var(--erp-text-soft);
+  opacity: 1;
+}
+
+select.form-control,
+select.custom-select {
+  color: var(--erp-text);
+  background-color: var(--erp-bg-card);
+  background-image: none;
+}
+
+select.form-control option,
+select.custom-select option {
+  background-color: var(--erp-bg-card);
+  color: var(--erp-text);
+}
+
+/* Bootstrap dropdowns / menus in overlay (toolbar, tables) */
+.dropdown-menu {
+  padding: 8px;
+  border: 1px solid var(--erp-border);
+  border-radius: 14px;
+  background: var(--erp-bg-card);
+  box-shadow: var(--erp-shadow-md);
+}
+
+.dropdown-item {
+  color: var(--erp-text);
+  border-radius: 10px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: var(--bg-hover);
+  color: var(--erp-text);
+}
+
+.dropdown-divider {
+  border-color: var(--erp-border);
+}
+
+/* ng-bootstrap datepicker */
+ngb-datepicker {
+  border: 1px solid var(--erp-border) !important;
+  border-radius: 14px !important;
+  background: var(--erp-bg-card) !important;
+  color: var(--erp-text) !important;
+}
+
+ngb-datepicker .ngb-dp-header,
+ngb-datepicker .ngb-dp-weekdays {
+  background: var(--erp-bg-muted) !important;
+  border-color: var(--erp-border) !important;
+}
+
+ngb-datepicker .ngb-dp-day .btn-light,
+ngb-datepicker .ngb-dp-day .btn-secondary {
+  background: transparent !important;
+  color: var(--erp-text) !important;
+  border: none !important;
+}
+
+ngb-datepicker .ngb-dp-day .btn-light:hover,
+ngb-datepicker .ngb-dp-day .btn-light.focus {
+  background: var(--bg-hover) !important;
+  color: var(--erp-text) !important;
+}
+
+ngb-datepicker .ngb-dp-day .bg-primary {
+  background: var(--erp-primary) !important;
+  color: #fff !important;
+}
+
+/* Tooltips */
+.tooltip .tooltip-inner {
+  background: var(--erp-bg-muted);
+  color: var(--erp-text);
+  border: 1px solid var(--erp-border);
+  border-radius: 10px;
+  box-shadow: var(--erp-shadow-sm);
+}
+
+.tooltip .arrow::before {
+  border-top-color: var(--erp-border);
+}
+
+/* Modals (if used) */
+.modal-content {
+  background: var(--erp-bg-card);
+  color: var(--erp-text);
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius-dialog);
+  box-shadow: var(--erp-shadow-lg);
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--erp-border);
+}
+
+.close,
+.btn-close {
+  color: var(--erp-text-muted);
+  opacity: 0.85;
+  text-shadow: none;
+}
+
+.alert .close {
+  color: inherit;
+  opacity: 0.7;
+}
+
+/* Pagination */
+.pagination .page-link {
+  background: var(--erp-bg-card);
+  border-color: var(--erp-border);
+  color: var(--erp-text);
+  border-radius: 10px;
+  margin: 0 2px;
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--erp-primary);
+  border-color: var(--erp-primary);
+  color: #fff;
+}
+
+.pagination .page-link:hover {
+  background: var(--bg-hover);
+  color: var(--erp-text);
+}
+
+/* Sidebar active row: theme-aware border */
+.pcoded-navbar .pcoded-inner-navbar > li.active > a,
+.pcoded-navbar .pcoded-inner-navbar > li.pcoded-trigger > a,
+.pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li.active > a {
+  border: 1px solid color-mix(in srgb, var(--erp-primary) 28%, transparent);
+}
+
+/* CDK overlay pane fallback */
+.cdk-overlay-pane {
+  color: var(--erp-text);
 }

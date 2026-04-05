@@ -8,9 +8,9 @@
     </div>
   </app-page-header>
 
-  <div class="card" *ngIf="loading"><app-loading-state></app-loading-state></div>
+  <div class="card erp-unified-card" *ngIf="loading"><app-loading-state></app-loading-state></div>
 
-  <div class="card" *ngIf="!loading && errorKey">
+  <div class="card erp-unified-card" *ngIf="!loading && errorKey">
     <div class="card-body text-center text-danger">
       {{ errorKey | translate }}
       <button class="erp-icon-button ms-2" type="button" (click)="goBack()">
@@ -21,7 +21,7 @@
 
   <div *ngIf="!loading && !errorKey && entry" class="gl-detail">
     <!-- Header Info Card -->
-    <div class="card gl-detail__header-card">
+    <div class="card erp-unified-card gl-detail__header-card">
       <div class="card-body">
         <div class="row">
           <div class="col-md-4 gl-detail__field">
@@ -77,7 +77,7 @@
     </div>
 
     <!-- Lines Table -->
-    <div class="card">
+    <div class="card erp-unified-card">
       <div class="card-header">
         <h5 class="card-title mb-0">{{ 'GENERAL_LEDGER.LINES' | translate }}</h5>
       </div>
@@ -110,7 +110,7 @@
     </div>
 
     <!-- Posting / Reversal Info -->
-    <div class="card" *ngIf="entry.postedAt || entry.reversedAt">
+    <div class="card erp-unified-card" *ngIf="entry.postedAt || entry.reversedAt">
       <div class="card-body">
         <div class="row">
           <div class="col-md-3 gl-detail__field" *ngIf="entry.postedAt">

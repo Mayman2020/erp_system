@@ -1,31 +1,44 @@
 .report-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius-card, 16px);
   padding: 16px;
   height: 100%;
+  background: var(--erp-bg-card);
+  color: var(--erp-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-card h6 {
+  color: var(--erp-text);
+  font-weight: 700;
 }
 
 .report-card.active {
-  border-color: #04a9f5;
-  box-shadow: 0 6px 18px rgba(4, 169, 245, 0.2);
+  border-color: var(--erp-primary);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--erp-primary) 22%, transparent);
 }
 
 .report-card--metric {
-  background: linear-gradient(180deg, rgba(4, 169, 245, 0.06), rgba(255, 255, 255, 0.96));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--erp-info) 10%, transparent),
+    var(--erp-bg-card)
+  );
 }
 
 .report-card--positive {
-  border-color: rgba(46, 125, 50, 0.35);
+  border-color: color-mix(in srgb, var(--erp-success) 40%, var(--erp-border));
 }
 
 .report-card--negative {
-  border-color: rgba(198, 40, 40, 0.35);
+  border-color: color-mix(in srgb, var(--erp-danger) 40%, var(--erp-border));
 }
 
 .report-table {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius-card, 16px);
   padding: 16px;
+  background: var(--erp-bg-muted);
 }
 
 .report-summary {

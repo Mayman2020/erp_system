@@ -36,7 +36,8 @@ public class AccountingCheckService {
     private final AccountingPostingService accountingPostingService;
 
     @Transactional(readOnly = true)
-    public List<AccountingCheckDisplayDto> getChecks(CheckType type, CheckStatus status, String search) {
+    public List<AccountingCheckDisplayDto> getChecks(CheckType type, CheckStatus status, String search,
+                                                     LocalDate fromDate, LocalDate toDate) {
         List<AccountingCheck> checks = status != null
                 ? checkRepository.findByStatusOrderByIssueDateDescIdDesc(status)
                 : type != null
@@ -46,6 +47,8 @@ public class AccountingCheckService {
         String normalizedSearch = search == null || search.isBlank() ? null : search.trim().toLowerCase();
         return checks.stream()
                 .filter(check -> type == null || check.getCheckType() == type)
+                .filter(check -> fromDate == null || !check.getDueDate().isBefore(fromDate))
+                .filter(check -> toDate == null || !check.getDueDate().isAfter(toDate))
                 .filter(check -> normalizedSearch == null
                         || check.getCheckNumber().toLowerCase().contains(normalizedSearch)
                         || check.getBankName().toLowerCase().contains(normalizedSearch)

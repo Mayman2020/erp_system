@@ -30,56 +30,31 @@
     </div>
   </app-page-header>
 
-  <div class="card">
+  <div class="card erp-unified-card">
     <div class="card-body">
-      <div class="alert alert-success" *ngIf="successKey">{{ successKey | translate }}</div>
-      <div class="alert alert-danger" *ngIf="errorKey">{{ errorKey | translate }}</div>
-      <app-advanced-search-bar (search)="onSearch($event)" [showStatus]="true" [showAmountRange]="true" [statusOptions]="voucherStatuses"></app-advanced-search-bar>
-        <div class="row mb-3">
-          <div class="col-md-2">
-            <label class="form-label">{{ 'COMMON.STATUS' | translate }}</label>
-            <select class="form-control" [(ngModel)]="filters.status" (ngModelChange)="load()">
-              <option value="">{{ 'COMMON.ALL' | translate }}</option>
-              <option *ngFor="let item of voucherStatuses" [value]="item">{{ ('STATUS.' + item) | translate }}</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">{{ 'VOUCHERS.LIST.METHOD' | translate }}</label>
-            <select class="form-control" [(ngModel)]="filters.paymentMethod" (ngModelChange)="load()">
-              <option value="">{{ 'COMMON.ALL' | translate }}</option>
-              <option *ngFor="let item of paymentMethods" [value]="item">{{ ('PAYMENT_METHOD.' + item) | translate }}</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">{{ 'VOUCHERS.FORM.BANK_ACCOUNT' | translate }}</label>
-            <select class="form-control" [(ngModel)]="filters.bankAccountId" (ngModelChange)="load()">
-              <option value="">{{ 'COMMON.ALL' | translate }}</option>
-              <option *ngFor="let bank of bankAccounts" [value]="bank.linkedAccountId">{{ bank.bankName }} - {{ bank.accountNumber }}</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">{{ 'VOUCHERS.FILTER.MIN_AMOUNT' | translate }}</label>
-            <input class="form-control" type="number" [(ngModel)]="filters.minAmount" (change)="load()" />
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">{{ 'VOUCHERS.FILTER.MAX_AMOUNT' | translate }}</label>
-            <input class="form-control" type="number" [(ngModel)]="filters.maxAmount" (change)="load()" />
-          </div>
-        </div>
+      <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
+        {{ successKey | translate }}
+        <button type="button" class="btn-close" (click)="successKey = ''"></button>
+      </div>
+      <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
+        {{ errorKey | translate }}
+        <button type="button" class="btn-close" (click)="errorKey = ''"></button>
+      </div>
+      <app-advanced-search-bar (search)="onSearch($event)" [showStatus]="true" [showDateRange]="true" [showAmountRange]="true" [statusOptions]="voucherStatuses"></app-advanced-search-bar>
       <app-data-table [columns]="columns" [data]="rows" [actions]="actions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
     </div>
   </div>
 </section>
 
-<app-erp-dialog [visible]="dialogVisible" [title]="dialogTitle" size="xl" (close)="dialogVisible = false">
+<app-erp-dialog [visible]="dialogVisible" [title]="dialogTitle" size="xl" (close)="closeDialog()">
   <div dialog-body>
     <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
       {{ successKey | translate }}
-      <button type="button" class="close" (click)="successKey=''"><span>&times;</span></button>
+      <button type="button" class="btn-close" (click)="successKey = ''"></button>
     </div>
     <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
       {{ errorKey | translate }}
-      <button type="button" class="close" (click)="errorKey=''"><span>&times;</span></button>
+      <button type="button" class="btn-close" (click)="errorKey = ''"></button>
     </div>
   <form [formGroup]="form" class="row">
     <div class="col-md-6 mb-3">
@@ -89,7 +64,6 @@
       <app-form-field
         [control]="form.controls.reference"
         labelKey="VOUCHERS.FORM.NUMBER"
-        placeholderKey="VOUCHERS.FORM.NUMBER_PLACEHOLDER"
         hintKey="VOUCHERS.FORM.NUMBER_HINT"
         type="text"
         [readonly]="true"
@@ -150,7 +124,7 @@
     <button type="button" class="erp-button erp-button--primary" (click)="save()" [disabled]="readOnlyMode || saving">
       {{ 'COMMON.SAVE' | translate }}
     </button>
-    <button type="button" class="erp-button erp-button--ghost" (click)="dialogVisible = false">
+    <button type="button" class="erp-button erp-button--ghost" (click)="closeDialog()">
       {{ 'COMMON.CANCEL' | translate }}
     </button>
   </div>

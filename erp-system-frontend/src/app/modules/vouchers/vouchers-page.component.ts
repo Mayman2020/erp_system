@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { distinctUntilChanged, finalize, map } from 'rxjs/operators';
@@ -15,7 +15,7 @@ import { DataTableAction, DataTableColumn } from '../../shared/components/data-t
   templateUrl: './vouchers-page.component.html',
   styleUrls: ['./vouchers-page.component.scss']
 })
-export class VouchersPageComponent implements OnInit {
+export class VouchersPageComponent implements OnInit, OnDestroy {
   readonly titleKey = 'VOUCHERS.TITLE';
   readonly columns: DataTableColumn[] = [
     { key: 'reference', title: 'VOUCHERS.LIST.NUMBER', align: 'start' },
@@ -73,6 +73,7 @@ export class VouchersPageComponent implements OnInit {
   dialogTitle = 'VOUCHERS.PAYMENT.CREATE';
   readOnlyMode = false;
   actorEmail = 'frontend.user';
+  private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
   filters = {
     query: '',
@@ -110,6 +111,10 @@ export class VouchersPageComponent implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
+
+  ngOnDestroy(): void {
+    if (this.feedbackTimer) { clearTimeout(this.feedbackTimer); }
+  }
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user) => {
@@ -187,11 +192,11 @@ export class VouchersPageComponent implements OnInit {
     }
     if (event.actionId === 'approve') {
       if (status !== 'DRAFT') {
-        this.errorKey = 'VOUCHERS.ONLY_DRAFT_CAN_APPROVE';
+        this.showError('VOUCHERS.ONLY_DRAFT_CAN_APPROVE');
         return;
       }
       this.confirmDialog.confirmByKey({ messageKey: 'VOUCHERS.CONFIRM_APPROVE' }).subscribe((ok) => {
-        if (ok) {
+        if (ok === true) {
           this.runWorkflow(id, 'approve');
         }
       });
@@ -202,7 +207,7 @@ export class VouchersPageComponent implements OnInit {
         return;
       }
       this.confirmDialog.confirmByKey({ messageKey: 'VOUCHERS.CONFIRM_CANCEL', danger: true }).subscribe((ok) => {
-        if (ok) {
+        if (ok === true) {
           this.runWorkflow(id, 'cancel');
         }
       });
@@ -212,7 +217,7 @@ export class VouchersPageComponent implements OnInit {
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.errorKey = 'VOUCHERS.SAVE_ERROR';
+      this.showError('VOUCHERS.SAVE_ERROR');
       return;
     }
     const raw = this.form.getRawValue();
@@ -229,44 +234,42 @@ export class VouchersPageComponent implements OnInit {
       partyName: raw.partyName || undefined
     };
 
+    let request$;
     if (this.activeVoucherType === 'payment') {
       const payload: PaymentVoucherForm = {
         ...commonPayload,
         expenseAccountId: Number(raw.targetAccountId || 0),
         linkedDocumentReference: raw.linkedReference || undefined
       };
-      const request$ = this.selectedId ? this.api.updatePaymentVoucher(this.selectedId, payload) : this.api.createPaymentVoucher(payload);
-      request$.pipe(finalize(() => (this.saving = false))).subscribe(
-        () => {
-          this.successKey = 'VOUCHERS.SAVE_SUCCESS';
-          this.errorKey = '';
-          this.dialogVisible = false;
-          this.load();
-        },
-        (err) => {
-          this.errorKey = this.extractError(err, 'VOUCHERS.SAVE_ERROR');
-        }
-      );
-      return;
+      request$ = this.selectedId ? this.api.updatePaymentVoucher(this.selectedId, payload) : this.api.createPaymentVoucher(payload);
+    } else {
+      const payload: ReceiptVoucherForm = {
+        ...commonPayload,
+        revenueAccountId: Number(raw.targetAccountId || 0),
+        invoiceReference: raw.linkedReference || undefined
+      };
+      request$ = this.selectedId ? this.api.updateReceiptVoucher(this.selectedId, payload) : this.api.createReceiptVoucher(payload);
     }
 
-    const payload: ReceiptVoucherForm = {
-      ...commonPayload,
-      revenueAccountId: Number(raw.targetAccountId || 0),
-      invoiceReference: raw.linkedReference || undefined
-    };
-    const request$ = this.selectedId ? this.api.updateReceiptVoucher(this.selectedId, payload) : this.api.createReceiptVoucher(payload);
-    request$.pipe(finalize(() => (this.saving = false))).subscribe(
-      () => {
-        this.successKey = 'VOUCHERS.SAVE_SUCCESS';
-        this.errorKey = '';
-        this.dialogVisible = false;
-        this.load();
-      },
-      (err) => {
-        this.errorKey = this.extractError(err, 'VOUCHERS.SAVE_ERROR');
-      }
-    );
+    request$
+      .pipe(
+        finalize(() => {
+          this.saving = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.dialogVisible = false;
+          this.selectedId = null;
+          this.readOnlyMode = false;
+          this.showSuccess('VOUCHERS.SAVE_SUCCESS');
+          this.load();
+        },
+        error: (err) => {
+          this.showError(this.extractError(err, 'VOUCHERS.SAVE_ERROR'));
+        }
+      });
   }
 
   load(): void {
@@ -294,16 +297,16 @@ export class VouchersPageComponent implements OnInit {
             this.cdr.detectChanges();
           })
         )
-        .subscribe(
-          (items: PaymentVoucher[]) => {
+        .subscribe({
+          next: (items: PaymentVoucher[]) => {
             this.paymentVouchers = items;
             this.rows = items.map((voucher) => this.toRow(voucher));
           },
-          () => {
+          error: () => {
             this.errorKey = 'COMMON.ERROR_LOADING';
             this.rows = [];
           }
-        );
+        });
       return;
     }
 
@@ -315,16 +318,16 @@ export class VouchersPageComponent implements OnInit {
           this.cdr.detectChanges();
         })
       )
-      .subscribe(
-        (items: ReceiptVoucher[]) => {
+      .subscribe({
+        next: (items: ReceiptVoucher[]) => {
           this.receiptVouchers = items;
           this.rows = items.map((voucher) => this.toRow(voucher));
         },
-        () => {
+        error: () => {
           this.errorKey = 'COMMON.ERROR_LOADING';
           this.rows = [];
         }
-      );
+      });
   }
 
   private openEdit(id: number, readOnly: boolean): void {
@@ -333,55 +336,57 @@ export class VouchersPageComponent implements OnInit {
     this.readOnlyMode = readOnly;
     this.dialogTitle = readOnly ? 'VOUCHERS.VIEW_TITLE' : 'VOUCHERS.EDIT_TITLE';
     if (this.activeVoucherType === 'payment') {
-      this.api.getPaymentVoucher(id).subscribe(
-        (voucher: PaymentVoucher) => this.patchDialogForm(voucher, voucher.expenseAccountId, voucher.linkedDocumentReference, readOnly),
-        () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
-      );
+      this.api.getPaymentVoucher(id).subscribe({
+        next: (voucher: PaymentVoucher) => this.patchDialogForm(voucher, voucher.expenseAccountId, voucher.linkedDocumentReference, readOnly),
+        error: () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
+      });
       return;
     }
-    this.api.getReceiptVoucher(id).subscribe(
-      (voucher: ReceiptVoucher) => this.patchDialogForm(voucher, voucher.revenueAccountId, voucher.invoiceReference, readOnly),
-      () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
-    );
+    this.api.getReceiptVoucher(id).subscribe({
+      next: (voucher: ReceiptVoucher) => this.patchDialogForm(voucher, voucher.revenueAccountId, voucher.invoiceReference, readOnly),
+      error: () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
+    });
   }
 
   private runWorkflow(id: number, action: 'approve' | 'cancel'): void {
     const actor = this.currentUser();
+    const onOk = (): void => {
+      if (this.selectedId === id) {
+        this.dialogVisible = false;
+        this.selectedId = null;
+        this.readOnlyMode = false;
+      }
+      this.showSuccess('VOUCHERS.WORKFLOW_SUCCESS');
+      this.load();
+      this.cdr.markForCheck();
+    };
+    const onErr = (err: unknown): void => {
+      this.showError(this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'));
+      this.cdr.markForCheck();
+    };
     if (this.activeVoucherType === 'payment') {
       if (action === 'approve') {
-        this.api.approvePaymentVoucher(id, actor).subscribe(
-          () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
-          (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
-        );
+        this.api.approvePaymentVoucher(id, actor).subscribe({ next: onOk, error: onErr });
       } else {
-        this.api.cancelPaymentVoucher(id, actor).subscribe(
-          () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
-          (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
-        );
+        this.api.cancelPaymentVoucher(id, actor).subscribe({ next: onOk, error: onErr });
       }
       return;
     }
     if (action === 'approve') {
-      this.api.approveReceiptVoucher(id, actor).subscribe(
-        () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
-        (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
-      );
+      this.api.approveReceiptVoucher(id, actor).subscribe({ next: onOk, error: onErr });
     } else {
-      this.api.cancelReceiptVoucher(id, actor).subscribe(
-        () => { this.successKey = 'VOUCHERS.WORKFLOW_SUCCESS'; this.errorKey = ''; this.load(); },
-        (err) => (this.errorKey = this.extractError(err, 'VOUCHERS.WORKFLOW_ERROR'))
-      );
+      this.api.cancelReceiptVoucher(id, actor).subscribe({ next: onOk, error: onErr });
     }
   }
 
   private bootstrapLookups(): void {
-    this.lookupService.getLookup('payment-methods').subscribe((items) => (this.paymentMethods = items.map((item) => item.code)), () => { /* lookup fallback */ });
-    this.lookupService.getLookup('voucher-statuses').subscribe((items) => (this.voucherStatuses = items.map((item) => item.code)), () => { /* lookup fallback */ });
-    this.lookupService.getLookup('currencies').subscribe((items) => (this.currencies = items.map((item) => item.code)), () => { /* lookup fallback */ });
-    this.lookupService.getLookup('voucher-types').subscribe((items) => (this.voucherTypes = items.map((item) => item.code)), () => { /* lookup fallback */ });
-    this.api.getBankAccounts({ active: true }).subscribe((items) => (this.bankAccounts = items), () => { /* lookup fallback */ });
-    this.api.getAccounts({ active: true }).subscribe((items) => (this.accountOptions = items), () => { /* lookup fallback */ });
-    this.api.getAccountTree().subscribe((tree) => (this.accountTree = tree), () => {});
+    this.lookupService.getLookup('payment-methods').subscribe({ next: (items) => (this.paymentMethods = items.map((item) => item.code)) });
+    this.lookupService.getLookup('voucher-statuses').subscribe({ next: (items) => (this.voucherStatuses = items.map((item) => item.code)) });
+    this.lookupService.getLookup('currencies').subscribe({ next: (items) => (this.currencies = items.map((item) => item.code)) });
+    this.lookupService.getLookup('voucher-types').subscribe({ next: (items) => (this.voucherTypes = items.map((item) => item.code)) });
+    this.api.getBankAccounts({ active: true }).subscribe({ next: (items) => (this.bankAccounts = items) });
+    this.api.getAccounts({ active: true }).subscribe({ next: (items) => (this.accountOptions = items) });
+    this.api.getAccountTree().subscribe({ next: (tree) => (this.accountTree = tree) });
   }
 
   private currentUser(): string {
@@ -426,6 +431,36 @@ export class VouchersPageComponent implements OnInit {
       this.form.enable();
     }
     this.dialogVisible = true;
+  }
+
+  closeDialog(): void {
+    this.dialogVisible = false;
+    this.selectedId = null;
+    this.readOnlyMode = false;
+    this.errorKey = '';
+    this.successKey = '';
+  }
+
+  private showSuccess(key: string): void {
+    this.successKey = key;
+    this.errorKey = '';
+    this.queueFeedbackClear();
+  }
+
+  private showError(key: string): void {
+    this.errorKey = key;
+    this.successKey = '';
+    this.queueFeedbackClear();
+  }
+
+  private queueFeedbackClear(): void {
+    if (this.feedbackTimer) { clearTimeout(this.feedbackTimer); }
+    this.feedbackTimer = setTimeout(() => {
+      this.errorKey = '';
+      this.successKey = '';
+      this.feedbackTimer = null;
+      this.cdr.markForCheck();
+    }, 5000);
   }
 
   private extractError(err: any, fallback: string): string {

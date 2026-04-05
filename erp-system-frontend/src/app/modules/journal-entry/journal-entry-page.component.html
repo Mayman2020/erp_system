@@ -12,13 +12,18 @@
     </div>
   </app-page-header>
 
-  <div class="alert alert-danger" *ngIf="errorKey && !formVisible && !accountPickerVisible">{{ errorKey | translate }}</div>
-  <div class="alert alert-success" *ngIf="successKey && !formVisible && !accountPickerVisible">{{ successKey | translate }}</div>
+  <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey && !formVisible && !accountPickerVisible">
+    {{ errorKey | translate }}
+    <button type="button" class="btn-close" (click)="errorKey = ''"></button>
+  </div>
+  <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey && !formVisible && !accountPickerVisible">
+    {{ successKey | translate }}
+    <button type="button" class="btn-close" (click)="successKey = ''"></button>
+  </div>
 
-  <app-advanced-search-bar [showStatus]="true" [showDateRange]="true" [showAmountRange]="true" [statusOptions]="statusCodes" (search)="onSearch($event)"></app-advanced-search-bar>
-
-  <div class="card">
-    <div class="card-body p-0">
+  <div class="card erp-unified-card">
+    <div class="card-body">
+      <app-advanced-search-bar [showStatus]="true" [showDateRange]="true" [showAmountRange]="true" [statusOptions]="statusCodes" (search)="onSearch($event)"></app-advanced-search-bar>
       <app-data-table [columns]="columns" [data]="filteredEntries" [actions]="actions" [loading]="loading" (actionClick)="onRowAction($event)"></app-data-table>
     </div>
   </div>
@@ -27,8 +32,14 @@
 <app-erp-dialog [visible]="formVisible" [title]="'JOURNAL.FORM_TITLE_' + formMode.toUpperCase()" size="xxl" (close)="closeForm()">
   <div dialog-body>
   <form [formGroup]="form">
-    <div class="alert alert-danger mb-2" *ngIf="errorKey">{{ errorKey | translate }}</div>
-    <div class="alert alert-success mb-2" *ngIf="successKey">{{ successKey | translate }}</div>
+    <div class="alert alert-danger alert-dismissible fade show mb-2" *ngIf="errorKey">
+      {{ errorKey | translate }}
+      <button type="button" class="btn-close" (click)="errorKey = ''"></button>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show mb-2" *ngIf="successKey">
+      {{ successKey | translate }}
+      <button type="button" class="btn-close" (click)="successKey = ''"></button>
+    </div>
     <div class="row">
       <div class="col-md-3 form-group">
         <app-form-field [control]="form.controls.entryDate" labelKey="JOURNAL.DATE" icon="calendar_month" type="date"></app-form-field>

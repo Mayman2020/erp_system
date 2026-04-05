@@ -8,9 +8,11 @@ import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.common.enums.TransactionType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,9 +26,11 @@ public class AccountingTransactionController {
     public ApiResponse<List<AccountingTransactionDisplayDto>> getTransactions(
             @RequestParam(required = false) TransactionType type,
             @RequestParam(required = false) TransactionStatus status,
-            @RequestParam(required = false) String search
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
     ) {
-        return ApiResponse.success(transactionService.getTransactions(type, status, search));
+        return ApiResponse.success(transactionService.getTransactions(type, status, search, fromDate, toDate));
     }
 
     @GetMapping("/{id}")

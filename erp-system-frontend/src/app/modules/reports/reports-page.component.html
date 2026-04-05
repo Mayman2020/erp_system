@@ -1,7 +1,7 @@
 <section class="erp-page">
   <app-page-header [titleKey]="titleKey"></app-page-header>
 
-  <div class="card">
+  <div class="card erp-unified-card">
     <div class="card-body">
         <div class="row mb-3">
           <div class="col-md-4" *ngFor="let card of reportCards">
@@ -55,7 +55,10 @@
         </form>
 
         <app-loading-state *ngIf="loading"></app-loading-state>
-        <div *ngIf="!loading && errorKey" class="alert alert-danger mb-3">{{ errorKey | translate }}</div>
+        <div *ngIf="!loading && errorKey" class="alert alert-danger alert-dismissible fade show mb-3">
+          {{ errorKey | translate }}
+          <button type="button" class="btn-close" (click)="errorKey = ''"></button>
+        </div>
 
         <div *ngIf="!loading && activeReport === 'profitLoss' && profitLoss" class="report-table">
           <div class="d-flex justify-content-end mb-2">

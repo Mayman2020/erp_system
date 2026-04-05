@@ -1,9 +1,9 @@
 <section class="erp-page">
   <app-page-header [titleKey]="titleKey"></app-page-header>
 
-  <div class="card mb-3">
+  <div class="card erp-unified-card mb-3">
     <div class="card-body">
-      <app-advanced-search-bar (search)="onSearch($event)" [showDateRange]="false"></app-advanced-search-bar>
+      <app-advanced-search-bar (search)="onSearch($event)" [showDateRange]="true" [showStatus]="true" [statusOptions]="statuses"></app-advanced-search-bar>
       <div class="d-flex gap-2 mb-3">
         <button type="button" class="erp-button erp-button--primary" (click)="toggleCreateForm()">
           <mat-icon aria-hidden="true">{{ showCreateForm ? 'close' : 'add' }}</mat-icon>
@@ -111,11 +111,11 @@
             <mat-icon aria-hidden="true">link</mat-icon>
             <span>{{ 'RECONCILIATION.MATCH' | translate }}</span>
           </button>
-          <button type="button" class="erp-button erp-button--primary" (click)="finalizeReconciliation()" [disabled]="!isEditable">
+          <button type="button" class="erp-button erp-button--primary" (click)="finalizeReconciliation()" [disabled]="!isEditable || saving">
             <mat-icon aria-hidden="true">task_alt</mat-icon>
             <span>{{ 'RECONCILIATION.FINALIZE' | translate }}</span>
           </button>
-          <button type="button" class="erp-button erp-button--danger" (click)="cancelReconciliation()" [disabled]="!isEditable">
+          <button type="button" class="erp-button erp-button--danger" (click)="cancelReconciliation()" [disabled]="!isEditable || saving">
             <mat-icon aria-hidden="true">cancel</mat-icon>
             <span>{{ 'COMMON.CANCEL' | translate }}</span>
           </button>

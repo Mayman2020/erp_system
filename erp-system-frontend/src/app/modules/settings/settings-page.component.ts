@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -80,7 +80,8 @@ export class SettingsPageComponent implements OnInit {
     private lookupService: LookupService,
     private themeService: ThemeService,
     public translationService: TranslationService,
-    private confirmDialog: ConfirmDialogService
+    private confirmDialog: ConfirmDialogService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -126,18 +127,20 @@ export class SettingsPageComponent implements OnInit {
       companyName: (this.form.value.companyName || '').trim() || null,
       profileImage: (this.form.value.profileImage || '').trim() || null
     };
-    this.authService.updateMyProfile(payload).subscribe(
-      (user) => {
+    this.authService.updateMyProfile(payload).subscribe({
+      next: (user) => {
         this.user = user;
         this.imagePreview = user.profile?.profileImage || '';
         this.successKey = 'PROFILE.SAVE_SUCCESS';
         this.saving = false;
+        this.cdr.detectChanges();
       },
-      () => {
+      error: () => {
         this.errorKey = 'PROFILE.SAVE_ERROR';
         this.saving = false;
+        this.cdr.detectChanges();
       }
-    );
+    });
   }
 
   saveAccountingSettings(): void {
@@ -169,15 +172,17 @@ export class SettingsPageComponent implements OnInit {
     this.accountingApi
       .updateSettings(payload)
       .pipe(finalize(() => (this.accountingSaving = false)))
-      .subscribe(
-        (settings) => {
+      .subscribe({
+        next: (settings) => {
           this.applyAccountingSettings(settings);
           this.accountingSuccessKey = 'SETTINGS.SAVE_SUCCESS';
+          this.cdr.detectChanges();
         },
-        () => {
+        error: () => {
           this.accountingErrorKey = 'SETTINGS.SAVE_ERROR';
+          this.cdr.detectChanges();
         }
-      );
+      });
   }
 
   createFiscalYear(): void {
@@ -199,17 +204,19 @@ export class SettingsPageComponent implements OnInit {
     this.accountingApi
       .createFiscalYear(payload)
       .pipe(finalize(() => (this.fiscalYearSaving = false)))
-      .subscribe(
-        () => {
+      .subscribe({
+        next: () => {
           this.accountingSuccessKey = 'SETTINGS.CREATE_SUCCESS';
           this.fiscalYearForm.patchValue({ year: new Date().getFullYear(), startDate: '', endDate: '' });
           this.refreshAccountingSettings();
+          this.cdr.detectChanges();
         },
-        (err) => {
+        error: (err) => {
           const msg = err?.error?.message;
           this.accountingErrorKey = msg && msg !== 'COMMON.OK' ? msg : 'SETTINGS.ACTION_ERROR';
+          this.cdr.detectChanges();
         }
-      );
+      });
   }
 
   createFiscalPeriod(): void {
@@ -237,16 +244,18 @@ export class SettingsPageComponent implements OnInit {
     this.accountingApi
       .createFiscalPeriod(fiscalYearId, payload)
       .pipe(finalize(() => (this.fiscalPeriodSaving = false)))
-      .subscribe(
-        () => {
+      .subscribe({
+        next: () => {
           this.accountingSuccessKey = 'SETTINGS.CREATE_SUCCESS';
           this.fiscalPeriodForm.patchValue({ periodName: '', startDate: '', endDate: '' });
           this.refreshAccountingSettings();
+          this.cdr.detectChanges();
         },
-        () => {
+        error: () => {
           this.accountingErrorKey = 'SETTINGS.ACTION_ERROR';
+          this.cdr.detectChanges();
         }
-      );
+      });
   }
 
   setTheme(mode: ThemeMode): void {
@@ -298,16 +307,18 @@ export class SettingsPageComponent implements OnInit {
         ? this.accountingApi.closeFiscalYear(year.id, this.actorEmail)
         : this.accountingApi.openFiscalYear(year.id);
 
-      request$.pipe(finalize(() => (this.fiscalToggling = false))).subscribe(
-        () => {
+      request$.pipe(finalize(() => (this.fiscalToggling = false))).subscribe({
+        next: () => {
           this.accountingSuccessKey = 'SETTINGS.ACTION_SUCCESS';
           this.refreshAccountingSettings();
+          this.cdr.detectChanges();
         },
-        (err) => {
+        error: (err) => {
           const msg = err?.error?.message;
           this.accountingErrorKey = msg && msg !== 'COMMON.OK' ? msg : 'SETTINGS.ACTION_ERROR';
+          this.cdr.detectChanges();
         }
-      );
+      });
     });
   }
 
@@ -326,16 +337,18 @@ export class SettingsPageComponent implements OnInit {
         ? this.accountingApi.closeFiscalPeriod(period.id, this.actorEmail)
         : this.accountingApi.openFiscalPeriod(period.id);
 
-      request$.pipe(finalize(() => (this.fiscalToggling = false))).subscribe(
-        () => {
+      request$.pipe(finalize(() => (this.fiscalToggling = false))).subscribe({
+        next: () => {
           this.accountingSuccessKey = 'SETTINGS.ACTION_SUCCESS';
           this.refreshAccountingSettings();
+          this.cdr.detectChanges();
         },
-        (err) => {
+        error: (err) => {
           const msg = err?.error?.message;
           this.accountingErrorKey = msg && msg !== 'COMMON.OK' ? msg : 'SETTINGS.ACTION_ERROR';
+          this.cdr.detectChanges();
         }
-      );
+      });
     });
   }
 
@@ -351,8 +364,8 @@ export class SettingsPageComponent implements OnInit {
     this.loading = true;
     this.errorKey = '';
     this.successKey = '';
-    this.authService.getMyProfile().subscribe(
-      (user) => {
+    this.authService.getMyProfile().subscribe({
+      next: (user) => {
         this.imagePreview = user.profile?.profileImage || '';
         this.form.patchValue({
           fullName: user.profile?.fullName || '',
@@ -364,12 +377,14 @@ export class SettingsPageComponent implements OnInit {
           profileImage: user.profile?.profileImage || ''
         });
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      () => {
+      error: () => {
         this.errorKey = 'PROFILE.LOAD_ERROR';
         this.loading = false;
+        this.cdr.detectChanges();
       }
-    );
+    });
   }
 
   private loadAccountingContext(): void {
@@ -383,16 +398,18 @@ export class SettingsPageComponent implements OnInit {
       settings: this.accountingApi.getSettings()
     })
       .pipe(finalize(() => (this.accountingLoading = false)))
-      .subscribe(
-        (result) => {
+      .subscribe({
+        next: (result) => {
           this.accountingMethodOptions = result.methods || [];
           this.currencyOptions = result.currencies || [];
           this.applyAccountingSettings(result.settings);
+          this.cdr.detectChanges();
         },
-        () => {
+        error: () => {
           this.accountingErrorKey = 'SETTINGS.LOAD_ERROR';
+          this.cdr.detectChanges();
         }
-      );
+      });
   }
 
   private refreshAccountingSettings(): void {
@@ -400,12 +417,16 @@ export class SettingsPageComponent implements OnInit {
     this.accountingApi
       .getSettings()
       .pipe(finalize(() => (this.accountingLoading = false)))
-      .subscribe(
-        (settings) => this.applyAccountingSettings(settings),
-        () => {
+      .subscribe({
+        next: (settings) => {
+          this.applyAccountingSettings(settings);
+          this.cdr.detectChanges();
+        },
+        error: () => {
           this.accountingErrorKey = 'SETTINGS.LOAD_ERROR';
+          this.cdr.detectChanges();
         }
-      );
+      });
   }
 
   private applyAccountingSettings(settings: AccountingSettingsDto): void {

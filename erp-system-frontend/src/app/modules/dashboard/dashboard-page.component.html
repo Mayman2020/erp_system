@@ -249,11 +249,11 @@
 </div>
 
 <ng-template #dashboardState>
-  <div class="card" *ngIf="loading"><app-loading-state></app-loading-state></div>
-  <div class="card" *ngIf="!loading && !errorKey">
+  <div class="card erp-unified-card" *ngIf="loading"><app-loading-state></app-loading-state></div>
+  <div class="card erp-unified-card" *ngIf="!loading && !errorKey">
     <app-empty-state icon="dashboard"></app-empty-state>
   </div>
-  <div class="card" *ngIf="errorKey">
+  <div class="card erp-unified-card" *ngIf="errorKey">
     <div class="card-body text-center text-danger" *ngIf="errorKey">
       {{ errorKey | translate }}
       <button class="erp-icon-button" type="button" (click)="fetchDashboard()">

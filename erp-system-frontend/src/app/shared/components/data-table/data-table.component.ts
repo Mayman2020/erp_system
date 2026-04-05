@@ -200,6 +200,9 @@ export class DataTableComponent implements OnChanges {
     if (changes['data']) {
       const prev = changes['data'].previousValue as unknown[] | undefined;
       const curr = changes['data'].currentValue as unknown[] | undefined;
+      if (!changes['data'].firstChange && prev !== curr) {
+        this.currentPage = 1;
+      }
       const prevLen = prev?.length ?? 0;
       const currLen = curr?.length ?? 0;
       if (prev === undefined || prevLen !== currLen) {

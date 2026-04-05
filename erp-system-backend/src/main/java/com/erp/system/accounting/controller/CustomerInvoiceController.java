@@ -7,9 +7,11 @@ import com.erp.system.common.dto.ApiResponse;
 import com.erp.system.common.enums.InvoiceStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,9 +22,12 @@ public class CustomerInvoiceController {
     private final CustomerInvoiceService invoiceService;
 
     @GetMapping
-    public ApiResponse<List<CustomerInvoiceDisplayDto>> getInvoices(@RequestParam(required = false) InvoiceStatus status,
-                                                                     @RequestParam(required = false) String search) {
-        return ApiResponse.success(invoiceService.getInvoices(status, search));
+    public ApiResponse<List<CustomerInvoiceDisplayDto>> getInvoices(
+            @RequestParam(required = false) InvoiceStatus status,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+        return ApiResponse.success(invoiceService.getInvoices(status, search, fromDate, toDate));
     }
 
     @GetMapping("/{id}")

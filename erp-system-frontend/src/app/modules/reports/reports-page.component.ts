@@ -46,7 +46,7 @@ export class ReportsPageComponent implements OnInit {
     const today = new Date().toISOString().slice(0, 10);
     const monthStart = `${today.slice(0, 8)}01`;
     this.form.patchValue({ fromDate: monthStart, toDate: today, asOfDate: today });
-    this.lookupService.getLookup('report-periods').subscribe((items) => (this.periodOptions = items), () => undefined);
+    this.lookupService.getLookup('report-periods').subscribe({ next: (items) => (this.periodOptions = items) });
     this.form.controls.period.valueChanges.subscribe((value) => this.applyPeriodPreset(String(value || 'CUSTOM')));
     this.runReport('profitLoss');
   }
@@ -58,7 +58,6 @@ export class ReportsPageComponent implements OnInit {
       return;
     }
 
-    this.activeReport = report;
     this.loading = true;
     this.errorKey = '';
     const raw = this.form.getRawValue();

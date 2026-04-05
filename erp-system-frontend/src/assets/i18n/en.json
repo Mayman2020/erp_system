@@ -533,6 +533,8 @@
     "MATCH_ERROR": "Failed to match lines.",
     "UNMATCH_SUCCESS": "Line unmatched successfully.",
     "UNMATCH_ERROR": "Failed to unmatch line.",
+    "CONFIRM_FINALIZE": "Are you sure you want to finalize this reconciliation? This action cannot be undone.",
+    "CONFIRM_CANCEL": "Are you sure you want to cancel this reconciliation?",
     "FINALIZE_SUCCESS": "Reconciliation finalized successfully.",
     "FINALIZE_ERROR": "Failed to finalize reconciliation.",
     "CANCEL_SUCCESS": "Reconciliation cancelled successfully.",

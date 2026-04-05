@@ -190,7 +190,6 @@ export class AccountsPageComponent implements OnInit {
         },
         error: (err) => {
           this.errorKey = this.extractError(err, 'ACCOUNTS.SAVE_ERROR');
-          console.error('Account save failed:', err);
         }
       });
   }

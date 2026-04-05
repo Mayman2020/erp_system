@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 import { AccountingTransactionDto } from '../../core/models/accounting.models';
 import { LookupItem } from '../../core/models/lookup.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 import { LookupService } from '../../core/services/lookup.service';
+
 @Component({ standalone: false, selector: 'app-transactions-page', templateUrl: './transactions-page.component.html' })
 export class TransactionsPageComponent implements OnInit {
   titleKey = 'NAV.TRANSACTIONS';
@@ -20,31 +22,40 @@ export class TransactionsPageComponent implements OnInit {
     { key: 'status', title: 'COMMON.STATUS', kind: 'status' as const }
   ];
   private filters: Record<string, string> = {};
-  constructor(private api: AccountingApiService, private lookupService: LookupService) {}
+
+  constructor(private api: AccountingApiService, private lookupService: LookupService, private cdr: ChangeDetectorRef) {}
+
   ngOnInit(): void {
-    this.lookupService.getLookup('transaction-statuses').subscribe(
-      (rows: LookupItem[]) => {
-        this.statusOptions = rows.map((item) => item.code);
-      },
-      () => undefined
-    );
+    this.lookupService.getLookup('transaction-statuses').subscribe({
+      next: (rows: LookupItem[]) => { this.statusOptions = rows.map((item) => item.code); },
+      error: () => undefined
+    });
     this.load();
   }
+
   onSearch(filters: Record<string, string>): void { this.filters = filters || {}; this.load(); }
+
   private load(): void {
     this.loading = true;
     this.errorKey = '';
-    this.api.getTransactions({ search: this.filters.query || '', status: this.filters.status || '' })
-      .subscribe((rows: AccountingTransactionDto[]) => {
-        this.loading = false;
-        this.rows = rows.map((row) => ({
-          ...row,
-          amount: Number(row.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        }));
-      }, () => {
-        this.loading = false;
-        this.errorKey = 'COMMON.ERROR_LOADING';
-        this.rows = [];
+    this.api.getTransactions({
+      search: this.filters.query || '',
+      status: this.filters.status || '',
+      fromDate: this.filters.fromDate || '',
+      toDate: this.filters.toDate || ''
+    })
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (rows: AccountingTransactionDto[]) => {
+          this.rows = rows.map((row) => ({
+            ...row,
+            amount: Number(row.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          }));
+        },
+        error: () => {
+          this.errorKey = 'COMMON.ERROR_LOADING';
+          this.rows = [];
+        }
       });
   }
 }

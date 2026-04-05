@@ -8,9 +8,11 @@ import com.erp.system.common.enums.CheckStatus;
 import com.erp.system.common.enums.CheckType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -21,10 +23,13 @@ public class AccountingCheckController {
     private final AccountingCheckService checkService;
 
     @GetMapping
-    public ApiResponse<List<AccountingCheckDisplayDto>> getChecks(@RequestParam(required = false) CheckType type,
-                                                                  @RequestParam(required = false) CheckStatus status,
-                                                                  @RequestParam(required = false) String search) {
-        return ApiResponse.success(checkService.getChecks(type, status, search));
+    public ApiResponse<List<AccountingCheckDisplayDto>> getChecks(
+            @RequestParam(required = false) CheckType type,
+            @RequestParam(required = false) CheckStatus status,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+        return ApiResponse.success(checkService.getChecks(type, status, search, fromDate, toDate));
     }
 
     @GetMapping("/{id}")
