@@ -180,7 +180,7 @@
             <div class="year-item-premium__header">
               <div class="year-info">
                 <h3>{{ year.year }}</h3>
-                <span class="date-range">{{ year.startDate }} - {{ year.endDate }}</span>
+                <span class="date-range">{{ year.startDate | erpDate }} - {{ year.endDate | erpDate }}</span>
               </div>
               <div class="year-controls">
                 <span class="erp-status-chip" [class.is-open]="year.open">{{ (year.open ? 'SETTINGS.OPEN' : 'SETTINGS.CLOSED') | translate }}</span>
@@ -194,7 +194,7 @@
               <div class="period-pill" *ngFor="let period of year.periods" [class.is-open]="period.open">
                 <div class="period-pill__content">
                   <span class="period-name">{{ period.periodName }}</span>
-                  <span class="period-dates">{{ period.startDate }} - {{ period.endDate }}</span>
+                  <span class="period-dates">{{ period.startDate | erpDate }} - {{ period.endDate | erpDate }}</span>
                 </div>
                 <button type="button" class="period-toggle-btn" (click)="togglePeriod.emit(period)">
                   <mat-icon>{{ period.open ? 'check_circle' : 'block' }}</mat-icon>

@@ -1,0 +1,325 @@
+/**
+ * Enterprise design system — semantic CSS variables.
+ * Loaded last from styles.scss so these override earlier theme fragments.
+ * Maps to legacy --erp-* for existing components without template changes.
+ */
+
+:root,
+[data-theme='light'],
+[data-theme="light"] {
+  --color-primary: #2563eb;
+  --color-primary-light: #3b82f6;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-hover: #f1f5f9;
+
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  --border-color: #e2e8f0;
+
+  --radius: 12px;
+  --transition: all 0.2s ease;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-page-title: clamp(1.35rem, 2.2vw, 1.75rem);
+  --fs-section-title: 1.125rem;
+  --fs-body: 0.875rem;
+  --fs-small: 0.8125rem;
+
+  /* RGB for shadows / gradients that use rgba(var(--erp-*-rgb), a) */
+  --erp-primary-rgb: 34, 197, 94;
+  --erp-info-rgb: 37, 99, 235;
+  --erp-success-rgb: 34, 197, 94;
+  --erp-warning-rgb: 245, 158, 11;
+  --erp-danger-rgb: 239, 68, 68;
+
+  /* Legacy bridge */
+  --erp-bg: var(--bg-main);
+  --erp-bg-elevated: var(--bg-card);
+  --erp-bg-card: var(--bg-card);
+  --erp-bg-muted: var(--bg-hover);
+  --erp-bg-soft: color-mix(in srgb, var(--bg-hover) 92%, var(--border-color) 8%);
+  --erp-text: var(--text-primary);
+  --erp-text-muted: var(--text-secondary);
+  --erp-text-secondary: var(--text-secondary);
+  --erp-text-soft: var(--text-muted);
+  --erp-border: var(--border-color);
+  --erp-border-strong: color-mix(in srgb, var(--border-color) 65%, var(--text-primary) 35%);
+  --erp-border-soft: color-mix(in srgb, var(--border-color) 55%, transparent);
+
+  --erp-primary: var(--color-success);
+  --erp-primary-strong: #16a34a;
+  --erp-primary-soft: rgba(var(--erp-primary-rgb), 0.12);
+  --erp-info: var(--color-primary);
+  --erp-info-soft: rgba(var(--erp-info-rgb), 0.12);
+  --erp-success: var(--color-success);
+  --erp-success-soft: rgba(var(--erp-success-rgb), 0.12);
+  --erp-warning: var(--color-warning);
+  --erp-warning-soft: rgba(var(--erp-warning-rgb), 0.12);
+  --erp-danger: var(--color-danger);
+  --erp-danger-soft: rgba(var(--erp-danger-rgb), 0.12);
+
+  --erp-radius-input: var(--radius);
+  --erp-radius-button: var(--radius);
+  --erp-radius-card: var(--radius);
+  --erp-radius-dialog: calc(var(--radius) + 4px);
+  --erp-radius-sm: var(--radius);
+  --erp-radius-md: var(--radius);
+  --erp-radius-lg: var(--radius);
+  --erp-transition: var(--transition);
+
+  --primary-color: var(--color-primary);
+  --secondary-color: var(--erp-primary);
+  --bg-color: var(--bg-main);
+  --card-bg: var(--bg-card);
+}
+
+[data-theme='dark'],
+[data-theme="dark"] {
+  --color-primary: #60a5fa;
+  --color-primary-light: #93c5fd;
+  --color-success: #22c55e;
+  --color-danger: #f87171;
+  --color-warning: #fbbf24;
+
+  --bg-main: #0f172a;
+  --bg-card: #1e293b;
+  --bg-hover: #334155;
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  --border-color: #334155;
+
+  --erp-primary-rgb: 34, 197, 94;
+  --erp-info-rgb: 96, 165, 250;
+  --erp-success-rgb: 34, 197, 94;
+  --erp-warning-rgb: 251, 191, 36;
+  --erp-danger-rgb: 248, 113, 113;
+
+  --erp-bg: var(--bg-main);
+  --erp-bg-elevated: var(--bg-card);
+  --erp-bg-card: var(--bg-card);
+  --erp-bg-muted: color-mix(in srgb, var(--bg-card) 82%, var(--bg-hover) 18%);
+  --erp-bg-soft: color-mix(in srgb, var(--bg-card) 70%, var(--bg-hover) 30%);
+  --erp-text: var(--text-primary);
+  --erp-text-muted: var(--text-secondary);
+  --erp-text-secondary: var(--text-secondary);
+  --erp-text-soft: var(--text-muted);
+  --erp-border: var(--border-color);
+  --erp-border-strong: color-mix(in srgb, var(--border-color) 80%, #ffffff 20%);
+  --erp-border-soft: color-mix(in srgb, var(--border-color) 50%, transparent);
+
+  --erp-primary: var(--color-success);
+  --erp-primary-strong: #4ade80;
+  --erp-primary-soft: rgba(var(--erp-primary-rgb), 0.16);
+  --erp-info: var(--color-primary);
+  --erp-info-soft: rgba(var(--erp-info-rgb), 0.16);
+  --erp-success: var(--color-success);
+  --erp-success-soft: rgba(var(--erp-success-rgb), 0.16);
+  --erp-warning: var(--color-warning);
+  --erp-warning-soft: rgba(var(--erp-warning-rgb), 0.16);
+  --erp-danger: var(--color-danger);
+  --erp-danger-soft: rgba(var(--erp-danger-rgb), 0.16);
+
+  --primary-color: var(--color-primary);
+  --secondary-color: var(--erp-primary);
+  --bg-color: var(--bg-main);
+  --card-bg: var(--bg-card);
+}
+
+/* Shell bar: keep gradient identity; only harmonize if not set earlier */
+:root,
+[data-theme='light'],
+[data-theme="light"] {
+  --erp-shell-bar-gradient: linear-gradient(to right, #0c4a6e, #1d4ed8 52%, #172554);
+  --erp-shell-bar-text: #f8fafc;
+  --erp-shell-bar-text-muted: rgba(248, 250, 252, 0.88);
+  --erp-shell-sidebar-gradient: var(--erp-shell-bar-gradient);
+}
+
+[data-theme='dark'],
+[data-theme="dark"] {
+  --erp-shell-bar-gradient: linear-gradient(to right, #020617, #0f172a 45%, #1e1b4b);
+  --erp-shell-bar-text: #f8fafc;
+  --erp-shell-bar-text-muted: rgba(248, 250, 252, 0.88);
+  --erp-shell-sidebar-gradient: var(--erp-shell-bar-gradient);
+}
+
+/* Single font stack on body (Cairo overrides for Arabic via body.lang-ar below) */
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  background:
+    radial-gradient(circle at top left, rgba(var(--erp-primary-rgb), 0.06), transparent 24%),
+    radial-gradient(circle at top right, rgba(var(--erp-info-rgb), 0.06), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-main) 96%, #ffffff 4%) 0%, var(--bg-main) 100%);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] body,
+[data-theme="dark"] body,
+body.theme-dark {
+  background: var(--bg-main);
+}
+
+/* Heading hierarchy */
+h1,
+.h1,
+.erp-page-header__copy h1 {
+  margin: 0 0 0.35em;
+  font-size: var(--fs-page-title);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+h2,
+.h2,
+.erp-section-title {
+  margin: 0 0 1rem;
+  font-size: var(--fs-section-title);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+small,
+.small,
+.text-small {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+/* Surfaces: one card language */
+.erp-card,
+.erp-unified-card,
+.card,
+.erp-table-card,
+.erp-panel,
+.erp-surface {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--erp-shadow-sm);
+}
+
+.erp-card--soft {
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent) !important;
+  border-color: color-mix(in srgb, var(--border-color) 70%, transparent) !important;
+}
+
+/* Form controls: same focus ring, theme-safe fill */
+.erp-input:focus,
+.form-control:focus,
+.custom-select:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--border-color)) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 22%, transparent) !important;
+  background: var(--bg-card) !important;
+}
+
+/* Custom dialogs (app-form-dialog) */
+.erp-dialog__backdrop {
+  background: color-mix(in srgb, var(--bg-main) 40%, #020617 60%);
+}
+
+.erp-dialog__surface {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--erp-radius-dialog);
+  box-shadow: var(--erp-shadow-lg);
+}
+
+.erp-dialog__title {
+  color: var(--text-primary);
+  font-size: var(--fs-section-title);
+}
+
+.erp-dialog__header,
+.erp-dialog__footer {
+  border-color: var(--border-color);
+}
+
+/* Material confirmation dialog */
+.erp-confirm-dialog-panel .mat-mdc-dialog-container {
+  padding: var(--erp-space-4, 24px);
+  border-radius: var(--erp-radius-dialog);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--erp-shadow-lg);
+}
+
+/* Sidebar: consistent hover / open group (shell gradient background) */
+.pcoded-navbar:not(.theme-horizontal) .pcoded-inner-navbar > li > a:hover,
+.pcoded-navbar:not(.theme-horizontal) .pcoded-inner-navbar .pcoded-submenu li > a:hover,
+.erp-nav-module-group__head:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.pcoded-navbar .pcoded-inner-navbar > li.pcoded-trigger:not(.active) > a,
+.erp-nav-module-group.pcoded-trigger > .erp-nav-module-group__head {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.pcoded-navbar .pcoded-inner-navbar > li.active > a,
+.pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li.active > a {
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Dashboard KPI row: equal visual weight */
+.dash-kpi-card,
+.dash-chart-card {
+  border-radius: var(--radius);
+  min-height: 104px;
+}
+
+.dash-kpi-card__value--positive,
+.dash-summary-row__value--positive {
+  color: var(--color-success);
+}
+
+.dash-kpi-card__value--negative,
+.dash-summary-row__value--negative {
+  color: var(--color-danger);
+}
+
+/* Header shell: profile control matches theme/lang controls (no random light pill on bar) */
+.erp-header-shell .erp-user-menu__toggle {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--erp-shell-bar-text, #f8fafc) !important;
+  transition: var(--transition);
+}
+
+.erp-header-shell .erp-user-menu__toggle:hover,
+.erp-header-shell .erp-user-menu__toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.erp-header-shell .erp-user-menu__info strong {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+.erp-header-shell .erp-user-menu__info small {
+  color: rgba(248, 250, 252, 0.75);
+}

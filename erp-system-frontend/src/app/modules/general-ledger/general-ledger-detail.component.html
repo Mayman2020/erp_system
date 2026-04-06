@@ -30,7 +30,7 @@
           </div>
           <div class="col-md-4 gl-detail__field">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.DATE' | translate }}</span>
-            <strong class="gl-detail__value">{{ entry.entryDate }}</strong>
+            <strong class="gl-detail__value">{{ entry.entryDate | erpDate }}</strong>
           </div>
           <div class="col-md-4 gl-detail__field">
             <span class="gl-detail__label">{{ 'COMMON.STATUS' | translate }}</span>
@@ -115,7 +115,7 @@
         <div class="row">
           <div class="col-md-3 gl-detail__field" *ngIf="entry.postedAt">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.POSTED_AT' | translate }}</span>
-            <strong class="gl-detail__value">{{ entry.postedAt }}</strong>
+            <strong class="gl-detail__value">{{ entry.postedAt | erpDate }}</strong>
           </div>
           <div class="col-md-3 gl-detail__field" *ngIf="entry.postedBy">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.POSTED_BY' | translate }}</span>
@@ -123,7 +123,7 @@
           </div>
           <div class="col-md-3 gl-detail__field" *ngIf="entry.reversedAt">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.REVERSED_AT' | translate }}</span>
-            <strong class="gl-detail__value">{{ entry.reversedAt }}</strong>
+            <strong class="gl-detail__value">{{ entry.reversedAt | erpDate }}</strong>
           </div>
           <div class="col-md-3 gl-detail__field" *ngIf="entry.reversedBy">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.REVERSED_BY' | translate }}</span>

@@ -7,6 +7,7 @@ import { NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap
 import { AccountTreePickerComponent } from './components/account-tree-picker/account-tree-picker.component';
 import { AdvancedSearchBarComponent } from './components/advanced-search-bar/advanced-search-bar.component';
 import { AvatarComponent } from './components/avatar/avatar.component';
+import { DsCardComponent } from './components/ds-card/ds-card.component';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { EmptyStateComponent } from './components/empty-state/empty-state.component';
 import { FormFieldComponent } from './components/form-field/form-field.component';
@@ -21,14 +22,17 @@ import { StatusBadgeComponent } from './components/status-badge/status-badge.com
 import { TabsComponent } from './components/tabs/tabs.component';
 import { TreeSelectorComponent } from './components/tree-selector/tree-selector.component';
 import { TypeBadgeComponent } from './components/type-badge/type-badge.component';
+import { ErpDatePipe } from './pipes/erp-date.pipe';
 import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
 
 @NgModule({
   declarations: [
     TranslatePipe,
     LegacyTranslatePipe,
+    ErpDatePipe,
     FormFieldComponent,
     AdvancedSearchBarComponent,
+    DsCardComponent,
     DataTableComponent,
     StatusBadgeComponent,
     TypeBadgeComponent,
@@ -66,8 +70,10 @@ import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
     MatIconModule,
     TranslatePipe,
     LegacyTranslatePipe,
+    ErpDatePipe,
     FormFieldComponent,
     AdvancedSearchBarComponent,
+    DsCardComponent,
     DataTableComponent,
     StatusBadgeComponent,
     TypeBadgeComponent,

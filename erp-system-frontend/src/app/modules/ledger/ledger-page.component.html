@@ -57,9 +57,9 @@
           <div class="report-card">
             <div class="text-muted small">{{ 'LEDGER.PERIOD' | translate }}</div>
             <div class="h6 mb-0">
-              <ng-container *ngIf="form.controls.fromDate.value">{{ form.controls.fromDate.value }}</ng-container>
+              <ng-container *ngIf="form.controls.fromDate.value">{{ form.controls.fromDate.value | erpDate }}</ng-container>
               <ng-container *ngIf="form.controls.fromDate.value && form.controls.toDate.value"> — </ng-container>
-              <ng-container *ngIf="form.controls.toDate.value">{{ form.controls.toDate.value }}</ng-container>
+              <ng-container *ngIf="form.controls.toDate.value">{{ form.controls.toDate.value | erpDate }}</ng-container>
             </div>
           </div>
         </div>

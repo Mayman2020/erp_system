@@ -117,7 +117,7 @@
   outline: none;
   border-color: rgba(37, 99, 235, 0.65);
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
-  background: #ffffff;
+  background: var(--erp-bg-card, var(--erp-bg-elevated));
 }
 
 .erp-form-field {
@@ -3505,16 +3505,9 @@ ngb-datepicker.erp-datepicker-popup-wide {
   color: var(--erp-text);
 }
 
-/* Sidebar: expanded group head (dark shell) */
-.pcoded-navbar .pcoded-inner-navbar>li.pcoded-trigger:not(.active)>a {
-  background: rgba(255, 255, 255, 0.07) !important;
-}
-
-.erp-nav-module-group.pcoded-trigger>.erp-nav-module-group__head {
-  background: rgba(255, 255, 255, 0.08) !important;
-}
-
 /* CDK overlay pane fallback */
 .cdk-overlay-pane {
   color: var(--erp-text);
 }
+
+@import 'scss/design-system/tokens';

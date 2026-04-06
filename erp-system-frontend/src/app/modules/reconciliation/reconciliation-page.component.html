@@ -61,7 +61,7 @@
                   <small class="fw-semibold">{{ rec.bankAccountNumber }}</small>
                   <app-status-badge [status]="rec.status" labelPrefix="STATUS."></app-status-badge>
                 </div>
-                <small class="text-muted">{{ rec.statementStartDate }} — {{ rec.statementEndDate }}</small>
+                <small class="text-muted">{{ rec.statementStartDate | erpDate }} — {{ rec.statementEndDate | erpDate }}</small>
               </li>
             </ul>
           </ng-container>
@@ -143,7 +143,7 @@
                     <tbody *ngIf="statementLines$ | async as statementLines">
                       <tr *ngIf="statementLines.length === 0"><td colspan="6" class="text-center text-muted py-3">{{ 'COMMON.NO_DATA' | translate }}</td></tr>
                       <tr *ngFor="let line of statementLines" (click)="pickStatement(line)" [class.table-active]="selectedStatementLineId === line.id" [class.erp-line-matched]="line.status === 'MATCHED'">
-                        <td>{{ line.transactionDate }}</td>
+                        <td>{{ line.transactionDate | erpDate }}</td>
                         <td>{{ line.description }}</td>
                         <td>{{ line.sourceReference }}</td>
                         <td [ngClass]="amountClass(line)">{{ line.amount | number:'1.2-2' }}</td>
@@ -179,7 +179,7 @@
                     <tbody *ngIf="systemLines$ | async as systemLines">
                       <tr *ngIf="systemLines.length === 0"><td colspan="6" class="text-center text-muted py-3">{{ 'COMMON.NO_DATA' | translate }}</td></tr>
                       <tr *ngFor="let line of systemLines" (click)="pickSystem(line)" [class.table-active]="selectedSystemLineId === line.id" [class.erp-line-matched]="line.status === 'MATCHED'">
-                        <td>{{ line.transactionDate }}</td>
+                        <td>{{ line.transactionDate | erpDate }}</td>
                         <td>{{ line.description }}</td>
                         <td>{{ line.sourceReference }}</td>
                         <td [ngClass]="amountClass(line)">{{ line.amount | number:'1.2-2' }}</td>

@@ -1,3 +1,4 @@
+import { DATE_PIPE_DEFAULT_OPTIONS } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
@@ -59,6 +60,7 @@ import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
     MatDialogModule
   ],
   providers: [
+    { provide: DATE_PIPE_DEFAULT_OPTIONS, useValue: { dateFormat: 'dd/MM/yyyy' } },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: JwtInterceptor,

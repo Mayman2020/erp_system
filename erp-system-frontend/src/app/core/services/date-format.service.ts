@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class DateFormatService {
-  readonly placeholder = 'DD/MM/YYYY';
+  readonly placeholder = 'dd/MM/yyyy';
 
   format(value: unknown): string {
     const parts = this.extractParts(value);
@@ -21,7 +21,19 @@ export class DateFormatService {
   }
 
   isDateKey(key: string): boolean {
-    return /(^date$|date$)/i.test((key || '').trim());
+    const k = (key || '').trim();
+    if (!k) {
+      return false;
+    }
+    const lower = k.toLowerCase();
+    if (lower === 'date') {
+      return true;
+    }
+    if (lower.endsWith('date')) {
+      return true;
+    }
+    /* camelCase timestamps: createdAt, postedAt, reversedAt, … */
+    return /[a-z]At$/i.test(k);
   }
 
   normalizeDisplayInput(raw: string): string {

@@ -5,6 +5,7 @@ import { finalize, map, takeUntil } from 'rxjs/operators';
 import { DashboardSummary } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
+import { DateFormatService } from '../../core/services/date-format.service';
 
 @Component({ standalone: false,
   selector: 'app-dashboard-page',
@@ -80,7 +81,8 @@ export class DashboardPageComponent implements OnInit {
   constructor(
     private api: AccountingApiService,
     private translationService: TranslationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dateFormat: DateFormatService
   ) {}
 
   ngOnInit(): void {
@@ -388,7 +390,7 @@ export class DashboardPageComponent implements OnInit {
     const now = new Date();
     for (let i = total - 1; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      labels.push(date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' }));
+      labels.push(this.dateFormat.format(date));
     }
     return labels;
   }
@@ -398,7 +400,7 @@ export class DashboardPageComponent implements OnInit {
     const now = new Date();
     for (let i = 6; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-      labels.push(date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' }));
+      labels.push(this.dateFormat.format(date));
     }
     return labels;
   }
