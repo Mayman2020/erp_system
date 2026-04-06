@@ -1,18 +1,32 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { Navigation, NavigationService } from '../navigation';
 import { NextConfig } from '../../../../../app-config';
 import { Location } from '@angular/common';
 import { Subject } from 'rxjs';
-import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
-import { AuthService, AuthUser } from '../../../../../core/auth/auth.service';
 
 @Component({ standalone: false,
   selector: 'app-nav-content',
   templateUrl: './nav-content.component.html',
-  styleUrls: ['./nav-content.component.scss']
+  styleUrls: ['./nav-content.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
+export class NavContentComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   public flatConfig: any;
   public navigation: Navigation[] = [];
   public prevDisabled: string;
@@ -21,16 +35,14 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public wrapperWidth: any;
   public scrollWidth: any;
   public windowWidth: number;
-  public displayName = '';
-  public roleKey = 'PROFILE.TITLE';
-  public avatarUrl = 'assets/images/user/avatar-1.jpg';
-  public loadingUser = true;
   public menuLoading = false;
-  public profileMenuOpen = false;
 
   private readonly destroy$ = new Subject<void>();
 
   @Output() onNavMobCollapse = new EventEmitter();
+
+  /** True when sidebar is collapsed to icons only (show tooltips on items). */
+  @Input() menuIconsOnly = false;
 
   @ViewChild('navbarContent') navbarContent: ElementRef;
   @ViewChild('navbarWrapper') navbarWrapper: ElementRef;
@@ -39,8 +51,6 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
     private navigationService: NavigationService,
     private zone: NgZone,
     private location: Location,
-    private authService: AuthService,
-    private router: Router,
     private cdr: ChangeDetectorRef
   ) {
     this.flatConfig = NextConfig.config;
@@ -53,12 +63,6 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.loadNavigation();
-    // Subscribe first, then trigger load so the first emission is always caught
-    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
-      this.applyUser(user);
-      this.cdr.detectChanges();
-    });
-    this.authService.refreshCurrentUser();
     if (this.windowWidth < 992) {
       this.flatConfig['layout'] = 'vertical';
       setTimeout(() => {
@@ -66,6 +70,10 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
         (document.querySelector('#nav-ps-flat-able') as HTMLElement).style.maxHeight = '100%';
       }, 500);
     }
+  }
+
+  ngOnChanges(_changes: SimpleChanges): void {
+    this.cdr.markForCheck();
   }
 
   ngAfterViewInit() {
@@ -168,39 +176,6 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  toggleProfileMenu(): void {
-    this.profileMenuOpen = !this.profileMenuOpen;
-  }
-
-  closeProfileMenu(): void {
-    this.profileMenuOpen = false;
-  }
-
-  logout(): void {
-    this.profileMenuOpen = false;
-    this.authService.logout();
-    this.router.navigate(['/auth/signin']);
-  }
-
-  private applyUser(user: AuthUser | null): void {
-    if (!user) {
-      this.displayName = '';
-      this.roleKey = 'PROFILE.TITLE';
-      this.avatarUrl = 'assets/images/user/avatar-1.jpg';
-      this.loadingUser = false;
-      return;
-    }
-
-    const name = (user.profile?.fullName || '').trim();
-    this.displayName = name || user.username || user.email || '';
-
-    const role = (user.role || '').toUpperCase();
-    this.roleKey = role === 'ADMIN' ? 'AUTH.ROLE_ADMIN' : role === 'ACCOUNTANT' ? 'AUTH.ROLE_ACCOUNTANT' : 'PROFILE.TITLE';
-
-    const image = (user.profile?.profileImage || '').trim();
-    this.avatarUrl = image || 'assets/images/user/avatar-1.jpg';
-  }
-
   private loadNavigation(): void {
     this.menuLoading = true;
     this.navigationService
@@ -209,6 +184,7 @@ export class NavContentComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe((items) => {
         this.navigation = items || [];
         this.menuLoading = false;
+        this.cdr.markForCheck();
         setTimeout(() => this.refreshHorizontalDimensions());
       });
   }

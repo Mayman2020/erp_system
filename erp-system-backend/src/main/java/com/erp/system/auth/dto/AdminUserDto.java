@@ -14,6 +14,8 @@ public record AdminUserDto(
         String primaryRole,
         boolean active,
         String fullName,
+        String fullNameEn,
+        String fullNameAr,
         Instant createdAt,
         List<Long> roleIds,
         List<String> roleCodes

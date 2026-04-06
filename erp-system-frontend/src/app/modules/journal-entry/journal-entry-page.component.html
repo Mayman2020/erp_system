@@ -24,12 +24,21 @@
   <div class="card erp-unified-card">
     <div class="card-body">
       <app-advanced-search-bar [showStatus]="true" [showDateRange]="true" [showAmountRange]="true" [statusOptions]="statusCodes" (search)="onSearch($event)"></app-advanced-search-bar>
-      <app-data-table [columns]="columns" [data]="filteredEntries" [actions]="actions" [loading]="loading" (actionClick)="onRowAction($event)"></app-data-table>
+      <app-data-table
+        [columns]="columns"
+        [data]="(filteredEntries$ | async) ?? []"
+        [actions]="actions"
+        [loading]="loading"
+        [filterable]="true"
+        emptyTitleKey="JOURNAL.NO_ENTRIES"
+        emptyDescriptionKey="JOURNAL.NO_ENTRIES_HINT"
+        (actionClick)="onRowAction($event)"
+      ></app-data-table>
     </div>
   </div>
 </section>
 
-<app-erp-dialog [visible]="formVisible" [title]="'JOURNAL.FORM_TITLE_' + formMode.toUpperCase()" size="xxl" (close)="closeForm()">
+<app-erp-dialog [visible]="formVisible" [titleKey]="'JOURNAL.FORM_TITLE_' + formMode.toUpperCase()" size="xxl" (close)="closeForm()">
   <div dialog-body>
   <form [formGroup]="form">
     <div class="alert alert-danger alert-dismissible fade show mb-2" *ngIf="errorKey">
@@ -80,7 +89,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-bordered mb-0">
+          <table class="erp-table">
             <thead>
               <tr>
                 <th>{{ 'JOURNAL.ACCOUNT' | translate }}</th>
@@ -147,11 +156,16 @@
   </div>
 </app-erp-dialog>
 
-<app-erp-dialog [visible]="accountPickerVisible" [title]="'JOURNAL.ACCOUNT'" size="xl" (close)="closeAccountSelector()">
+<app-erp-dialog [visible]="accountPickerVisible" [titleKey]="'JOURNAL.ACCOUNT'" size="xl" (close)="closeAccountSelector()">
   <div dialog-body>
     <div class="alert alert-danger mb-2" *ngIf="errorKey">{{ errorKey | translate }}</div>
     <div class="journal-account-picker">
-      <app-tree-selector [nodes]="accountTree" [minSelectableLevel]="2" (selected)="selectAccount($event)"></app-tree-selector>
+      <app-tree-selector
+        [nodes]="accountTree"
+        [minSelectableLevel]="1"
+        [selectableLeafOnly]="true"
+        (selected)="selectAccount($event)"
+      ></app-tree-selector>
     </div>
   </div>
   <div dialog-footer class="erp-dialog-actions">

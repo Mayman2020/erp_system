@@ -18,15 +18,12 @@
 
       <a
         [routerLink]="['/dashboard']"
-        class="erp-header-brand-pill"
+        class="erp-header-brand-pill erp-header-brand-pill--mark-only"
         [attr.title]="'APP.BRAND' | translate"
         [attr.aria-label]="'APP.BRAND' | translate"
       >
-        <span class="erp-header-brand-pill__icon-wrap">
-          <img [src]="logoIconSrc" alt="" class="erp-header-brand-pill__icon" aria-hidden="true" />
-        </span>
-        <span class="erp-header-brand-pill__wordmark">
-          <img [src]="logoFullSrc" [alt]="'APP.BRAND' | translate" class="erp-header-brand-pill__logo" />
+        <span class="erp-header-brand-pill__icon-wrap erp-header-brand-pill__icon-wrap--hero">
+          <img [src]="logoMarkSrc" [alt]="'APP.BRAND' | translate" class="erp-header-brand-pill__mark" />
         </span>
       </a>
     </div>

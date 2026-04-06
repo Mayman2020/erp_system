@@ -1,16 +1,30 @@
 <ng-container *ngIf="!item.hidden">
   <ng-container *ngIf="useCollapsibleGroup">
     <li class="nav-item pcoded-hasmenu erp-nav-module-group" [class.pcoded-trigger]="expanded">
-      <a href="javascript:" class="nav-link erp-nav-module-group__head" (click)="toggleExpanded($event)"
-         [attr.aria-expanded]="expanded" [attr.aria-label]="item.title | translate">
+      <a
+        href="javascript:"
+        class="nav-link erp-nav-module-group__head"
+        (click)="toggleExpanded($event)"
+        [attr.aria-expanded]="expanded"
+        [attr.title]="menuIconsOnly ? null : (item.title | translate)"
+        [attr.aria-label]="item.title | translate"
+        [ngbTooltip]="menuIconsOnly ? (item.title | translate) : null"
+        placement="end"
+        container="body"
+        triggers="mouseenter:mouseleave"
+        [openDelay]="200"
+      >
         <span class="pcoded-micon" *ngIf="item.icon"><mat-icon aria-hidden="true">{{ item.icon }}</mat-icon></span>
         <span class="pcoded-mtext">{{ item.title | translate }}</span>
+        <span class="erp-nav-submenu-chevron" aria-hidden="true">
+          <mat-icon>expand_more</mat-icon>
+        </span>
       </a>
       <ul class="pcoded-submenu erp-nav-module-group__children">
         <ng-container *ngFor="let child of item.children">
-          <app-nav-group *ngIf="child.type=='group'" [item]="child"></app-nav-group>
-          <app-nav-collapse *ngIf="child.type=='collapse'" [item]="child"></app-nav-collapse>
-          <app-nav-item *ngIf="child.type=='item'" [item]="child"></app-nav-item>
+          <app-nav-group *ngIf="child.type=='group'" [item]="child" [menuIconsOnly]="menuIconsOnly"></app-nav-group>
+          <app-nav-collapse *ngIf="child.type=='collapse'" [item]="child" [menuIconsOnly]="menuIconsOnly"></app-nav-collapse>
+          <app-nav-item *ngIf="child.type=='item'" [item]="child" [menuIconsOnly]="menuIconsOnly"></app-nav-item>
         </ng-container>
       </ul>
     </li>
@@ -19,9 +33,9 @@
   <ng-container *ngIf="!useCollapsibleGroup">
     <li class="nav-item pcoded-menu-caption"><label>{{ item.title | translate }}</label></li>
     <ng-container *ngFor="let child of item.children">
-      <app-nav-group *ngIf="child.type=='group'" [item]="child"></app-nav-group>
-      <app-nav-collapse *ngIf="child.type=='collapse'" [item]="child"></app-nav-collapse>
-      <app-nav-item *ngIf="child.type=='item'" [item]="child"></app-nav-item>
+      <app-nav-group *ngIf="child.type=='group'" [item]="child" [menuIconsOnly]="menuIconsOnly"></app-nav-group>
+      <app-nav-collapse *ngIf="child.type=='collapse'" [item]="child" [menuIconsOnly]="menuIconsOnly"></app-nav-collapse>
+      <app-nav-item *ngIf="child.type=='item'" [item]="child" [menuIconsOnly]="menuIconsOnly"></app-nav-item>
     </ng-container>
   </ng-container>
 </ng-container>

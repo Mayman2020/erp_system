@@ -16,7 +16,7 @@
 
       <app-data-table
         [columns]="columns"
-        [data]="rows"
+        [data]="(rows$ | async) ?? []"
         [actions]="actions"
         [loading]="loading"
         (actionClick)="onTableAction($event)"

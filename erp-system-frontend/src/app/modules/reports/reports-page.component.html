@@ -60,141 +60,145 @@
           <button type="button" class="btn-close" (click)="errorKey = ''"></button>
         </div>
 
-        <div *ngIf="!loading && activeReport === 'profitLoss' && profitLoss" class="report-table">
-          <div class="d-flex justify-content-end mb-2">
-            <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportProfitLoss()">
-              <mat-icon aria-hidden="true">file_download</mat-icon>
-              <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
-            </button>
-          </div>
-          <div class="row report-summary">
-            <div class="col-md-4">
-              <div class="report-card report-card--metric">
-                <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.TOTAL_REVENUE' | translate }}</div>
-                <div class="h4 mb-0">{{ profitLoss.totalRevenue | number:'1.2-2' }}</div>
+        <ng-container *ngIf="activeReport === 'profitLoss'">
+          <div *ngIf="profitLoss$ | async as profitLoss" class="report-table">
+            <div class="d-flex justify-content-end mb-2">
+              <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportProfitLoss()">
+                <mat-icon aria-hidden="true">file_download</mat-icon>
+                <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
+              </button>
+            </div>
+            <div class="row report-summary">
+              <div class="col-md-4">
+                <div class="report-card report-card--metric">
+                  <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.TOTAL_REVENUE' | translate }}</div>
+                  <div class="h4 mb-0">{{ profitLoss.totalRevenue | number:'1.2-2' }}</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="report-card report-card--metric">
+                  <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.TOTAL_EXPENSES' | translate }}</div>
+                  <div class="h4 mb-0">{{ profitLoss.totalExpenses | number:'1.2-2' }}</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div
+                  class="report-card report-card--metric"
+                  [class.report-card--positive]="profitLoss.netProfit >= 0"
+                  [class.report-card--negative]="profitLoss.netProfit < 0"
+                >
+                  <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.NET_RESULT' | translate }}</div>
+                  <div class="h4 mb-0">{{ profitLoss.netProfit | number:'1.2-2' }}</div>
+                </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="report-card report-card--metric">
-                <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.TOTAL_EXPENSES' | translate }}</div>
-                <div class="h4 mb-0">{{ profitLoss.totalExpenses | number:'1.2-2' }}</div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div
-                class="report-card report-card--metric"
-                [class.report-card--positive]="profitLoss.netProfit >= 0"
-                [class.report-card--negative]="profitLoss.netProfit < 0"
-              >
-                <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.NET_RESULT' | translate }}</div>
-                <div class="h4 mb-0">{{ profitLoss.netProfit | number:'1.2-2' }}</div>
-              </div>
-            </div>
-          </div>
 
-          <h6>{{ 'REPORTS.PROFIT_LOSS.REVENUE_SECTION' | translate }}</h6>
-          <table class="table table-sm">
-            <tr *ngFor="let line of profitLoss.revenues">
-              <td>{{ formatReportAccountCell(line) }}</td>
-              <td class="text-right">{{ line.amount | number:'1.2-2' }}</td>
-            </tr>
-            <tr class="font-weight-bold">
-              <td>{{ 'REPORTS.PROFIT_LOSS.TOTAL_REVENUE' | translate }}</td>
-              <td class="text-right">{{ profitLoss.totalRevenue | number:'1.2-2' }}</td>
-            </tr>
-          </table>
-          <h6>{{ 'REPORTS.PROFIT_LOSS.EXPENSE_SECTION' | translate }}</h6>
-          <table class="table table-sm">
-            <tr *ngFor="let line of profitLoss.expenses">
-              <td>{{ formatReportAccountCell(line) }}</td>
-              <td class="text-right">{{ line.amount | number:'1.2-2' }}</td>
-            </tr>
-            <tr class="font-weight-bold">
-              <td>{{ 'REPORTS.PROFIT_LOSS.TOTAL_EXPENSES' | translate }}</td>
-              <td class="text-right">{{ profitLoss.totalExpenses | number:'1.2-2' }}</td>
-            </tr>
-            <tr class="table-success font-weight-bold">
-              <td>{{ 'REPORTS.PROFIT_LOSS.NET_RESULT' | translate }}</td>
-              <td class="text-right">{{ profitLoss.netProfit | number:'1.2-2' }}</td>
-            </tr>
-          </table>
-        </div>
+            <h6>{{ 'REPORTS.PROFIT_LOSS.REVENUE_SECTION' | translate }}</h6>
+            <table class="erp-table">
+              <tr *ngFor="let line of profitLoss.revenues">
+                <td>{{ formatReportAccountCell(line) }}</td>
+                <td class="text-right">{{ line.amount | number:'1.2-2' }}</td>
+              </tr>
+              <tr class="font-weight-bold">
+                <td>{{ 'REPORTS.PROFIT_LOSS.TOTAL_REVENUE' | translate }}</td>
+                <td class="text-right">{{ profitLoss.totalRevenue | number:'1.2-2' }}</td>
+              </tr>
+            </table>
+            <h6>{{ 'REPORTS.PROFIT_LOSS.EXPENSE_SECTION' | translate }}</h6>
+            <table class="erp-table">
+              <tr *ngFor="let line of profitLoss.expenses">
+                <td>{{ formatReportAccountCell(line) }}</td>
+                <td class="text-right">{{ line.amount | number:'1.2-2' }}</td>
+              </tr>
+              <tr class="font-weight-bold">
+                <td>{{ 'REPORTS.PROFIT_LOSS.TOTAL_EXPENSES' | translate }}</td>
+                <td class="text-right">{{ profitLoss.totalExpenses | number:'1.2-2' }}</td>
+              </tr>
+              <tr class="table-success font-weight-bold">
+                <td>{{ 'REPORTS.PROFIT_LOSS.NET_RESULT' | translate }}</td>
+                <td class="text-right">{{ profitLoss.netProfit | number:'1.2-2' }}</td>
+              </tr>
+            </table>
+          </div>
+        </ng-container>
 
-        <div *ngIf="!loading && activeReport === 'balanceSheet' && balanceSheet" class="report-table">
-          <div class="d-flex justify-content-end mb-2">
-            <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportBalanceSheet()">
-              <mat-icon aria-hidden="true">file_download</mat-icon>
-              <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
-            </button>
-          </div>
-          <div class="row report-summary">
-            <div class="col-md-4">
-              <div class="report-card report-card--metric">
-                <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_ASSETS' | translate }}</div>
-                <div class="h4 mb-0">{{ balanceSheet.totalAssets | number:'1.2-2' }}</div>
+        <ng-container *ngIf="activeReport === 'balanceSheet'">
+          <div *ngIf="balanceSheet$ | async as balanceSheet" class="report-table">
+            <div class="d-flex justify-content-end mb-2">
+              <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportBalanceSheet()">
+                <mat-icon aria-hidden="true">file_download</mat-icon>
+                <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
+              </button>
+            </div>
+            <div class="row report-summary">
+              <div class="col-md-4">
+                <div class="report-card report-card--metric">
+                  <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_ASSETS' | translate }}</div>
+                  <div class="h4 mb-0">{{ balanceSheet.totalAssets | number:'1.2-2' }}</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="report-card report-card--metric">
+                  <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES' | translate }}</div>
+                  <div class="h4 mb-0">{{ balanceSheet.totalLiabilities | number:'1.2-2' }}</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="report-card report-card--metric">
+                  <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_EQUITY' | translate }}</div>
+                  <div class="h4 mb-0">{{ balanceSheet.totalEquity | number:'1.2-2' }}</div>
+                </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="report-card report-card--metric">
-                <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES' | translate }}</div>
-                <div class="h4 mb-0">{{ balanceSheet.totalLiabilities | number:'1.2-2' }}</div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="report-card report-card--metric">
-                <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_EQUITY' | translate }}</div>
-                <div class="h4 mb-0">{{ balanceSheet.totalEquity | number:'1.2-2' }}</div>
-              </div>
-            </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-4">
-              <h6>{{ 'REPORTS.BALANCE_SHEET.ASSETS' | translate }}</h6>
-              <table class="table table-sm">
-                <tr *ngFor="let line of balanceSheet.assets">
-                  <td>{{ formatReportAccountCell(line) }}</td>
-                  <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
-                </tr>
-                <tr class="font-weight-bold">
-                  <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_ASSETS' | translate }}</td>
-                  <td class="text-right">{{ balanceSheet.totalAssets | number:'1.2-2' }}</td>
-                </tr>
-              </table>
+            <div class="row">
+              <div class="col-md-4">
+                <h6>{{ 'REPORTS.BALANCE_SHEET.ASSETS' | translate }}</h6>
+                <table class="erp-table">
+                  <tr *ngFor="let line of balanceSheet.assets">
+                    <td>{{ formatReportAccountCell(line) }}</td>
+                    <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
+                  </tr>
+                  <tr class="font-weight-bold">
+                    <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_ASSETS' | translate }}</td>
+                    <td class="text-right">{{ balanceSheet.totalAssets | number:'1.2-2' }}</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-md-4">
+                <h6>{{ 'REPORTS.BALANCE_SHEET.LIABILITIES' | translate }}</h6>
+                <table class="erp-table">
+                  <tr *ngFor="let line of balanceSheet.liabilities">
+                    <td>{{ formatReportAccountCell(line) }}</td>
+                    <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
+                  </tr>
+                  <tr class="font-weight-bold">
+                    <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES' | translate }}</td>
+                    <td class="text-right">{{ balanceSheet.totalLiabilities | number:'1.2-2' }}</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-md-4">
+                <h6>{{ 'REPORTS.BALANCE_SHEET.EQUITY' | translate }}</h6>
+                <table class="erp-table">
+                  <tr *ngFor="let line of balanceSheet.equity">
+                    <td>{{ formatReportAccountCell(line) }}</td>
+                    <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
+                  </tr>
+                  <tr class="font-weight-bold">
+                    <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_EQUITY' | translate }}</td>
+                    <td class="text-right">{{ balanceSheet.totalEquity | number:'1.2-2' }}</td>
+                  </tr>
+                </table>
+              </div>
             </div>
-            <div class="col-md-4">
-              <h6>{{ 'REPORTS.BALANCE_SHEET.LIABILITIES' | translate }}</h6>
-              <table class="table table-sm">
-                <tr *ngFor="let line of balanceSheet.liabilities">
-                  <td>{{ formatReportAccountCell(line) }}</td>
-                  <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
-                </tr>
-                <tr class="font-weight-bold">
-                  <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES' | translate }}</td>
-                  <td class="text-right">{{ balanceSheet.totalLiabilities | number:'1.2-2' }}</td>
-                </tr>
-              </table>
-            </div>
-            <div class="col-md-4">
-              <h6>{{ 'REPORTS.BALANCE_SHEET.EQUITY' | translate }}</h6>
-              <table class="table table-sm">
-                <tr *ngFor="let line of balanceSheet.equity">
-                  <td>{{ formatReportAccountCell(line) }}</td>
-                  <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
-                </tr>
-                <tr class="font-weight-bold">
-                  <td>{{ 'REPORTS.BALANCE_SHEET.TOTAL_EQUITY' | translate }}</td>
-                  <td class="text-right">{{ balanceSheet.totalEquity | number:'1.2-2' }}</td>
-                </tr>
-              </table>
+            <div class="alert" [ngClass]="balanceSheet.balanced ? 'alert-success' : 'alert-warning'">
+              {{ 'REPORTS.BALANCE_SHEET.EQUATION' | translate }}:
+              {{ balanceSheet.totalAssets | number:'1.2-2' }} =
+              {{ balanceSheet.liabilitiesAndEquity | number:'1.2-2' }}
             </div>
           </div>
-          <div class="alert" [ngClass]="balanceSheet.balanced ? 'alert-success' : 'alert-warning'">
-            {{ 'REPORTS.BALANCE_SHEET.EQUATION' | translate }}:
-            {{ balanceSheet.totalAssets | number:'1.2-2' }} =
-            {{ balanceSheet.liabilitiesAndEquity | number:'1.2-2' }}
-          </div>
-        </div>
+        </ng-container>
     </div>
   </div>
 </section>

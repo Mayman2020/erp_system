@@ -15,8 +15,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   logoFullSrc = 'assets/images/brand/coreerp-logo-light.svg';
   logoMarkSrc = 'assets/images/brand/coreerp-mark-light.svg';
-  // The mark icon is always the dark variant — it is the official app icon for all themes
-  readonly logoIconSrc = 'assets/images/brand/coreerp-mark-dark.svg';
 
   @Output() onNavCollapse = new EventEmitter();
   @Output() onNavHeaderMobCollapse = new EventEmitter();
@@ -46,7 +44,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
       this.logoFullSrc = 'assets/images/brand/coreerp-logo-light.svg';
       this.logoMarkSrc = 'assets/images/brand/coreerp-mark-light.svg';
     }
-    // logoIconSrc stays dark-variant always
   }
 
   navCollapse() {

@@ -3,6 +3,7 @@ package com.erp.system.accounting.service;
 import com.erp.system.accounting.domain.Account;
 import com.erp.system.accounting.domain.JournalEntry;
 import com.erp.system.accounting.domain.JournalEntryLine;
+import com.erp.system.accounting.support.JournalPostingNarratives;
 import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.repository.JournalEntryRepository;
 import com.erp.system.common.enums.JournalEntryStatus;
@@ -122,10 +123,15 @@ public class AccountingPostingService {
         BigDecimal totalCredit = BigDecimal.ZERO;
         int lineNumber = 1;
         for (JournalEntryLine originalLine : originalEntry.getLines()) {
+            String originalText = originalLine.getDescription();
+            String reversalLineDesc = "Reversal of "
+                    + (originalText != null && !originalText.isBlank()
+                    ? originalText
+                    : JournalPostingNarratives.accountCaption(originalLine.getAccount()));
             JournalEntryLine reversalLine = JournalEntryLine.builder()
                     .journalEntry(reversalEntry)
                     .account(originalLine.getAccount())
-                    .description("Reversal of " + originalLine.getDescription())
+                    .description(reversalLineDesc)
                     .debit(originalLine.getCredit())
                     .credit(originalLine.getDebit())
                     .lineNumber(lineNumber++)

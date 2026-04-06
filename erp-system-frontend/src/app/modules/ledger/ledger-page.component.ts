@@ -1,6 +1,7 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { finalize, map } from 'rxjs/operators';
 import { AccountDto, AccountTreeDto, LedgerDto } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -8,16 +9,32 @@ import { AccountingApiService } from '../../core/services/accounting-api.service
   standalone: false,
   selector: 'app-ledger-page',
   templateUrl: './ledger-page.component.html',
-  styleUrls: ['./ledger-page.component.scss']
+  styleUrls: ['./ledger-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LedgerPageComponent implements OnInit {
   titleKey = 'NAV.LEDGER';
   loading = false;
   errorKey = '';
-  rows: Array<Record<string, unknown>> = [];
+  
+  private readonly ledgerSubject = new BehaviorSubject<LedgerDto | null>(null);
+  public readonly ledger$: Observable<LedgerDto | null> = this.ledgerSubject.asObservable();
+  public readonly rows$: Observable<Array<Record<string, unknown>>> = this.ledgerSubject.asObservable().pipe(
+    map((ledger) => {
+      if (!ledger) return [];
+      return (ledger.lines || []).map((line) => ({
+        ...line,
+        transactionType: this.translationService.instant(`LEDGER.TRANSACTION_TYPE_${line.transactionType || 'JOURNAL_VOUCHER'}`),
+        description: line.description || this.translationService.instant('LEDGER.NO_DESCRIPTION'),
+        debit: Number(line.debit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        credit: Number(line.credit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        runningBalance: Number(line.runningBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      }));
+    })
+  );
+
   accounts: AccountDto[] = [];
   accountTree: AccountTreeDto[] = [];
-  ledger: LedgerDto | null = null;
   columns = [
     { key: 'transactionType', title: 'LEDGER.TRANSACTION_TYPE', align: 'start' as 'start' },
     { key: 'journalReference', title: 'LEDGER.REFERENCE', align: 'start' as 'start' },
@@ -90,8 +107,7 @@ export class LedgerPageComponent implements OnInit {
   load(): void {
     const accountId = Number(this.form.controls.accountId.value || 0);
     if (!accountId) {
-      this.ledger = null;
-      this.rows = [];
+      this.ledgerSubject.next(null);
       return;
     }
     this.loading = true;
@@ -105,25 +121,16 @@ export class LedgerPageComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (ledger: LedgerDto) => {
-          this.ledger = ledger;
-          this.rows = (ledger.lines || []).map((line) => ({
-            ...line,
-            transactionType: this.translationService.instant(`LEDGER.TRANSACTION_TYPE_${line.transactionType || 'JOURNAL_VOUCHER'}`),
-            description: line.description || this.translationService.instant('LEDGER.NO_DESCRIPTION'),
-            debit: Number(line.debit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            credit: Number(line.credit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            runningBalance: Number(line.runningBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          }));
+          this.ledgerSubject.next(ledger);
         },
         error: () => {
-          this.ledger = null;
+          this.ledgerSubject.next(null);
           this.errorKey = 'COMMON.ERROR_LOADING';
-          this.rows = [];
         }
       });
   }

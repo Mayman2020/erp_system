@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, finalize, map } from 'rxjs/operators';
-import { AccountDto, AccountTreeDto, BankAccountDto, PaymentVoucher, PaymentVoucherForm, ReceiptVoucher, ReceiptVoucherForm } from '../../core/models/accounting.models';
+import { AccountDto, AccountTreeDto, PaymentVoucher, PaymentVoucherForm, ReceiptVoucher, ReceiptVoucherForm } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -10,10 +11,12 @@ import { ConfirmDialogService } from '../../core/services/confirm-dialog.service
 import { LookupService } from '../../core/services/lookup.service';
 import { DataTableAction, DataTableColumn } from '../../shared/components/data-table/data-table.component';
 
-@Component({ standalone: false,
+@Component({
+  standalone: false,
   selector: 'app-vouchers-page',
   templateUrl: './vouchers-page.component.html',
-  styleUrls: ['./vouchers-page.component.scss']
+  styleUrls: ['./vouchers-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VouchersPageComponent implements OnInit, OnDestroy {
   readonly titleKey = 'VOUCHERS.TITLE';
@@ -56,17 +59,24 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   saving = false;
   errorKey = '';
   successKey = '';
-  rows: Array<Record<string, unknown>> = [];
-  paymentVouchers: PaymentVoucher[] = [];
-  receiptVouchers: ReceiptVoucher[] = [];
+  readonly user$ = this.authService.currentUser$;
+  private readonly vouchersSubject = new BehaviorSubject<{ payment: PaymentVoucher[], receipt: ReceiptVoucher[] }>({ payment: [], receipt: [] });
+
+  public readonly rows$: Observable<Array<Record<string, unknown>>> = this.vouchersSubject.asObservable().pipe(
+    map(vouchers => {
+      const items = this.activeVoucherType === 'payment' ? vouchers.payment : vouchers.receipt;
+      return items.map(v => this.toRow(v));
+    })
+  );
 
   paymentMethods: string[] = [];
   voucherStatuses: string[] = [];
   currencies: string[] = [];
   voucherTypes: string[] = [];
-  bankAccounts: BankAccountDto[] = [];
   accountOptions: AccountDto[] = [];
   accountTree: AccountTreeDto[] = [];
+  /** ASSET branch only — settlement / cash-bank side of vouchers (leaf selectable in template) */
+  assetAccountTree: AccountTreeDto[] = [];
 
   selectedId: number | null = null;
   dialogVisible = false;
@@ -110,18 +120,15 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnDestroy(): void {
     if (this.feedbackTimer) { clearTimeout(this.feedbackTimer); }
   }
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe((user) => {
-      this.actorEmail = user?.email || user?.username || 'frontend.user';
-    });
-    this.authService.refreshCurrentUser();
     this.bootstrapLookups();
+    this.authService.refreshCurrentUser();
     this.route.paramMap
       .pipe(
         map((p) => p.get('kind')),
@@ -294,17 +301,18 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
         .pipe(
           finalize(() => {
             this.loading = false;
-            this.cdr.detectChanges();
+            this.cdr.markForCheck();
           })
         )
         .subscribe({
           next: (items: PaymentVoucher[]) => {
-            this.paymentVouchers = items;
-            this.rows = items.map((voucher) => this.toRow(voucher));
+            const current = this.vouchersSubject.value;
+            this.vouchersSubject.next({ ...current, payment: items });
           },
           error: () => {
             this.errorKey = 'COMMON.ERROR_LOADING';
-            this.rows = [];
+            const current = this.vouchersSubject.value;
+            this.vouchersSubject.next({ ...current, payment: [] });
           }
         });
       return;
@@ -315,17 +323,18 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (items: ReceiptVoucher[]) => {
-          this.receiptVouchers = items;
-          this.rows = items.map((voucher) => this.toRow(voucher));
+          const current = this.vouchersSubject.value;
+          this.vouchersSubject.next({ ...current, receipt: items });
         },
         error: () => {
           this.errorKey = 'COMMON.ERROR_LOADING';
-          this.rows = [];
+          const current = this.vouchersSubject.value;
+          this.vouchersSubject.next({ ...current, receipt: [] });
         }
       });
   }
@@ -384,13 +393,31 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
     this.lookupService.getLookup('voucher-statuses').subscribe({ next: (items) => (this.voucherStatuses = items.map((item) => item.code)) });
     this.lookupService.getLookup('currencies').subscribe({ next: (items) => (this.currencies = items.map((item) => item.code)) });
     this.lookupService.getLookup('voucher-types').subscribe({ next: (items) => (this.voucherTypes = items.map((item) => item.code)) });
-    this.api.getBankAccounts({ active: true }).subscribe({ next: (items) => (this.bankAccounts = items) });
     this.api.getAccounts({ active: true }).subscribe({ next: (items) => (this.accountOptions = items) });
-    this.api.getAccountTree().subscribe({ next: (tree) => (this.accountTree = tree) });
+    this.api.getAccountTree().subscribe({
+      next: (tree) => {
+        this.accountTree = tree;
+        this.assetAccountTree = this.filterAssetAccountTree(tree);
+      }
+    });
+  }
+
+  /** Keep only ASSET nodes (same tree as Accounts; backend requires asset for settlement). */
+  private filterAssetAccountTree(nodes: AccountTreeDto[]): AccountTreeDto[] {
+    const out: AccountTreeDto[] = [];
+    for (const n of nodes || []) {
+      if (n.accountType !== 'ASSET') {
+        continue;
+      }
+      const children = this.filterAssetAccountTree(n.children || []);
+      out.push({ ...n, children });
+    }
+    return out;
   }
 
   private currentUser(): string {
-    return this.actorEmail || 'frontend.user';
+    const user = this.authService.currentUser;
+    return user?.email || user?.username || 'frontend.user';
   }
 
   private toRow(voucher: PaymentVoucher | ReceiptVoucher): Record<string, unknown> {

@@ -36,6 +36,12 @@ public class UserProfile extends BaseEntity {
     @Column(name = "full_name", nullable = false, length = 150)
     private String fullName;
 
+    @Column(name = "full_name_en", nullable = false, length = 150)
+    private String fullNameEn;
+
+    @Column(name = "full_name_ar", nullable = false, length = 150)
+    private String fullNameAr;
+
     @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
@@ -44,4 +50,10 @@ public class UserProfile extends BaseEntity {
 
     @Column(name = "company_name", length = 180)
     private String companyName;
+
+    @Column(name = "company_name_en", length = 180)
+    private String companyNameEn;
+
+    @Column(name = "company_name_ar", length = 180)
+    private String companyNameAr;
 }

@@ -10,7 +10,7 @@
             [accountTree]="accountTree"
             labelKey="LEDGER.ACCOUNT"
             icon="account_balance"
-            [minSelectableLevel]="2"
+            [minSelectableLevel]="1"
           ></app-account-tree-picker>
         </div>
         <div class="col-lg-3 col-md-6">
@@ -27,7 +27,7 @@
         </div>
       </form>
 
-      <div class="row mb-4" *ngIf="ledger">
+      <div class="row mb-4" *ngIf="ledger$ | async as ledger">
         <div class="col-lg-4 col-md-6">
           <div class="report-card">
             <div class="text-muted small">{{ 'LEDGER.ACCOUNT' | translate }}</div>
@@ -38,6 +38,7 @@
           <div class="report-card">
             <div class="text-muted small">{{ 'LEDGER.OPENING_BALANCE' | translate }}</div>
             <div class="h5 mb-0">{{ ledger.openingBalance | number:'1.2-2' }}</div>
+            <div class="text-muted small mt-1 ledger-opening-hint">{{ 'LEDGER.OPENING_BALANCE_HINT' | translate }}</div>
           </div>
         </div>
         <div class="col-lg-2 col-md-6">
@@ -49,7 +50,7 @@
         <div class="col-lg-2 col-md-6">
           <div class="report-card">
             <div class="text-muted small">{{ 'LEDGER.ENTRY_COUNT' | translate }}</div>
-            <div class="h5 mb-0">{{ ledger.lines.length }}</div>
+            <div class="h5 mb-0">{{ ledger.lines?.length || 0 }}</div>
           </div>
         </div>
         <div class="col-lg-2 col-md-6">
@@ -68,7 +69,7 @@
         {{ errorKey | translate }}
         <button type="button" class="btn-close" (click)="errorKey = ''"></button>
       </div>
-      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+      <app-data-table [columns]="columns" [data]="(rows$ | async) ?? []" [loading]="loading"></app-data-table>
     </div>
   </div>
 </section>

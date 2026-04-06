@@ -7,6 +7,7 @@
     "ALL": "الجميع",
     "APPLY": "تطبيق",
     "CLEAR": "مسح",
+    "TREE_FILTER_ACCOUNTS": "تصفية بالرمز أو الاسم أو الوصف…",
     "RESET": "إعادة ضبط",
     "LOADING": "تحميل...",
     "PLEASE_WAIT": "إعداد أحدث البيانات بالنسبة لك",
@@ -54,7 +55,8 @@
     "RELOAD": "إعادة تحميل",
     "REMOVE": "إزالة",
     "EXPORT_EXCEL": "تصدير إلى Excel",
-    "UPGRADE_TO_PRO": "الترقية للنسخة المميزة"
+    "UPGRADE_TO_PRO": "الترقية للنسخة المميزة",
+    "TABLE_SHOWING": "عرض {{start}}–{{end}} من أصل {{total}}"
   },
   "NAV": {
     "GROUP": "محاسبة تخطيط موارد المؤسسات",
@@ -63,8 +65,8 @@
     "CHART_OF_ACCOUNTS": "مخطط الحسابات",
     "JOURNAL_ENTRIES": "سندات اليومية",
     "JOURNAL_VOUCHERS": "سندات اليومية",
-    "PAYMENT_VOUCHERS": "قسائم الدفع",
-    "RECEIPT_VOUCHERS": "إيصالات الاستلام",
+    "PAYMENT_VOUCHERS": "سندات الدفع",
+    "RECEIPT_VOUCHERS": "سندات القبض",
     "TRANSACTIONS": "المعاملات",
     "INVOICES": "الفواتير",
     "CHECKS": "الشيكات",
@@ -82,7 +84,8 @@
     "LOOKUPS": "البيانات المرجعية",
     "SCREENS": "الشاشات (القائمة)",
     "TOGGLE_THEME": "التبديل للوضع الداكن / التبديل للوضع الفاتح",
-    "TOGGLE_MENU": "تبديل الشريط الجانبي"
+    "TOGGLE_MENU": "تبديل الشريط الجانبي",
+    "SIDEBAR_WELCOME": "مرحبا بكم"
   },
   "STATUS": {
     "DRAFT": "مسودة",
@@ -139,10 +142,14 @@
   "AUTH": {
     "SIGN_IN": "تسجيل الدخول",
     "EMAIL": "بريد إلكتروني",
+    "EMAIL_PLACEHOLDER": "name@example.com",
+    "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD": "كلمة المرور",
     "LOGIN": "تسجيل الدخول",
     "INVALID_CREDENTIALS": "بيانات اعتماد غير صالحة",
     "SUBTITLE": "الوصول بشكل آمن إلى مساحة عمل ERP الخاصة بك",
+    "BRAND_SUBTITLE": "حلول محاسبية متقدمة",
+    "SECURE_LOGIN": "دخول آمن ومحمي",
     "NEW_EXPERIENCE": "تجربة تسجيل دخول جديدة",
     "HERO_TITLE": "التحكم في العمليات المحاسبية من مكان واحد موثوق به",
     "HERO_SUBTITLE": "تسجيل دخول حديث يتماشى مع جودة حساباتي من حيث السرعة والوضوح والأمان.",
@@ -160,7 +167,26 @@
     "FOOTER_NOTE": "نظام تخطيط موارد المؤسسات - موثوق. سريع. احترافي.",
     "ROLE_ADMIN": "المسؤول",
     "ROLE_ACCOUNTANT": "محاسب",
-    "LOGOUT": "تسجيل الخروج"
+    "LOGOUT": "تسجيل الخروج",
+    "SHOW_PASSWORD": "إظهار كلمة المرور",
+    "HIDE_PASSWORD": "إخفاء كلمة المرور"
+  },
+  "login": {
+    "logoAlt": "شعار النظام",
+    "heroTitle": "التحكم في العمليات المحاسبية من مكان واحد موثوق به",
+    "heroLead": "تسجيل دخول حديث يتماشى مع جودة حساباتي من حيث السرعة والوضوح والأمان.",
+    "visionBadge": "تخطيط موارد المؤسسات",
+    "feat1Title": "جلسات محمية",
+    "feat1Desc": "المصادقة الآمنة والجلسات المحمية",
+    "feat2Title": "سير عمل موحد",
+    "feat2Desc": "الوصول الموحد عبر سير العمل المحاسبي",
+    "feat3Title": "أداء لحظي",
+    "feat3Desc": "الرؤية في الوقت الحقيقي للأداء المالي",
+    "footerBlurb": "مساحة عمل محاسبية موثوقة للفرق التي تحتاج إلى الوضوح والسرعة والتحكم.",
+    "footerLinksTitle": "روابط سريعة",
+    "footerOfficeTitle": "الثقة",
+    "footerOfficeLine": "تسجيل دخول مشفّر · صلاحيات حسب الدور · سير عمل جاهز للتدقيق",
+    "footerCopyright": "© {{year}} — حساباتي ERP"
   },
   "LANG": {
     "EN": "EN",
@@ -181,8 +207,8 @@
     "CASH_FLOW": "التدفق النقدي",
     "LATEST_JOURNALS": "أحدث سندات اليومية",
     "LATEST_JOURNAL_VOUCHERS": "أحدث سندات اليومية",
-    "LATEST_PAYMENTS": "أحدث قسائم الدفع",
-    "LATEST_RECEIPTS": "أحدث إيصالات الاستلام",
+    "LATEST_PAYMENTS": "أحدث سندات الدفع",
+    "LATEST_RECEIPTS": "أحدث سندات القبض",
     "RECEIVABLES_PAYABLES": "ملخص الذمم المدينة / الذمم الدائنة",
     "RECEIVABLES": "المستحقات",
     "PAYABLES_OUTSTANDING": "الذمم الدائنة المعلقة",
@@ -213,7 +239,7 @@
     "TOTAL_ASSETS": "إجمالي الأصول",
     "TOTAL_LIABILITIES": "إجمالي الالتزامات",
     "TOTAL_EQUITY": "إجمالي حقوق الملكية",
-    "KPI_POSTED_NOTE": "أرقام الإيرادات والمصروفات والربح تعتمد على القيود المعتمدة فقط. قسائم الدفع والقبض تؤثر على الإيرادات والمصروفات بعد الاعتماد (يُنشأ قيد يومية). عند استخدام فلتر التواريخ يجب أن يقع تاريخ القيد ضمن المدة المختارة."
+    "KPI_POSTED_NOTE": "أرقام الإيرادات والمصروفات والربح تعتمد على القيود المعتمدة فقط. سندات الدفع والقبض تؤثر على الإيرادات والمصروفات بعد الاعتماد (يُنشأ قيد يومية). عند استخدام فلتر التواريخ يجب أن يقع تاريخ القيد ضمن المدة المختارة."
   },
   "ACCOUNTS": {
     "TITLE": "مخطط الحسابات",
@@ -238,7 +264,11 @@
     "DEACTIVATE_ERROR": "فشل في إلغاء تنشيط الحساب",
     "ACTIVATE_SUCCESS": "تم تفعيل الحساب بنجاح",
     "ACTIVATE_ERROR": "فشل في تفعيل الحساب",
-    "FINANCIAL_STATEMENT": "القائمة المالية"
+    "FINANCIAL_STATEMENT": "القائمة المالية",
+    "DETAIL_TITLE": "تفاصيل الحساب",
+    "LEVEL": "المستوى",
+    "FULL_PATH": "المسار الكامل",
+    "VIEW_DETAIL_HINT": "عرض تفاصيل الحساب كاملة"
   },
   "FINANCIAL_STATEMENT": {
     "BALANCE_SHEET": "الميزانية العمومية",
@@ -324,25 +354,25 @@
     "CUSTOM": "مخصص"
   },
   "VOUCHERS": {
-    "TITLE": "قسائم الدفع والاستلام",
-    "CREATE": "إنشاء قسيمة",
-    "VIEW_TITLE": "تفاصيل القسيمة",
-    "EDIT_TITLE": "تحرير القسيمة",
-    "CONFIRM_APPROVE": "تأكيد الموافقة على القسيمة؟",
-    "CONFIRM_POST": "تأكيد نشر القسيمة؟",
-    "CONFIRM_CANCEL": "تأكيد إلغاء القسيمة؟",
-    "SAVE_SUCCESS": "تم حفظ القسيمة بنجاح.",
-    "SAVE_ERROR": "فشل حفظ القسيمة.",
+    "TITLE": "سندات الدفع والقبض",
+    "CREATE": "إنشاء سند",
+    "VIEW_TITLE": "تفاصيل السند",
+    "EDIT_TITLE": "تحرير السند",
+    "CONFIRM_APPROVE": "تأكيد اعتماد السند؟",
+    "CONFIRM_POST": "تأكيد ترحيل السند؟",
+    "CONFIRM_CANCEL": "تأكيد إلغاء السند؟",
+    "SAVE_SUCCESS": "تم حفظ السند بنجاح.",
+    "SAVE_ERROR": "فشل حفظ السند.",
     "WORKFLOW_SUCCESS": "تمت العملية بنجاح.",
     "WORKFLOW_ERROR": "فشلت العملية.",
-    "ONLY_DRAFT_CAN_APPROVE": "لا يمكن اعتماد إلا القسائم ذات حالة مسودة.",
-    "CANNOT_POST_STATUS": "لا يمكن ترحيل هذه القسيمة في حالتها الحالية.",
+    "ONLY_DRAFT_CAN_APPROVE": "لا يمكن اعتماد إلا السندات ذات حالة مسودة.",
+    "CANNOT_POST_STATUS": "لا يمكن ترحيل هذا السند في حالته الحالية.",
     "FILTER": {
       "MIN_AMOUNT": "الحد الأدنى للمبلغ",
       "MAX_AMOUNT": "المبلغ الأقصى"
     },
     "LIST": {
-      "NUMBER": "رقم القسيمة",
+      "NUMBER": "رقم السند",
       "DATE": "تاريخ",
       "PARTY": "المستفيد / الدافع",
       "METHOD": "طريقة",
@@ -353,10 +383,10 @@
       "CREATED_AT": "تاريخ الإنشاء"
     },
     "FORM": {
-      "DATE": "تاريخ القسيمة",
-      "NUMBER": "رقم القسيمة",
+      "DATE": "تاريخ السند",
+      "NUMBER": "رقم السند",
       "NUMBER_PLACEHOLDER": "يُحدَّد بعد الحفظ",
-      "NUMBER_HINT": "يُولَّد رقم القسيمة تلقائياً عند الحفظ (ترقيم تسلسلي).",
+      "NUMBER_HINT": "يُولَّد رقم السند تلقائياً عند الحفظ (ترقيم تسلسلي).",
       "BENEFICIARY": "المستفيد/ المستفيد",
       "PAYER": "تم الاستلام من",
       "METHOD": "طريقة الدفع/الاستلام",
@@ -365,17 +395,17 @@
       "TARGET_ACCOUNT_RECEIPT": "حساب الإيرادات / المستحق",
       "AMOUNT": "المبلغ",
       "CURRENCY": "العملة",
-      "VOUCHER_TYPE": "نوع القسيمة",
+      "VOUCHER_TYPE": "نوع السند",
       "REFERENCE": "الرقم المرجعي",
       "DESCRIPTION": "وصف"
     },
     "PAYMENT": {
-      "TITLE": "قسائم الدفع",
-      "CREATE": "إنشاء قسيمة الدفع"
+      "TITLE": "سندات الدفع",
+      "CREATE": "إنشاء سند دفع"
     },
     "RECEIPT": {
-      "TITLE": "إيصالات الاستلام",
-      "CREATE": "إنشاء قسيمة استلام"
+      "TITLE": "سندات القبض",
+      "CREATE": "إنشاء سند قبض"
     }
   },
   "REPORTS": {
@@ -436,7 +466,7 @@
     "REVERSED_BY": "عُكس بواسطة",
     "SOURCE_MANUAL": "قيد يدوي",
     "SOURCE_PAYMENT_VOUCHER": "سند دفع",
-    "SOURCE_RECEIPT_VOUCHER": "إيصال استلام",
+    "SOURCE_RECEIPT_VOUCHER": "سند قبض",
     "SOURCE_CUSTOMER_INVOICE": "فاتورة مبيعات",
     "SOURCE_BILL": "فاتورة مشتريات",
     "SOURCE_REVERSAL": "عكس قيد"
@@ -477,7 +507,7 @@
     "SOURCE_REFERENCE": "مرجع المصدر",
     "TRANSACTION_TYPE_JOURNAL_VOUCHER": "سند يومية",
     "TRANSACTION_TYPE_PAYMENT_VOUCHER": "سند دفع",
-    "TRANSACTION_TYPE_RECEIPT_VOUCHER": "إيصال استلام",
+    "TRANSACTION_TYPE_RECEIPT_VOUCHER": "سند قبض",
     "TRANSACTION_TYPE_CUSTOMER_INVOICE": "فاتورة مبيعات",
     "TRANSACTION_TYPE_BILL": "فاتورة مشتريات",
     "REFERENCE": "مرجع",
@@ -487,6 +517,7 @@
     "CREDIT": "دائن",
     "RUNNING_BALANCE": "الرصيد التراكمي",
     "OPENING_BALANCE": "الرصيد الافتتاحي",
+    "OPENING_BALANCE_HINT": "يُؤخذ من مخطط الحسابات (الحسابات التفصيلية فقط). عند تحديد «من تاريخ» يُضاف صافي الحركات المعتمدة قبل ذلك التاريخ.",
     "CLOSING_BALANCE": "الرصيد الختامي",
     "ENTRY_COUNT": "الحركات",
     "PERIOD": "الفترة",
@@ -586,11 +617,15 @@
     "SECURITY": "حماية",
     "PREFERENCES": "التفضيلات",
     "FULL_NAME": "الاسم الكامل",
+    "FULL_NAME_EN": "الاسم الكامل (إنجليزي)",
+    "FULL_NAME_AR": "الاسم الكامل (عربي)",
     "USERNAME": "اسم المستخدم",
     "EMAIL": "بريد إلكتروني",
     "PHONE": "رقم التليفون",
     "NATIONAL_ID": "الهوية الوطنية",
     "COMPANY_NAME": "اسم الشركة",
+    "COMPANY_NAME_EN": "اسم الشركة (إنجليزي)",
+    "COMPANY_NAME_AR": "اسم الشركة (عربي)",
     "ACCOUNT_ROLE": "دور الحساب",
     "VISUAL_THEME": "الموضوع المرئي",
     "LIGHT_MODE": "التبديل للوضع الفاتح",
@@ -737,7 +772,11 @@
   },
   "APP": {
     "BRAND": "CoreERP",
-    "RIGHTS_RESERVED": "جميع الحقوق محفوظة"
+    "RIGHTS_RESERVED": "جميع الحقوق محفوظة",
+    "FOOTER_COPYRIGHT": "© {{year}} CoreERP",
+    "VERSION_LABEL": "الإصدار",
+    "ENV_LOCAL": "محلي",
+    "ENV_PRODUCTION": "إنتاج"
   },
   "TRANSACTION_TYPE": {
     "BANK_STATEMENT": "كشف حساب البنك",

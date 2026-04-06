@@ -53,58 +53,60 @@
       <div class="card h-100">
         <div class="card-header fw-semibold">{{ 'RECONCILIATION.LIST' | translate }}</div>
         <div class="card-body p-0">
-          <app-empty-state *ngIf="reconciliations.length === 0" icon="rule" titleKey="COMMON.NO_DATA" descriptionKey="COMMON.NO_RESULTS_HINT"></app-empty-state>
-          <ul class="list-group list-group-flush" *ngIf="reconciliations.length > 0">
-            <li *ngFor="let rec of reconciliations" class="list-group-item list-group-item-action erp-recon-list-item" [class.active]="selectedReconciliation?.id === rec.id" (click)="selectReconciliation(rec.id)">
-              <div class="d-flex justify-content-between align-items-center">
-                <small class="fw-semibold">{{ rec.bankAccountNumber }}</small>
-                <app-status-badge [status]="rec.status" labelPrefix="STATUS."></app-status-badge>
-              </div>
-              <small class="text-muted">{{ rec.statementStartDate }} — {{ rec.statementEndDate }}</small>
-            </li>
-          </ul>
+          <ng-container *ngIf="reconciliations$ | async as reconciliations">
+            <app-empty-state *ngIf="reconciliations.length === 0" icon="rule" titleKey="COMMON.NO_DATA" descriptionKey="COMMON.NO_RESULTS_HINT"></app-empty-state>
+            <ul class="list-group list-group-flush" *ngIf="reconciliations.length > 0">
+              <li *ngFor="let rec of reconciliations" class="list-group-item list-group-item-action erp-recon-list-item" [class.active]="(selectedReconciliation$ | async)?.id === rec.id" (click)="selectReconciliation(rec.id)">
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="fw-semibold">{{ rec.bankAccountNumber }}</small>
+                  <app-status-badge [status]="rec.status" labelPrefix="STATUS."></app-status-badge>
+                </div>
+                <small class="text-muted">{{ rec.statementStartDate }} — {{ rec.statementEndDate }}</small>
+              </li>
+            </ul>
+          </ng-container>
         </div>
       </div>
     </div>
 
     <div class="col-md-9">
-      <app-empty-state *ngIf="!selectedReconciliation" icon="rule" titleKey="COMMON.NO_DATA" descriptionKey="RECONCILIATION.SELECT_HINT"></app-empty-state>
-
-      <div *ngIf="selectedReconciliation">
-        <div class="row mb-3">
-          <div class="col-md-3">
-            <div class="card text-center erp-summary-card">
-              <div class="card-body py-2">
-                <small class="text-muted">{{ 'RECONCILIATION.FORM.OPENING_BALANCE' | translate }}</small>
-                <div class="fw-bold">{{ summary?.openingBalance || 0 | number:'1.2-2' }}</div>
+      <ng-container *ngIf="selectedReconciliation$ | async as selectedReconciliation; else noSelectedState">
+        <ng-container *ngIf="summary$ | async as summary">
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <div class="card text-center erp-summary-card">
+                <div class="card-body py-2">
+                  <small class="text-muted">{{ 'RECONCILIATION.FORM.OPENING_BALANCE' | translate }}</small>
+                  <div class="fw-bold">{{ summary.openingBalance || 0 | number:'1.2-2' }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card text-center erp-summary-card">
+                <div class="card-body py-2">
+                  <small class="text-muted">{{ 'RECONCILIATION.FORM.CLOSING_BALANCE' | translate }}</small>
+                  <div class="fw-bold">{{ summary.closingBalance || 0 | number:'1.2-2' }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card text-center erp-summary-card">
+                <div class="card-body py-2">
+                  <small class="text-muted">{{ 'RECONCILIATION.SUMMARY.MATCHED' | translate }}</small>
+                  <div class="fw-bold text-success">{{ summary.matchedCount || 0 }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card text-center erp-summary-card" [ngClass]="{'border-danger': (summary.difference || 0) !== 0}">
+                <div class="card-body py-2">
+                  <small class="text-muted">{{ 'RECONCILIATION.SUMMARY.DIFFERENCE' | translate }}</small>
+                  <div class="fw-bold" [ngClass]="(summary.difference || 0) === 0 ? 'text-success' : 'text-danger'">{{ summary.difference || 0 | number:'1.2-2' }}</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="card text-center erp-summary-card">
-              <div class="card-body py-2">
-                <small class="text-muted">{{ 'RECONCILIATION.FORM.CLOSING_BALANCE' | translate }}</small>
-                <div class="fw-bold">{{ summary?.closingBalance || 0 | number:'1.2-2' }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card text-center erp-summary-card">
-              <div class="card-body py-2">
-                <small class="text-muted">{{ 'RECONCILIATION.SUMMARY.MATCHED' | translate }}</small>
-                <div class="fw-bold text-success">{{ summary?.matchedCount || 0 }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card text-center erp-summary-card" [ngClass]="{'border-danger': (summary?.difference || 0) !== 0}">
-              <div class="card-body py-2">
-                <small class="text-muted">{{ 'RECONCILIATION.SUMMARY.DIFFERENCE' | translate }}</small>
-                <div class="fw-bold" [ngClass]="(summary?.difference || 0) === 0 ? 'text-success' : 'text-danger'">{{ summary?.difference || 0 | number:'1.2-2' }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </ng-container>
 
         <div class="erp-reconciliation-actions mb-3">
           <button type="button" class="erp-button erp-button--ghost" (click)="matchSelected()" [disabled]="!isEditable || !selectedStatementLineId || !selectedSystemLineId">
@@ -127,7 +129,7 @@
               <div class="card-header fw-semibold">{{ 'RECONCILIATION.STATEMENT_LINES' | translate }}</div>
               <div class="card-body p-0">
                 <div class="table-responsive erp-unified-table-wrap">
-                  <table class="table table-sm table-hover erp-unified-table mb-0">
+                  <table class="erp-table">
                     <thead>
                       <tr>
                         <th>{{ 'RECONCILIATION.DATE' | translate }}</th>
@@ -138,7 +140,7 @@
                         <th>{{ 'COMMON.ACTIONS' | translate }}</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody *ngIf="statementLines$ | async as statementLines">
                       <tr *ngIf="statementLines.length === 0"><td colspan="6" class="text-center text-muted py-3">{{ 'COMMON.NO_DATA' | translate }}</td></tr>
                       <tr *ngFor="let line of statementLines" (click)="pickStatement(line)" [class.table-active]="selectedStatementLineId === line.id" [class.erp-line-matched]="line.status === 'MATCHED'">
                         <td>{{ line.transactionDate }}</td>
@@ -163,7 +165,7 @@
               <div class="card-header fw-semibold">{{ 'RECONCILIATION.SYSTEM_TRANSACTIONS' | translate }}</div>
               <div class="card-body p-0">
                 <div class="table-responsive erp-unified-table-wrap">
-                  <table class="table table-sm table-hover erp-unified-table mb-0">
+                  <table class="erp-table">
                     <thead>
                       <tr>
                         <th>{{ 'RECONCILIATION.DATE' | translate }}</th>
@@ -174,7 +176,7 @@
                         <th>{{ 'COMMON.ACTIONS' | translate }}</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody *ngIf="systemLines$ | async as systemLines">
                       <tr *ngIf="systemLines.length === 0"><td colspan="6" class="text-center text-muted py-3">{{ 'COMMON.NO_DATA' | translate }}</td></tr>
                       <tr *ngFor="let line of systemLines" (click)="pickSystem(line)" [class.table-active]="selectedSystemLineId === line.id" [class.erp-line-matched]="line.status === 'MATCHED'">
                         <td>{{ line.transactionDate }}</td>
@@ -195,7 +197,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </ng-container>
+
+      <ng-template #noSelectedState>
+        <app-empty-state icon="rule" titleKey="COMMON.NO_DATA" descriptionKey="RECONCILIATION.SELECT_HINT"></app-empty-state>
+      </ng-template>
     </div>
   </div>
 </section>

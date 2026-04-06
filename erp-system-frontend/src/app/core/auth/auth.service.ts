@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { finalize, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api.models';
 import { PermissionService } from '../services/permission.service';
@@ -22,10 +22,44 @@ export type LoginUserType = 'ADMIN' | 'ACCOUNTANT';
 export interface UserProfile {
   id?: number;
   userId?: number;
+  /** Resolved for Accept-Language at response time; use `resolveProfileFullName` when UI language changes without refetch. */
   fullName?: string;
+  fullNameEn?: string;
+  fullNameAr?: string;
   profileImage?: string;
   nationalId?: string;
   companyName?: string;
+  companyNameEn?: string | null;
+  companyNameAr?: string | null;
+}
+
+/** Display name from bilingual profile fields using current UI language (localStorage `erp_language`). */
+export function resolveProfileFullName(profile: UserProfile | null | undefined, lang: string): string {
+  if (!profile) {
+    return '';
+  }
+  const preferAr = lang === 'ar';
+  const en = (profile.fullNameEn || '').trim();
+  const ar = (profile.fullNameAr || '').trim();
+  const legacy = (profile.fullName || '').trim();
+  if (preferAr) {
+    return ar || legacy || en;
+  }
+  return en || legacy || ar;
+}
+
+export function resolveProfileCompanyName(profile: UserProfile | null | undefined, lang: string): string {
+  if (!profile) {
+    return '';
+  }
+  const preferAr = lang === 'ar';
+  const en = (profile.companyNameEn || '').trim();
+  const ar = (profile.companyNameAr || '').trim();
+  const legacy = (profile.companyName || '').trim();
+  if (preferAr) {
+    return ar || legacy || en;
+  }
+  return en || legacy || ar;
 }
 
 export interface AuthUser {
@@ -44,10 +78,12 @@ export interface UpdateProfileRequest {
   username: string;
   email: string;
   phone: string;
-  fullName: string;
+  fullNameEn: string;
+  fullNameAr: string;
   profileImage?: string | null;
   nationalId?: string | null;
-  companyName?: string | null;
+  companyNameEn?: string | null;
+  companyNameAr?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -56,6 +92,7 @@ export class AuthService {
   private readonly menuCacheKey = 'erp_ui_menu_cache';
   private readonly authenticatedSubject = new BehaviorSubject<boolean>(!!localStorage.getItem(this.tokenKey));
   private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
+  private readonly loadingUserSubject = new BehaviorSubject<boolean>(false);
 
   constructor(private http: HttpClient, private permissionService: PermissionService) {}
 
@@ -65,6 +102,14 @@ export class AuthService {
 
   get currentUser$(): Observable<AuthUser | null> {
     return this.currentUserSubject.asObservable();
+  }
+
+  get loadingUser$(): Observable<boolean> {
+    return this.loadingUserSubject.asObservable();
+  }
+
+  get currentUser(): AuthUser | null {
+    return this.currentUserSubject.value;
   }
 
   get token(): string | null {
@@ -124,9 +169,11 @@ export class AuthService {
   }
 
   getMyProfile(): Observable<AuthUser> {
+    this.loadingUserSubject.next(true);
     return this.http.get<ApiResponse<AuthUser>>(`${environment.apiBaseUrl}/profile/me`).pipe(
       map((res) => res.data),
-      tap((user) => this.currentUserSubject.next(user))
+      tap((user) => this.currentUserSubject.next(user)),
+      finalize(() => this.loadingUserSubject.next(false))
     );
   }
 

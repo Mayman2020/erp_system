@@ -36,7 +36,11 @@ public class AdminUserFormDto {
 
     @NotBlank
     @Size(max = 150)
-    private String fullName;
+    private String fullNameEn;
+
+    @NotBlank
+    @Size(max = 150)
+    private String fullNameAr;
 
     @NotNull
     private UserRole primaryRole;

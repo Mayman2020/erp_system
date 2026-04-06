@@ -1,130 +1,59 @@
-.profile-layout .profile-card {
-  border: 1px solid var(--erp-border);
-  border-radius: var(--erp-radius-card);
-  padding: var(--erp-space-4);
-  text-align: center;
-  background: var(--erp-bg-muted);
-}
-
-.avatar-wrap {
-  margin-bottom: 0.9rem;
-}
-
-.profile-avatar {
-  width: 96px;
-  height: 96px;
-  border-radius: 999px;
-  object-fit: cover;
-  border: 3px solid color-mix(in srgb, var(--erp-primary) 18%, transparent);
-}
-
-.erp-settings-card,
-.erp-settings__year-card {
-  border: 1px solid var(--erp-border);
-  border-radius: 14px;
-  background: var(--erp-bg-muted);
-}
-
-.erp-settings-card {
-  padding: 1rem;
-  min-height: 100%;
-}
-
-.erp-settings-card__label {
-  color: var(--erp-text-secondary);
-  font-size: 0.82rem;
-  margin-bottom: 0.45rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.erp-settings-card__value {
-  color: var(--erp-text);
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.erp-settings__section-label {
-  display: block;
-  margin-bottom: 0.75rem;
-  color: var(--erp-text);
-  font-weight: 600;
-}
-
-.erp-settings__currency-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 0.75rem;
-}
-
-.erp-settings__currency-item {
+.settings-premium-container {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 0.9rem;
-  border: 1px solid var(--erp-border);
-  border-radius: 12px;
-  background: var(--erp-bg-card);
-  cursor: pointer;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem 0;
 }
 
-.erp-settings__year-list {
-  display: grid;
-  gap: 1rem;
-}
-
-.erp-settings__year-card {
-  padding: 1rem;
-}
-
-.erp-settings__year-header,
-.erp-settings__period-item {
+.settings-nav-pills {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding: 0.5rem;
+  background: var(--erp-bg-muted);
+  border-radius: 18px;
+  width: fit-content;
+  border: 1px solid var(--erp-border);
+
+  .nav-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1.75rem;
+    border-radius: 14px;
+    border: none;
+    background: transparent;
+    color: var(--erp-text-soft);
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      color: var(--erp-text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &.is-active {
+      background: var(--erp-bg-elevated);
+      color: var(--erp-primary);
+      box-shadow: var(--erp-shadow-sm);
+      transform: scale(1.02);
+    }
+  }
 }
 
-.erp-settings__year-header {
-  margin-bottom: 0.9rem;
+.settings-content-wrapper {
+  min-height: 500px;
 }
 
-.erp-settings__period-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.erp-settings__period-item {
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--erp-border);
-}
-
-.erp-settings__status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 88px;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.erp-settings__status.is-open {
-  background: var(--erp-success-soft);
-  color: var(--erp-success);
-}
-
-.erp-settings__status.is-closed {
-  background: var(--erp-danger-soft);
-  color: var(--erp-danger);
-}
-
-.erp-button--sm {
-  padding: 0.45rem 0.8rem;
-  font-size: 0.82rem;
-}
-
-.profile-layout app-tabs {
-  display: block;
+body.rtl {
+  .settings-nav-pills {
+    margin-right: 0;
+    margin-left: auto;
+  }
 }

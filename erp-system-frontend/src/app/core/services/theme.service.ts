@@ -28,6 +28,16 @@ export class ThemeService {
     this.setMode(this.mode === 'dark' ? 'light' : 'dark');
   }
 
+  /** Alias for enterprise shell / login — same as {@link toggle}. */
+  toggleTheme(): void {
+    this.toggle();
+  }
+
+  /** Current persisted theme. */
+  getCurrentTheme(): ThemeMode {
+    return this.modeSubject.value;
+  }
+
   private readMode(): ThemeMode {
     return localStorage.getItem(this.key) === 'dark' ? 'dark' : 'light';
   }
@@ -37,6 +47,8 @@ export class ThemeService {
     document.documentElement.style.setProperty('color-scheme', mode);
     document.body.classList.toggle('theme-light', mode === 'light');
     document.body.classList.toggle('theme-dark', mode === 'dark');
+    document.body.classList.toggle('light-mode', mode === 'light');
+    document.body.classList.toggle('dark-mode', mode === 'dark');
     document.body.classList.toggle('flat-able-dark', mode === 'dark');
   }
 }

@@ -4,13 +4,14 @@ import com.erp.system.auth.domain.User;
 import com.erp.system.auth.domain.UserProfile;
 import com.erp.system.auth.dto.AuthUserDto;
 import com.erp.system.auth.dto.UpdateProfileRequestDto;
-import com.erp.system.auth.dto.UserProfileDto;
+import com.erp.system.auth.dto.UserProfileDtoMapper;
 import com.erp.system.auth.repository.UserProfileRepository;
 import com.erp.system.auth.repository.UserRepository;
-import com.erp.system.auth.service.AccessControlService;
+import com.erp.system.auth.util.UserProfileI18n;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.security.JwtPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -54,10 +55,16 @@ public class UserProfileService {
             user.setProfile(profile);
         }
 
-        profile.setFullName(normalizeRequired(request.getFullName()));
+        String fullNameEn = normalizeRequired(request.getFullNameEn());
+        String fullNameAr = normalizeRequired(request.getFullNameAr());
+        profile.setFullNameEn(fullNameEn);
+        profile.setFullNameAr(fullNameAr);
+        profile.setFullName(UserProfileI18n.syncLegacyFullName(fullNameEn, fullNameAr));
         profile.setProfileImage(normalizeOptional(request.getProfileImage()));
         profile.setNationalId(normalizeOptional(request.getNationalId()));
-        profile.setCompanyName(normalizeOptional(request.getCompanyName()));
+        profile.setCompanyNameEn(normalizeOptional(request.getCompanyNameEn()));
+        profile.setCompanyNameAr(normalizeOptional(request.getCompanyNameAr()));
+        profile.setCompanyName(UserProfileI18n.syncLegacyCompanyName(profile.getCompanyNameEn(), profile.getCompanyNameAr()));
 
         userProfileRepository.save(profile);
         return toDto(userRepository.save(user));
@@ -74,14 +81,7 @@ public class UserProfileService {
                 .roles(accessControlService.authorityCodesFor(user))
                 .active(user.isActive())
                 .createdAt(user.getCreatedAt())
-                .profile(profile == null ? null : UserProfileDto.builder()
-                        .id(profile.getId())
-                        .userId(user.getId())
-                        .fullName(profile.getFullName())
-                        .profileImage(profile.getProfileImage())
-                        .nationalId(profile.getNationalId())
-                        .companyName(profile.getCompanyName())
-                        .build())
+                .profile(UserProfileDtoMapper.from(profile, user.getId(), LocaleContextHolder.getLocale()))
                 .build();
     }
 

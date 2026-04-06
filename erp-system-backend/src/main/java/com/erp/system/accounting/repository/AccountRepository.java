@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,4 +56,26 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<AccountTypeAmountDto> aggregateSignedOpeningBalancesByType();
 
     Optional<Account> findByCode(String code);
+
+    /**
+     * Ledger rollup: selected account plus every active descendant (by {@link Account#getFullPath()} prefix).
+     */
+    @Query("""
+            SELECT a.id FROM Account a
+            WHERE a.id = :rootId
+               OR (a.active = true AND a.fullPath IS NOT NULL AND a.fullPath LIKE CONCAT(:rootPath, '/%'))
+            ORDER BY a.code
+            """)
+    List<Long> findLedgerSubtreeAccountIds(@Param("rootId") Long rootId, @Param("rootPath") String rootPath);
+
+    /**
+     * Detail (leaf) accounts only — same rows where users normally set opening balance in COA.
+     * Used by the ledger so parent rollups do not double-count a parent opening plus child openings.
+     */
+    @Query("""
+            SELECT a FROM Account a
+            WHERE a.id IN :ids
+              AND NOT EXISTS (SELECT 1 FROM Account c WHERE c.parent.id = a.id)
+            """)
+    List<Account> findLedgerLeafAccountsAmongIds(@Param("ids") Collection<Long> ids);
 }

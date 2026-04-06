@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, forkJoin, Observable, Subject } from 'rxjs';
+import { finalize, map, takeUntil } from 'rxjs/operators';
 import { AccountTreeDto, JournalEntry, JournalEntryForm, JournalEntryLine } from '../../core/models/accounting.models';
 import { LookupItem } from '../../core/models/lookup.models';
 import { TranslationService } from '../../core/i18n/translation.service';
@@ -13,7 +13,8 @@ import { LookupService } from '../../core/services/lookup.service';
 @Component({ standalone: false,
   selector: 'app-journal-entry-page',
   templateUrl: './journal-entry-page.component.html',
-  styleUrls: ['./journal-entry-page.component.scss']
+  styleUrls: ['./journal-entry-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class JournalEntryPageComponent implements OnInit, OnDestroy {
   loading = false;
@@ -21,19 +22,41 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   errorKey = '';
   successKey = '';
 
-  entries: JournalEntry[] = [];
-  filteredEntries: Array<Record<string, unknown>> = [];
+  private readonly entriesSubject = new BehaviorSubject<JournalEntry[]>([]);
+  private readonly filterStatusSubject = new BehaviorSubject<string>('');
+  private readonly filterAmountSubject = new BehaviorSubject<{ min: number | null; max: number | null }>({ min: null, max: null });
+  private readonly destroy$ = new Subject<void>();
+
+  public readonly filteredEntries$: Observable<Array<Record<string, unknown>>> = combineLatest([
+    this.entriesSubject,
+    this.filterStatusSubject,
+    this.filterAmountSubject
+  ]).pipe(
+    map(([entries, status, amounts]) => {
+      return entries
+        .filter((entry) => !status || entry.status === status)
+        .filter((entry) => (amounts.min == null ? true : Number(entry.totalDebit) >= amounts.min))
+        .filter((entry) => (amounts.max == null ? true : Number(entry.totalDebit) <= amounts.max))
+        .map((entry) => ({
+          id: entry.id,
+          referenceNumber: entry.referenceNumber,
+          entryDate: entry.entryDate,
+          description: entry.description || '',
+          totalDebit: Number(entry.totalDebit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          totalCredit: Number(entry.totalCredit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          status: entry.status,
+          createdAt: entry.createdAt || '',
+          createdBy: entry.createdBy || '',
+          balanced: entry.balanced
+        }));
+    })
+  );
 
   accountTree: AccountTreeDto[] = [];
   statusLookups: LookupItem[] = [];
   statusCodes: string[] = [];
   currencyLookups: LookupItem[] = [];
   entryTypeLookups: LookupItem[] = [];
-
-  filterStatus = '';
-  filterMinAmount: number | null = null;
-  filterMaxAmount: number | null = null;
-  filterEntryNumber = '';
 
   formVisible = false;
   accountPickerVisible = false;
@@ -95,14 +118,17 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe((user) => {
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       this.actorEmail = user?.email || user?.username || 'system@erp.local';
+      this.cdr.markForCheck();
     });
     this.authService.refreshCurrentUser();
     this.loadLookupsAndData();
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     if (this.feedbackTimer) {
       clearTimeout(this.feedbackTimer);
       this.feedbackTimer = null;
@@ -114,25 +140,25 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   }
 
   onSearch(filters: { query?: string; fromDate?: string; toDate?: string; status?: string; minAmount?: string; maxAmount?: string }): void {
-    this.filterEntryNumber = filters.query || '';
-    this.filterStatus = filters.status || '';
-    this.filterMinAmount = filters.minAmount ? Number(filters.minAmount) : null;
-    this.filterMaxAmount = filters.maxAmount ? Number(filters.maxAmount) : null;
+    this.filterStatusSubject.next(filters.status || '');
+    this.filterAmountSubject.next({
+      min: filters.minAmount ? Number(filters.minAmount) : null,
+      max: filters.maxAmount ? Number(filters.maxAmount) : null
+    });
     this.loadEntries({
-      search: this.filterEntryNumber || undefined,
+      search: filters.query || undefined,
       fromDate: filters.fromDate || undefined,
       toDate: filters.toDate || undefined,
-      status: this.filterStatus || undefined
+      status: filters.status || undefined
     });
   }
 
   onStatusFilterChange(value: string): void {
-    this.filterStatus = value || '';
-    this.applyClientFilters();
+    this.filterStatusSubject.next(value || '');
   }
 
-  onAmountFilterChange(): void {
-    this.applyClientFilters();
+  onAmountFilterChange(min: number | null, max: number | null): void {
+    this.filterAmountSubject.next({ min, max });
   }
 
   openCreate(): void {
@@ -143,7 +169,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   }
 
   onRowAction(event: { actionId: string; row: Record<string, unknown> }): void {
-    const entry = this.entries.find((item) => item.id === Number(event.row.id));
+    const entry = this.entriesSubject.value.find((item) => item.id === Number(event.row.id));
     if (!entry) {
       return;
     }
@@ -230,7 +256,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.saving = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
@@ -316,13 +342,12 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (rows) => {
-          this.entries = rows;
-          this.applyClientFilters();
+          this.entriesSubject.next(rows);
         },
         error: () => {
           this.showError('COMMON.ERROR_LOADING');
@@ -331,22 +356,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   }
 
   private applyClientFilters(): void {
-    this.filteredEntries = this.entries
-      .filter((entry) => !this.filterStatus || entry.status === this.filterStatus)
-      .filter((entry) => (this.filterMinAmount == null ? true : Number(entry.totalDebit) >= this.filterMinAmount))
-      .filter((entry) => (this.filterMaxAmount == null ? true : Number(entry.totalDebit) <= this.filterMaxAmount))
-      .map((entry) => ({
-        id: entry.id,
-        referenceNumber: entry.referenceNumber,
-        entryDate: entry.entryDate,
-        description: entry.description || '',
-        totalDebit: Number(entry.totalDebit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-        totalCredit: Number(entry.totalCredit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-        status: entry.status,
-        createdAt: entry.createdAt || '',
-        createdBy: entry.createdBy || '',
-        balanced: entry.balanced
-      }));
+    // This method is now obsolete as filteredEntries$ handles it reactively.
   }
 
   private openView(id: number): void {
@@ -364,7 +374,7 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
       .getJournalEntry(id)
       .pipe(
         finalize(() => {
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({

@@ -1,0 +1,209 @@
+<div class="erp-accounting-settings">
+  <div class="settings-grid">
+    <!-- Configuration Row -->
+    <div class="settings-grid__main">
+      <div class="erp-settings-section">
+        <h4 class="section-title">
+          <mat-icon>settings_suggest</mat-icon>
+          {{ 'SETTINGS.ACCOUNTING_FORM_TITLE' | translate }}
+        </h4>
+        
+        <div class="card premium-card">
+          <div class="card-body">
+            <form [formGroup]="accountingForm" class="row">
+              <div class="col-md-6 mb-3">
+                <app-form-field
+                  [control]="accountingForm.controls.accountingMethod"
+                  labelKey="SETTINGS.ACCOUNTING_METHOD"
+                  icon="calculate"
+                  type="select"
+                  [options]="methodOptions"
+                  optionValueField="code"
+                  optionLabelField="code"
+                  optionLabelPrefix="ACCOUNTING_METHOD_OPTION."
+                ></app-form-field>
+              </div>
+              <div class="col-md-6 mb-3">
+                <app-form-field
+                  [control]="accountingForm.controls.baseCurrency"
+                  labelKey="SETTINGS.BASE_CURRENCY"
+                  icon="currency_exchange"
+                  type="select"
+                  [options]="currencyOptions"
+                  optionValueField="code"
+                  optionLabelField="code"
+                ></app-form-field>
+              </div>
+              
+              <div class="col-12 mb-4">
+                <label class="erp-settings__section-label">
+                  <mat-icon>payments</mat-icon>
+                  {{ 'SETTINGS.SELECT_ALLOWED_CURRENCIES' | translate }}
+                </label>
+                <div class="currency-chip-grid">
+                  <label class="currency-chip" *ngFor="let currency of currencyOptions" [class.is-selected]="isCurrencySelected(currency.code)">
+                    <input
+                      type="checkbox"
+                      hidden
+                      [checked]="isCurrencySelected(currency.code)"
+                      (change)="toggleCurrency(currency.code, $any($event.target).checked)"
+                    />
+                    <span class="currency-chip__code">{{ currency.code }}</span>
+                    <mat-icon class="currency-chip__check" *ngIf="isCurrencySelected(currency.code)">check_circle</mat-icon>
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-12 d-flex justify-content-end gap-3">
+                <div *ngIf="successKey" class="alert-inline alert-success">{{ successKey | translate }}</div>
+                <div *ngIf="errorKey" class="alert-inline alert-danger">{{ errorKey | translate }}</div>
+                <button type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="onSaveAccounting()">
+                  <mat-icon>save</mat-icon>
+                  <span>{{ 'COMMON.SAVE' | translate }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Creation Row -->
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <div class="erp-settings-section h-100">
+            <h4 class="section-title">
+              <mat-icon>calendar_add_on</mat-icon>
+              {{ 'SETTINGS.FISCAL_YEAR_FORM_TITLE' | translate }}
+            </h4>
+            <div class="card premium-card h-100">
+              <div class="card-body">
+                <form [formGroup]="fiscalYearForm" class="row">
+                  <div class="col-12 mb-3 erp-settings-year-select">
+                    <label class="erp-form-field__label" for="fiscal-year-select">{{ 'SETTINGS.YEAR' | translate }}</label>
+                    <select id="fiscal-year-select" class="erp-input" formControlName="year">
+                      <option *ngFor="let y of fiscalYearSelectOptions" [ngValue]="y">{{ y }}</option>
+                    </select>
+                  </div>
+                  <div class="col-12 mb-3 fiscal-form-date">
+                    <app-form-field
+                      [control]="fiscalYearForm.controls.startDate"
+                      labelKey="SETTINGS.START_DATE"
+                      icon="start"
+                      type="date"
+                    ></app-form-field>
+                  </div>
+                  <div class="col-12 mb-3 fiscal-form-date">
+                    <app-form-field
+                      [control]="fiscalYearForm.controls.endDate"
+                      labelKey="SETTINGS.END_DATE"
+                      icon="event_available"
+                      type="date"
+                    ></app-form-field>
+                  </div>
+                  <div class="col-12 d-flex justify-content-end">
+                    <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="createYear.emit(fiscalYearForm.value)">
+                      <mat-icon>add_box</mat-icon>
+                      <span>{{ 'SETTINGS.CREATE_FISCAL_YEAR' | translate }}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+          <div class="erp-settings-section h-100">
+            <h4 class="section-title">
+              <mat-icon>history_toggle_off</mat-icon>
+              {{ 'SETTINGS.FISCAL_PERIOD_FORM_TITLE' | translate }}
+            </h4>
+            <div class="card premium-card h-100">
+              <div class="card-body">
+                <form [formGroup]="fiscalPeriodForm" class="row">
+                  <div class="col-12 mb-3">
+                    <app-form-field
+                      [control]="fiscalPeriodForm.controls.fiscalYearId"
+                      labelKey="SETTINGS.SELECT_FISCAL_YEAR"
+                      icon="date_range"
+                      type="select"
+                      [options]="settings?.fiscalYears || []"
+                      optionValueField="id"
+                      optionLabelField="year"
+                    ></app-form-field>
+                  </div>
+                  <div class="col-12 mb-3">
+                    <app-form-field [control]="fiscalPeriodForm.controls.periodName" labelKey="SETTINGS.PERIOD_NAME" icon="title"></app-form-field>
+                  </div>
+                  <div class="col-12 mb-3 fiscal-form-date">
+                    <app-form-field
+                      [control]="fiscalPeriodForm.controls.startDate"
+                      labelKey="SETTINGS.START_DATE"
+                      icon="start"
+                      type="date"
+                    ></app-form-field>
+                  </div>
+                  <div class="col-12 mb-3 fiscal-form-date">
+                    <app-form-field
+                      [control]="fiscalPeriodForm.controls.endDate"
+                      labelKey="SETTINGS.END_DATE"
+                      icon="event_available"
+                      type="date"
+                    ></app-form-field>
+                  </div>
+                  <div class="col-12 d-flex justify-content-end">
+                    <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="createPeriod.emit(fiscalPeriodForm.value)">
+                      <mat-icon>playlist_add</mat-icon>
+                      <span>{{ 'SETTINGS.CREATE_FISCAL_PERIOD' | translate }}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar Sidebar -->
+    <div class="settings-grid__sidebar">
+      <div class="erp-settings-section">
+        <h4 class="section-title">
+          <mat-icon>timeline</mat-icon>
+          {{ 'SETTINGS.FISCAL_CALENDAR' | translate }}
+        </h4>
+        
+        <div class="fiscal-calendar-list">
+          <app-empty-state *ngIf="!settings?.fiscalYears?.length" icon="event_busy" [titleKey]="'SETTINGS.NO_FISCAL_YEARS' | translate"></app-empty-state>
+
+          <div class="year-item-premium" *ngFor="let year of settings?.fiscalYears">
+            <div class="year-item-premium__header">
+              <div class="year-info">
+                <h3>{{ year.year }}</h3>
+                <span class="date-range">{{ year.startDate }} - {{ year.endDate }}</span>
+              </div>
+              <div class="year-controls">
+                <span class="erp-status-chip" [class.is-open]="year.open">{{ (year.open ? 'SETTINGS.OPEN' : 'SETTINGS.CLOSED') | translate }}</span>
+                <button type="button" class="erp-icon-button erp-icon-button--sm" (click)="toggleYear.emit(year)" [ngbTooltip]="'SETTINGS.CLOSE_ACTION' | translate">
+                  <mat-icon>{{ year.open ? 'lock_open' : 'lock' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="period-grid-premium">
+              <div class="period-pill" *ngFor="let period of year.periods" [class.is-open]="period.open">
+                <div class="period-pill__content">
+                  <span class="period-name">{{ period.periodName }}</span>
+                  <span class="period-dates">{{ period.startDate }} - {{ period.endDate }}</span>
+                </div>
+                <button type="button" class="period-toggle-btn" (click)="togglePeriod.emit(period)">
+                  <mat-icon>{{ period.open ? 'check_circle' : 'block' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

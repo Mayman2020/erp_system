@@ -12,14 +12,16 @@ import com.erp.system.auth.dto.AuthResponseDto;
 import com.erp.system.auth.dto.AuthUserDto;
 import com.erp.system.auth.dto.PasswordResetOtpConfirmRequestDto;
 import com.erp.system.auth.dto.PasswordResetOtpSendRequestDto;
-import com.erp.system.auth.dto.UserProfileDto;
+import com.erp.system.auth.dto.UserProfileDtoMapper;
 import com.erp.system.auth.repository.PasswordResetOtpRepository;
 import com.erp.system.auth.repository.UserRepository;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.security.AppUserPrincipal;
 import com.erp.system.common.security.JwtProperties;
+import com.erp.system.auth.util.UserProfileI18n;
 import com.erp.system.common.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -33,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -114,7 +115,11 @@ public class AuthService {
         String username = normalizeIdentifier(request.getUsername());
         String email = normalizeEmail(request.getEmail());
         String phone = normalizePhone(request.getPhone());
-        String fullName = normalizeRequired(request.getFullName());
+        String fullNameEn = coalesceNonBlank(request.getFullNameEn(), request.getFullName());
+        String fullNameAr = coalesceNonBlank(request.getFullNameAr(), request.getFullName());
+        if (fullNameEn.isBlank() || fullNameAr.isBlank()) {
+            throw new BusinessException("AUTH.ERRORS.INVALID_REQUEST");
+        }
 
         ensureUserDoesNotExist(username, email);
 
@@ -127,11 +132,7 @@ public class AuthService {
                 .active(true)
                 .build();
 
-        user.setProfile(UserProfile.builder()
-                .fullName(fullName)
-                .nationalId(normalizeOptional(request.getNationalId()))
-                .companyName(resolveCompanyName(request))
-                .build());
+        user.setProfile(buildProfileForRegister(request, fullNameEn, fullNameAr));
 
         return buildResponse(userRepository.save(user));
     }
@@ -179,14 +180,7 @@ public class AuthService {
                 .roles(accessControlService.authorityCodesFor(user))
                 .active(user.isActive())
                 .createdAt(user.getCreatedAt())
-                .profile(profile == null ? null : UserProfileDto.builder()
-                        .id(profile.getId())
-                        .userId(user.getId())
-                        .fullName(profile.getFullName())
-                        .profileImage(profile.getProfileImage())
-                        .nationalId(profile.getNationalId())
-                        .companyName(profile.getCompanyName())
-                        .build())
+                .profile(UserProfileDtoMapper.from(profile, user.getId(), LocaleContextHolder.getLocale()))
                 .build();
     }
 
@@ -207,18 +201,49 @@ public class AuthService {
 
     private String resolveDisplayName(User user) {
         UserProfile profile = user.getProfile();
-        if (profile != null && profile.getFullName() != null && !profile.getFullName().isBlank()) {
-            return profile.getFullName().trim();
+        if (profile != null) {
+            String localized = UserProfileI18n.resolveFullName(
+                    profile.getFullNameEn(), profile.getFullNameAr(), LocaleContextHolder.getLocale());
+            if (!localized.isBlank()) {
+                return localized;
+            }
         }
         return user.getUsername();
     }
 
-    private String resolveCompanyName(AuthRegisterRequestDto request) {
+    private UserProfile buildProfileForRegister(AuthRegisterRequestDto request, String fullNameEn, String fullNameAr) {
+        String companyNameEn;
+        String companyNameAr;
         if (request.getRegistrationType() == RegistrationType.COMPANY) {
-            String value = normalizeOptional(request.getCompanyName());
-            return value != null ? value : normalizeRequired(request.getFullName());
+            companyNameEn = coalesceNonBlank(request.getCompanyNameEn(), request.getCompanyName(), fullNameEn);
+            companyNameAr = coalesceNonBlank(request.getCompanyNameAr(), request.getCompanyName(), fullNameAr);
+        } else {
+            String en = coalesceNonBlank(request.getCompanyNameEn(), request.getCompanyName());
+            String ar = coalesceNonBlank(request.getCompanyNameAr(), request.getCompanyName());
+            companyNameEn = en.isBlank() ? null : en;
+            companyNameAr = ar.isBlank() ? null : ar;
         }
-        return normalizeOptional(request.getCompanyName());
+        return UserProfile.builder()
+                .fullNameEn(fullNameEn)
+                .fullNameAr(fullNameAr)
+                .fullName(UserProfileI18n.syncLegacyFullName(fullNameEn, fullNameAr))
+                .nationalId(normalizeOptional(request.getNationalId()))
+                .companyNameEn(companyNameEn)
+                .companyNameAr(companyNameAr)
+                .companyName(UserProfileI18n.syncLegacyCompanyName(companyNameEn, companyNameAr))
+                .build();
+    }
+
+    private String coalesceNonBlank(String... parts) {
+        if (parts == null) {
+            return "";
+        }
+        for (String part : parts) {
+            if (part != null && !part.isBlank()) {
+                return part.trim();
+            }
+        }
+        return "";
     }
 
     private String normalizeIdentifier(String value) {

@@ -10,6 +10,7 @@ import {Location} from '@angular/common';
 })
 export class NavItemComponent implements OnInit {
   @Input() item: NavigationItem;
+  @Input() menuIconsOnly = false;
   public flatConfig: any;
   public themeLayout: string;
 

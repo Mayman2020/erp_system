@@ -7,6 +7,7 @@
     "ALL": "All",
     "APPLY": "Apply",
     "CLEAR": "Clear",
+    "TREE_FILTER_ACCOUNTS": "Filter by code, name, or description…",
     "RESET": "Reset",
     "LOADING": "Loading...",
     "PLEASE_WAIT": "Preparing the latest data for you",
@@ -54,7 +55,8 @@
     "RELOAD": "Reload",
     "REMOVE": "Remove",
     "EXPORT_EXCEL": "Export to Excel",
-    "UPGRADE_TO_PRO": "Upgrade to Pro"
+    "UPGRADE_TO_PRO": "Upgrade to Pro",
+    "TABLE_SHOWING": "Showing {{start}}–{{end}} of {{total}}"
   },
   "NAV": {
     "GROUP": "ERP Accounting",
@@ -63,8 +65,8 @@
     "CHART_OF_ACCOUNTS": "Chart of Accounts",
     "JOURNAL_ENTRIES": "Journal Vouchers",
     "JOURNAL_VOUCHERS": "Journal Vouchers",
-    "PAYMENT_VOUCHERS": "Payment Vouchers",
-    "RECEIPT_VOUCHERS": "Receipt Vouchers",
+    "PAYMENT_VOUCHERS": "Payment bonds",
+    "RECEIPT_VOUCHERS": "Collection bonds",
     "TRANSACTIONS": "Transactions",
     "INVOICES": "Invoices",
     "CHECKS": "Checks",
@@ -82,7 +84,8 @@
     "LOOKUPS": "Lookups",
     "SCREENS": "Screens (menu)",
     "TOGGLE_THEME": "Toggle light / dark mode",
-    "TOGGLE_MENU": "Toggle sidebar"
+    "TOGGLE_MENU": "Toggle sidebar",
+    "SIDEBAR_WELCOME": "Welcome"
   },
   "STATUS": {
     "DRAFT": "Draft",
@@ -139,6 +142,8 @@
   "AUTH": {
     "SIGN_IN": "Sign in",
     "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "email@example.com",
+    "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD": "Password",
     "LOGIN": "Login",
     "INVALID_CREDENTIALS": "Invalid credentials",
@@ -160,7 +165,27 @@
     "FOOTER_NOTE": "ERP System - Reliable. Fast. Professional.",
     "ROLE_ADMIN": "Administrator",
     "ROLE_ACCOUNTANT": "Accountant",
-    "LOGOUT": "Sign out"
+    "LOGOUT": "Sign out",
+    "SECURE_LOGIN": "Secure, encrypted sign-in",
+    "SHOW_PASSWORD": "Show password",
+    "HIDE_PASSWORD": "Hide password"
+  },
+  "login": {
+    "logoAlt": "ERP logo",
+    "heroTitle": "Control accounting operations from one trusted place",
+    "heroLead": "A modern sign-in aligned with Hesabaty quality for speed, clarity, and security.",
+    "visionBadge": "Enterprise ERP",
+    "feat1Title": "Protected sessions",
+    "feat1Desc": "Secure authentication and protected sessions",
+    "feat2Title": "Unified workflows",
+    "feat2Desc": "Unified access across accounting workflows",
+    "feat3Title": "Live performance",
+    "feat3Desc": "Real-time visibility into financial performance",
+    "footerBlurb": "A reliable accounting workspace for teams that need clarity, speed, and control.",
+    "footerLinksTitle": "Quick links",
+    "footerOfficeTitle": "Trust",
+    "footerOfficeLine": "Encrypted sign-in · role-based access · audit-ready workflows",
+    "footerCopyright": "© {{year}} — Hesabaty ERP"
   },
   "LANG": {
     "EN": "EN",
@@ -181,8 +206,8 @@
     "CASH_FLOW": "Cash Flow",
     "LATEST_JOURNALS": "Latest Journal Vouchers",
     "LATEST_JOURNAL_VOUCHERS": "Latest Journal Vouchers",
-    "LATEST_PAYMENTS": "Latest Payment Vouchers",
-    "LATEST_RECEIPTS": "Latest Receipt Vouchers",
+    "LATEST_PAYMENTS": "Latest payment bonds",
+    "LATEST_RECEIPTS": "Latest collection bonds",
     "RECEIVABLES_PAYABLES": "Receivables / Payables Summary",
     "RECEIVABLES": "Receivables",
     "PAYABLES_OUTSTANDING": "Payables Outstanding",
@@ -213,7 +238,7 @@
     "TOTAL_ASSETS": "Total Assets",
     "TOTAL_LIABILITIES": "Total Liabilities",
     "TOTAL_EQUITY": "Total Equity",
-    "KPI_POSTED_NOTE": "KPI totals use approved journal entries only. Payment and receipt vouchers affect revenue and expenses once they are approved (a journal entry is created). With date filters, journal entry dates must fall within the selected range."
+    "KPI_POSTED_NOTE": "KPI totals use approved journal entries only. Payment and collection bonds affect revenue and expenses once they are approved (a journal entry is created). With date filters, journal entry dates must fall within the selected range."
   },
   "ACCOUNTS": {
     "TITLE": "Chart of Accounts",
@@ -238,7 +263,11 @@
     "DEACTIVATE_ERROR": "Failed to deactivate account",
     "ACTIVATE_SUCCESS": "Account activated successfully",
     "ACTIVATE_ERROR": "Failed to activate account",
-    "FINANCIAL_STATEMENT": "Financial Statement"
+    "FINANCIAL_STATEMENT": "Financial Statement",
+    "DETAIL_TITLE": "Account details",
+    "LEVEL": "Level",
+    "FULL_PATH": "Full path",
+    "VIEW_DETAIL_HINT": "View full account details"
   },
   "FINANCIAL_STATEMENT": {
     "BALANCE_SHEET": "Balance Sheet",
@@ -324,25 +353,25 @@
     "CUSTOM": "Custom"
   },
   "VOUCHERS": {
-    "TITLE": "Payment and Receipt Vouchers",
-    "CREATE": "Create Voucher",
-    "VIEW_TITLE": "Voucher Details",
-    "EDIT_TITLE": "Edit Voucher",
-    "CONFIRM_APPROVE": "Confirm voucher approval?",
-    "CONFIRM_POST": "Confirm voucher posting?",
-    "CONFIRM_CANCEL": "Confirm voucher cancellation?",
-    "SAVE_SUCCESS": "Voucher saved successfully.",
-    "SAVE_ERROR": "Failed to save voucher.",
+    "TITLE": "Payment & collection bonds",
+    "CREATE": "Create bond",
+    "VIEW_TITLE": "Bond details",
+    "EDIT_TITLE": "Edit bond",
+    "CONFIRM_APPROVE": "Approve this bond?",
+    "CONFIRM_POST": "Post this bond?",
+    "CONFIRM_CANCEL": "Cancel this bond?",
+    "SAVE_SUCCESS": "Bond saved successfully.",
+    "SAVE_ERROR": "Failed to save bond.",
     "WORKFLOW_SUCCESS": "Operation completed successfully.",
     "WORKFLOW_ERROR": "Operation failed.",
-    "ONLY_DRAFT_CAN_APPROVE": "Only draft vouchers can be approved.",
-    "CANNOT_POST_STATUS": "This voucher cannot be posted in its current status.",
+    "ONLY_DRAFT_CAN_APPROVE": "Only draft bonds can be approved.",
+    "CANNOT_POST_STATUS": "This bond cannot be posted in its current status.",
     "FILTER": {
       "MIN_AMOUNT": "Min Amount",
       "MAX_AMOUNT": "Max Amount"
     },
     "LIST": {
-      "NUMBER": "Voucher Number",
+      "NUMBER": "Bond number",
       "DATE": "Date",
       "PARTY": "Beneficiary / Payer",
       "METHOD": "Method",
@@ -353,10 +382,10 @@
       "CREATED_AT": "Created at"
     },
     "FORM": {
-      "DATE": "Voucher Date",
-      "NUMBER": "Voucher Number",
+      "DATE": "Bond date",
+      "NUMBER": "Bond number",
       "NUMBER_PLACEHOLDER": "Assigned after save",
-      "NUMBER_HINT": "The voucher number is generated automatically when you save (sequential numbering).",
+      "NUMBER_HINT": "The bond number is generated automatically when you save (sequential numbering).",
       "BENEFICIARY": "Beneficiary / Payee",
       "PAYER": "Received From",
       "METHOD": "Payment / Receipt Method",
@@ -365,17 +394,17 @@
       "TARGET_ACCOUNT_RECEIPT": "Revenue / Receivable Account",
       "AMOUNT": "Amount",
       "CURRENCY": "Currency",
-      "VOUCHER_TYPE": "Voucher Type",
+      "VOUCHER_TYPE": "Bond type",
       "REFERENCE": "Reference Number",
       "DESCRIPTION": "Description"
     },
     "PAYMENT": {
-      "TITLE": "Payment Vouchers",
-      "CREATE": "Create Payment Voucher"
+      "TITLE": "Payment bonds",
+      "CREATE": "Create payment bond"
     },
     "RECEIPT": {
-      "TITLE": "Receipt Vouchers",
-      "CREATE": "Create Receipt Voucher"
+      "TITLE": "Collection bonds",
+      "CREATE": "Create collection bond"
     }
   },
   "REPORTS": {
@@ -435,8 +464,8 @@
     "REVERSED_AT": "Reversed At",
     "REVERSED_BY": "Reversed By",
     "SOURCE_MANUAL": "Manual Entry",
-    "SOURCE_PAYMENT_VOUCHER": "Payment Voucher",
-    "SOURCE_RECEIPT_VOUCHER": "Receipt Voucher",
+    "SOURCE_PAYMENT_VOUCHER": "Payment bond",
+    "SOURCE_RECEIPT_VOUCHER": "Collection bond",
     "SOURCE_CUSTOMER_INVOICE": "Sales Invoice",
     "SOURCE_BILL": "Purchase Invoice",
     "SOURCE_REVERSAL": "Reversal"
@@ -476,8 +505,8 @@
     "TRANSACTION_TYPE": "Transaction Type",
     "SOURCE_REFERENCE": "Source Reference",
     "TRANSACTION_TYPE_JOURNAL_VOUCHER": "Journal Voucher",
-    "TRANSACTION_TYPE_PAYMENT_VOUCHER": "Payment Voucher",
-    "TRANSACTION_TYPE_RECEIPT_VOUCHER": "Receipt Voucher",
+    "TRANSACTION_TYPE_PAYMENT_VOUCHER": "Payment bond",
+    "TRANSACTION_TYPE_RECEIPT_VOUCHER": "Collection bond",
     "TRANSACTION_TYPE_CUSTOMER_INVOICE": "Sales Invoice",
     "TRANSACTION_TYPE_BILL": "Purchase Invoice",
     "REFERENCE": "Reference",
@@ -487,6 +516,7 @@
     "CREDIT": "Credit",
     "RUNNING_BALANCE": "Running Balance",
     "OPENING_BALANCE": "Opening Balance",
+    "OPENING_BALANCE_HINT": "From Chart of Accounts (detail/leaf accounts). If you set a start date, net posted movement before that date is included.",
     "CLOSING_BALANCE": "Closing Balance",
     "ENTRY_COUNT": "Entries",
     "PERIOD": "Period",
@@ -586,11 +616,15 @@
     "SECURITY": "Security",
     "PREFERENCES": "Preferences",
     "FULL_NAME": "Full Name",
+    "FULL_NAME_EN": "Full name (English)",
+    "FULL_NAME_AR": "Full name (Arabic)",
     "USERNAME": "Username",
     "EMAIL": "Email",
     "PHONE": "Phone Number",
     "NATIONAL_ID": "National ID",
     "COMPANY_NAME": "Company Name",
+    "COMPANY_NAME_EN": "Company name (English)",
+    "COMPANY_NAME_AR": "Company name (Arabic)",
     "ACCOUNT_ROLE": "Account Role",
     "VISUAL_THEME": "Visual Theme",
     "LIGHT_MODE": "Light Mode",
@@ -737,7 +771,11 @@
   },
   "APP": {
     "BRAND": "CoreERP",
-    "RIGHTS_RESERVED": "All rights reserved"
+    "RIGHTS_RESERVED": "All rights reserved",
+    "FOOTER_COPYRIGHT": "© {{year}} CoreERP",
+    "VERSION_LABEL": "Version",
+    "ENV_LOCAL": "Local",
+    "ENV_PRODUCTION": "Production"
   },
   "TRANSACTION_TYPE": {
     "BANK_STATEMENT": "Bank Statement",

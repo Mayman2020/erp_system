@@ -47,7 +47,8 @@ class LedgerServiceTest {
                 .build();
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
-        when(journalEntryLineRepository.findLedgerLines(eq(1L), isNull(), isNull()))
+        when(accountRepository.findLedgerLeafAccountsAmongIds(List.of(1L))).thenReturn(List.of(account));
+        when(journalEntryLineRepository.findLedgerLinesForAccountIds(eq(List.of(1L)), isNull(), isNull()))
                 .thenReturn(Collections.emptyList());
 
         LedgerDisplayDto ledger = ledgerService.getLedger(1L, null, null);
@@ -92,7 +93,8 @@ class LedgerServiceTest {
                 .build();
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
-        when(journalEntryLineRepository.findLedgerLines(eq(1L), isNull(), isNull()))
+        when(accountRepository.findLedgerLeafAccountsAmongIds(List.of(1L))).thenReturn(List.of(account));
+        when(journalEntryLineRepository.findLedgerLinesForAccountIds(eq(List.of(1L)), isNull(), isNull()))
                 .thenReturn(List.of(debitLine, creditLine));
 
         LedgerDisplayDto ledger = ledgerService.getLedger(1L, null, null);
@@ -118,9 +120,10 @@ class LedgerServiceTest {
         LocalDate fromDate = LocalDate.of(2026, 3, 1);
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
-        when(journalEntryLineRepository.sumNetMovementBefore(1L, fromDate))
+        when(accountRepository.findLedgerLeafAccountsAmongIds(List.of(1L))).thenReturn(List.of(account));
+        when(journalEntryLineRepository.sumNetMovementBeforeAccountIds(eq(List.of(1L)), eq(fromDate)))
                 .thenReturn(new BigDecimal("300"));
-        when(journalEntryLineRepository.findLedgerLines(eq(1L), eq(fromDate), isNull()))
+        when(journalEntryLineRepository.findLedgerLinesForAccountIds(eq(List.of(1L)), eq(fromDate), isNull()))
                 .thenReturn(Collections.emptyList());
 
         LedgerDisplayDto ledger = ledgerService.getLedger(1L, fromDate, null);
@@ -164,7 +167,8 @@ class LedgerServiceTest {
                 .build();
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
-        when(journalEntryLineRepository.findLedgerLines(eq(1L), isNull(), isNull()))
+        when(accountRepository.findLedgerLeafAccountsAmongIds(List.of(1L))).thenReturn(List.of(account));
+        when(journalEntryLineRepository.findLedgerLinesForAccountIds(eq(List.of(1L)), isNull(), isNull()))
                 .thenReturn(List.of(originalLine, reversalLine));
 
         LedgerDisplayDto ledger = ledgerService.getLedger(1L, null, null);

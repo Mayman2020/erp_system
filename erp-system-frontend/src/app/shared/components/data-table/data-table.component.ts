@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import * as XLSX from 'xlsx';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { DateFormatService } from '../../../core/services/date-format.service';
@@ -11,6 +11,7 @@ export interface DataTableColumn {
   clickable?: boolean;
   align?: 'start' | 'center' | 'end';
   className?: string;
+  sortable?: boolean;
 }
 
 export interface DataTableAction {
@@ -24,13 +25,15 @@ export interface DataTableAction {
 
 @Component({ standalone: false,
   selector: 'app-data-table',
-  templateUrl: './data-table.component.html'
+  templateUrl: './data-table.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DataTableComponent implements OnChanges {
   @Input() columns: DataTableColumn[] = [];
   @Input() data: Array<Record<string, unknown>> = [];
   @Input() actions: DataTableAction[] = [];
   @Input() loading = false;
+  @Input() skeletonRows = 5;
   @Input() pageSize = 5;
   @Input() page = 1;
   @Input() totalItems: number | null = null;
@@ -39,23 +42,64 @@ export class DataTableComponent implements OnChanges {
   @Input() emptyTitleKey = 'COMMON.NO_DATA';
   @Input() emptyDescriptionKey = 'COMMON.NO_RESULTS_HINT';
   @Input() exportable = true;
+  @Input() filterable = false;
   @Input() exportFileName = 'export';
+
   @Output() actionClick = new EventEmitter<{ actionId: string; row: Record<string, unknown> }>();
   @Output() cellClick = new EventEmitter<{ key: string; row: Record<string, unknown> }>();
   @Output() booleanToggle = new EventEmitter<{ key: string; row: Record<string, unknown>; checked: boolean }>();
   @Output() pageChange = new EventEmitter<number>();
+  @Output() sortChange = new EventEmitter<{ key: string; direction: 'asc' | 'desc' }>();
+  @Output() filterChange = new EventEmitter<string>();
 
-  constructor(
-    private dateFormatService: DateFormatService,
-    private translationService: TranslationService
-  ) {}
-
+  globalFilter = '';
+  sortKey: string | null = null;
+  sortDirection: 'asc' | 'desc' = 'asc';
   currentPage = 1;
   readonly siblingCount = 1;
 
+  constructor(
+    private dateFormatService: DateFormatService,
+    private translationService: TranslationService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  get processedData(): Array<Record<string, unknown>> {
+    let source = this.data || [];
+    
+    // 1. Filter
+    if (this.paginationMode === 'client' && this.globalFilter) {
+      const q = this.globalFilter.toLowerCase();
+      source = source.filter(row => {
+        return this.columns.some(col => {
+          const val = this.formatCellValue(col, row, row[col.key]);
+          return val && val.toLowerCase().includes(q);
+        });
+      });
+    }
+
+    // 2. Sort
+    if (this.paginationMode === 'client' && this.sortKey) {
+      source = [...source].sort((a, b) => {
+        const valA = a[this.sortKey!];
+        const valB = b[this.sortKey!];
+        
+        let comparison = 0;
+        if (typeof valA === 'number' && typeof valB === 'number') {
+          comparison = valA - valB;
+        } else {
+          comparison = String(valA || '').localeCompare(String(valB || ''));
+        }
+        return this.sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    return source;
+  }
+
   get totalPages(): number {
     const size = Math.max(1, this.pageSize || 5);
-    const itemCount = this.paginationMode === 'server' ? Math.max(0, this.totalItems ?? 0) : (this.data || []).length;
+    const itemCount = this.paginationMode === 'server' ? Math.max(0, this.totalItems ?? 0) : this.processedData.length;
     return Math.max(1, Math.ceil(itemCount / size));
   }
 
@@ -63,9 +107,26 @@ export class DataTableComponent implements OnChanges {
     if (this.paginationMode === 'server') {
       return this.data || [];
     }
-    const size = Math.max(1, this.pageSize || 5);
+    const size = this.currentPageSize;
     const start = (this.currentPage - 1) * size;
-    return (this.data || []).slice(start, start + size);
+    return this.processedData.slice(start, start + size);
+  }
+
+  get currentPageSize(): number {
+    return Math.max(1, this.pageSize || 5);
+  }
+
+  get totalItemsCount(): number {
+    return this.paginationMode === 'server' ? (this.totalItems ?? 0) : this.processedData.length;
+  }
+
+  get rangeStart(): number {
+    if (this.totalItemsCount === 0) return 0;
+    return (this.currentPage - 1) * this.currentPageSize + 1;
+  }
+
+  get rangeEnd(): number {
+    return Math.min(this.currentPage * this.currentPageSize, this.totalItemsCount);
   }
 
   visiblePages(): number[] {
@@ -101,6 +162,34 @@ export class DataTableComponent implements OnChanges {
     if (this.paginationMode === 'server') {
       this.pageChange.emit(page);
     }
+    this.cdr.markForCheck();
+  }
+
+  onGlobalFilter(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.globalFilter = target.value;
+    this.currentPage = 1;
+    this.filterChange.emit(this.globalFilter);
+    this.cdr.markForCheck();
+  }
+
+  getSkeletonArray(): number[] {
+    return Array(this.skeletonRows).fill(0);
+  }
+
+  onSort(column: DataTableColumn): void {
+    if (!column.sortable) {
+      return;
+    }
+    if (this.sortKey === column.key) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortKey = column.key;
+      this.sortDirection = 'asc';
+    }
+    this.currentPage = 1;
+    this.sortChange.emit({ key: this.sortKey, direction: this.sortDirection });
+    this.cdr.markForCheck();
   }
 
   onCellClick(column: DataTableColumn, row: Record<string, unknown>): void {
@@ -179,6 +268,12 @@ export class DataTableComponent implements OnChanges {
       const localizedValue = this.resolveLocalizedCellValue(column, row);
       if (localizedValue) {
         return localizedValue;
+      }
+    }
+    if (row && column.kind !== 'localized') {
+      const sibling = this.resolveSiblingLocalizedField(row, column.key);
+      if (sibling) {
+        return sibling;
       }
     }
     if (value === null || value === undefined || value === '') {
@@ -299,5 +394,28 @@ export class DataTableComponent implements OnChanges {
       }
     }
     return '';
+  }
+
+  /**
+   * When a column binds to `name` / `accountName` / `description` etc. and the row has *Ar / *En
+   * siblings, show the value for the active UI language.
+   */
+  private resolveSiblingLocalizedField(row: Record<string, unknown>, key: string): string {
+    if (!key || key.endsWith('Ar') || key.endsWith('En')) {
+      return '';
+    }
+    const arKey = `${key}Ar`;
+    const enKey = `${key}En`;
+    const arVal = row[arKey];
+    const enVal = row[enKey];
+    const ar = typeof arVal === 'string' ? arVal.trim() : '';
+    const en = typeof enVal === 'string' ? enVal.trim() : '';
+    if (!ar && !en) {
+      return '';
+    }
+    if (this.translationService.currentLanguage === 'ar') {
+      return ar || en;
+    }
+    return en || ar;
   }
 }

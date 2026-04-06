@@ -1,5 +1,7 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { finalize } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { finalize, map, takeUntil } from 'rxjs/operators';
 import { DashboardSummary } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -7,16 +9,44 @@ import { AccountingApiService } from '../../core/services/accounting-api.service
 @Component({ standalone: false,
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html',
-  styleUrls: ['./dashboard-page.component.scss']
+  styleUrls: ['./dashboard-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardPageComponent implements OnInit {
   loading = false;
   errorKey = '';
-  summary: DashboardSummary | null = null;
-  monthlySummaries: Array<{ label: string; debit: number; credit: number; cashFlow: number }> = [];
+  
+  private readonly summarySubject = new BehaviorSubject<DashboardSummary | null>(null);
+  public readonly summary$: Observable<DashboardSummary | null> = this.summarySubject.asObservable();
+  private readonly destroy$ = new Subject<void>();
 
-  filterFromDate = '';
-  filterToDate = '';
+  public readonly monthlySummaryRows$: Observable<Array<Record<string, unknown>>> = this.summary$.pipe(
+    map((summary) => {
+      if (!summary) return [];
+      const monthly = this.mapMonthlySummaries(summary);
+      return monthly.map((month) => ({
+        month: month.label,
+        debit: this.formatAmount(month.debit),
+        credit: this.formatAmount(month.credit),
+        cashFlow: this.formatAmount(month.cashFlow)
+      }));
+    })
+  );
+
+  public readonly bankBalanceRows$: Observable<Array<Record<string, unknown>>> = this.summary$.pipe(
+    map((summary) => {
+      if (!summary) return [];
+      return (summary.bankBalances || []).map((item) => ({
+        bankName: item.bankName,
+        accountNumber: item.accountNumber,
+        balance: this.formatAmount(item.balance),
+        currency: item.currency
+      }));
+    })
+  );
+
+  readonly filterFromCtrl = new FormControl('', { nonNullable: true });
+  readonly filterToCtrl = new FormControl('', { nonNullable: true });
 
   revenueExpenseChartId = 'revenue-expense-chart';
   cashFlowChartId = 'cash-flow-chart';
@@ -55,11 +85,18 @@ export class DashboardPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchDashboard();
-    this.translationService.currentLanguage$.subscribe(() => {
-      if (this.summary) {
-        this.buildCharts(this.summary);
+    this.translationService.currentLanguage$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      const summary = this.summarySubject.value;
+      if (summary) {
+        this.buildCharts(summary);
+        this.cdr.markForCheck();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   applyFilter(): void {
@@ -67,8 +104,8 @@ export class DashboardPageComponent implements OnInit {
   }
 
   resetFilter(): void {
-    this.filterFromDate = '';
-    this.filterToDate = '';
+    this.filterFromCtrl.setValue('');
+    this.filterToCtrl.setValue('');
     this.fetchDashboard();
   }
 
@@ -77,26 +114,31 @@ export class DashboardPageComponent implements OnInit {
     this.errorKey = '';
 
     const filters: { fromDate?: string; toDate?: string } = {};
-    if (this.filterFromDate) { filters.fromDate = this.filterFromDate; }
-    if (this.filterToDate) { filters.toDate = this.filterToDate; }
+    const fromDate = (this.filterFromCtrl.value || '').trim();
+    const toDate = (this.filterToCtrl.value || '').trim();
+    if (fromDate) {
+      filters.fromDate = fromDate;
+    }
+    if (toDate) {
+      filters.toDate = toDate;
+    }
 
     this.api
       .getDashboardSummary(filters)
       .pipe(
         finalize(() => {
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (summary) => {
           if (summary == null) {
-            this.summary = null;
+            this.summarySubject.next(null);
             this.errorKey = 'COMMON.ERROR_LOADING';
             return;
           }
-          this.summary = summary;
-          this.monthlySummaries = this.mapMonthlySummaries(summary);
+          this.summarySubject.next(summary);
           this.buildCharts(summary);
         },
         error: () => {
@@ -106,21 +148,11 @@ export class DashboardPageComponent implements OnInit {
   }
 
   toMonthlySummaryRows(): Array<Record<string, unknown>> {
-    return (this.monthlySummaries || []).map((month) => ({
-      month: month.label,
-      debit: this.formatAmount(month.debit),
-      credit: this.formatAmount(month.credit),
-      cashFlow: this.formatAmount(month.cashFlow)
-    }));
+    return []; // Obsolete: used monthlySummaryRows$ instead
   }
 
   toBankBalanceRows(): Array<Record<string, unknown>> {
-    return (this.summary?.bankBalances || []).map((item) => ({
-      bankName: item.bankName,
-      accountNumber: item.accountNumber,
-      balance: this.formatAmount(item.balance),
-      currency: item.currency
-    }));
+    return []; // Obsolete: used bankBalanceRows$ instead
   }
 
   recentActivityConfig = [
@@ -140,7 +172,7 @@ export class DashboardPageComponent implements OnInit {
   }
 
   get hasBudgetData(): boolean {
-    return !!(this.summary?.budgetSummaries?.length);
+    return !!(this.summarySubject.value?.budgetSummaries?.length);
   }
 
   private mapMonthlySummaries(summary: DashboardSummary): Array<{ label: string; debit: number; credit: number; cashFlow: number }> {
@@ -190,7 +222,10 @@ export class DashboardPageComponent implements OnInit {
   }
 
   private buildCashFlowChart(labels: string[], t: (k: string) => string): void {
-    const data = this.monthlySummaries.map((item) => item.cashFlow);
+    const summary = this.summarySubject.value;
+    if (!summary) return;
+    const monthly = this.mapMonthlySummaries(summary);
+    const data = monthly.map((item) => item.cashFlow);
     const positive = data.map(v => v >= 0 ? v : 0);
     const negative = data.map(v => v < 0 ? v : 0);
 

@@ -1,6 +1,7 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { finalize, map } from 'rxjs/operators';
 import { JournalEntry } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -10,13 +11,17 @@ import { DataTableColumn, DataTableAction } from '../../shared/components/data-t
   standalone: false,
   selector: 'app-general-ledger-list',
   templateUrl: './general-ledger-list.component.html',
-  styleUrls: ['./general-ledger-list.component.scss']
+  styleUrls: ['./general-ledger-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GeneralLedgerListComponent implements OnInit {
   loading = false;
   errorKey = '';
-  entries: JournalEntry[] = [];
-  rows: Array<Record<string, unknown>> = [];
+  
+  private readonly entriesSubject = new BehaviorSubject<JournalEntry[]>([]);
+  public readonly rows$: Observable<Array<Record<string, unknown>>> = this.entriesSubject.asObservable().pipe(
+    map((items) => items.map((e) => this.toRow(e)))
+  );
 
   filters = {
     query: '',
@@ -72,15 +77,17 @@ export class GeneralLedgerListComponent implements OnInit {
         fromDate: this.filters.fromDate,
         toDate: this.filters.toDate
       })
-      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .pipe(finalize(() => { 
+        this.loading = false; 
+        this.cdr.markForCheck(); 
+      }))
       .subscribe({
         next: (items) => {
-          this.entries = items;
-          this.rows = items.map((e) => this.toRow(e));
+          this.entriesSubject.next(items);
         },
         error: () => {
           this.errorKey = 'COMMON.ERROR_LOADING';
-          this.rows = [];
+          this.entriesSubject.next([]);
         }
       });
   }

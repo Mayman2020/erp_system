@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
+import { finalize, map } from 'rxjs/operators';
 import { AccountDto, AccountFormDto, AccountTreeDto, AccountingType } from '../../core/models/accounting.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 import { LookupItem } from '../../core/models/lookup.models';
@@ -13,7 +13,8 @@ import { ConfirmDialogService } from '../../core/services/confirm-dialog.service
   standalone: false,
   selector: 'app-accounts-page',
   templateUrl: './accounts-page.component.html',
-  styleUrls: ['./accounts-page.component.scss']
+  styleUrls: ['./accounts-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountsPageComponent implements OnInit {
   loading = false;
@@ -23,9 +24,16 @@ export class AccountsPageComponent implements OnInit {
 
   accountTypeOptions: LookupItem[] = [];
   statusOptions: LookupItem[] = [];
-  rows: AccountDto[] = [];
-  pagedRows: AccountDto[] = [];
-  treeRows: AccountTreeDto[] = [];
+  
+  private readonly rowsSubject = new BehaviorSubject<AccountDto[]>([]);
+  public readonly pagedRows$: Observable<AccountDto[]> = this.rowsSubject.asObservable().pipe(
+    map(rows => this.applyTableState(rows))
+  );
+
+  private readonly treeRowsSubject = new BehaviorSubject<AccountTreeDto[]>([]);
+  public readonly treeRows$: Observable<AccountTreeDto[]> = this.treeRowsSubject.asObservable();
+
+  private rawRows: AccountDto[] = [];
 
   query = '';
   selectedType: AccountingType | '' = '';
@@ -99,13 +107,17 @@ export class AccountsPageComponent implements OnInit {
 
   onFinancialStatementFilterChange(value: '' | 'BALANCE_SHEET' | 'INCOME_STATEMENT'): void {
     this.selectedFinancialStatement = value;
-    this.applyTableState();
+    this.refreshTable();
+  }
+
+  refreshTable(): void {
+    this.rowsSubject.next([...this.rawRows]);
   }
 
   setSort(field: 'code' | 'name' | 'accountType', direction: 'asc' | 'desc'): void {
     this.sortBy = field;
     this.sortDir = direction;
-    this.applyTableState();
+    this.refreshTable();
   }
 
   openCreateDialog(): void {
@@ -147,7 +159,7 @@ export class AccountsPageComponent implements OnInit {
 
   toggleTreeView(): void {
     this.viewMode = this.viewMode === 'table' ? 'tree' : 'table';
-    if (this.viewMode === 'tree' && !this.treeRows.length) {
+    if (this.viewMode === 'tree' && !this.treeRowsSubject.value.length) {
       this.loadAccountTree();
     }
   }
@@ -220,7 +232,7 @@ export class AccountsPageComponent implements OnInit {
   }
 
   onTableAction(event: { actionId: string; row: Record<string, unknown> }): void {
-    const account = this.rows.find((item) => item.id === Number(event.row.id));
+    const account = this.rawRows.find((item) => item.id === Number(event.row.id));
     if (!account) {
       return;
     }
@@ -270,16 +282,18 @@ export class AccountsPageComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (rows) => {
-          this.rows = rows || [];
-          this.applyTableState();
+          this.rawRows = rows || [];
+          this.refreshTable();
         },
         error: () => {
           this.errorKey = 'COMMON.ERROR_LOADING';
+          this.rawRows = [];
+          this.refreshTable();
         }
       });
   }
@@ -287,18 +301,18 @@ export class AccountsPageComponent implements OnInit {
   private loadAccountTree(): void {
     this.api.getAccountTree().subscribe({
       next: (tree) => {
-        this.treeRows = tree || [];
+        this.treeRowsSubject.next(tree || []);
       },
       error: () => {
-        this.treeRows = [];
+        this.treeRowsSubject.next([]);
       }
     });
   }
 
-  private applyTableState(): void {
+  private applyTableState(rows: AccountDto[]): AccountDto[] {
     const filtered = this.selectedFinancialStatement
-      ? this.rows.filter((row) => row.financialStatement === this.selectedFinancialStatement)
-      : this.rows;
+      ? rows.filter((row) => row.financialStatement === this.selectedFinancialStatement)
+      : rows;
     const sorted = [...filtered].sort((a, b) => {
       const aValue = (a[this.sortBy] || '').toString().toLowerCase();
       const bValue = (b[this.sortBy] || '').toString().toLowerCase();
@@ -306,7 +320,7 @@ export class AccountsPageComponent implements OnInit {
       return this.sortDir === 'asc' ? result : -result;
     });
 
-    this.pagedRows = sorted.map((row) => ({
+    return sorted.map((row) => ({
       ...row,
       status: row.active ? 'ACTIVE' : 'INACTIVE'
     }));

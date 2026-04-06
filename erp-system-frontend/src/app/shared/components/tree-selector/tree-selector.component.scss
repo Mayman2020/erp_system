@@ -2,6 +2,34 @@
   display: block;
 }
 
+.erp-tree-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--erp-space-2);
+  margin-bottom: var(--erp-space-3);
+  padding: var(--erp-space-2) var(--erp-space-3);
+  border-radius: var(--erp-radius-md);
+  border: 1px solid var(--erp-border);
+  background: var(--erp-bg-muted);
+}
+
+.erp-tree-filter mat-icon {
+  flex: 0 0 auto;
+  color: var(--erp-text-secondary);
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.erp-tree-filter__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius-input);
+  background: var(--erp-bg-card);
+}
+
 .erp-tree,
 .erp-tree__children {
   list-style: none;
@@ -87,21 +115,64 @@
   pointer-events: none;
 }
 
-.erp-tree__label {
+.erp-tree__pick {
   min-width: 0;
-  width: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--erp-space-2);
+}
+
+.erp-tree__pick-code {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 48%;
   border: 0;
   background: transparent;
   padding: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--erp-space-2);
   color: var(--erp-text);
   text-align: start;
+  cursor: pointer;
 }
 
-.erp-tree__label:disabled {
+.erp-tree__pick-code:disabled {
   cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.erp-tree__pick-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 4px 2px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--erp-info, #2563eb);
+  text-align: start;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--erp-info, #2563eb) 45%, transparent);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.erp-tree__pick-name:hover {
+  color: color-mix(in srgb, var(--erp-info, #2563eb) 88%, #000);
+}
+
+.erp-tree__code {
+  font-size: 13px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .erp-tree__icon {
@@ -114,29 +185,6 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-}
-
-.erp-tree__text {
-  min-width: 0;
-  display: grid;
-  gap: 2px;
-}
-
-.erp-tree__text strong,
-.erp-tree__text span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.erp-tree__text strong {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.erp-tree__text span {
-  font-size: 12px;
-  color: var(--erp-text-secondary);
 }
 
 .erp-tree__meta {
@@ -180,4 +228,40 @@
   .erp-tree__content {
     width: 100%;
   }
+}
+
+.erp-account-detail {
+  margin: 0;
+  display: grid;
+  gap: var(--erp-space-2);
+}
+
+.erp-account-detail__row {
+  display: grid;
+  grid-template-columns: minmax(140px, 34%) 1fr;
+  gap: var(--erp-space-2);
+  align-items: start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--erp-border);
+  font-size: 0.9375rem;
+}
+
+.erp-account-detail__row:last-child {
+  border-bottom: 0;
+}
+
+.erp-account-detail__row dt {
+  margin: 0;
+  font-weight: 700;
+  color: var(--erp-text-muted);
+}
+
+.erp-account-detail__row dd {
+  margin: 0;
+  color: var(--erp-text);
+  word-break: break-word;
+}
+
+.erp-account-detail__multiline {
+  white-space: pre-wrap;
 }

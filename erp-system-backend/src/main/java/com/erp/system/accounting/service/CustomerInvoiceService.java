@@ -10,6 +10,7 @@ import com.erp.system.accounting.dto.form.CustomerInvoiceFormDto;
 import com.erp.system.accounting.dto.form.CustomerInvoiceLineFormDto;
 import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.repository.CustomerInvoiceRepository;
+import com.erp.system.accounting.support.JournalPostingNarratives;
 import com.erp.system.accounting.repository.ReceiptVoucherRepository;
 import com.erp.system.common.enums.AccountingType;
 import com.erp.system.common.enums.InvoiceStatus;
@@ -90,26 +91,34 @@ public class CustomerInvoiceService {
             throw new BusinessException("Only draft invoices can be posted");
         }
 
+        String entryNarrative = JournalPostingNarratives.entryHeader(
+                invoice.getDescription(),
+                JournalPostingNarratives.SALES_INVOICE,
+                invoice.getInvoiceNumber());
+        Account receivable = invoice.getReceivableAccount();
         List<AccountingPostingService.JournalLineDraft> journalLines = new ArrayList<>();
         journalLines.add(AccountingPostingService.JournalLineDraft.builder()
-                .accountId(invoice.getReceivableAccount().getId())
-                .description("Customer receivable")
+                .accountId(receivable.getId())
+                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, receivable, true))
                 .debit(invoice.getTotalAmount())
                 .credit(BigDecimal.ZERO)
                 .build());
 
         for (CustomerInvoiceLine line : invoice.getLines()) {
+            Account lineAccount = line.getAccount();
             journalLines.add(AccountingPostingService.JournalLineDraft.builder()
-                    .accountId(line.getAccount().getId())
-                    .description(line.getDescription())
+                    .accountId(lineAccount.getId())
+                    .description(JournalPostingNarratives.lineDescriptionOrFallback(line.getDescription(), entryNarrative, lineAccount, false))
                     .debit(BigDecimal.ZERO)
                     .credit(line.getLineTotal())
                     .build());
         }
         if (invoice.getTaxAmount().compareTo(BigDecimal.ZERO) > 0) {
+            Account taxRevenueAccount = invoice.getRevenueAccount();
             journalLines.add(AccountingPostingService.JournalLineDraft.builder()
-                    .accountId(invoice.getRevenueAccount().getId())
-                    .description("Invoice tax allocation")
+                    .accountId(taxRevenueAccount.getId())
+                    .description(JournalPostingNarratives.lineWithAccount(entryNarrative, taxRevenueAccount, false)
+                            + " · ضريبة | Tax")
                     .debit(BigDecimal.ZERO)
                     .credit(invoice.getTaxAmount())
                     .build());
@@ -117,7 +126,7 @@ public class CustomerInvoiceService {
 
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 invoice.getInvoiceDate(),
-                invoice.getDescription(),
+                entryNarrative,
                 "CUSTOMER_INVOICE",
                 invoice.getId(),
                 actor,

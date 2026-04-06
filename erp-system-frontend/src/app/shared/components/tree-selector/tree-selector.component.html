@@ -1,3 +1,14 @@
+<div class="erp-tree-filter" *ngIf="showFilter">
+  <mat-icon aria-hidden="true">filter_alt</mat-icon>
+  <input
+    type="search"
+    class="erp-input erp-tree-filter__input"
+    [attr.placeholder]="filterPlaceholderKey | translate"
+    [value]="filterText"
+    (input)="onFilterInput($any($event.target).value)"
+  />
+</div>
+
 <ng-template #treeNode let-node let-level="level">
   <li class="erp-tree__item" [class.is-selected]="selectedId === node.id" [class.is-disabled]="!isSelectable(node)">
     <div class="erp-tree__row" [ngClass]="'erp-tree__row--level-' + normalizeLevel(level)">
@@ -14,15 +25,22 @@
 
         <span class="erp-tree__toggle erp-tree__toggle--placeholder" *ngIf="!node.children?.length" aria-hidden="true"></span>
 
-        <button type="button" class="erp-tree__label" [disabled]="!isSelectable(node)" (click)="selectNode(node)">
-          <span class="erp-tree__icon">
-            <mat-icon aria-hidden="true">{{ icon(node.accountType) }}</mat-icon>
-          </span>
-          <span class="erp-tree__text">
-            <strong>{{ node.code }}</strong>
-            <span>{{ label(node) }}</span>
-          </span>
-        </button>
+        <div class="erp-tree__pick">
+          <button type="button" class="erp-tree__pick-code" [disabled]="!isSelectable(node)" (click)="selectNode(node)">
+            <span class="erp-tree__icon">
+              <mat-icon aria-hidden="true">{{ icon(node.accountType) }}</mat-icon>
+            </span>
+            <strong class="erp-tree__code">{{ node.code }}</strong>
+          </button>
+          <button
+            type="button"
+            class="erp-tree__pick-name"
+            [attr.title]="'ACCOUNTS.VIEW_DETAIL_HINT' | translate"
+            (click)="onAccountNameClick($event, node)"
+          >
+            {{ label(node) }}
+          </button>
+        </div>
       </div>
 
       <span class="erp-tree__meta erp-tree__meta--badges" *ngIf="node.accountType || node.financialStatement">
@@ -40,7 +58,71 @@
 </ng-template>
 
 <ul class="erp-tree">
-  <ng-container *ngFor="let node of nodes">
+  <ng-container *ngFor="let node of displayNodes">
     <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: node, level: 0 }"></ng-container>
   </ng-container>
 </ul>
+
+<app-erp-dialog
+  [visible]="detailVisible"
+  titleKey="ACCOUNTS.DETAIL_TITLE"
+  size="lg"
+  surfaceClass="erp-tree-account-detail-dialog"
+  (close)="closeAccountDetail()"
+>
+  <div dialog-body>
+    <p class="text-muted mb-3" *ngIf="detailLoading">{{ 'COMMON.LOADING' | translate }}</p>
+    <div class="alert alert-danger py-2" *ngIf="detailErrorKey && !detailLoading">{{ detailErrorKey | translate }}</div>
+    <dl class="erp-account-detail" *ngIf="detailAccount && !detailLoading">
+      <div class="erp-account-detail__row">
+        <dt>{{ 'ACCOUNTS.CODE' | translate }}</dt>
+        <dd>{{ detailAccount.code }}</dd>
+      </div>
+      <div class="erp-account-detail__row">
+        <dt>{{ 'ACCOUNTS.NAME_EN' | translate }}</dt>
+        <dd>{{ detailAccount.nameEn || detailAccount.name || '—' }}</dd>
+      </div>
+      <div class="erp-account-detail__row">
+        <dt>{{ 'ACCOUNTS.NAME_AR' | translate }}</dt>
+        <dd>{{ detailAccount.nameAr || '—' }}</dd>
+      </div>
+      <div class="erp-account-detail__row">
+        <dt>{{ 'ACCOUNTS.TYPE' | translate }}</dt>
+        <dd>{{ ('ACCOUNT_TYPE.' + detailAccount.accountType) | translate }}</dd>
+      </div>
+      <div class="erp-account-detail__row">
+        <dt>{{ 'ACCOUNTS.LEVEL' | translate }}</dt>
+        <dd>{{ detailAccount.level }}</dd>
+      </div>
+      <div class="erp-account-detail__row">
+        <dt>{{ 'ACCOUNTS.FULL_PATH' | translate }}</dt>
+        <dd class="erp-account-detail__multiline">{{ detailAccount.fullPath || '—' }}</dd>
+      </div>
+      <div class="erp-account-detail__row">
+        <dt>{{ 'ACCOUNTS.PARENT' | translate }}</dt>
+        <dd>{{ detailAccount.parentCode || '—' }}</dd>
+      </div>
+      <div class="erp-account-detail__row" *ngIf="detailAccount.financialStatement">
+        <dt>{{ 'ACCOUNTS.FINANCIAL_STATEMENT' | translate }}</dt>
+        <dd>{{ ('FINANCIAL_STATEMENT.' + detailAccount.financialStatement) | translate }}</dd>
+      </div>
+      <div class="erp-account-detail__row">
+        <dt>{{ 'COMMON.STATUS' | translate }}</dt>
+        <dd>{{ (detailAccount.active ? 'STATUS.ACTIVE' : 'STATUS.INACTIVE') | translate }}</dd>
+      </div>
+      <div class="erp-account-detail__row">
+        <dt>{{ 'ACCOUNTS.OPENING_BALANCE' | translate }}</dt>
+        <dd>{{ detailAccount.openingBalance | number:'1.2-2' }}</dd>
+      </div>
+      <div class="erp-account-detail__row" *ngIf="detailAccount.openingBalanceSide">
+        <dt>{{ 'ACCOUNTS.OPENING_BALANCE_SIDE' | translate }}</dt>
+        <dd>{{ ('BALANCE_SIDE.' + detailAccount.openingBalanceSide) | translate }}</dd>
+      </div>
+    </dl>
+  </div>
+  <div dialog-footer class="erp-dialog-actions">
+    <button type="button" class="erp-button erp-button--primary" (click)="closeAccountDetail()">
+      {{ 'COMMON.CLOSE' | translate }}
+    </button>
+  </div>
+</app-erp-dialog>

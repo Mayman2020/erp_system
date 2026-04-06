@@ -18,6 +18,8 @@ export class AccountTreePickerComponent implements ControlValueAccessor, OnChang
   @Input() labelKey = 'JOURNAL.ACCOUNT';
   @Input() icon = 'account_balance';
   @Input() minSelectableLevel = 1;
+  /** When true, nodes that have children (parent accounts) cannot be selected — only leaf accounts. */
+  @Input() selectableLeafOnly = false;
   @Input() nullable = false;
 
   dialogVisible = false;

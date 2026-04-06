@@ -1,6 +1,18 @@
 <ng-container *ngIf="!item.hidden">
   <li class="erp-nav-item" [ngClass]="item.classes" *ngIf="item.url && !item.external" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }">
-    <a class="nav-link erp-nav-link" [target]="item.target ? '_blank' : '_self'" [routerLink]="[item.url]" (click)="closeOtherMenu($event)">
+    <a
+      class="nav-link erp-nav-link"
+      [target]="item.target ? '_blank' : '_self'"
+      [routerLink]="[item.url]"
+      (click)="closeOtherMenu($event)"
+      [attr.title]="menuIconsOnly ? null : (item.title | translate)"
+      [attr.aria-label]="item.title | translate"
+      [ngbTooltip]="menuIconsOnly ? (item.title | translate) : null"
+      placement="end"
+      container="body"
+      triggers="mouseenter:mouseleave"
+      [openDelay]="200"
+    >
       <ng-container *ngTemplateOutlet="itemIcon"></ng-container>
       <span class="pcoded-mtext" *ngIf="item.icon; else directTitle">{{ item.title | translate }}</span>
       <ng-template #directTitle>
@@ -10,7 +22,18 @@
     </a>
   </li>
   <li class="erp-nav-item" [ngClass]="item.classes" *ngIf="item.url && item.external">
-    <a class="erp-nav-link" [target]="item.target ? '_blank' : '_self'" [href]="item.url">
+    <a
+      class="nav-link erp-nav-link"
+      [target]="item.target ? '_blank' : '_self'"
+      [href]="item.url"
+      [attr.title]="menuIconsOnly ? null : (item.title | translate)"
+      [attr.aria-label]="item.title | translate"
+      [ngbTooltip]="menuIconsOnly ? (item.title | translate) : null"
+      placement="end"
+      container="body"
+      triggers="mouseenter:mouseleave"
+      [openDelay]="200"
+    >
       <ng-container *ngTemplateOutlet="itemIcon"></ng-container>
       <span class="pcoded-mtext" *ngIf="item.icon; else directTitle">{{ item.title | translate }}</span>
       <ng-template #directTitle>

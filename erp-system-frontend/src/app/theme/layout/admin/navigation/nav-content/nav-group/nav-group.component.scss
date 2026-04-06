@@ -8,9 +8,13 @@
     align-items: center;
     gap: var(--erp-space-2);
     width: 100%;
-    min-height: 44px;
-    padding-inline-end: 14px;
-    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    min-width: 0;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 12px;
+    transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.92);
   }
 
   > .erp-nav-module-group__head::after {
@@ -18,30 +22,51 @@
     content: none !important;
   }
 
+  .pcoded-mtext {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.875rem;
+  }
+
   .pcoded-micon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    min-width: 20px;
-    height: 20px;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    transition: background 0.22s ease, transform 0.22s ease, color 0.22s ease;
+    color: rgba(255, 255, 255, 0.9);
   }
 
-  .pcoded-mtext {
-    flex: 1 1 auto;
-    min-width: 0;
+  .pcoded-micon .mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 
   .erp-nav-module-group__children {
     width: 100%;
     min-width: 0;
-    margin: var(--erp-space-1) 0 0;
+    margin: 4px 0 0;
     padding: 0;
+    padding-inline-start: 6px;
   }
 
-  > .erp-nav-module-group__head:hover,
+  > .erp-nav-module-group__head:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(2px);
+  }
+
+  > .erp-nav-module-group__head:hover .pcoded-micon {
+    background: rgba(255, 255, 255, 0.14);
+    transform: scale(1.03);
+  }
+
   &.pcoded-trigger > .erp-nav-module-group__head {
-    background: var(--bg-hover);
+    background: rgba(255, 255, 255, 0.08);
   }
 
   &:not(.pcoded-trigger) .erp-nav-module-group__children {
@@ -51,4 +76,8 @@
   &.pcoded-trigger .erp-nav-module-group__children {
     display: block;
   }
+}
+
+:host-context(body.rtl) .erp-nav-module-group > .erp-nav-module-group__head:hover {
+  transform: translateX(-2px);
 }

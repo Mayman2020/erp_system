@@ -1,22 +1,34 @@
 <section class="erp-page">
   <app-page-header titleKey="DASHBOARD.TITLE"></app-page-header>
 
-  <!-- Date Filter -->
+  <!-- Date Filter: from → to → search / reset -->
   <div class="dash-filter-bar">
-    <div class="dash-filter-bar__group">
-      <label class="dash-filter-bar__label">{{ 'DASHBOARD.FROM_DATE' | translate }}</label>
-      <input type="date" class="erp-input erp-input--sm" [(ngModel)]="filterFromDate" />
-    </div>
-    <div class="dash-filter-bar__group">
-      <label class="dash-filter-bar__label">{{ 'DASHBOARD.TO_DATE' | translate }}</label>
-      <input type="date" class="erp-input erp-input--sm" [(ngModel)]="filterToDate" />
+    <div class="dash-filter-bar__dates">
+      <div class="dash-filter-bar__group">
+        <app-form-field
+          class="dash-filter-bar__date"
+          [control]="filterFromCtrl"
+          labelKey="DASHBOARD.FROM_DATE"
+          icon="calendar_month"
+          type="date"
+        ></app-form-field>
+      </div>
+      <div class="dash-filter-bar__group">
+        <app-form-field
+          class="dash-filter-bar__date"
+          [control]="filterToCtrl"
+          labelKey="DASHBOARD.TO_DATE"
+          icon="event"
+          type="date"
+        ></app-form-field>
+      </div>
     </div>
     <div class="dash-filter-bar__actions">
-      <button class="erp-button erp-button--primary erp-button--sm" (click)="applyFilter()">
+      <button type="button" class="erp-button erp-button--primary erp-button--sm" (click)="applyFilter()">
         <mat-icon aria-hidden="true">search</mat-icon>
         {{ 'COMMON.SEARCH' | translate }}
       </button>
-      <button class="erp-button erp-button--outline erp-button--sm" (click)="resetFilter()">
+      <button type="button" class="erp-button erp-button--outline erp-button--sm" (click)="resetFilter()">
         <mat-icon aria-hidden="true">restart_alt</mat-icon>
         {{ 'COMMON.RESET' | translate }}
       </button>
@@ -25,7 +37,7 @@
 
   <p class="dash-kpi-hint small text-muted mb-3">{{ 'DASHBOARD.KPI_POSTED_NOTE' | translate }}</p>
 
-<div class="row dashboard-grid" *ngIf="!loading && !errorKey && summary; else dashboardState">
+<div class="row dashboard-grid" *ngIf="!loading && !errorKey && (summary$ | async) as summary; else dashboardState">
 
   <!-- KPI Cards Row: Income Statement -->
   <div class="col-xl-4 col-md-6">
@@ -207,11 +219,11 @@
       <div class="dash-chart-card__header">
         <h5>{{ 'DASHBOARD.MONTHLY_FINANCIAL_SUMMARY' | translate }}</h5>
       </div>
-      <div class="dash-chart-card__body" *ngIf="monthlySummaries?.length; else monthlyEmpty">
+      <div class="dash-chart-card__body" *ngIf="(monthlySummaryRows$ | async) as monthRows; else monthlyEmpty">
         <app-data-table
+          *ngIf="monthRows.length > 0; else monthlyEmpty"
           [columns]="monthlySummaryColumns"
-          [data]="toMonthlySummaryRows()"
-          [pageSize]="5"
+          [data]="monthRows"
           [compact]="true"
           [exportable]="false"
         ></app-data-table>
@@ -225,21 +237,19 @@
       [titleKey]="activity.titleKey"
       [kind]="activity.kind"
       [viewAllLink]="activity.viewAllLink"
-      [pageSize]="5"
     ></app-recent-activity-table>
   </div>
 
   <!-- Bank Balances Table -->
-  <div class="col-12">
+  <div class="col-12" *ngIf="(bankBalanceRows$ | async) as bankRows">
     <div class="dash-chart-card">
       <div class="dash-chart-card__header">
         <h5>{{ 'DASHBOARD.BANK_BALANCES' | translate }}</h5>
       </div>
-      <div class="dash-chart-card__body" *ngIf="summary.bankBalances?.length; else banksEmpty">
+      <div class="dash-chart-card__body" *ngIf="bankRows.length > 0; else banksEmpty">
         <app-data-table
           [columns]="bankBalanceColumns"
-          [data]="toBankBalanceRows()"
-          [pageSize]="5"
+          [data]="bankRows"
           [exportable]="false"
         ></app-data-table>
       </div>

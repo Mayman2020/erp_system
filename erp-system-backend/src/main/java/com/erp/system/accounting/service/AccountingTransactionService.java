@@ -7,6 +7,7 @@ import com.erp.system.accounting.dto.display.AccountingTransactionDisplayDto;
 import com.erp.system.accounting.dto.form.AccountingTransactionFormDto;
 import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.repository.AccountingTransactionRepository;
+import com.erp.system.accounting.support.JournalPostingNarratives;
 import com.erp.system.common.enums.AccountingType;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.common.enums.TransactionType;
@@ -92,22 +93,26 @@ public class AccountingTransactionService {
         Account debitAccount = resolveDebitAccount(transaction);
         Account creditAccount = resolveCreditAccount(transaction);
 
+        String entryNarrative = JournalPostingNarratives.entryHeader(
+                transaction.getDescription(),
+                JournalPostingNarratives.transactionTypeDefault(transaction.getTransactionType()),
+                transaction.getReference());
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 transaction.getTransactionDate(),
-                transaction.getDescription(),
+                entryNarrative,
                 "TRANSACTION",
                 transaction.getId(),
                 actor,
                 List.of(
                         AccountingPostingService.JournalLineDraft.builder()
                                 .accountId(debitAccount.getId())
-                                .description(transaction.getTransactionType() + " debit")
+                                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, debitAccount, true))
                                 .debit(transaction.getAmount())
                                 .credit(BigDecimal.ZERO)
                                 .build(),
                         AccountingPostingService.JournalLineDraft.builder()
                                 .accountId(creditAccount.getId())
-                                .description(transaction.getTransactionType() + " credit")
+                                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, creditAccount, false))
                                 .debit(BigDecimal.ZERO)
                                 .credit(transaction.getAmount())
                                 .build()

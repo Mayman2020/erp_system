@@ -4,7 +4,9 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:8091/api/v1'
+  apiBaseUrl: 'http://localhost:8091/api/v1',
+  /** Shown in shell footer (aligned with package.json for releases). */
+  appVersion: '21.0.0'
 };
 
 /*

@@ -1,8 +1,6 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { TranslationService } from '../../../core/i18n/translation.service';
-import { DateFormatService } from '../../../core/services/date-format.service';
 
 @Component({ standalone: false,
   selector: 'app-form-field',
@@ -40,38 +38,22 @@ import { DateFormatService } from '../../../core/services/date-format.service';
           </select>
 
           <ng-container *ngSwitchCase="'date'">
-            <input
-              class="erp-input erp-input--date"
-              [id]="inputId"
-              type="text"
-              [value]="dateDisplayValue"
-              [readonly]="readonly"
-              [disabled]="isDisabled"
-              [attr.placeholder]="''"
-              inputmode="numeric"
-              maxlength="10"
-              (input)="onDateInput($event)"
-              (blur)="onDateBlur()"
-            />
             <button
-              *ngIf="icon"
               type="button"
-              class="erp-form-field__date-button"
-              [disabled]="isDisabled || readonly"
-              (click)="openNativeDatePicker(nativeDateInput)"
+              class="erp-form-field__date-opener"
+              (click)="openDatePicker($event)"
+              [disabled]="isDisabled"
+              [attr.aria-label]="labelKey | translate"
             >
-              <mat-icon aria-hidden="true">{{ icon }}</mat-icon>
+              <mat-icon aria-hidden="true">{{ dateIconGlyph }}</mat-icon>
             </button>
             <input
-              #nativeDateInput
-              class="erp-form-field__native-date"
+              #dateInputRef
+              class="erp-input erp-input--date"
+              [id]="inputId"
               type="date"
-              [value]="control?.value || ''"
-              [disabled]="isDisabled || readonly"
-              tabindex="-1"
-              aria-hidden="true"
-              (input)="onNativeDateChange($event)"
-              (change)="onNativeDateChange($event)"
+              [formControl]="control!"
+              [readonly]="readonly"
             />
           </ng-container>
 
@@ -95,7 +77,9 @@ import { DateFormatService } from '../../../core/services/date-format.service';
     </div>
   `
 })
-export class FormFieldComponent implements OnInit, OnChanges, OnDestroy {
+export class FormFieldComponent {
+  @ViewChild('dateInputRef') private dateInputRef?: ElementRef<HTMLInputElement>;
+
   @Input() control: AbstractControl | null = null;
   @Input() labelKey = '';
   @Input() icon = '';
@@ -117,27 +101,44 @@ export class FormFieldComponent implements OnInit, OnChanges, OnDestroy {
   @Input() emptyValue: any = '';
   @Input() inputId = `erp-field-${Math.random().toString(36).slice(2, 10)}`;
 
-  dateDisplayValue = '';
-  readonly datePlaceholder = this.dateFormatService.placeholder;
-  private controlSubscription?: Subscription;
+  constructor(private translationService: TranslationService) {}
 
-  constructor(
-    private translationService: TranslationService,
-    private dateFormatService: DateFormatService
-  ) {}
-
-  ngOnInit(): void {
-    this.bindDateControl();
+  get dateIconGlyph(): string {
+    return (this.icon || 'calendar_today').trim() || 'calendar_today';
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['control'] || changes['type']) {
-      this.bindDateControl();
+  openDatePicker(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.isDisabled) {
+      return;
     }
+    const el = this.dateInputRef?.nativeElement;
+    if (!el) {
+      return;
+    }
+    const anyInput = el as HTMLInputElement & { showPicker?: () => void | Promise<void> };
+    if (typeof anyInput.showPicker === 'function') {
+      try {
+        const maybePromise = anyInput.showPicker() as void | Promise<void> | undefined;
+        if (maybePromise && typeof (maybePromise as Promise<void>).then === 'function') {
+          (maybePromise as Promise<void>).catch(() => this.focusDateInput(el));
+        }
+      } catch {
+        this.focusDateInput(el);
+      }
+      return;
+    }
+    this.focusDateInput(el);
   }
 
-  ngOnDestroy(): void {
-    this.controlSubscription?.unsubscribe();
+  private focusDateInput(el: HTMLInputElement): void {
+    el.focus();
+    try {
+      el.click();
+    } catch {
+      /* Safari / older browsers */
+    }
   }
 
   get showError(): boolean {
@@ -145,9 +146,6 @@ export class FormFieldComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get hasValue(): boolean {
-    if (this.type === 'date') {
-      return !!this.dateDisplayValue;
-    }
     if (!this.control) {
       return false;
     }
@@ -224,111 +222,5 @@ export class FormFieldComponent implements OnInit, OnChanges, OnDestroy {
       return fallback;
     }
     return '';
-  }
-
-  onDateInput(event: Event): void {
-    const rawValue = (event.target as HTMLInputElement).value || '';
-    this.dateDisplayValue = this.dateFormatService.normalizeDisplayInput(rawValue);
-
-    if (!this.control) {
-      return;
-    }
-
-    const isoValue = this.dateFormatService.toIsoDate(this.dateDisplayValue);
-    if (isoValue) {
-      this.control.setValue(isoValue, { emitEvent: false });
-      this.clearInvalidDateError();
-      return;
-    }
-
-    if (!this.dateDisplayValue) {
-      this.control.setValue('', { emitEvent: false });
-      this.clearInvalidDateError();
-      return;
-    }
-
-    this.control.setValue('', { emitEvent: false });
-  }
-
-  onDateBlur(): void {
-    if (!this.control) {
-      return;
-    }
-
-    this.control.markAsTouched();
-
-    if (!this.dateDisplayValue) {
-      this.clearInvalidDateError();
-      return;
-    }
-
-    const isoValue = this.dateFormatService.toIsoDate(this.dateDisplayValue);
-    if (isoValue) {
-      this.dateDisplayValue = this.dateFormatService.format(isoValue);
-      this.control.setValue(isoValue, { emitEvent: false });
-      this.clearInvalidDateError();
-      return;
-    }
-
-    this.applyInvalidDateError();
-  }
-
-  onNativeDateChange(event: Event): void {
-    if (!this.control) {
-      return;
-    }
-
-    const value = (event.target as HTMLInputElement).value || '';
-    this.control.setValue(value, { emitEvent: false });
-    this.syncDateDisplayFromControl(value);
-    this.clearInvalidDateError();
-    this.control.markAsTouched();
-  }
-
-  openNativeDatePicker(input: HTMLInputElement): void {
-    if (!input || this.isDisabled || this.readonly) {
-      return;
-    }
-
-    input.focus();
-    const pickerCapable = input as HTMLInputElement & { showPicker?: () => void };
-    pickerCapable.showPicker?.();
-    if (!pickerCapable.showPicker) {
-      input.click();
-    }
-  }
-
-  private bindDateControl(): void {
-    this.controlSubscription?.unsubscribe();
-
-    if (this.type !== 'date' || !this.control) {
-      this.dateDisplayValue = '';
-      return;
-    }
-
-    this.syncDateDisplayFromControl(this.control.value);
-    this.controlSubscription = this.control.valueChanges.subscribe((value) => this.syncDateDisplayFromControl(value));
-  }
-
-  private syncDateDisplayFromControl(value: unknown): void {
-    if (this.type !== 'date') {
-      return;
-    }
-    this.dateDisplayValue = value ? this.dateFormatService.format(value) : '';
-  }
-
-  private applyInvalidDateError(): void {
-    if (!this.control) {
-      return;
-    }
-    this.control.setErrors({ ...(this.control.errors || {}), invalidDate: true });
-  }
-
-  private clearInvalidDateError(): void {
-    if (!this.control?.errors?.['invalidDate']) {
-      return;
-    }
-    const { invalidDate, ...rest } = this.control.errors || {};
-    this.control.setErrors(Object.keys(rest).length ? rest : null);
   }
 }

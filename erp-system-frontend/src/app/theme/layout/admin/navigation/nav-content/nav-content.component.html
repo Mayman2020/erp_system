@@ -1,25 +1,12 @@
 <div *ngIf="this.flatConfig['layout'] === 'vertical'" (clickOutside)="navMob()" [excludeBeforeClick]="true" [exclude]="'#mobile-collapse'" id="nav-ps-flat-able" class="flat-able-scroll erp-nav-scroll" [style.max-width]="'100%'">
   <div class="navbar-content erp-navbar-content">
     <app-sidebar class="erp-sidebar-layout">
-      <app-profile-card
-        sidebar-profile
-        [displayName]="displayName"
-        [roleKey]="roleKey"
-        [avatarUrl]="avatarUrl"
-        [loading]="loadingUser"
-        [menuOpen]="profileMenuOpen"
-        (toggleMenu)="toggleProfileMenu()"
-        (closeMenu)="closeProfileMenu()"
-        (profileClick)="closeProfileMenu()"
-        (logoutClick)="logout()"
-      ></app-profile-card>
-
       <ul sidebar-menu class="nav pcoded-inner-navbar erp-sidebar-menu erp-sidebar-menu--root" (clickOutside)="fireOutClick()">
         <li class="nav-item pcoded-menu-caption" *ngIf="menuLoading"><label>{{ 'COMMON.LOADING' | translate }}</label></li>
         <ng-container *ngFor="let item of navigation">
-          <app-nav-group *ngIf="item.type=='group'" [item]="item"></app-nav-group>
-          <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item"></app-nav-collapse>
-          <app-nav-item *ngIf="item.type=='item'" [item]="item"></app-nav-item>
+          <app-nav-group *ngIf="item.type=='group'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-group>
+          <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-collapse>
+          <app-nav-item *ngIf="item.type=='item'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-item>
         </ng-container>
       </ul>
     </app-sidebar>
@@ -32,9 +19,9 @@
     <ul #navbarContent id="side-nav-horizontal" class="nav pcoded-inner-navbar sidenav-inner" (clickOutside)="fireLeave()" (mouseleave)="fireLeave()">
       <li class="nav-item pcoded-menu-caption" *ngIf="menuLoading"><label>{{ 'COMMON.LOADING' | translate }}</label></li>
       <ng-container *ngFor="let item of navigation">
-        <app-nav-group *ngIf="item.type=='group'" [item]="item"></app-nav-group>
-        <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item"></app-nav-collapse>
-        <app-nav-item *ngIf="item.type=='item'" [item]="item"></app-nav-item>
+        <app-nav-group *ngIf="item.type=='group'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-group>
+        <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-collapse>
+        <app-nav-item *ngIf="item.type=='item'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-item>
       </ng-container>
     </ul>
   </div>

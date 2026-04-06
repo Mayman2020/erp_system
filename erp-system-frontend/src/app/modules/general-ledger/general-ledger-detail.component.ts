@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { JournalEntry } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
@@ -9,12 +10,15 @@ import { AccountingApiService } from '../../core/services/accounting-api.service
   standalone: false,
   selector: 'app-general-ledger-detail',
   templateUrl: './general-ledger-detail.component.html',
-  styleUrls: ['./general-ledger-detail.component.scss']
+  styleUrls: ['./general-ledger-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GeneralLedgerDetailComponent implements OnInit {
   loading = false;
   errorKey = '';
-  entry: JournalEntry | null = null;
+  
+  private readonly entrySubject = new BehaviorSubject<JournalEntry | null>(null);
+  public readonly entry$: Observable<JournalEntry | null> = this.entrySubject.asObservable();
 
   constructor(
     private api: AccountingApiService,
@@ -37,11 +41,11 @@ export class GeneralLedgerDetailComponent implements OnInit {
     this.router.navigate(['/general-ledger']);
   }
 
-  get sourceLabel(): string {
-    if (!this.entry?.sourceModule) {
+  public resolveSourceLabel(entry: JournalEntry | null): string {
+    if (!entry?.sourceModule) {
       return this.i18n.instant('GENERAL_LEDGER.SOURCE_MANUAL');
     }
-    return this.i18n.instant('GENERAL_LEDGER.SOURCE_' + this.entry.sourceModule);
+    return this.i18n.instant('GENERAL_LEDGER.SOURCE_' + entry.sourceModule);
   }
 
   formatAmount(val: number): string {
@@ -53,9 +57,12 @@ export class GeneralLedgerDetailComponent implements OnInit {
     this.errorKey = '';
     this.api
       .getJournalEntry(id)
-      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .pipe(finalize(() => { 
+        this.loading = false; 
+        this.cdr.markForCheck(); 
+      }))
       .subscribe({
-        next: (entry) => { this.entry = entry; },
+        next: (entry) => { this.entrySubject.next(entry); },
         error: () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
       });
   }

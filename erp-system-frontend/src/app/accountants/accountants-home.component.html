@@ -64,6 +64,7 @@
               [data]="filteredUsers"
               [actions]="userActions"
               [loading]="loading"
+              [filterable]="true"
               emptyTitleKey="ACCESS_MANAGEMENT.NO_USERS"
               emptyDescriptionKey="ACCESS_MANAGEMENT.NO_USERS_HINT"
               (actionClick)="onUserAction($event)"
@@ -104,6 +105,7 @@
                     [data]="filteredRoles"
                     [actions]="roleActions"
                     [loading]="loading"
+                    [filterable]="true"
                     emptyTitleKey="ACCESS_MANAGEMENT.NO_ROLES"
                     emptyDescriptionKey="ACCESS_MANAGEMENT.NO_ROLES_HINT"
                     (actionClick)="onRoleAction($event)"
@@ -203,7 +205,7 @@
               [data]="filteredScreens"
               [actions]="screenActions"
               [loading]="loading"
-              [pageSize]="20"
+              [filterable]="true"
               emptyTitleKey="ACCESS_MANAGEMENT.NO_SCREENS"
               emptyDescriptionKey="ACCESS_MANAGEMENT.NO_SCREENS_HINT"
               (actionClick)="onScreenAction($event)"
@@ -246,6 +248,7 @@
                     [data]="filteredLookupTypes"
                     [actions]="lookupTypeActions"
                     [loading]="lookupTypesLoading"
+                    [filterable]="true"
                     emptyTitleKey="ACCESS_MANAGEMENT.NO_LOOKUP_TYPES"
                     emptyDescriptionKey="ACCESS_MANAGEMENT.NO_LOOKUP_TYPES_HINT"
                     (actionClick)="onLookupTypeAction($event)"
@@ -278,6 +281,7 @@
                       [data]="filteredLookupValues"
                       [actions]="lookupValueActions"
                       [loading]="lookupValuesLoading"
+                      [filterable]="true"
                       emptyTitleKey="ACCESS_MANAGEMENT.NO_LOOKUP_VALUES"
                       emptyDescriptionKey="ACCESS_MANAGEMENT.NO_LOOKUP_VALUES_HINT"
                       (actionClick)="onLookupValueAction($event)"
@@ -296,7 +300,7 @@
   </div>
 </section>
 
-<app-form-dialog [visible]="userDialogVisible" [title]="userDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_USER' : 'ACCESS_MANAGEMENT.EDIT_USER'" size="xl" (close)="closeUserDialog()">
+<app-form-dialog [visible]="userDialogVisible" [titleKey]="userDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_USER' : 'ACCESS_MANAGEMENT.EDIT_USER'" size="xl" (close)="closeUserDialog()">
   <div dialog-body>
     <div class="alert alert-success alert-dismissible fade show" *ngIf="accessSuccessKey">
       {{ accessSuccessKey | translate }}
@@ -307,7 +311,8 @@
       <button type="button" class="close" (click)="accessErrorKey=''"><span>&times;</span></button>
     </div>
     <form [formGroup]="userForm" class="row">
-      <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.fullName" labelKey="ACCESS_MANAGEMENT.FULL_NAME" icon="badge"></app-form-field></div>
+      <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.fullNameEn" labelKey="PROFILE.FULL_NAME_EN" icon="badge"></app-form-field></div>
+      <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.fullNameAr" labelKey="PROFILE.FULL_NAME_AR" icon="badge"></app-form-field></div>
       <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.username" labelKey="PROFILE.USERNAME" icon="person"></app-form-field></div>
       <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.email" labelKey="PROFILE.EMAIL" icon="mail" type="email"></app-form-field></div>
       <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.phone" labelKey="PROFILE.PHONE" icon="call"></app-form-field></div>
@@ -345,7 +350,7 @@
   </div>
 </app-form-dialog>
 
-<app-form-dialog [visible]="roleDialogVisible" [title]="roleDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_ROLE' : 'ACCESS_MANAGEMENT.EDIT_ROLE'" size="xxl" (close)="closeRoleDialog()">
+<app-form-dialog [visible]="roleDialogVisible" [titleKey]="roleDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_ROLE' : 'ACCESS_MANAGEMENT.EDIT_ROLE'" size="xxl" (close)="closeRoleDialog()">
   <div dialog-body>
     <div class="alert alert-success alert-dismissible fade show" *ngIf="accessSuccessKey">
       {{ accessSuccessKey | translate }}
@@ -413,7 +418,7 @@
   </div>
 </app-form-dialog>
 
-<app-form-dialog [visible]="lookupTypeDialogVisible" [title]="lookupTypeDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_LOOKUP_TYPE' : 'ACCESS_MANAGEMENT.EDIT_LOOKUP_TYPE'" size="lg" (close)="closeLookupTypeDialog()">
+<app-form-dialog [visible]="lookupTypeDialogVisible" [titleKey]="lookupTypeDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_LOOKUP_TYPE' : 'ACCESS_MANAGEMENT.EDIT_LOOKUP_TYPE'" size="lg" (close)="closeLookupTypeDialog()">
   <div dialog-body>
     <div class="alert alert-success alert-dismissible fade show" *ngIf="lookupSuccessKey">
       {{ lookupSuccessKey | translate }}
@@ -439,7 +444,7 @@
   </div>
 </app-form-dialog>
 
-<app-form-dialog [visible]="lookupValueDialogVisible" [title]="lookupValueDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_LOOKUP_VALUE' : 'ACCESS_MANAGEMENT.EDIT_LOOKUP_VALUE'" size="lg" (close)="closeLookupValueDialog()">
+<app-form-dialog [visible]="lookupValueDialogVisible" [titleKey]="lookupValueDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_LOOKUP_VALUE' : 'ACCESS_MANAGEMENT.EDIT_LOOKUP_VALUE'" size="lg" (close)="closeLookupValueDialog()">
   <div dialog-body>
     <div class="alert alert-success alert-dismissible fade show" *ngIf="lookupSuccessKey">
       {{ lookupSuccessKey | translate }}
@@ -468,7 +473,7 @@
   </div>
 </app-form-dialog>
 
-<app-form-dialog [visible]="screenDialogVisible" [title]="screenDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_SCREEN' : 'ACCESS_MANAGEMENT.EDIT_SCREEN'" size="xl" (close)="closeScreenDialog()">
+<app-form-dialog [visible]="screenDialogVisible" [titleKey]="screenDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_SCREEN' : 'ACCESS_MANAGEMENT.EDIT_SCREEN'" size="xl" (close)="closeScreenDialog()">
   <div dialog-body>
     <div class="alert alert-danger mb-2" *ngIf="accessErrorKey">{{ accessErrorKey | translate }}</div>
     <form [formGroup]="screenForm" class="row">
@@ -514,7 +519,7 @@
   </div>
 </app-form-dialog>
 
-<app-form-dialog [visible]="confirmDialogVisible" title="ACCESS_MANAGEMENT.DELETE_CONFIRM_TITLE" size="md" (close)="closeConfirmDialog()">
+<app-form-dialog [visible]="confirmDialogVisible" titleKey="ACCESS_MANAGEMENT.DELETE_CONFIRM_TITLE" size="md" (close)="closeConfirmDialog()">
   <div dialog-body>
     <p class="erp-confirm-copy">{{ 'ACCESS_MANAGEMENT.DELETE_CONFIRM_COPY' | translate }}</p>
     <div class="erp-confirm-label">{{ confirmTarget?.label }}</div>

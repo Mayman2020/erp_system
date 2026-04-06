@@ -4,5 +4,6 @@
  */
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://REPLACE-WITH-YOUR-API-HOST/api/v1'
+  apiBaseUrl: 'https://REPLACE-WITH-YOUR-API-HOST/api/v1',
+  appVersion: '21.0.0'
 };

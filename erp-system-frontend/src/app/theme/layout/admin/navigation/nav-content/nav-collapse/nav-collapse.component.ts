@@ -26,6 +26,7 @@ export class NavCollapseComponent implements OnInit, OnDestroy {
   public visible;
   public isActive = false;
   @Input() item: NavigationItem;
+  @Input() menuIconsOnly = false;
   public flatConfig: any;
   public themeLayout: string;
   private routerSub: Subscription;

@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import * as XLSX from 'xlsx';
 import { BalanceSheetReportDto, ProfitLossReportDto } from '../../core/models/accounting.models';
@@ -11,15 +12,21 @@ import { LookupService } from '../../core/services/lookup.service';
 @Component({ standalone: false,
   selector: 'app-reports-page',
   templateUrl: './reports-page.component.html',
-  styleUrls: ['./reports-page.component.scss']
+  styleUrls: ['./reports-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReportsPageComponent implements OnInit {
   readonly titleKey = 'REPORTS.TITLE';
   loading = false;
   activeReport: 'profitLoss' | 'balanceSheet' = 'profitLoss';
   periodOptions: LookupItem[] = [];
-  profitLoss: ProfitLossReportDto | null = null;
-  balanceSheet: BalanceSheetReportDto | null = null;
+  
+  private readonly profitLossSubject = new BehaviorSubject<ProfitLossReportDto | null>(null);
+  public readonly profitLoss$: Observable<ProfitLossReportDto | null> = this.profitLossSubject.asObservable();
+  
+  private readonly balanceSheetSubject = new BehaviorSubject<BalanceSheetReportDto | null>(null);
+  public readonly balanceSheet$: Observable<BalanceSheetReportDto | null> = this.balanceSheetSubject.asObservable();
+
   errorKey = '';
 
   readonly form = this.fb.group({
@@ -67,11 +74,11 @@ export class ReportsPageComponent implements OnInit {
         .pipe(
           finalize(() => {
             this.loading = false;
-            this.cdr.detectChanges();
+            this.cdr.markForCheck();
           })
         )
         .subscribe({
-          next: (result) => (this.profitLoss = result),
+          next: (result) => this.profitLossSubject.next(result),
           error: () => (this.errorKey = 'COMMON.ERROR_LOADING')
         });
       return;
@@ -82,11 +89,11 @@ export class ReportsPageComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
-        next: (result) => (this.balanceSheet = result),
+        next: (result) => this.balanceSheetSubject.next(result),
         error: () => (this.errorKey = 'COMMON.ERROR_LOADING')
       });
   }
@@ -117,24 +124,25 @@ export class ReportsPageComponent implements OnInit {
   }
 
   exportProfitLoss(): void {
-    if (!this.profitLoss) return;
+    const profitLoss = this.profitLossSubject.value;
+    if (!profitLoss) return;
     const headers = [
       this.translationService.instant('ACCOUNTS.CODE') + ' - ' + this.translationService.instant('COMMON.NAME'),
       this.translationService.instant('VOUCHERS.FORM.AMOUNT')
     ];
-    const revenueRows = this.profitLoss.revenues.map((l) => [this.formatReportAccountCell(l), l.amount]);
-    const expenseRows = this.profitLoss.expenses.map((l) => [this.formatReportAccountCell(l), l.amount]);
+    const revenueRows = profitLoss.revenues.map((l) => [this.formatReportAccountCell(l), l.amount]);
+    const expenseRows = profitLoss.expenses.map((l) => [this.formatReportAccountCell(l), l.amount]);
     const data: any[][] = [
       headers,
       [this.translationService.instant('REPORTS.PROFIT_LOSS.REVENUE_SECTION'), ''],
       ...revenueRows,
-      [this.translationService.instant('REPORTS.PROFIT_LOSS.TOTAL_REVENUE'), this.profitLoss.totalRevenue],
+      [this.translationService.instant('REPORTS.PROFIT_LOSS.TOTAL_REVENUE'), profitLoss.totalRevenue],
       ['', ''],
       [this.translationService.instant('REPORTS.PROFIT_LOSS.EXPENSE_SECTION'), ''],
       ...expenseRows,
-      [this.translationService.instant('REPORTS.PROFIT_LOSS.TOTAL_EXPENSES'), this.profitLoss.totalExpenses],
+      [this.translationService.instant('REPORTS.PROFIT_LOSS.TOTAL_EXPENSES'), profitLoss.totalExpenses],
       ['', ''],
-      [this.translationService.instant('REPORTS.PROFIT_LOSS.NET_RESULT'), this.profitLoss.netProfit]
+      [this.translationService.instant('REPORTS.PROFIT_LOSS.NET_RESULT'), profitLoss.netProfit]
     ];
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -143,27 +151,28 @@ export class ReportsPageComponent implements OnInit {
   }
 
   exportBalanceSheet(): void {
-    if (!this.balanceSheet) return;
+    const balanceSheet = this.balanceSheetSubject.value;
+    if (!balanceSheet) return;
     const headers = [
       this.translationService.instant('ACCOUNTS.CODE') + ' - ' + this.translationService.instant('COMMON.NAME'),
       this.translationService.instant('DASHBOARD.BALANCE')
     ];
-    const assetRows = this.balanceSheet.assets.map((l) => [this.formatReportAccountCell(l), l.balance]);
-    const liabilityRows = this.balanceSheet.liabilities.map((l) => [this.formatReportAccountCell(l), l.balance]);
-    const equityRows = this.balanceSheet.equity.map((l) => [this.formatReportAccountCell(l), l.balance]);
+    const assetRows = balanceSheet.assets.map((l) => [this.formatReportAccountCell(l), l.balance]);
+    const liabilityRows = balanceSheet.liabilities.map((l) => [this.formatReportAccountCell(l), l.balance]);
+    const equityRows = balanceSheet.equity.map((l) => [this.formatReportAccountCell(l), l.balance]);
     const data: any[][] = [
       headers,
       [this.translationService.instant('REPORTS.BALANCE_SHEET.ASSETS'), ''],
       ...assetRows,
-      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_ASSETS'), this.balanceSheet.totalAssets],
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_ASSETS'), balanceSheet.totalAssets],
       ['', ''],
       [this.translationService.instant('REPORTS.BALANCE_SHEET.LIABILITIES'), ''],
       ...liabilityRows,
-      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES'), this.balanceSheet.totalLiabilities],
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES'), balanceSheet.totalLiabilities],
       ['', ''],
       [this.translationService.instant('REPORTS.BALANCE_SHEET.EQUITY'), ''],
       ...equityRows,
-      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_EQUITY'), this.balanceSheet.totalEquity]
+      [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_EQUITY'), balanceSheet.totalEquity]
     ];
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();

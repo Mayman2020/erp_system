@@ -8,6 +8,7 @@ import com.erp.system.accounting.dto.display.AccountingCheckDisplayDto;
 import com.erp.system.accounting.dto.form.AccountingCheckFormDto;
 import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.repository.AccountingCheckRepository;
+import com.erp.system.accounting.support.JournalPostingNarratives;
 import com.erp.system.accounting.repository.BankAccountRepository;
 import com.erp.system.common.enums.AccountingType;
 import com.erp.system.common.enums.CheckStatus;
@@ -88,22 +89,28 @@ public class AccountingCheckService {
         if (check.getCheckType() != CheckType.RECEIVED || check.getStatus() != CheckStatus.PENDING) {
             throw new BusinessException("Only pending received checks can be deposited");
         }
+        Account bankGl = check.getBankAccount().getLinkedAccount();
+        Account holding = check.getHoldingAccount();
+        String entryNarrative = JournalPostingNarratives.entryHeader(
+                null,
+                JournalPostingNarratives.RECEIVED_CHECK_DEPOSIT,
+                check.getCheckNumber());
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 check.getDueDate(),
-                "Check deposit " + check.getCheckNumber(),
+                entryNarrative,
                 "CHECK",
                 check.getId(),
                 actor,
                 List.of(
                         AccountingPostingService.JournalLineDraft.builder()
-                                .accountId(check.getBankAccount().getLinkedAccount().getId())
-                                .description("Received check deposit")
+                                .accountId(bankGl.getId())
+                                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, bankGl, true))
                                 .debit(check.getAmount())
                                 .credit(BigDecimal.ZERO)
                                 .build(),
                         AccountingPostingService.JournalLineDraft.builder()
-                                .accountId(check.getHoldingAccount().getId())
-                                .description("Remove received check from holding")
+                                .accountId(holding.getId())
+                                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, holding, false))
                                 .debit(BigDecimal.ZERO)
                                 .credit(check.getAmount())
                                 .build()
@@ -130,22 +137,28 @@ public class AccountingCheckService {
             throw new BusinessException("Issued checks can only be cleared from pending status");
         }
 
+        Account holdingIssued = check.getHoldingAccount();
+        Account bankGlIssued = check.getBankAccount().getLinkedAccount();
+        String clearanceNarrative = JournalPostingNarratives.entryHeader(
+                null,
+                JournalPostingNarratives.ISSUED_CHECK_CLEARANCE,
+                check.getCheckNumber());
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 check.getDueDate(),
-                "Issued check clearance " + check.getCheckNumber(),
+                clearanceNarrative,
                 "CHECK",
                 check.getId(),
                 actor,
                 List.of(
                         AccountingPostingService.JournalLineDraft.builder()
-                                .accountId(check.getHoldingAccount().getId())
-                                .description("Clear issued check holding")
+                                .accountId(holdingIssued.getId())
+                                .description(JournalPostingNarratives.lineWithAccount(clearanceNarrative, holdingIssued, true))
                                 .debit(check.getAmount())
                                 .credit(BigDecimal.ZERO)
                                 .build(),
                         AccountingPostingService.JournalLineDraft.builder()
-                                .accountId(check.getBankAccount().getLinkedAccount().getId())
-                                .description("Reduce bank for issued check")
+                                .accountId(bankGlIssued.getId())
+                                .description(JournalPostingNarratives.lineWithAccount(clearanceNarrative, bankGlIssued, false))
                                 .debit(BigDecimal.ZERO)
                                 .credit(check.getAmount())
                                 .build()

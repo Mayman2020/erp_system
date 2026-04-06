@@ -53,6 +53,8 @@ export interface AdminUser {
   primaryRole: string;
   active: boolean;
   fullName?: string | null;
+  fullNameEn?: string | null;
+  fullNameAr?: string | null;
   createdAt?: string;
   roleIds: number[];
   roleCodes: string[];
@@ -63,7 +65,8 @@ export interface AdminUserForm {
   email: string;
   phone: string;
   password?: string;
-  fullName: string;
+  fullNameEn: string;
+  fullNameAr: string;
   primaryRole: 'ADMIN' | 'ACCOUNTANT';
   active: boolean;
   roleIds: number[];

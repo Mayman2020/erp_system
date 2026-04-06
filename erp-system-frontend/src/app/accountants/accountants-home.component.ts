@@ -94,41 +94,41 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
   rolePermissionDraft: PermissionDraft[] = [];
 
   readonly userColumns: DataTableColumn[] = [
-    { key: 'fullName', title: 'ACCESS_MANAGEMENT.FULL_NAME', clickable: true },
-    { key: 'username', title: 'PROFILE.USERNAME' },
-    { key: 'email', title: 'PROFILE.EMAIL' },
+    { key: 'fullName', title: 'ACCESS_MANAGEMENT.FULL_NAME', clickable: true, sortable: true },
+    { key: 'username', title: 'PROFILE.USERNAME', sortable: true },
+    { key: 'email', title: 'PROFILE.EMAIL', sortable: true },
     { key: 'passwordMasked', title: 'AUTH.PASSWORD' },
-    { key: 'primaryRole', title: 'ACCESS_MANAGEMENT.PRIMARY_ROLE', kind: 'type', prefix: 'ROLE.' },
+    { key: 'primaryRole', title: 'ACCESS_MANAGEMENT.PRIMARY_ROLE', kind: 'type', prefix: 'ROLE.', sortable: true },
     { key: 'roleSummary', title: 'ACCESS_MANAGEMENT.ASSIGNED_ROLES', align: 'start' },
-    { key: 'active', title: 'ACCESS_MANAGEMENT.ACTIVE_USER', kind: 'booleanToggle' }
+    { key: 'active', title: 'ACCESS_MANAGEMENT.ACTIVE_USER', kind: 'booleanToggle', sortable: true }
   ];
   readonly userActions: DataTableAction[] = [];
   readonly roleColumns: DataTableColumn[] = [
-    { key: 'displayName', title: 'COMMON.NAME', clickable: true, align: 'start' },
-    { key: 'code', title: 'ACCESS_MANAGEMENT.ROLE_CODE' },
-    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' },
-    { key: 'systemRole', title: 'ACCESS_MANAGEMENT.SYSTEM_ROLE', kind: 'boolean' },
-    { key: 'grantedScreens', title: 'ACCESS_MANAGEMENT.VISIBLE_SCREENS' }
+    { key: 'displayName', title: 'COMMON.NAME', clickable: true, align: 'start', sortable: true },
+    { key: 'code', title: 'ACCESS_MANAGEMENT.ROLE_CODE', sortable: true },
+    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean', sortable: true },
+    { key: 'systemRole', title: 'ACCESS_MANAGEMENT.SYSTEM_ROLE', kind: 'boolean', sortable: true },
+    { key: 'grantedScreens', title: 'ACCESS_MANAGEMENT.VISIBLE_SCREENS', sortable: true }
   ];
   readonly roleActions: DataTableAction[] = [
     { id: 'edit', labelKey: 'COMMON.EDIT', className: 'erp-action-btn--info' },
     { id: 'delete', labelKey: 'COMMON.DELETE', className: 'erp-action-btn--danger' }
   ];
   readonly lookupTypeColumns: DataTableColumn[] = [
-    { key: 'code', title: 'ACCESS_MANAGEMENT.TYPE_CODE', clickable: true },
-    { key: 'displayName', title: 'COMMON.NAME', align: 'start' },
-    { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER' },
-    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' }
+    { key: 'code', title: 'ACCESS_MANAGEMENT.TYPE_CODE', clickable: true, sortable: true },
+    { key: 'displayName', title: 'COMMON.NAME', align: 'start', sortable: true },
+    { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER', sortable: true },
+    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean', sortable: true }
   ];
   readonly lookupTypeActions: DataTableAction[] = [
     { id: 'edit', labelKey: 'COMMON.EDIT', className: 'erp-action-btn--info' },
     { id: 'delete', labelKey: 'COMMON.DELETE', className: 'erp-action-btn--danger' }
   ];
   readonly lookupValueColumns: DataTableColumn[] = [
-    { key: 'code', title: 'ACCESS_MANAGEMENT.VALUE_CODE' },
-    { key: 'displayName', title: 'COMMON.NAME', align: 'start' },
-    { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER' },
-    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' }
+    { key: 'code', title: 'ACCESS_MANAGEMENT.VALUE_CODE', sortable: true },
+    { key: 'displayName', title: 'COMMON.NAME', align: 'start', sortable: true },
+    { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER', sortable: true },
+    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean', sortable: true }
   ];
   readonly screenItemTypeOptions = [
     { value: 'item', labelKey: 'ACCESS_MANAGEMENT.MENU_ITEM_TYPE_ITEM' },
@@ -136,14 +136,14 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
     { value: 'collapse', labelKey: 'ACCESS_MANAGEMENT.MENU_ITEM_TYPE_COLLAPSE' }
   ];
   readonly screenColumns: DataTableColumn[] = [
-    { key: 'id', title: 'ACCESS_MANAGEMENT.SCREEN_ID', align: 'start' },
-    { key: 'titleKey', title: 'ACCESS_MANAGEMENT.TITLE_KEY', align: 'start' },
-    { key: 'titlePreview', title: 'ACCESS_MANAGEMENT.SCREEN_TITLE_PREVIEW', align: 'start' },
-    { key: 'itemTypeDisplay', title: 'ACCESS_MANAGEMENT.ITEM_TYPE' },
-    { key: 'parentId', title: 'ACCESS_MANAGEMENT.PARENT_ID', align: 'start' },
-    { key: 'url', title: 'ACCESS_MANAGEMENT.MENU_ROUTE', align: 'start' },
-    { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER' },
-    { key: 'rolesCsv', title: 'ACCESS_MANAGEMENT.ROLES_CSV', align: 'start' }
+    { key: 'id', title: 'ACCESS_MANAGEMENT.SCREEN_ID', align: 'start', sortable: true },
+    { key: 'titleKey', title: 'ACCESS_MANAGEMENT.TITLE_KEY', align: 'start', sortable: true },
+    { key: 'titlePreview', title: 'ACCESS_MANAGEMENT.SCREEN_TITLE_PREVIEW', align: 'start', sortable: true },
+    { key: 'itemTypeDisplay', title: 'ACCESS_MANAGEMENT.ITEM_TYPE', sortable: true },
+    { key: 'parentId', title: 'ACCESS_MANAGEMENT.PARENT_ID', align: 'start', sortable: true },
+    { key: 'url', title: 'ACCESS_MANAGEMENT.MENU_ROUTE', align: 'start', sortable: true },
+    { key: 'sortOrder', title: 'ACCESS_MANAGEMENT.SORT_ORDER', sortable: true },
+    { key: 'rolesCsv', title: 'ACCESS_MANAGEMENT.ROLES_CSV', align: 'start', sortable: true }
   ];
   readonly screenActions: DataTableAction[] = [
     { id: 'edit', labelKey: 'COMMON.EDIT', className: 'erp-action-btn--info' },
@@ -159,7 +159,8 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
     email: ['', [Validators.required, Validators.email, Validators.maxLength(190)]],
     phone: ['', [Validators.required, Validators.maxLength(30)]],
     password: ['', [Validators.minLength(8), Validators.maxLength(255), Validators.pattern(/^$|^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/)]],
-    fullName: ['', [Validators.required, Validators.maxLength(150)]],
+    fullNameEn: ['', [Validators.required, Validators.maxLength(150)]],
+    fullNameAr: ['', [Validators.required, Validators.maxLength(150)]],
     primaryRole: ['ACCOUNTANT' as PrimaryRole, Validators.required],
     active: [true, Validators.required],
     roleIds: [[] as number[]]
@@ -223,6 +224,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
       .subscribe((t) => {
         this.activeTabId = t;
       });
+    this.translationService.currentLanguage$.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.detectChanges());
     this.loadPage();
   }
 
@@ -248,9 +250,18 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
     const query = this.userQuery.trim().toLowerCase();
     const masked = this.translationService.instant('ACCESS_MANAGEMENT.PASSWORD_MASKED');
     return this.users
-      .filter((user) => !query || [user.fullName, user.username, user.email, user.phone, user.primaryRole, ...(user.roleCodes || [])].filter(Boolean).join(' ').toLowerCase().includes(query))
+      .filter(
+        (user) =>
+          !query ||
+          [user.fullNameEn, user.fullNameAr, user.fullName, user.username, user.email, user.phone, user.primaryRole, ...(user.roleCodes || [])]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase()
+            .includes(query)
+      )
       .map((user) => ({
         ...user,
+        fullName: this.displayName(user.fullNameEn, user.fullNameAr, user.username),
         passwordMasked: masked,
         roleSummary: (user.roleCodes || []).join(', ') || ''
       }));
@@ -345,7 +356,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
   openCreateUserDialog(): void {
     this.userDialogMode = 'create';
     this.editingUserId = null;
-    this.userForm.reset({ username: '', email: '', phone: '', password: '', fullName: '', primaryRole: 'ACCOUNTANT', active: true, roleIds: [] });
+    this.userForm.reset({ username: '', email: '', phone: '', password: '', fullNameEn: '', fullNameAr: '', primaryRole: 'ACCOUNTANT', active: true, roleIds: [] });
     this.userDialogVisible = true;
   }
 
@@ -354,7 +365,17 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
     if (!user) { return; }
     this.userDialogMode = 'edit';
     this.editingUserId = user.id;
-    this.userForm.reset({ username: user.username, email: user.email, phone: user.phone, password: '', fullName: user.fullName || '', primaryRole: (user.primaryRole || 'ACCOUNTANT') as PrimaryRole, active: !!user.active, roleIds: [...(user.roleIds || [])] });
+    this.userForm.reset({
+      username: user.username,
+      email: user.email,
+      phone: user.phone,
+      password: '',
+      fullNameEn: user.fullNameEn || '',
+      fullNameAr: user.fullNameAr || '',
+      primaryRole: (user.primaryRole || 'ACCOUNTANT') as PrimaryRole,
+      active: !!user.active,
+      roleIds: [...(user.roleIds || [])]
+    });
     this.userDialogVisible = true;
   }
 
@@ -377,7 +398,8 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
       email: String(this.userForm.value.email || '').trim(),
       phone: String(this.userForm.value.phone || '').trim(),
       password: password.trim() || undefined,
-      fullName: String(this.userForm.value.fullName || '').trim(),
+      fullNameEn: String(this.userForm.value.fullNameEn || '').trim(),
+      fullNameAr: String(this.userForm.value.fullNameAr || '').trim(),
       primaryRole: (this.userForm.value.primaryRole || 'ACCOUNTANT') as PrimaryRole,
       active: !!this.userForm.value.active,
       roleIds: [...(this.userForm.value.roleIds || [])]

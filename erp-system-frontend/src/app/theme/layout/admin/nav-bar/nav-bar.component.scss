@@ -1,6 +1,10 @@
 :host {
   display: block;
   width: 100%;
+  overflow: visible;
+  position: relative;
+  z-index: 1000;
+  isolation: isolate;
 }
 
 .erp-header-shell {
@@ -10,6 +14,17 @@
   gap: var(--erp-space-3);
   width: 100%;
   min-width: 0;
+  min-height: var(--erp-header-height);
+  padding: 8px 16px;
+  color: var(--erp-shell-bar-text, #f8fafc);
+  background: var(--erp-shell-bar-gradient);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 12px 32px rgba(2, 6, 23, 0.2);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible;
 }
 
 .erp-header-shell__brand,
@@ -23,30 +38,102 @@
   min-width: 0;
 }
 
+.erp-header-brand-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--erp-space-2);
+  padding: 6px 14px 6px 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.15);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.erp-header-brand-pill--mark-only {
+  padding: 6px;
+  border-radius: 16px;
+}
+
+.erp-header-brand-pill__icon-wrap--hero {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+
+.erp-header-brand-pill__mark {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
+}
+
+.erp-header-brand-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.erp-header-brand-pill__icon-wrap {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  transition: background 0.2s ease;
+}
+
+.erp-header-brand-pill:hover .erp-header-brand-pill__icon-wrap {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.erp-header-brand-pill__icon {
+  width: 26px;
+  height: auto;
+}
+
+.erp-header-brand-pill__logo {
+  height: 22px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+}
+
 .erp-header-shell__actions {
   justify-content: flex-end;
-  margin-inline-start: auto;
 }
 
-.erp-brand-logo-full {
-  display: block;
-  max-height: 30px;
-  width: auto;
+body.rtl .erp-header-shell__actions {
+  justify-content: flex-start;
 }
 
-.erp-brand-logo-mark {
-  display: block;
-  max-height: 28px;
-  width: auto;
+.erp-header-shell .erp-header-toggle,
+.erp-header-shell .mob-toggler {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--erp-shell-bar-text, #f8fafc);
 }
 
-@media (max-width: 767px) {
+.erp-header-shell .erp-header-toggle:hover,
+.erp-header-shell .mob-toggler:hover {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.2);
+}
+
+@media (max-width: 991px) {
   .erp-header-shell {
-    gap: var(--erp-space-2);
+    padding: 0 var(--erp-space-3);
+    flex-wrap: wrap;
   }
 
   .erp-header-shell__brand,
   .erp-header-shell__actions {
-    gap: var(--erp-space-2);
+    width: 100%;
+    justify-content: space-between;
   }
 }

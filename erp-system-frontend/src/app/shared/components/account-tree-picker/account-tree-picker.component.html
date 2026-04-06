@@ -23,11 +23,12 @@
   </div>
 </div>
 
-<app-erp-dialog [visible]="dialogVisible" [title]="labelKey" size="xl" (close)="closeDialog()">
+<app-erp-dialog [visible]="dialogVisible" [titleKey]="labelKey" size="xl" (close)="closeDialog()">
   <div dialog-body>
     <app-tree-selector
       [nodes]="accountTree"
       [minSelectableLevel]="minSelectableLevel"
+      [selectableLeafOnly]="selectableLeafOnly"
       [selectedId]="selectedId"
       [initiallyExpandedDepth]="2"
       (selected)="onNodeSelected($event)"

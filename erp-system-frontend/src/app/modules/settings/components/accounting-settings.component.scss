@@ -1,0 +1,259 @@
+.erp-accounting-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  /* Fiscal date fields: uniform full-width blocks in year + period forms */
+  .fiscal-form-date {
+    app-form-field {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  .erp-settings-year-select {
+    .erp-input {
+      width: 100%;
+      min-height: 48px;
+      border-radius: var(--erp-radius-input, 10px);
+    }
+  }
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 1400px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: var(--erp-text);
+  
+  mat-icon {
+    color: var(--erp-primary);
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.premium-card {
+  box-shadow: var(--erp-shadow-md);
+  border: 1px solid var(--erp-border-strong);
+  
+  .card-body {
+    padding: 2rem;
+  }
+}
+
+.erp-settings__section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--erp-text-soft);
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.currency-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.currency-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  background: var(--erp-bg-muted);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+
+  &:hover {
+    background: var(--erp-border-strong);
+    transform: translateY(-2px);
+  }
+
+  &.is-selected {
+    background: var(--erp-primary-soft);
+    border-color: var(--erp-primary);
+    color: var(--erp-primary);
+    box-shadow: 0 4px 12px var(--erp-primary-soft);
+  }
+
+  &__code {
+    font-weight: 800;
+    font-size: 0.9rem;
+  }
+
+  &__check {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.fiscal-calendar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.year-item-premium {
+  padding: 1.5rem;
+  background: var(--erp-bg-muted);
+  border-radius: 16px;
+  border: 1px solid var(--erp-border);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+  }
+
+  .year-info {
+    h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.2rem;
+    }
+    .date-range {
+      font-size: 0.8rem;
+      color: var(--erp-text-soft);
+      font-weight: 600;
+    }
+  }
+
+  .year-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+}
+
+.erp-status-chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--erp-danger-soft);
+  color: var(--erp-danger);
+  
+  &.is-open {
+    background: var(--erp-success-soft);
+    color: var(--erp-success);
+  }
+}
+
+.period-grid-premium {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.period-pill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--erp-bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--erp-border);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--erp-primary);
+    transform: translateX(4px);
+  }
+
+  &.is-open {
+    border-left: 4px solid var(--erp-success);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    .period-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .period-dates {
+      font-size: 0.75rem;
+      color: var(--erp-text-soft);
+    }
+  }
+}
+
+.period-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--erp-text-soft);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: var(--erp-primary);
+    transform: scale(1.1);
+  }
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.period-pill.is-open .period-toggle-btn {
+  color: var(--erp-success);
+}
+
+.alert-inline {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  
+  &.alert-danger { color: var(--erp-danger); background: var(--erp-danger-soft); }
+  &.alert-success { color: var(--erp-success); background: var(--erp-success-soft); }
+}
+
+body.rtl {
+  .period-pill:hover {
+    transform: translateX(-4px);
+  }
+  .period-pill.is-open {
+    border-left: none;
+    border-right: 4px solid var(--erp-success);
+  }
+}

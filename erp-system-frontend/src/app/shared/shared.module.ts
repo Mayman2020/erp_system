@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AccountTreePickerComponent } from './components/account-tree-picker/account-tree-picker.component';
 import { AdvancedSearchBarComponent } from './components/advanced-search-bar/advanced-search-bar.component';
+import { AvatarComponent } from './components/avatar/avatar.component';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { EmptyStateComponent } from './components/empty-state/empty-state.component';
 import { FormFieldComponent } from './components/form-field/form-field.component';
@@ -41,9 +42,19 @@ import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
     RecentActivityTableComponent,
     PageHeaderComponent,
     EmptyStateComponent,
-    LoadingStateComponent
+    LoadingStateComponent,
+    AvatarComponent
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgbDropdownModule, NgbTooltipModule, NgbNavModule, MatIconModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    NgbDropdownModule,
+    NgbTooltipModule,
+    NgbNavModule,
+    MatIconModule
+  ],
   exports: [
     CommonModule,
     FormsModule,
@@ -70,7 +81,8 @@ import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
     RecentActivityTableComponent,
     PageHeaderComponent,
     EmptyStateComponent,
-    LoadingStateComponent
+    LoadingStateComponent,
+    AvatarComponent
   ]
 })
 export class SharedModule {}

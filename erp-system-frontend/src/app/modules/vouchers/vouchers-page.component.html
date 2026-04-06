@@ -41,12 +41,12 @@
         <button type="button" class="btn-close" (click)="errorKey = ''"></button>
       </div>
       <app-advanced-search-bar (search)="onSearch($event)" [showStatus]="true" [showDateRange]="true" [showAmountRange]="true" [statusOptions]="voucherStatuses"></app-advanced-search-bar>
-      <app-data-table [columns]="columns" [data]="rows" [actions]="actions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+      <app-data-table [columns]="columns" [data]="(rows$ | async) ?? []" [actions]="actions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
     </div>
   </div>
 </section>
 
-<app-erp-dialog [visible]="dialogVisible" [title]="dialogTitle" size="xl" (close)="closeDialog()">
+<app-erp-dialog [visible]="dialogVisible" [titleKey]="dialogTitle" size="xl" (close)="closeDialog()">
   <div dialog-body>
     <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
       {{ successKey | translate }}
@@ -92,10 +92,14 @@
       </select>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ 'VOUCHERS.FORM.BANK_ACCOUNT' | translate }}</label>
-      <select class="form-control" formControlName="cashAccountId" [disabled]="readOnlyMode">
-        <option *ngFor="let bank of bankAccounts" [value]="bank.linkedAccountId">{{ bank.bankName }} - {{ bank.accountNumber }}</option>
-      </select>
+      <app-account-tree-picker
+        formControlName="cashAccountId"
+        [accountTree]="assetAccountTree"
+        labelKey="VOUCHERS.FORM.BANK_ACCOUNT"
+        icon="account_balance_wallet"
+        [minSelectableLevel]="1"
+        [selectableLeafOnly]="true"
+      ></app-account-tree-picker>
     </div>
     <div class="col-md-6 mb-3">
       <app-account-tree-picker
@@ -103,7 +107,8 @@
         [accountTree]="accountTree"
         [labelKey]="activeVoucherType === 'payment' ? 'VOUCHERS.FORM.TARGET_ACCOUNT_PAYMENT' : 'VOUCHERS.FORM.TARGET_ACCOUNT_RECEIPT'"
         icon="account_tree"
-        [minSelectableLevel]="2"
+        [minSelectableLevel]="1"
+        [selectableLeafOnly]="true"
       ></app-account-tree-picker>
     </div>
     <div class="col-md-6 mb-3">

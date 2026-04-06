@@ -1,12 +1,35 @@
 <ng-container *ngIf="!item.hidden">
   <li *ngIf="themeLayout === 'horizontal'" (mouseenter)="navCollapse($event)" class="nav-item pcoded-hasmenu erp-nav-collapse" [class.active]="isActive">
-    <a href="javascript:" class="nav-link erp-nav-link" [class.active]="isActive">
+    <a
+      href="javascript:"
+      class="nav-link erp-nav-link"
+      [class.active]="isActive"
+      [attr.title]="menuIconsOnly ? null : (item.title | translate)"
+      [attr.aria-label]="item.title | translate"
+      [ngbTooltip]="menuIconsOnly ? (item.title | translate) : null"
+      placement="end"
+      container="body"
+      triggers="mouseenter:mouseleave"
+      [openDelay]="200"
+    >
       <ng-container *ngTemplateOutlet="itemContent"></ng-container>
     </a>
     <ng-container *ngTemplateOutlet="subMenuContent"></ng-container>
   </li>
   <li *ngIf="themeLayout === 'vertical'" class="nav-item pcoded-hasmenu erp-nav-collapse" [class.active]="isActive">
-    <a href="javascript:" class="nav-link erp-nav-link" [class.active]="isActive" (click)="navCollapse($event)">
+    <a
+      href="javascript:"
+      class="nav-link erp-nav-link"
+      [class.active]="isActive"
+      (click)="navCollapse($event)"
+      [attr.title]="menuIconsOnly ? null : (item.title | translate)"
+      [attr.aria-label]="item.title | translate"
+      [ngbTooltip]="menuIconsOnly ? (item.title | translate) : null"
+      placement="end"
+      container="body"
+      triggers="mouseenter:mouseleave"
+      [openDelay]="200"
+    >
       <ng-container *ngTemplateOutlet="itemContent"></ng-container>
     </a>
     <ng-container *ngTemplateOutlet="subMenuContent"></ng-container>
@@ -23,13 +46,16 @@
       <span *ngIf="item.badge && themeLayout === 'vertical'" class="pcoded-badge badge" [ngClass]="item.badge.type">
         {{item.badge.title}}
       </span>
+      <span *ngIf="themeLayout === 'vertical'" class="erp-nav-submenu-chevron" aria-hidden="true">
+        <mat-icon>expand_more</mat-icon>
+      </span>
   </ng-template>
   <ng-template #subMenuContent>
     <ul class="pcoded-submenu" [routerLinkActive]="['active']">
       <ng-container *ngFor="let item of item.children">
-        <app-nav-group *ngIf="item.type=='group'" [item]="item"></app-nav-group>
-        <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item"></app-nav-collapse>
-        <app-nav-item *ngIf="item.type=='item'" [item]="item"></app-nav-item>
+        <app-nav-group *ngIf="item.type=='group'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-group>
+        <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-collapse>
+        <app-nav-item *ngIf="item.type=='item'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-item>
       </ng-container>
     </ul>
   </ng-template>

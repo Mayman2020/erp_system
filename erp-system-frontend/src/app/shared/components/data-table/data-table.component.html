@@ -1,13 +1,43 @@
 <div class="erp-table-card" [class.erp-table-card--compact]="compact">
-  <app-loading-state *ngIf="loading"></app-loading-state>
-
-  <ng-container *ngIf="!loading && visibleRows.length; else erpTableState">
-    <div class="erp-table-export" *ngIf="exportable && data?.length">
-      <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportToExcel()">
-        <mat-icon aria-hidden="true">file_download</mat-icon>
-        <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
-      </button>
+  <ng-container *ngIf="loading; else tableContent">
+    <div class="erp-table-scroll">
+      <table class="erp-table">
+        <thead>
+          <tr>
+            <th *ngFor="let column of columns">{{ column.title | translate }}</th>
+            <th *ngIf="actions.length" class="erp-table__cell--actions">{{ 'COMMON.ACTIONS' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let _ of getSkeletonArray()">
+            <td *ngFor="let column of columns">
+              <div class="skeleton-box" style="height: 20px; width: 80%; border-radius: 4px;"></div>
+            </td>
+            <td *ngIf="actions.length">
+              <div class="skeleton-box" style="height: 20px; width: 40px; border-radius: 4px;"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </ng-container>
+
+  <ng-template #tableContent>
+    <ng-container *ngIf="visibleRows.length; else erpTableState">
+      <div class="erp-table-toolbar" *ngIf="exportable || filterable">
+        <div class="erp-table-toolbar__start">
+          <div class="erp-table-search" *ngIf="filterable">
+            <mat-icon>search</mat-icon>
+            <input type="text" class="erp-input erp-input--sm" [placeholder]="'COMMON.SEARCH' | translate" (input)="onGlobalFilter($event)" [value]="globalFilter">
+          </div>
+        </div>
+        <div class="erp-table-toolbar__end" *ngIf="exportable && processedData?.length">
+          <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportToExcel()">
+            <mat-icon aria-hidden="true">file_download</mat-icon>
+            <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
+          </button>
+        </div>
+      </div>
     <div class="erp-table-scroll">
       <table class="erp-table">
         <thead>
@@ -18,8 +48,13 @@
               [ngClass]="column.className || null"
               [class.erp-table__cell--align-start]="column.align === 'start'"
               [class.erp-table__cell--align-end]="column.align === 'end'"
+              [style.cursor]="column.sortable ? 'pointer' : 'default'"
+              (click)="onSort(column)"
             >
               {{ column.title | translate }}
+              <mat-icon class="erp-table__sort-icon" aria-hidden="true" *ngIf="column.sortable && sortKey === column.key">
+                {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+              </mat-icon>
             </th>
             <th *ngIf="actions.length" class="erp-table__cell--actions">{{ 'COMMON.ACTIONS' | translate }}</th>
           </tr>
@@ -77,24 +112,32 @@
       </table>
     </div>
 
-    <nav class="erp-table-pagination" *ngIf="totalPages > 1" [attr.aria-label]="'COMMON.PAGINATION' | translate">
-      <button type="button" class="erp-pagination-btn erp-pagination-btn--nav" (click)="setPage(currentPage - 1)" [disabled]="currentPage <= 1" [attr.aria-label]="'COMMON.PREVIOUS' | translate">
-        <mat-icon aria-hidden="true">chevron_left</mat-icon>
-        <span>{{ 'COMMON.PREVIOUS' | translate }}</span>
-      </button>
-      <button type="button" class="erp-pagination-btn" *ngIf="hasLeadingJump()" (click)="setPage(1)">1</button>
-      <span class="erp-pager-ellipsis" *ngIf="hasLeadingJump()">...</span>
-      <button type="button" class="erp-pagination-btn" *ngFor="let p of visiblePages()" [class.is-active]="p === currentPage" (click)="setPage(p)">{{ p }}</button>
-      <span class="erp-pager-ellipsis" *ngIf="hasTrailingJump()">...</span>
-      <button type="button" class="erp-pagination-btn" *ngIf="hasTrailingJump()" (click)="setPage(totalPages)">{{ totalPages }}</button>
-      <button type="button" class="erp-pagination-btn erp-pagination-btn--nav" (click)="setPage(currentPage + 1)" [disabled]="currentPage >= totalPages" [attr.aria-label]="'COMMON.NEXT' | translate">
-        <span>{{ 'COMMON.NEXT' | translate }}</span>
-        <mat-icon aria-hidden="true">chevron_right</mat-icon>
-      </button>
+    <nav class="erp-table-pagination" *ngIf="totalItemsCount > 0" [attr.aria-label]="'COMMON.PAGINATION' | translate">
+      <div class="erp-table-pagination__info">
+        {{ 'COMMON.TABLE_SHOWING' | translate:{ start: rangeStart, end: rangeEnd, total: totalItemsCount } }}
+      </div>
+      <div class="erp-table-pagination__controls" *ngIf="totalPages > 1">
+        <button type="button" class="erp-pagination-btn erp-pagination-btn--nav" (click)="setPage(currentPage - 1)" [disabled]="currentPage <= 1" [attr.aria-label]="'COMMON.PREVIOUS' | translate">
+          <mat-icon aria-hidden="true">chevron_left</mat-icon>
+          <span>{{ 'COMMON.PREVIOUS' | translate }}</span>
+        </button>
+        <div class="erp-table-pagination__pages">
+          <button type="button" class="erp-pagination-btn" *ngIf="hasLeadingJump()" (click)="setPage(1)">1</button>
+          <span class="erp-pager-ellipsis" *ngIf="hasLeadingJump()">...</span>
+          <button type="button" class="erp-pagination-btn" *ngFor="let p of visiblePages()" [class.is-active]="p === currentPage" (click)="setPage(p)">{{ p }}</button>
+          <span class="erp-pager-ellipsis" *ngIf="hasTrailingJump()">...</span>
+          <button type="button" class="erp-pagination-btn" *ngIf="hasTrailingJump()" (click)="setPage(totalPages)">{{ totalPages }}</button>
+        </div>
+        <button type="button" class="erp-pagination-btn erp-pagination-btn--nav" (click)="setPage(currentPage + 1)" [disabled]="currentPage >= totalPages" [attr.aria-label]="'COMMON.NEXT' | translate">
+          <span>{{ 'COMMON.NEXT' | translate }}</span>
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
+        </button>
+      </div>
     </nav>
-  </ng-container>
+    </ng-container>
 
-  <ng-template #erpTableState>
-    <app-empty-state *ngIf="!loading" icon="table_rows" [titleKey]="emptyTitleKey" [descriptionKey]="emptyDescriptionKey"></app-empty-state>
+    <ng-template #erpTableState>
+      <app-empty-state icon="table_rows" [titleKey]="emptyTitleKey" [descriptionKey]="emptyDescriptionKey"></app-empty-state>
+    </ng-template>
   </ng-template>
 </div>

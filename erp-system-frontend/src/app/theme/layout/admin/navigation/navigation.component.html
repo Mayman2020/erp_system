@@ -1,4 +1,11 @@
 <div class="navbar-wrapper" [ngClass]="{'container': this.flatConfig.layout === 'horizontal' && this.flatConfig.subLayout === 'horizontal-2'}">
-  <app-nav-content (onNavMobCollapse)="navMobCollapse()"></app-nav-content>
+  <div class="sidebar-brand">
+    <button type="button" class="collapse-btn" (click)="navCollapse()" [attr.aria-label]="'NAV.TOGGLE_MENU' | translate">
+      <mat-icon>{{ sidebarCollapsed ? 'menu_open' : 'menu' }}</mat-icon>
+    </button>
+    <span class="sidebar-welcome">{{ 'NAV.SIDEBAR_WELCOME' | translate }}</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <app-nav-content [menuIconsOnly]="sidebarCollapsed" (onNavMobCollapse)="navMobCollapse()"></app-nav-content>
 </div>
 

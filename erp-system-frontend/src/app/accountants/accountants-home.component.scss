@@ -14,10 +14,10 @@
 .erp-admin-inline-input { min-width: 220px; max-width: 360px; }
 .erp-admin-subfilters { margin-bottom: var(--erp-space-3); justify-content: flex-end; }
 .erp-admin-dot { display: inline-block; width: 6px; height: 6px; border-radius: 999px; background: var(--erp-text-secondary); margin: 0 0.5rem; }
-.erp-permission-matrix { border: 1px solid var(--erp-border); border-radius: 16px; overflow: auto; }
 .erp-matrix-table { width: 100%; min-width: 760px; border-collapse: collapse; }
-.erp-matrix-table th, .erp-matrix-table td { border-bottom: 1px solid var(--erp-border); padding: 0.85rem 0.9rem; text-align: start; vertical-align: middle; }
-.erp-matrix-table th { background: var(--erp-bg-muted); color: var(--erp-text-secondary); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.erp-matrix-table th, .erp-matrix-table td { border: 1px solid var(--erp-border); padding: 12px 14px; text-align: start; vertical-align: middle; transition: background-color 0.2s ease; }
+.erp-matrix-table th { background: var(--erp-bg-muted); color: var(--erp-text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--erp-border-strong); }
+.erp-matrix-table tr:hover td { background: var(--erp-bg-muted); }
 .erp-matrix-table td:last-child, .erp-matrix-table th:last-child, .erp-matrix-table td:nth-last-child(2), .erp-matrix-table th:nth-last-child(2), .erp-matrix-table td:nth-last-child(3), .erp-matrix-table th:nth-last-child(3), .erp-matrix-table td:nth-last-child(4), .erp-matrix-table th:nth-last-child(4) { text-align: center; }
 .erp-selector-card { background: var(--erp-bg-muted); border: 1px solid var(--erp-border); border-radius: 18px; padding: var(--erp-space-3); }
 .erp-selector-card__header { margin-bottom: 0.9rem; }

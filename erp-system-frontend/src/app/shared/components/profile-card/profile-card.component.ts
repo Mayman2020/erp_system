@@ -13,7 +13,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
         [attr.aria-expanded]="menuOpen"
         *ngIf="!loading; else profileSkeleton"
       >
-        <img [src]="avatarUrl" class="erp-sidebar-profile__avatar" [attr.alt]="'PROFILE.AVATAR_ALT' | translate" />
+        <app-avatar [src]="avatarUrl" size="44px" [alt]="'PROFILE.AVATAR_ALT' | translate"></app-avatar>
         <span class="erp-sidebar-profile__info">
           <strong>{{ displayName || ('NAV.HESABATY' | translate) | slice:0:18 }}</strong>
           <small>{{ roleKey | translate }}</small>
@@ -23,7 +23,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
       <ng-template #profileSkeleton>
         <div class="erp-sidebar-profile__toggle erp-sidebar-profile__skeleton">
-          <div class="erp-sidebar-profile__avatar skeleton-pulse"></div>
+          <app-avatar [loading]="true" size="44px"></app-avatar>
           <div class="erp-sidebar-profile__info">
             <div class="skeleton-line skeleton-line--primary skeleton-pulse"></div>
             <div class="skeleton-line skeleton-line--secondary skeleton-pulse"></div>
@@ -42,7 +42,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
         </button>
       </div>
     </div>
-  `
+  `,
+  styleUrls: ['./profile-card.component.scss']
 })
 export class ProfileCardComponent {
   @Input() displayName = '';

@@ -45,11 +45,14 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  toggleDesktopSidebar(): void {
+  /** Desktop: toggle narrow icon-only sidebar (labels hidden; tooltips show titles). */
+  toggleSidebarCollapsed(): void {
     if (this.windowWidth < 992) {
       return;
     }
-    this.navSidebarHidden = !this.navSidebarHidden;
+    this.navSidebarHidden = false;
+    this.navCollapsed = !this.navCollapsed;
+    this.flatConfig.collapseMenu = this.navCollapsed;
   }
 
   navMobClick() {

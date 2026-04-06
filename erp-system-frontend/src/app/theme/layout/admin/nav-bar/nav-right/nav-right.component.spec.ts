@@ -3,11 +3,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgbDropdownConfig, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 
 import { NavRightComponent } from './nav-right.component';
 import { AuthService } from '../../../../../core/auth/auth.service';
 import { ThemeService } from '../../../../../core/services/theme.service';
+import { TranslationService } from '../../../../../core/i18n/translation.service';
 
 @Pipe({ name: 't' })
 class StubTranslatePipe implements PipeTransform {
@@ -31,7 +32,9 @@ describe('NavRightComponent', () => {
           provide: AuthService,
           useValue: {
             refreshCurrentUser: jasmine.createSpy('refreshCurrentUser'),
+            isAuthenticated$: of(false),
             currentUser$: of(null),
+            loadingUser$: of(false),
             logout: jasmine.createSpy('logout'),
           },
         },
@@ -40,7 +43,13 @@ describe('NavRightComponent', () => {
           useValue: {
             mode: 'light',
             mode$: of('light'),
-            toggle: jasmine.createSpy('toggle'),
+            toggleTheme: jasmine.createSpy('toggleTheme'),
+          },
+        },
+        {
+          provide: TranslationService,
+          useValue: {
+            currentLanguage$: new BehaviorSubject('ar').asObservable(),
           },
         },
       ],

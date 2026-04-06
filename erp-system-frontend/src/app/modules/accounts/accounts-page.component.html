@@ -80,7 +80,7 @@
     </div>
     <app-data-table
       [columns]="columns"
-      [data]="pagedRows"
+      [data]="(pagedRows$ | async) ?? []"
       [actions]="rowActions"
       [pageSize]="5"
       [loading]="loading"
@@ -93,16 +93,18 @@
       <h2>{{ 'ACCOUNTS.TREE_VIEW' | translate }}</h2>
     </div>
     <div class="accounts-tree-page-wrap">
-      <app-loading-state *ngIf="loading && !treeRows.length" [compact]="true"></app-loading-state>
-      <app-tree-selector *ngIf="treeRows.length" [nodes]="treeRows" [selectedId]="null" [initiallyExpandedDepth]="2"></app-tree-selector>
-      <app-empty-state *ngIf="!loading && !treeRows.length" icon="account_tree"></app-empty-state>
+      <ng-container *ngIf="treeRows$ | async as treeNodes">
+        <app-loading-state *ngIf="loading && !treeNodes.length" [compact]="true"></app-loading-state>
+        <app-tree-selector *ngIf="treeNodes.length" [nodes]="treeNodes" [selectedId]="null" [initiallyExpandedDepth]="2"></app-tree-selector>
+        <app-empty-state *ngIf="!loading && !treeNodes.length" icon="account_tree"></app-empty-state>
+      </ng-container>
     </div>
   </section>
 </section>
 
 <app-erp-dialog
   [visible]="dialogVisible"
-  [title]="'ACCOUNTS.FORM_TITLE_' + dialogMode.toUpperCase()"
+  [titleKey]="'ACCOUNTS.FORM_TITLE_' + dialogMode.toUpperCase()"
   size="account"
   surfaceClass="accounts-dialog"
   (close)="closeDialog()"
@@ -138,7 +140,7 @@
         <div class="accounts-dialog__parent-field accounts-dialog__parent-field--full">
           <app-account-tree-picker
             formControlName="parentId"
-            [accountTree]="treeRows"
+            [accountTree]="(treeRows$ | async) ?? []"
             labelKey="ACCOUNTS.PARENT"
             icon="account_tree"
             [nullable]="true"

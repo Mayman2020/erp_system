@@ -38,9 +38,21 @@ public class AuthRegisterRequestDto {
     @Size(max = 150, message = "AUTH.REGISTER.FULL_NAME_LENGTH")
     private String fullName;
 
+    @Size(max = 150, message = "AUTH.REGISTER.FULL_NAME_EN_LENGTH")
+    private String fullNameEn;
+
+    @Size(max = 150, message = "AUTH.REGISTER.FULL_NAME_AR_LENGTH")
+    private String fullNameAr;
+
     @Size(max = 60, message = "AUTH.REGISTER.NATIONAL_ID_LENGTH")
     private String nationalId;
 
     @Size(max = 180, message = "AUTH.REGISTER.COMPANY_NAME_LENGTH")
     private String companyName;
+
+    @Size(max = 180, message = "AUTH.REGISTER.COMPANY_NAME_EN_LENGTH")
+    private String companyNameEn;
+
+    @Size(max = 180, message = "AUTH.REGISTER.COMPANY_NAME_AR_LENGTH")
+    private String companyNameAr;
 }

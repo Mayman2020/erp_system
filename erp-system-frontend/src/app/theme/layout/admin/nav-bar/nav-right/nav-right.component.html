@@ -1,13 +1,30 @@
 <div class="erp-header-actions">
-  <app-language-switcher [compact]="true" placement="bottom-right" align="end"></app-language-switcher>
+  <div class="erp-header-actions__rail">
+    <app-language-switcher [compact]="true" placement="bottom-right" align="end"></app-language-switcher>
+    <button
+      type="button"
+      class="erp-nav-theme-btn"
+      (click)="toggleTheme()"
+      [attr.title]="'NAV.TOGGLE_THEME' | translate"
+      [attr.aria-label]="'NAV.TOGGLE_THEME' | translate"
+    >
+      <mat-icon aria-hidden="true">{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+  </div>
 
-  <button
-    type="button"
-    class="erp-nav-theme-btn"
-    (click)="toggleTheme()"
-    [attr.title]="'NAV.TOGGLE_THEME' | translate"
-    [attr.aria-label]="'NAV.TOGGLE_THEME' | translate"
-  >
-    <mat-icon aria-hidden="true">{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
-  </button>
+  <ng-container *ngIf="authenticated$ | async">
+    <ng-container *ngIf="{ user: user$ | async, loading: loadingProfile$ | async } as profile">
+      <app-profile-card
+        [displayName]="resolveDisplayName(profile.user)"
+        [roleKey]="resolveRoleKey(profile.user)"
+        [avatarUrl]="resolveAvatarUrl(profile.user)"
+        [loading]="profile.loading"
+        [menuOpen]="profileMenuOpen"
+        (toggleMenu)="toggleProfileMenu()"
+        (closeMenu)="closeProfileMenu()"
+        (profileClick)="closeProfileMenu()"
+        (logoutClick)="logout()"
+      ></app-profile-card>
+    </ng-container>
+  </ng-container>
 </div>

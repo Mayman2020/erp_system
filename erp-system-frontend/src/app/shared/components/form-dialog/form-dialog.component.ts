@@ -6,7 +6,8 @@ import { Component, EventEmitter, HostListener, Input, Output } from '@angular/c
 })
 export class FormDialogComponent {
   @Input() visible = false;
-  @Input() title = '';
+  /** i18n key for the dialog heading (avoid naming this `title` — conflicts with native HTML title / tooltips on the host). */
+  @Input() titleKey = '';
   @Input() size: 'md' | 'lg' | 'xl' | 'xxl' | 'account' = 'lg';
   @Input() surfaceClass = '';
   @Output() close = new EventEmitter<void>();

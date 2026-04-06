@@ -17,7 +17,7 @@ import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.common.service.AccountingSettingsService;
 import com.erp.system.common.service.NumberingService;
-import com.erp.system.accounting.service.CustomerInvoiceService;
+import com.erp.system.accounting.support.JournalPostingNarratives;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,24 +126,32 @@ public class ReceiptVoucherService {
         }
 
         Account offsetAccount = resolvePostingOffsetAccount(voucher);
+        String entryNarrative = JournalPostingNarratives.entryHeader(
+                voucher.getDescription(),
+                JournalPostingNarratives.COLLECTION_BOND,
+                voucher.getReference());
+        Account cashAccount = voucher.getCashAccount();
+        boolean invoiceSettlement = voucher.getInvoiceReference() != null && !voucher.getInvoiceReference().isBlank();
+        String creditLineText = JournalPostingNarratives.lineWithAccount(entryNarrative, offsetAccount, false);
+        if (invoiceSettlement) {
+            creditLineText = creditLineText + " · " + JournalPostingNarratives.receiptCreditInvoiceSuffix();
+        }
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 voucher.getVoucherDate(),
-                voucher.getDescription(),
+                entryNarrative,
                 "RECEIPT_VOUCHER",
                 voucher.getId(),
                 actor,
                 List.of(
                         AccountingPostingService.JournalLineDraft.builder()
-                                .accountId(voucher.getCashAccount().getId())
-                                .description("Receipt voucher debit")
+                                .accountId(cashAccount.getId())
+                                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, cashAccount, true))
                                 .debit(voucher.getAmount())
                                 .credit(BigDecimal.ZERO)
                                 .build(),
                         AccountingPostingService.JournalLineDraft.builder()
                                 .accountId(offsetAccount.getId())
-                                .description(voucher.getInvoiceReference() != null && !voucher.getInvoiceReference().isBlank()
-                                        ? "Receipt voucher credit - invoice settlement"
-                                        : "Receipt voucher credit - revenue")
+                                .description(creditLineText)
                                 .debit(BigDecimal.ZERO)
                                 .credit(voucher.getAmount())
                                 .build()

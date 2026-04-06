@@ -1,15 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, PLATFORM_ID, Inject, ViewChild, ElementRef } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import gsap from 'gsap';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
-@Component({ standalone: false,
+declare var particlesJS: any;
+
+@Component({
+  standalone: false,
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('loginCard', { read: ElementRef }) loginCardRef?: ElementRef<HTMLElement>;
+  @ViewChild('brandPanel', { read: ElementRef }) brandPanelRef?: ElementRef<HTMLElement>;
+
   errorKey = '';
   loading = false;
   otpLoading = false;
@@ -18,6 +28,8 @@ export class LoginComponent {
   darkMode = false;
   mode: 'login' | 'forgot' = 'login';
   otpSent = false;
+
+  private loginIntroPlayed = false;
 
   readonly form = this.fb.group({
     email: [localStorage.getItem('erp_login_email') || '', [Validators.required, Validators.email]],
@@ -34,18 +46,110 @@ export class LoginComponent {
     newPassword: ['', [Validators.required, Validators.minLength(8)]]
   });
 
+  private readonly destroy$ = new Subject<void>();
+
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.darkMode = this.themeService.mode === 'dark';
+    this.darkMode = this.themeService.getCurrentTheme() === 'dark';
+  }
+
+  ngOnInit(): void {
+    this.themeService.mode$.pipe(takeUntil(this.destroy$)).subscribe((m) => {
+      this.darkMode = m === 'dark';
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => this.initParticles(), 200);
+      requestAnimationFrame(() => this.runLoginIntro());
+    }
+  }
+
+  private initParticles(): void {
+    if (typeof particlesJS === 'undefined') {
+      return;
+    }
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: '#ffffff' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.3, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+        size: { value: 3, random: true, anim: { enable: true, speed: 2, size_min: 1, sync: false } },
+        line_linked: { enable: true, distance: 150, color: '#ffffff', opacity: 0.2, width: 1 },
+        move: { enable: true, speed: 1, direction: 'none', random: true, straight: false, out_mode: 'out', bounce: false }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' }, resize: true },
+        modes: {
+          grab: { distance: 140, line_linked: { opacity: 1 } },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
   }
 
   toggleTheme(): void {
-    this.themeService.toggle();
-    this.darkMode = this.themeService.mode === 'dark';
+    this.themeService.toggleTheme();
+  }
+
+  private runLoginIntro(): void {
+    if (!isPlatformBrowser(this.platformId) || this.loginIntroPlayed) {
+      return;
+    }
+    const card = this.loginCardRef?.nativeElement;
+    if (!card) {
+      return;
+    }
+    this.loginIntroPlayed = true;
+
+    const tl = gsap.timeline({});
+    tl.fromTo(
+      card,
+      { y: -120, scaleX: 0.22, scaleY: 0.52, opacity: 0 },
+      { y: 0, scaleX: 0.22, scaleY: 0.52, opacity: 1, duration: 1.2, ease: 'power3.out' }
+    );
+    tl.to(card, { scaleY: 1, duration: 0.55, ease: 'power3.out' }, '-=0.35');
+    tl.to(card, { scaleX: 1, duration: 0.65, ease: 'power3.out' }, '-=0.25');
+
+    const staggerEls = card.querySelectorAll<HTMLElement>('.login-gsap-stagger');
+    if (staggerEls.length) {
+      gsap.set(staggerEls, { opacity: 0, y: -48 });
+      gsap.to(staggerEls, {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        ease: 'power2.out',
+        stagger: 0.12,
+        delay: 0.4,
+        clearProps: 'transform'
+      });
+    }
+
+    const brand = this.brandPanelRef?.nativeElement;
+    if (brand) {
+      const rtl = getComputedStyle(document.documentElement).direction === 'rtl';
+      gsap.from(brand, {
+        x: rtl ? -72 : 72,
+        opacity: 0,
+        duration: 1.05,
+        ease: 'elastic.out(1, 0.62)',
+        delay: 0.75
+      });
+    }
   }
 
   submit(): void {

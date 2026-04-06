@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <div *ngIf="!loading && !errorKey && entry" class="gl-detail">
+  <div *ngIf="!loading && !errorKey && (entry$ | async) as entry" class="gl-detail">
     <!-- Header Info Card -->
     <div class="card erp-unified-card gl-detail__header-card">
       <div class="card-body">
@@ -38,7 +38,7 @@
           </div>
           <div class="col-md-4 gl-detail__field">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.SOURCE_TYPE' | translate }}</span>
-            <strong class="gl-detail__value">{{ sourceLabel }}</strong>
+            <strong class="gl-detail__value">{{ resolveSourceLabel(entry) }}</strong>
           </div>
           <div class="col-md-4 gl-detail__field">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.ENTRY_TYPE' | translate }}</span>
@@ -83,7 +83,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover mb-0 gl-detail__lines-table">
+          <table class="erp-table gl-detail__lines-table">
             <thead>
               <tr>
                 <th>#</th>

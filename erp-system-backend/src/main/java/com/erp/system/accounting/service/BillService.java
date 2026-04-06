@@ -10,6 +10,7 @@ import com.erp.system.accounting.dto.form.BillFormDto;
 import com.erp.system.accounting.dto.form.BillLineFormDto;
 import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.repository.BillRepository;
+import com.erp.system.accounting.support.JournalPostingNarratives;
 import com.erp.system.accounting.repository.PaymentVoucherRepository;
 import com.erp.system.common.enums.AccountingType;
 import com.erp.system.common.enums.BillStatus;
@@ -96,11 +97,16 @@ public class BillService {
             bill.setApprovedBy(actor);
         }
 
+        String entryNarrative = JournalPostingNarratives.entryHeader(
+                bill.getDescription(),
+                JournalPostingNarratives.PURCHASE_INVOICE,
+                bill.getBillNumber());
         List<AccountingPostingService.JournalLineDraft> journalLines = new ArrayList<>();
         for (BillLine line : bill.getLines()) {
+            Account lineAccount = line.getAccount();
             journalLines.add(AccountingPostingService.JournalLineDraft.builder()
-                    .accountId(line.getAccount().getId())
-                    .description(line.getDescription())
+                    .accountId(lineAccount.getId())
+                    .description(JournalPostingNarratives.lineDescriptionOrFallback(line.getDescription(), entryNarrative, lineAccount, true))
                     .debit(line.getLineTotal())
                     .credit(BigDecimal.ZERO)
                     .build());
@@ -109,23 +115,26 @@ public class BillService {
             if (bill.getTaxAccount() == null) {
                 throw new BusinessException("Tax account is required when tax amount is greater than zero");
             }
+            Account taxAccount = bill.getTaxAccount();
             journalLines.add(AccountingPostingService.JournalLineDraft.builder()
-                    .accountId(bill.getTaxAccount().getId())
-                    .description("Bill tax")
+                    .accountId(taxAccount.getId())
+                    .description(JournalPostingNarratives.lineWithAccount(entryNarrative, taxAccount, true)
+                            + " · ضريبة | Tax")
                     .debit(bill.getTaxAmount())
                     .credit(BigDecimal.ZERO)
                     .build());
         }
+        Account payableAccount = bill.getPayableAccount();
         journalLines.add(AccountingPostingService.JournalLineDraft.builder()
-                .accountId(bill.getPayableAccount().getId())
-                .description("Bill payable")
+                .accountId(payableAccount.getId())
+                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, payableAccount, false))
                 .debit(BigDecimal.ZERO)
                 .credit(bill.getTotalAmount())
                 .build());
 
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 bill.getBillDate(),
-                bill.getDescription(),
+                entryNarrative,
                 "BILL",
                 bill.getId(),
                 actor,

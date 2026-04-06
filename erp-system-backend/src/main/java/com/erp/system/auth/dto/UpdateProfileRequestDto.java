@@ -21,15 +21,22 @@ public class UpdateProfileRequestDto {
     @Size(max = 30, message = "PROFILE.PHONE_LENGTH")
     private String phone;
 
-    @NotBlank(message = "PROFILE.FULL_NAME_REQUIRED")
-    @Size(max = 150, message = "PROFILE.FULL_NAME_LENGTH")
-    private String fullName;
+    @NotBlank(message = "PROFILE.FULL_NAME_EN_REQUIRED")
+    @Size(max = 150, message = "PROFILE.FULL_NAME_EN_LENGTH")
+    private String fullNameEn;
+
+    @NotBlank(message = "PROFILE.FULL_NAME_AR_REQUIRED")
+    @Size(max = 150, message = "PROFILE.FULL_NAME_AR_LENGTH")
+    private String fullNameAr;
 
     private String profileImage;
 
     @Size(max = 60, message = "PROFILE.NATIONAL_ID_LENGTH")
     private String nationalId;
 
-    @Size(max = 180, message = "PROFILE.COMPANY_NAME_LENGTH")
-    private String companyName;
+    @Size(max = 180, message = "PROFILE.COMPANY_NAME_EN_LENGTH")
+    private String companyNameEn;
+
+    @Size(max = 180, message = "PROFILE.COMPANY_NAME_AR_LENGTH")
+    private String companyNameAr;
 }

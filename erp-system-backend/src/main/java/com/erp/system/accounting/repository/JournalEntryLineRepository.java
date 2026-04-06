@@ -88,6 +88,22 @@ public interface JournalEntryLineRepository extends JpaRepository<JournalEntryLi
                                            @Param("toDate") LocalDate toDate);
 
     @Query("""
+            select line
+            from JournalEntryLine line
+            where line.account.id in :accountIds
+              and line.journalEntry.entryDate >= coalesce(:fromDate, line.journalEntry.entryDate)
+              and line.journalEntry.entryDate <= coalesce(:toDate, line.journalEntry.entryDate)
+              and line.journalEntry.status in (
+                    com.erp.system.common.enums.JournalEntryStatus.APPROVED,
+                    com.erp.system.common.enums.JournalEntryStatus.REVERSED
+              )
+            order by line.journalEntry.entryDate asc, line.journalEntry.id asc, line.lineNumber asc
+            """)
+    List<JournalEntryLine> findLedgerLinesForAccountIds(@Param("accountIds") Collection<Long> accountIds,
+                                                      @Param("fromDate") LocalDate fromDate,
+                                                      @Param("toDate") LocalDate toDate);
+
+    @Query("""
             select coalesce(sum(line.debit - line.credit), 0)
             from JournalEntryLine line
             where line.account.id = :accountId
@@ -98,6 +114,19 @@ public interface JournalEntryLineRepository extends JpaRepository<JournalEntryLi
               )
             """)
     BigDecimal sumNetMovementBefore(@Param("accountId") Long accountId, @Param("beforeDate") LocalDate beforeDate);
+
+    @Query("""
+            select coalesce(sum(line.debit - line.credit), 0)
+            from JournalEntryLine line
+            where line.account.id in :accountIds
+              and line.journalEntry.entryDate < :beforeDate
+              and line.journalEntry.status in (
+                    com.erp.system.common.enums.JournalEntryStatus.APPROVED,
+                    com.erp.system.common.enums.JournalEntryStatus.REVERSED
+              )
+            """)
+    BigDecimal sumNetMovementBeforeAccountIds(@Param("accountIds") Collection<Long> accountIds,
+                                              @Param("beforeDate") LocalDate beforeDate);
 
     @Query("""
             select coalesce(sum(line.debit - line.credit), 0)

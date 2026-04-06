@@ -1,0 +1,185 @@
+.erp-sidebar-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--erp-radius-md);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    color: var(--text-primary);
+
+    &:hover {
+      background: var(--bg-hover);
+    }
+
+    .erp-sidebar-profile__info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      min-width: 0;
+
+      strong {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 160px;
+        line-height: 1.25;
+      }
+
+      small {
+        font-size: 12px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 160px;
+        line-height: 1.25;
+      }
+    }
+
+    .erp-sidebar-profile__caret {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      color: var(--text-secondary);
+      transition: transform 0.2s ease;
+    }
+  }
+
+  &--open .erp-sidebar-profile__caret {
+    transform: rotate(180deg);
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    min-width: 220px;
+    max-width: min(280px, 92vw);
+    background: var(--erp-bg-elevated);
+    border: 1px solid var(--erp-border);
+    border-radius: var(--erp-radius-md);
+    box-shadow: var(--erp-shadow-lg);
+    z-index: 1080;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease,
+      visibility 0.22s ease,
+      box-shadow 0.2s ease;
+    pointer-events: none;
+
+    .erp-sidebar-profile--open & {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+  }
+
+  &__menu-link {
+    display: flex;
+    align-items: center;
+    gap: var(--erp-space-2);
+    width: 100%;
+    padding: var(--erp-space-3);
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: var(--bg-hover);
+    }
+
+    &:first-child {
+      border-radius: var(--erp-radius-md) var(--erp-radius-md) 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 0 var(--erp-radius-md) var(--erp-radius-md);
+    }
+
+    &--danger {
+      color: var(--erp-danger);
+
+      &:hover {
+        background: var(--erp-danger-soft);
+      }
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &__skeleton {
+    .erp-sidebar-profile__info {
+      strong,
+      small {
+        background: var(--skeleton-bg);
+        border-radius: var(--erp-radius-sm);
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      strong {
+        height: 14px;
+        width: 80px;
+        margin-bottom: var(--erp-space-1);
+      }
+
+      small {
+        height: 12px;
+        width: 60px;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Header bar: enterprise surface (not the dark sidebar variant) */
+:host-context(.erp-header-actions) .erp-sidebar-profile__toggle {
+  background: var(--erp-bg-elevated) !important;
+  border: 1px solid var(--erp-border) !important;
+  border-radius: 12px !important;
+  color: var(--erp-text) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+:host-context(.erp-header-actions) .erp-sidebar-profile__info strong {
+  color: var(--erp-text) !important;
+}
+
+:host-context(.erp-header-actions) .erp-sidebar-profile__info small {
+  color: var(--erp-text-muted) !important;
+}
+
+:host-context(.erp-header-actions) .erp-sidebar-profile__caret {
+  color: var(--erp-text-muted) !important;
+}

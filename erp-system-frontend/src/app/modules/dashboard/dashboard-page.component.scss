@@ -1,9 +1,10 @@
 .dash-filter-bar {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--erp-space-3);
   margin-bottom: var(--erp-space-3);
-  flex-wrap: wrap;
   padding: var(--erp-space-3) var(--erp-space-4);
   background: var(--erp-bg-card);
   border: 1px solid var(--erp-border);
@@ -11,10 +12,25 @@
   box-shadow: var(--erp-shadow-sm);
 }
 
+.dash-filter-bar__dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--erp-space-3);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .dash-filter-bar__group {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.dash-filter-bar__date {
+  flex: 1 1 200px;
+  min-width: 168px;
+  max-width: 280px;
 }
 
 .dash-filter-bar__label {
@@ -25,8 +41,19 @@
 
 .dash-filter-bar__actions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--erp-space-2);
   align-items: flex-end;
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
+@media (max-width: 576px) {
+  .dash-filter-bar__actions {
+    margin-inline-start: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 
 .dashboard-grid > [class*='col-'] {

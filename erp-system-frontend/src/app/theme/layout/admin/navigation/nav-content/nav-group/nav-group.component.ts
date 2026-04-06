@@ -11,6 +11,7 @@ import {NextConfig} from '../../../../../../app-config';
 })
 export class NavGroupComponent implements OnInit {
   @Input() item: NavigationItem;
+  @Input() menuIconsOnly = false;
   @Input() layout1: boolean = false;
   @Input() activeId: any;
   public flatConfig: any;

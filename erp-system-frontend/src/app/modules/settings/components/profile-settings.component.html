@@ -1,0 +1,103 @@
+<div class="erp-profile-settings" *ngIf="user">
+  <div class="profile-header-premium">
+    <div class="profile-header-premium__bg"></div>
+    <div class="profile-header-premium__content">
+      <div class="profile-header-premium__avatar-section">
+        <div class="avatar-ring">
+          <img [src]="imagePreview || 'assets/images/user/avatar-1.jpg'" class="avatar-large" />
+          <label class="avatar-edit-overlay">
+            <mat-icon>photo_camera</mat-icon>
+            <input type="file" hidden accept="image/*" (change)="onSelectImage($event)" />
+          </label>
+        </div>
+        <div class="profile-header-premium__info">
+          <h3>{{ headerDisplayName() || user.username }}</h3>
+          <span class="badge-role">{{ ('ROLE.' + (user.role || '')) | translate }}</span>
+        </div>
+      </div>
+
+      <div class="profile-header-premium__quick-actions">
+        <!-- Quick Switchers (requested UI improvement) -->
+        <div class="quick-switcher-group">
+          <button type="button" class="quick-btn" (click)="changeTheme.emit(themeMode === 'light' ? 'dark' : 'light')" [ngbTooltip]="'NAV.TOGGLE_THEME' | translate">
+            <mat-icon>{{ themeMode === 'light' ? 'dark_mode' : 'light_mode' }}</mat-icon>
+          </button>
+          <button type="button" class="quick-btn" (click)="changeLanguage.emit(currentLanguage === 'ar' ? 'en' : 'ar')" [ngbTooltip]="'PROFILE.LANGUAGE' | translate">
+            <mat-icon>translate</mat-icon>
+            <span class="lang-label">{{ currentLanguage === 'ar' ? 'EN' : 'AR' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-body-grid">
+    <div class="profile-body-main">
+      <div class="erp-settings-section">
+        <h4 class="section-title">
+          <mat-icon>person</mat-icon>
+          {{ 'PROFILE.PERSONAL_INFO' | translate }}
+        </h4>
+        
+        <form [formGroup]="form" class="row">
+          <div class="col-md-6 mb-3">
+            <app-form-field [control]="form.controls.fullNameEn" labelKey="PROFILE.FULL_NAME_EN" icon="badge"></app-form-field>
+          </div>
+          <div class="col-md-6 mb-3">
+            <app-form-field [control]="form.controls.fullNameAr" labelKey="PROFILE.FULL_NAME_AR" icon="badge"></app-form-field>
+          </div>
+          <div class="col-md-6 mb-3">
+            <app-form-field [control]="form.controls.username" labelKey="PROFILE.USERNAME" icon="alternate_email"></app-form-field>
+          </div>
+          <div class="col-md-6 mb-3">
+            <app-form-field [control]="form.controls.email" labelKey="PROFILE.EMAIL" icon="mail" type="email"></app-form-field>
+          </div>
+          <div class="col-md-6 mb-3">
+            <app-form-field [control]="form.controls.phone" labelKey="PROFILE.PHONE" icon="call"></app-form-field>
+          </div>
+          <div class="col-md-6 mb-3">
+            <app-form-field [control]="form.controls.nationalId" labelKey="PROFILE.NATIONAL_ID" icon="credit_card"></app-form-field>
+          </div>
+          <div class="col-md-6 mb-3">
+            <app-form-field [control]="form.controls.companyNameEn" labelKey="PROFILE.COMPANY_NAME_EN" icon="business_center"></app-form-field>
+          </div>
+          <div class="col-md-6 mb-3">
+            <app-form-field [control]="form.controls.companyNameAr" labelKey="PROFILE.COMPANY_NAME_AR" icon="business_center"></app-form-field>
+          </div>
+        </form>
+      </div>
+
+      <div class="erp-settings-section">
+        <h4 class="section-title">
+          <mat-icon>lock</mat-icon>
+          {{ 'PROFILE.SECURITY' | translate }}
+        </h4>
+        <div class="security-card">
+          <div class="security-info">
+            <div class="info-item">
+              <label>{{ 'PROFILE.EMAIL' | translate }}</label>
+              <span>{{ user.email }}</span>
+            </div>
+            <div class="info-item">
+              <label>{{ 'PROFILE.ACCOUNT_ROLE' | translate }}</label>
+              <span class="text-primary fw-bold">{{ ('ROLE.' + (user.role || '')) | translate }}</span>
+            </div>
+          </div>
+          <button type="button" class="erp-button erp-button--outline erp-button--sm">
+            <mat-icon>password</mat-icon>
+            {{ 'PROFILE.CHANGE_PASSWORD' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-footer-sticky">
+    <div *ngIf="errorKey" class="alert-inline alert-danger">{{ errorKey | translate }}</div>
+    <div *ngIf="successKey" class="alert-inline alert-success">{{ successKey | translate }}</div>
+    <button type="button" class="erp-button erp-button--primary" [disabled]="saving || form.invalid" (click)="onSave()">
+      <mat-icon>save</mat-icon>
+      <span>{{ 'PROFILE.SAVE_CHANGES' | translate }}</span>
+    </button>
+  </div>
+</div>

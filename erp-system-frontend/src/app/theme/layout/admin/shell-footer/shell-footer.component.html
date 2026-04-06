@@ -1,0 +1,41 @@
+<footer class="erp-shell-footer" role="contentinfo">
+  <div class="erp-shell-footer__grid">
+    <div class="erp-shell-footer__col">
+      <h2 class="erp-shell-footer__heading">{{ 'NAV.GROUP' | translate }}</h2>
+      <div class="erp-shell-footer__underline" aria-hidden="true"><span></span></div>
+      <p class="erp-shell-footer__blurb">{{ 'login.footerBlurb' | translate }}</p>
+    </div>
+    <div class="erp-shell-footer__col">
+      <h2 class="erp-shell-footer__heading">{{ 'login.footerLinksTitle' | translate }}</h2>
+      <div class="erp-shell-footer__underline" aria-hidden="true"><span></span></div>
+      <ul class="erp-shell-footer__list">
+        <li>
+          <a routerLink="/dashboard" class="erp-shell-footer__link">
+            <mat-icon>dashboard</mat-icon>
+            <span>{{ 'NAV.DASHBOARD' | translate }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="erp-shell-footer__col">
+      <h2 class="erp-shell-footer__heading">{{ 'login.footerOfficeTitle' | translate }}</h2>
+      <div class="erp-shell-footer__underline" aria-hidden="true"><span></span></div>
+      <p class="erp-shell-footer__office">{{ 'login.footerOfficeLine' | translate }}</p>
+      <div class="erp-shell-footer__icons">
+        <span class="erp-shell-footer__icon-chip" [attr.title]="'AUTH.SECURE_LOGIN' | translate">
+          <mat-icon>lock</mat-icon>
+        </span>
+        <span class="erp-shell-footer__icon-chip" [attr.title]="'login.footerOfficeTitle' | translate">
+          <mat-icon>cloud_done</mat-icon>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="erp-shell-footer__meta">
+    <span>{{ 'login.footerCopyright' | translate: { year: year } }}</span>
+    <span class="erp-shell-footer__sep" aria-hidden="true">&middot;</span>
+    <span>{{ 'APP.VERSION_LABEL' | translate }} {{ version }}</span>
+    <span class="erp-shell-footer__sep" aria-hidden="true">&middot;</span>
+    <span>{{ envLabelKey | translate }}</span>
+  </div>
+</footer>

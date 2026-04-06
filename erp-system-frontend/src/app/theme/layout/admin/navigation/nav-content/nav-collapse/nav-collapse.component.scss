@@ -14,10 +14,21 @@
   justify-content: flex-start;
   gap: var(--erp-space-2);
   width: 100%;
-  min-height: 44px;
-  padding: 0 14px !important;
-  border-radius: 10px;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 12px !important;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.88) !important;
+  transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
+}
+
+:host ::ng-deep .erp-nav-collapse > .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  transform: translateX(2px);
+}
+
+:host-context(body.rtl) :host ::ng-deep .erp-nav-collapse > .nav-link:hover {
+  transform: translateX(-2px);
 }
 
 :host ::ng-deep .erp-nav-collapse > .nav-link::after {
@@ -25,7 +36,14 @@
   content: none !important;
 }
 
+:host ::ng-deep .erp-nav-collapse > .nav-link .pcoded-mtext {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.875rem;
+}
+
 :host ::ng-deep .pcoded-submenu {
-  margin: var(--erp-space-1) 0 0;
+  margin: 2px 0 0;
   padding: 0;
+  padding-inline-start: 8px;
 }

@@ -4,6 +4,7 @@ import com.erp.system.auth.domain.AccessRole;
 import com.erp.system.auth.domain.RoleMenuPermission;
 import com.erp.system.auth.domain.User;
 import com.erp.system.auth.domain.UserAccessRole;
+import com.erp.system.auth.domain.UserProfile;
 import com.erp.system.auth.dto.AdminAccessContextDto;
 import com.erp.system.auth.dto.AdminAccessRoleDto;
 import com.erp.system.auth.dto.AdminAccessRoleFormDto;
@@ -19,8 +20,10 @@ import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.ui.domain.UiMenuItem;
 import com.erp.system.ui.dto.AdminMenuItemDto;
+import com.erp.system.auth.util.UserProfileI18n;
 import com.erp.system.ui.repository.UiMenuItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,8 +104,12 @@ public class AdminAccessManagementService {
                 .active(Boolean.TRUE.equals(request.getActive()))
                 .build();
 
+        String fullNameEn = normalize(request.getFullNameEn());
+        String fullNameAr = normalize(request.getFullNameAr());
         user.setProfile(com.erp.system.auth.domain.UserProfile.builder()
-                .fullName(normalize(request.getFullName()))
+                .fullNameEn(fullNameEn)
+                .fullNameAr(fullNameAr)
+                .fullName(UserProfileI18n.syncLegacyFullName(fullNameEn, fullNameAr))
                 .build());
 
         User saved = userRepository.save(user);
@@ -149,7 +156,11 @@ public class AdminAccessManagementService {
         if (user.getProfile() == null) {
             user.setProfile(com.erp.system.auth.domain.UserProfile.builder().build());
         }
-        user.getProfile().setFullName(normalize(request.getFullName()));
+        String fullNameEn = normalize(request.getFullNameEn());
+        String fullNameAr = normalize(request.getFullNameAr());
+        user.getProfile().setFullNameEn(fullNameEn);
+        user.getProfile().setFullNameAr(fullNameAr);
+        user.getProfile().setFullName(UserProfileI18n.syncLegacyFullName(fullNameEn, fullNameAr));
 
         User saved = userRepository.save(user);
         syncAssignments(saved, request.getRoleIds());
@@ -247,6 +258,11 @@ public class AdminAccessManagementService {
         List<AccessRole> assignedRoles = userAccessRoleRepository.findByUserIdOrderByRoleCodeAsc(user.getId()).stream()
                 .map(UserAccessRole::getRole)
                 .toList();
+        UserProfile prof = user.getProfile();
+        Locale locale = LocaleContextHolder.getLocale();
+        String resolvedFullName = prof == null
+                ? null
+                : UserProfileI18n.resolveFullName(prof.getFullNameEn(), prof.getFullNameAr(), locale);
         return AdminUserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -254,7 +270,9 @@ public class AdminAccessManagementService {
                 .phone(user.getPhone())
                 .primaryRole(user.getRole() == null ? null : user.getRole().name())
                 .active(user.isActive())
-                .fullName(user.getProfile() == null ? null : user.getProfile().getFullName())
+                .fullName(resolvedFullName)
+                .fullNameEn(prof == null ? null : prof.getFullNameEn())
+                .fullNameAr(prof == null ? null : prof.getFullNameAr())
                 .createdAt(user.getCreatedAt())
                 .roleIds(assignedRoles.stream().map(AccessRole::getId).toList())
                 .roleCodes(assignedRoles.stream().map(AccessRole::getCode).toList())

@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ReconciliationBankAccountDto, ReconciliationDto, ReconciliationLineDto, ReconciliationSummaryDto } from '../../core/models/accounting.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -9,7 +10,8 @@ import { LookupService } from '../../core/services/lookup.service';
 @Component({ standalone: false,
   selector: 'app-reconciliation-page',
   templateUrl: './reconciliation-page.component.html',
-  styleUrls: ['./reconciliation-page.component.scss']
+  styleUrls: ['./reconciliation-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReconciliationPageComponent implements OnInit {
   readonly titleKey = 'RECONCILIATION.TITLE';
@@ -18,11 +20,20 @@ export class ReconciliationPageComponent implements OnInit {
   errorKey = '';
   successKey = '';
   showCreateForm = false;
-  reconciliations: ReconciliationDto[] = [];
-  selectedReconciliation: ReconciliationDto | null = null;
-  statementLines: ReconciliationLineDto[] = [];
-  systemLines: ReconciliationLineDto[] = [];
-  summary: ReconciliationSummaryDto | null = null;
+  private readonly reconciliationsSubject = new BehaviorSubject<ReconciliationDto[]>([]);
+  public readonly reconciliations$: Observable<ReconciliationDto[]> = this.reconciliationsSubject.asObservable();
+  
+  private readonly selectedRecSubject = new BehaviorSubject<ReconciliationDto | null>(null);
+  public readonly selectedReconciliation$: Observable<ReconciliationDto | null> = this.selectedRecSubject.asObservable();
+
+  private readonly statementLinesSubject = new BehaviorSubject<ReconciliationLineDto[]>([]);
+  public readonly statementLines$: Observable<ReconciliationLineDto[]> = this.statementLinesSubject.asObservable();
+
+  private readonly systemLinesSubject = new BehaviorSubject<ReconciliationLineDto[]>([]);
+  public readonly systemLines$: Observable<ReconciliationLineDto[]> = this.systemLinesSubject.asObservable();
+
+  private readonly summarySubject = new BehaviorSubject<ReconciliationSummaryDto | null>(null);
+  public readonly summary$: Observable<ReconciliationSummaryDto | null> = this.summarySubject.asObservable();
   bankAccounts: ReconciliationBankAccountDto[] = [];
   bankAccountOptions: Array<{ id: number; label: string }> = [];
   selectedStatementLineId: number | null = null;
@@ -60,7 +71,8 @@ export class ReconciliationPageComponent implements OnInit {
   }
 
   get isEditable(): boolean {
-    return !!this.selectedReconciliation && (this.selectedReconciliation.status === 'OPEN' || this.selectedReconciliation.status === 'IN_PROGRESS');
+    const selected = this.selectedRecSubject.value;
+    return !!selected && (selected.status === 'OPEN' || selected.status === 'IN_PROGRESS');
   }
 
   onSearch(searchValue?: Record<string, string>): void {
@@ -84,18 +96,19 @@ export class ReconciliationPageComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (items) => {
-          this.reconciliations = items;
-          if (!this.selectedReconciliation && items.length) {
+          this.reconciliationsSubject.next(items);
+          if (!this.selectedRecSubject.value && items.length) {
             this.selectReconciliation(items[0].id);
           }
         },
         error: () => {
           this.errorKey = 'COMMON.ERROR_LOADING';
+          this.reconciliationsSubject.next([]);
         }
       });
   }
@@ -121,7 +134,7 @@ export class ReconciliationPageComponent implements OnInit {
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
         next: (item) => {
-          this.selectedReconciliation = item;
+          this.selectedRecSubject.next(item);
           this.showCreateForm = false;
           this.successKey = 'RECONCILIATION.CREATE_SUCCESS';
           this.load();
@@ -140,10 +153,10 @@ export class ReconciliationPageComponent implements OnInit {
     this.selectedSystemLineId = null;
     this.api.getReconciliation(id).subscribe({
       next: (rec) => {
-        this.selectedReconciliation = rec;
-        this.api.getReconciliationStatementLines(id).subscribe((rows) => (this.statementLines = rows));
-        this.api.getReconciliationSystemTransactions(id).subscribe((rows) => (this.systemLines = rows));
-        this.api.getReconciliationSummary(id).subscribe((s) => (this.summary = s));
+        this.selectedRecSubject.next(rec);
+        this.api.getReconciliationStatementLines(id).subscribe((rows) => this.statementLinesSubject.next(rows));
+        this.api.getReconciliationSystemTransactions(id).subscribe((rows) => this.systemLinesSubject.next(rows));
+        this.api.getReconciliationSummary(id).subscribe((s) => this.summarySubject.next(s));
       },
       error: () => { this.errorKey = 'COMMON.ERROR_LOADING'; }
     });
@@ -160,11 +173,12 @@ export class ReconciliationPageComponent implements OnInit {
   }
 
   matchSelected(): void {
-    if (!this.selectedReconciliation || !this.selectedStatementLineId || !this.selectedSystemLineId) return;
+    const selected = this.selectedRecSubject.value;
+    if (!selected || !this.selectedStatementLineId || !this.selectedSystemLineId) return;
     this.errorKey = '';
-    this.api.matchReconciliationLines(this.selectedReconciliation.id, this.selectedStatementLineId, this.selectedSystemLineId).subscribe({
+    this.api.matchReconciliationLines(selected.id, this.selectedStatementLineId, this.selectedSystemLineId).subscribe({
       next: (updated) => {
-        this.selectedReconciliation = updated;
+        this.selectedRecSubject.next(updated);
         this.selectReconciliation(updated.id);
         this.successKey = 'RECONCILIATION.MATCH_SUCCESS';
       },
@@ -173,11 +187,12 @@ export class ReconciliationPageComponent implements OnInit {
   }
 
   unmatchLine(line: ReconciliationLineDto): void {
-    if (!this.selectedReconciliation) return;
+    const selected = this.selectedRecSubject.value;
+    if (!selected) return;
     this.errorKey = '';
-    this.api.unmatchReconciliationLine(this.selectedReconciliation.id, line.id).subscribe({
+    this.api.unmatchReconciliationLine(selected.id, line.id).subscribe({
       next: (updated) => {
-        this.selectedReconciliation = updated;
+        this.selectedRecSubject.next(updated);
         this.selectReconciliation(updated.id);
         this.successKey = 'RECONCILIATION.UNMATCH_SUCCESS';
       },
@@ -186,16 +201,17 @@ export class ReconciliationPageComponent implements OnInit {
   }
 
   finalizeReconciliation(): void {
-    if (!this.selectedReconciliation) return;
+    const selected = this.selectedRecSubject.value;
+    if (!selected) return;
     this.confirmDialog.confirmByKey({ messageKey: 'RECONCILIATION.CONFIRM_FINALIZE' }).subscribe((ok) => {
-      if (ok !== true || !this.selectedReconciliation) return;
+      if (ok !== true) return;
       this.errorKey = '';
       this.saving = true;
-      this.api.finalizeReconciliation(this.selectedReconciliation.id, this.currentUser())
-        .pipe(finalize(() => { this.saving = false; this.cdr.detectChanges(); }))
+      this.api.finalizeReconciliation(selected.id, this.currentUser())
+        .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }))
         .subscribe({
           next: (updated) => {
-            this.selectedReconciliation = updated;
+            this.selectedRecSubject.next(updated);
             this.selectReconciliation(updated.id);
             this.successKey = 'RECONCILIATION.FINALIZE_SUCCESS';
             this.load();
@@ -206,16 +222,17 @@ export class ReconciliationPageComponent implements OnInit {
   }
 
   cancelReconciliation(): void {
-    if (!this.selectedReconciliation) return;
+    const selected = this.selectedRecSubject.value;
+    if (!selected) return;
     this.confirmDialog.confirmByKey({ messageKey: 'RECONCILIATION.CONFIRM_CANCEL', danger: true }).subscribe((ok) => {
-      if (ok !== true || !this.selectedReconciliation) return;
+      if (ok !== true) return;
       this.errorKey = '';
       this.saving = true;
-      this.api.cancelReconciliation(this.selectedReconciliation.id, this.currentUser())
-        .pipe(finalize(() => { this.saving = false; this.cdr.detectChanges(); }))
+      this.api.cancelReconciliation(selected.id, this.currentUser())
+        .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }))
         .subscribe({
           next: (updated) => {
-            this.selectedReconciliation = updated;
+            this.selectedRecSubject.next(updated);
             this.selectReconciliation(updated.id);
             this.successKey = 'RECONCILIATION.CANCEL_SUCCESS';
             this.load();

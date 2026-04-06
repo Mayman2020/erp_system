@@ -1,0 +1,164 @@
+.erp-shell-footer {
+  flex: 0 0 auto;
+  width: 100%;
+  margin-top: auto;
+  background: var(--erp-shell-bar-gradient);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top-left-radius: clamp(40px, 10vw, 88px);
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.14);
+  color: var(--erp-shell-bar-text, #f8fafc);
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.erp-shell-footer__grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 28px 24px;
+  padding: clamp(24px, 3.5vw, 40px) clamp(18px, 5%, 56px);
+  max-width: var(--erp-content-max);
+  margin: 0 auto;
+}
+
+.erp-shell-footer__col {
+  flex: 1 1 200px;
+  min-width: min(100%, 200px);
+}
+
+.erp-shell-footer__heading {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin: 0 0 4px;
+  color: var(--erp-shell-bar-text, #f8fafc);
+  font-weight: 800;
+}
+
+.erp-shell-footer__underline {
+  width: 72px;
+  height: 3px;
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.92);
+  margin: 4px 0 14px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.erp-shell-footer__underline span {
+  width: 9px;
+  height: 100%;
+  position: absolute;
+  left: 10px;
+  background-color: #64748b;
+  border-radius: 3px;
+  animation: erp-shell-footer-underline 1.5s linear infinite;
+}
+
+@keyframes erp-shell-footer-underline {
+  0% {
+    left: -20px;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.erp-shell-footer__blurb,
+.erp-shell-footer__office {
+  color: var(--erp-shell-bar-text-muted, rgba(248, 250, 252, 0.88));
+  font-size: 0.875rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 280px;
+}
+
+.erp-shell-footer__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.erp-shell-footer__list li {
+  margin: 8px 0;
+}
+
+.erp-shell-footer__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--erp-shell-bar-text, #f8fafc);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.erp-shell-footer__link:hover {
+  color: #bae6fd;
+}
+
+.erp-shell-footer__link mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.erp-shell-footer__icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.erp-shell-footer__icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--erp-shell-bar-text, #f8fafc);
+}
+
+.erp-shell-footer__icon-chip mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.erp-shell-footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  padding: 0 clamp(14px, 4%, 40px) 16px;
+  font-size: 0.8125rem;
+  color: rgba(248, 250, 252, 0.65);
+  text-align: center;
+}
+
+.erp-shell-footer__sep {
+  opacity: 0.75;
+  user-select: none;
+}
+
+@media (max-width: 767px) {
+  .erp-shell-footer__grid {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .erp-shell-footer__meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .erp-shell-footer__sep {
+    display: none;
+  }
+}

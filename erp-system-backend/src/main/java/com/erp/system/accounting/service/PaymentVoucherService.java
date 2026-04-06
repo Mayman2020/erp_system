@@ -16,6 +16,7 @@ import com.erp.system.common.enums.PaymentMethod;
 import com.erp.system.common.enums.VoucherStatus;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
+import com.erp.system.accounting.support.JournalPostingNarratives;
 import com.erp.system.common.service.AccountingSettingsService;
 import com.erp.system.common.service.NumberingService;
 import lombok.RequiredArgsConstructor;
@@ -133,22 +134,28 @@ public class PaymentVoucherService {
             }
         }
 
+        String entryNarrative = JournalPostingNarratives.entryHeader(
+                voucher.getDescription(),
+                JournalPostingNarratives.PAYMENT_BOND,
+                voucher.getReference());
+        Account expenseAccount = voucher.getExpenseAccount();
+        Account cashAccount = voucher.getCashAccount();
         JournalEntry journalEntry = accountingPostingService.createPostedJournal(
                 voucher.getVoucherDate(),
-                voucher.getDescription(),
+                entryNarrative,
                 "PAYMENT_VOUCHER",
                 voucher.getId(),
                 actor,
                 List.of(
                         AccountingPostingService.JournalLineDraft.builder()
-                                .accountId(voucher.getExpenseAccount().getId())
-                                .description("Payment voucher debit")
+                                .accountId(expenseAccount.getId())
+                                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, expenseAccount, true))
                                 .debit(voucher.getAmount())
                                 .credit(BigDecimal.ZERO)
                                 .build(),
                         AccountingPostingService.JournalLineDraft.builder()
-                                .accountId(voucher.getCashAccount().getId())
-                                .description("Payment voucher credit")
+                                .accountId(cashAccount.getId())
+                                .description(JournalPostingNarratives.lineWithAccount(entryNarrative, cashAccount, false))
                                 .debit(BigDecimal.ZERO)
                                 .credit(voucher.getAmount())
                                 .build()

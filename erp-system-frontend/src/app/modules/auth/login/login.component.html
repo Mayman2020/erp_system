@@ -1,122 +1,144 @@
-<section class="erp-login-page" [class.dark-mode]="darkMode">
-  <div class="erp-login-shell">
-    <div class="erp-login-form-panel">
-      <div class="erp-login-form-panel__topbar">
-        <app-language-switcher [compact]="false" placement="bottom-left" align="start"></app-language-switcher>
-        <button type="button" class="erp-icon-button" (click)="toggleTheme()" [attr.aria-label]="'NAV.TOGGLE_THEME' | translate">
-          <mat-icon aria-hidden="true">{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
-        </button>
-      </div>
-
-      <div class="erp-login-card">
-        <div class="erp-login-mode-switch">
-          <button class="erp-button" [ngClass]="mode === 'login' ? 'erp-button--primary' : 'erp-button--ghost'" type="button" (click)="mode = 'login'">
-            {{ 'AUTH.SIGN_IN' | translate }}
-          </button>
-          <button class="erp-button" [ngClass]="mode === 'forgot' ? 'erp-button--primary' : 'erp-button--ghost'" type="button" (click)="mode = 'forgot'">
-            {{ 'AUTH.FORGOT' | translate }}
-          </button>
-        </div>
-
-        <div class="erp-login-card__copy">
-          <h1>{{ mode === 'login' ? ('AUTH.SIGN_IN' | translate) : ('AUTH.FORGOT' | translate) }}</h1>
-          <p>{{ mode === 'login' ? ('AUTH.SUBTITLE' | translate) : ('AUTH.FORGOT_SUBTITLE' | translate) }}</p>
-        </div>
-
-        <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="mode === 'login'" class="erp-login-form">
-          <label class="erp-login-field">
-            <span>{{ 'AUTH.EMAIL' | translate }}</span>
-            <input type="email" class="erp-input" formControlName="email" />
-          </label>
-
-          <label class="erp-login-field">
-            <span>{{ 'AUTH.PASSWORD' | translate }}</span>
-            <span class="erp-login-password">
-              <input [type]="hidePassword ? 'password' : 'text'" class="erp-input" formControlName="password" />
-              <button type="button" class="erp-login-password__toggle" (click)="hidePassword = !hidePassword">
-                <mat-icon aria-hidden="true">{{ hidePassword ? 'visibility' : 'visibility_off' }}</mat-icon>
-              </button>
-            </span>
-          </label>
-
-          <div class="erp-login-form__meta">
-            <label class="erp-login-checkbox">
-              <input type="checkbox" formControlName="rememberMe" />
-              <span>{{ 'AUTH.REMEMBER_ME' | translate }}</span>
-            </label>
-            <button type="button" class="erp-login-link" (click)="mode = 'forgot'">{{ 'AUTH.FORGOT' | translate }}</button>
-          </div>
-
-          <div class="text-danger" *ngIf="errorKey">{{ errorKey | translate }}</div>
-
-          <button class="erp-button erp-button--primary erp-login-submit" type="submit" [disabled]="loading">
-            <mat-icon aria-hidden="true">login</mat-icon>
-            <span>{{ loading ? ('COMMON.LOADING' | translate) : ('AUTH.LOGIN' | translate) }}</span>
-          </button>
-        </form>
-
-        <div *ngIf="mode === 'forgot'" class="erp-login-form">
-          <form [formGroup]="forgotForm" (ngSubmit)="sendOtp()" class="erp-login-form">
-            <label class="erp-login-field">
-              <span>{{ 'AUTH.EMAIL' | translate }}</span>
-              <input type="email" class="erp-input" formControlName="email" />
-            </label>
-
-            <button class="erp-button erp-button--ghost erp-login-submit" type="submit" [disabled]="otpLoading || otpSent">
-              {{ otpLoading ? ('COMMON.LOADING' | translate) : ('AUTH.SEND_OTP' | translate) }}
-            </button>
-          </form>
-
-          <form [formGroup]="resetForm" (ngSubmit)="resetPassword()" *ngIf="otpSent" class="erp-login-form">
-            <label class="erp-login-field">
-              <span>{{ 'AUTH.OTP_CODE' | translate }}</span>
-              <input class="erp-input" formControlName="otpCode" />
-            </label>
-
-            <label class="erp-login-field">
-              <span>{{ 'AUTH.NEW_PASSWORD' | translate }}</span>
-              <span class="erp-login-password">
-                <input [type]="hideNewPassword ? 'password' : 'text'" class="erp-input" formControlName="newPassword" />
-                <button type="button" class="erp-login-password__toggle" (click)="hideNewPassword = !hideNewPassword">
-                  <mat-icon aria-hidden="true">{{ hideNewPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
-                </button>
-              </span>
-            </label>
-
-            <button class="erp-button erp-button--primary erp-login-submit" type="submit" [disabled]="otpLoading">
-              {{ otpLoading ? ('COMMON.LOADING' | translate) : ('AUTH.RESET_PASSWORD' | translate) }}
-            </button>
-          </form>
-        </div>
-
-        <div class="erp-login-footer">{{ 'AUTH.FOOTER_NOTE' | translate }}</div>
-      </div>
+<section class="login-shell login-shell--immersive erp-bg-animated">
+  <div class="login-bg-fx" aria-hidden="true">
+    <div class="login-brand-visual">
+      <div class="login-brand-visual__orb login-brand-visual__orb--a"></div>
+      <div class="login-brand-visual__orb login-brand-visual__orb--b"></div>
+      <div class="login-brand-visual__wave"></div>
     </div>
+    <div id="particles-js"></div>
+  </div>
 
-    <aside class="erp-login-brand-panel">
-      <div class="erp-login-brand-panel__inner">
-        <img
-          [src]="darkMode ? 'assets/images/brand/coreerp-logo-dark.svg' : 'assets/images/brand/coreerp-logo-light.svg'"
-          class="erp-logo"
-          [attr.alt]="'APP.BRAND' | translate"
-        />
-        <span class="erp-login-brand-panel__badge">{{ 'AUTH.NEW_EXPERIENCE' | translate }}</span>
-        <h2>{{ 'AUTH.HERO_TITLE' | translate }}</h2>
-        <p>{{ 'AUTH.HERO_SUBTITLE' | translate }}</p>
+  <div class="login-shell__grid">
+    <main class="login-side login-side--form">
+      <div class="login-form-panel">
+        <div #loginCard class="login-card login-anim-target erp-card erp-card--soft">
+          <div class="login-card__toolbar">
+            <button
+              type="button"
+              class="erp-nav-theme-btn"
+              (click)="toggleTheme()"
+              [attr.title]="'NAV.TOGGLE_THEME' | translate"
+              [attr.aria-label]="'NAV.TOGGLE_THEME' | translate"
+            >
+              <mat-icon aria-hidden="true">{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+            </button>
+          </div>
+          <div class="login-brand login-gsap-stagger">
+            <div class="login-brand__meta">
+              <p class="login-brand__tag">{{ 'login.heroLead' | t }}</p>
+            </div>
+          </div>
 
-        <div class="erp-login-brand-panel__points">
-          <div class="erp-login-brand-panel__point">
-            <mat-icon aria-hidden="true">shield</mat-icon>
-            <span>{{ 'AUTH.FEATURE_1' | translate }}</span>
+          <div class="login-head login-gsap-stagger">
+            <h3>{{ mode === 'login' ? ('AUTH.SIGN_IN' | translate) : ('AUTH.FORGOT' | translate) }}</h3>
+            <p class="sub">{{ mode === 'login' ? ('AUTH.SUBTITLE' | translate) : ('AUTH.FORGOT_SUBTITLE' | translate) }}</p>
           </div>
-          <div class="erp-login-brand-panel__point">
-            <mat-icon aria-hidden="true">dashboard_customize</mat-icon>
-            <span>{{ 'AUTH.FEATURE_2' | translate }}</span>
+
+          <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="mode === 'login'" class="login-form login-gsap-stagger">
+            <div class="field erp-form-field">
+              <label>{{ 'AUTH.EMAIL' | translate }}</label>
+              <input type="email" class="erp-input login-input" formControlName="email" [attr.placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate" />
+            </div>
+
+            <div class="field erp-form-field">
+              <label>{{ 'AUTH.PASSWORD' | translate }}</label>
+              <div class="password-wrapper">
+                <input [type]="hidePassword ? 'password' : 'text'" class="erp-input login-input" formControlName="password" [attr.placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate" />
+                <button type="button" class="eye-btn" (click)="hidePassword = !hidePassword" [attr.aria-label]="(hidePassword ? 'AUTH.SHOW_PASSWORD' : 'AUTH.HIDE_PASSWORD') | translate">
+                  <mat-icon>{{ hidePassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="meta-row">
+              <label class="remember">
+                <input type="checkbox" formControlName="rememberMe" />
+                <span>{{ 'AUTH.REMEMBER_ME' | translate }}</span>
+              </label>
+              <a class="forgot" (click)="mode = 'forgot'">{{ 'AUTH.FORGOT' | translate }}</a>
+            </div>
+
+            <div class="text-danger error-msg" *ngIf="errorKey">{{ errorKey | translate }}</div>
+
+            <div class="login-actions">
+              <button class="erp-btn erp-btn-primary login-submit" type="submit" [disabled]="loading">
+                <span *ngIf="!loading">{{ 'AUTH.LOGIN' | translate }}</span>
+                <div class="button-spinner" *ngIf="loading"></div>
+              </button>
+            </div>
+          </form>
+
+          <div *ngIf="mode === 'forgot'" class="login-form login-form--forgot login-gsap-stagger">
+            <form [formGroup]="forgotForm" (ngSubmit)="sendOtp()" *ngIf="!otpSent">
+              <div class="field erp-form-field">
+                <label>{{ 'AUTH.EMAIL' | translate }}</label>
+                <input type="email" class="erp-input login-input" formControlName="email" />
+              </div>
+              <button class="erp-btn erp-btn-primary login-submit" type="submit" [disabled]="otpLoading">
+                <span *ngIf="!otpLoading">{{ 'AUTH.SEND_OTP' | translate }}</span>
+                <div class="button-spinner" *ngIf="otpLoading"></div>
+              </button>
+              <a class="back-link" (click)="mode = 'login'">{{ 'COMMON.BACK' | translate }}</a>
+            </form>
+
+            <form [formGroup]="resetForm" (ngSubmit)="resetPassword()" *ngIf="otpSent">
+              <div class="field erp-form-field">
+                <label>{{ 'AUTH.OTP_CODE' | translate }}</label>
+                <input class="erp-input login-input" formControlName="otpCode" />
+              </div>
+              <div class="field erp-form-field">
+                <label>{{ 'AUTH.NEW_PASSWORD' | translate }}</label>
+                <input [type]="hideNewPassword ? 'password' : 'text'" class="erp-input login-input" formControlName="newPassword" />
+              </div>
+              <button class="erp-btn erp-btn-primary login-submit" type="submit" [disabled]="otpLoading">
+                <span *ngIf="!otpLoading">{{ 'AUTH.RESET_PASSWORD' | translate }}</span>
+                <div class="button-spinner" *ngIf="otpLoading"></div>
+              </button>
+            </form>
           </div>
-          <div class="erp-login-brand-panel__point">
-            <mat-icon aria-hidden="true">insights</mat-icon>
-            <span>{{ 'AUTH.FEATURE_3' | translate }}</span>
+
+          <div class="security-badge login-gsap-stagger">
+            <mat-icon>verified_user</mat-icon>
+            <span>{{ 'AUTH.SECURE_LOGIN' | translate }}</span>
           </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="login-side login-side--brand" aria-hidden="false">
+      <div #brandPanel class="login-side__content">
+        <span class="vision-badge">{{ 'login.visionBadge' | t }}</span>
+        <h2 class="login-hero-title">{{ 'login.heroTitle' | t }}</h2>
+        <p class="login-side__lead">{{ 'login.heroLead' | t }}</p>
+
+        <div class="features">
+          <article class="feature-card">
+            <span class="feature-icon" aria-hidden="true">
+              <mat-icon>smart_toy</mat-icon>
+            </span>
+            <div class="feature-card__text">
+              <strong>{{ 'login.feat1Title' | t }}</strong>
+              <span>{{ 'login.feat1Desc' | t }}</span>
+            </div>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon" aria-hidden="true">
+              <mat-icon>gavel</mat-icon>
+            </span>
+            <div class="feature-card__text">
+              <strong>{{ 'login.feat2Title' | t }}</strong>
+              <span>{{ 'login.feat2Desc' | t }}</span>
+            </div>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon" aria-hidden="true">
+              <mat-icon>insights</mat-icon>
+            </span>
+            <div class="feature-card__text">
+              <strong>{{ 'login.feat3Title' | t }}</strong>
+              <span>{{ 'login.feat3Desc' | t }}</span>
+            </div>
+          </article>
         </div>
       </div>
     </aside>

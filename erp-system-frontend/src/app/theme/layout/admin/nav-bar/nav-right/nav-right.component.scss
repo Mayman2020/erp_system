@@ -1,14 +1,30 @@
 :host {
   display: flex;
   align-items: center;
+  position: relative;
+  z-index: 5;
+  overflow: visible;
 }
 
 .erp-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--erp-space-2);
   justify-content: flex-end;
+  position: relative;
+  overflow: visible;
 }
 
-.erp-nav-theme-btn {
+/* Language flag + theme toggle: same size, flush, icons optically centered */
+.erp-header-actions__rail {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
+
+/* RTL: profile (reading first) before language flag */
+:host-context(body.rtl) .erp-header-actions app-profile-card {
+  order: -1;
+}
+
