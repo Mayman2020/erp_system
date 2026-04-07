@@ -20,6 +20,10 @@ This repository is configured to auto-deploy on every push to `main` using:
 - Backend: `ghcr.io/<owner-lowercase>/erp-backend`
 - Frontend (Docker summary title / image): `ghcr.io/<owner-lowercase>/erp-system-dubai`
 
+## Frontend build (root approach)
+
+There is **one** path: `erp-system-frontend/Dockerfile` runs `npm ci` + `npm run build:production` inside the image. GitHub Actions does **not** build Angular on the runner first — avoids duplicate builds, wrong `--target`, and stale commits. Set secret `NG_API_BASE_URL` for real deployments.
+
 ## Required GitHub Secrets
 
 Set these in `Settings -> Secrets and variables -> Actions`:

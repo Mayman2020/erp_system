@@ -1,6 +1,5 @@
 node_modules/
-# dist/ must be includable for CI target `runtime-ci` (runner-built bundle).
-# Local `docker build` default target `runtime` rebuilds inside Docker and does not rely on host dist.
+dist/
 .angular/
 .git
 .gitignore

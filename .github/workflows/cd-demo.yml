@@ -24,30 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js (verify Angular build before Docker)
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: erp-system-frontend/package-lock.json
-
-      - name: Install & production-build frontend (fail fast with full logs)
-        working-directory: erp-system-frontend
-        env:
-          NG_API_BASE_URL: ${{ secrets.NG_API_BASE_URL != '' && secrets.NG_API_BASE_URL || 'http://127.0.0.1:8091/api/v1' }}
+      - name: Build context
         run: |
-          npm ci
-          npm run build:production
-
-      - name: Verify Angular dist for Docker (runtime-ci)
-        run: |
-          echo "Building from commit: $GITHUB_SHA"
-          DIST="erp-system-frontend/dist/erp-system-frontend/browser"
-          if [ ! -d "$DIST" ]; then
-            echo "::error::Missing $DIST — production build did not emit the browser bundle. Check budgets / TypeScript errors above."
-            exit 1
-          fi
-          echo "OK: $(du -sh "$DIST" | cut -f1) in $DIST"
+          echo "GITHUB_SHA=$GITHUB_SHA"
+          echo "Single-path frontend: Angular builds only inside Docker (see erp-system-frontend/Dockerfile)."
 
       - name: Registry owner (lowercase for GHCR)
         id: registry
@@ -106,13 +86,13 @@ jobs:
         with:
           context: ./erp-system-frontend
           file: ./erp-system-frontend/Dockerfile
-          # Must match Dockerfile stage that COPYs runner-built dist (see "Verify Angular dist" step).
-          target: runtime-ci
           push: true
           tags: ${{ steps.meta_frontend.outputs.tags }}
           labels: ${{ steps.meta_frontend.outputs.labels }}
-          cache-from: type=gha,scope=frontend-nginx
-          cache-to: type=gha,mode=max,scope=frontend-nginx
+          build-args: |
+            NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL != '' && secrets.NG_API_BASE_URL || 'http://127.0.0.1:8091/api/v1' }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
 
   deploy:
     runs-on: ubuntu-latest
