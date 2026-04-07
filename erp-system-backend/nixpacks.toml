@@ -3,7 +3,8 @@
 NIXPACKS_JDK_VERSION = "17"
 
 [phases.build]
-cmds = ["./mvnw clean package -DskipTests -B"]
+# Windows checkouts often lack +x on mvnw; sh avoids "Permission denied" on Linux builders.
+cmds = ["chmod +x mvnw || true", "sh mvnw clean package -DskipTests -B"]
 
 [start]
 cmd = "java -jar target/*.jar"
