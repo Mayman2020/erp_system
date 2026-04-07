@@ -24,13 +24,13 @@ Pull requests to `main` run a Docker build only (no registry push, no deploy).
 
 ## Frontend build (single path)
 
-There is **one** path: `erp-system-frontend/Dockerfile` runs `npm ci` + `npm run build:production` inside the image. GitHub Actions does **not** build Angular on the runner first. On `main`, the secret **`NG_API_BASE_URL` is required** so the production image calls your real API.
+There is **one** path: `erp-system-frontend/Dockerfile` runs `npm ci` + `npm run build:production` inside the image. GitHub Actions does **not** build Angular on the runner first. On `main`, **`NG_API_BASE_URL` is required** (repository **variable** or **secret**) so the production image calls your real API. Prefer a **variable** for a public URL (no need to hide it).
 
 ## Required GitHub Secrets
 
 Set these in `Settings -> Secrets and variables -> Actions`:
 
-- `NG_API_BASE_URL` (example: `https://your-host:8091/api/v1`) — **required** for pushes to `main`; baked into the Angular build.
+- `NG_API_BASE_URL` (example: `https://your-host:8091/api/v1`) — **required** for pushes to `main`; baked into the Angular build. Add under **Variables** (recommended) or **Secrets** with the same name.
 - `DEPLOY_HOST`
 - `DEPLOY_PORT` (optional, default 22)
 - `DEPLOY_USER`

@@ -1,6 +1,6 @@
 # Production path: GitHub Actions → GHCR → VPS (docker compose).
-# Required repo Secrets (Settings → Secrets and variables → Actions):
-#   Build: NG_API_BASE_URL — public API root baked into the Angular build, e.g. https://your-host:8091/api/v1
+# Required repo Secrets / Variables (Settings → Secrets and variables → Actions):
+#   Build: NG_API_BASE_URL — public API root baked into the Angular build (use a **variable** or **secret**)
 #   Deploy: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_PATH (e.g. /opt/erp),
 #           GHCR_USERNAME, GHCR_TOKEN (PAT with read:packages for private images),
 #           POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, JWT_SECRET, CORS_ALLOWED_ORIGINS
@@ -44,6 +44,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Resolve NG_API_BASE_URL for PR build
+        id: ng_api
+        env:
+          FROM_SECRET: ${{ secrets.NG_API_BASE_URL }}
+          FROM_VAR: ${{ vars.NG_API_BASE_URL }}
+        run: |
+          URL="${FROM_SECRET:-}"
+          [ -z "$URL" ] && URL="${FROM_VAR:-}"
+          [ -z "$URL" ] && URL='http://127.0.0.1:8091/api/v1'
+          echo "api_url<<GHA_NG_API_URL" >> "$GITHUB_OUTPUT"
+          echo "$URL" >> "$GITHUB_OUTPUT"
+          echo "GHA_NG_API_URL" >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -63,7 +76,7 @@ jobs:
           file: ./erp-system-frontend/Dockerfile
           push: false
           build-args: |
-            NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL != '' && secrets.NG_API_BASE_URL || 'http://127.0.0.1:8091/api/v1' }}
+            NG_API_BASE_URL=${{ steps.ng_api.outputs.api_url }}
           cache-from: type=gha,scope=frontend-pr
           cache-to: type=gha,mode=max,scope=frontend-pr
 
@@ -75,14 +88,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Require NG_API_BASE_URL for production images
+      - name: Resolve NG_API_BASE_URL for production images
+        id: ng_api
         env:
-          NG_API_BASE_URL: ${{ secrets.NG_API_BASE_URL }}
+          FROM_SECRET: ${{ secrets.NG_API_BASE_URL }}
+          FROM_VAR: ${{ vars.NG_API_BASE_URL }}
         run: |
-          if [ -z "$NG_API_BASE_URL" ]; then
-            echo "::error::Secret NG_API_BASE_URL is not set. Set it to your public API URL (example: https://api.example.com/api/v1) so the frontend build calls the real backend."
+          URL="${FROM_SECRET:-}"
+          [ -z "$URL" ] && URL="${FROM_VAR:-}"
+          if [ -z "$URL" ]; then
+            echo "::error::NG_API_BASE_URL is not set. Add it under Settings → Secrets and variables → Actions:"
+            echo "::error::  • **Variables** → New repository variable NG_API_BASE_URL (preferred for a public URL), or"
+            echo "::error::  • **Secrets** → New repository secret NG_API_BASE_URL"
+            echo "::error::Example value: https://your-domain:8091/api/v1"
             exit 1
           fi
+          echo "api_url<<GHA_NG_API_URL" >> "$GITHUB_OUTPUT"
+          echo "$URL" >> "$GITHUB_OUTPUT"
+          echo "GHA_NG_API_URL" >> "$GITHUB_OUTPUT"
 
       - name: Registry owner (lowercase for GHCR)
         id: registry
@@ -145,7 +168,7 @@ jobs:
           tags: ${{ steps.meta_frontend.outputs.tags }}
           labels: ${{ steps.meta_frontend.outputs.labels }}
           build-args: |
-            NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL }}
+            NG_API_BASE_URL=${{ steps.ng_api.outputs.api_url }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
 
