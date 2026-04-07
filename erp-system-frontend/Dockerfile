@@ -1,6 +1,9 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 
+# Angular production builds can OOM on default Node heap inside CI/containers.
+ENV NODE_OPTIONS=--max-old-space-size=6144
+
 COPY package*.json ./
 RUN npm ci
 
