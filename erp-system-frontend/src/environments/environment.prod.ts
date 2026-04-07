@@ -1,11 +1,11 @@
 /**
- * For Netlify/Vercel, NG_API_BASE_URL is applied by scripts/write-env.cjs before build.
- * Example: https://your-api.onrender.com/api/v1 (must match server.servlet.context-path).
+ * Production: set `apiUrl` to your Railway API root (full URL including /api/v1), or inject at build time
+ * via NG_API_BASE_URL (see scripts/write-env.cjs — used on Vercel).
  */
 import type { AppEnvironment } from './environment.types';
 
 export const environment: AppEnvironment = {
   production: true,
-  apiBaseUrl: 'https://REPLACE-WITH-YOUR-API-HOST/api/v1',
+  apiUrl: 'REPLACE_WITH_RAILWAY_URL',
   appVersion: '21.0.0'
 };

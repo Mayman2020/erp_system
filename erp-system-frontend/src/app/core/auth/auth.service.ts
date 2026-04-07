@@ -122,7 +122,7 @@ export class AuthService {
       password: payload.password
     };
 
-    return this.http.post<ApiResponse<LoginResponse>>(`${environment.apiBaseUrl}/auth/login`, requestPayload).pipe(
+    return this.http.post<ApiResponse<LoginResponse>>(`${environment.apiUrl}/auth/login`, requestPayload).pipe(
       map((res) => res.data),
       tap((response) => {
         localStorage.setItem(this.tokenKey, response.token);
@@ -136,19 +136,19 @@ export class AuthService {
 
   resolveLoginRoles(usernameOrEmail: string): Observable<LoginUserType[]> {
     return this.http
-      .post<ApiResponse<LoginUserType[]>>(`${environment.apiBaseUrl}/auth/login/roles`, { usernameOrEmail })
+      .post<ApiResponse<LoginUserType[]>>(`${environment.apiUrl}/auth/login/roles`, { usernameOrEmail })
       .pipe(map((res) => res.data || []));
   }
 
   sendPasswordResetOtp(email: string): Observable<boolean> {
     return this.http
-      .post<ApiResponse<boolean>>(`${environment.apiBaseUrl}/auth/password/otp/send`, { email })
+      .post<ApiResponse<boolean>>(`${environment.apiUrl}/auth/password/otp/send`, { email })
       .pipe(map((res) => !!res.data));
   }
 
   resetPasswordWithOtp(email: string, otpCode: string, newPassword: string): Observable<boolean> {
     return this.http
-      .post<ApiResponse<boolean>>(`${environment.apiBaseUrl}/auth/password/otp/reset`, { email, otpCode, newPassword })
+      .post<ApiResponse<boolean>>(`${environment.apiUrl}/auth/password/otp/reset`, { email, otpCode, newPassword })
       .pipe(map((res) => !!res.data));
   }
 
@@ -170,7 +170,7 @@ export class AuthService {
 
   getMyProfile(): Observable<AuthUser> {
     this.loadingUserSubject.next(true);
-    return this.http.get<ApiResponse<AuthUser>>(`${environment.apiBaseUrl}/profile/me`).pipe(
+    return this.http.get<ApiResponse<AuthUser>>(`${environment.apiUrl}/profile/me`).pipe(
       map((res) => res.data),
       tap((user) => this.currentUserSubject.next(user)),
       finalize(() => this.loadingUserSubject.next(false))
@@ -178,7 +178,7 @@ export class AuthService {
   }
 
   updateMyProfile(payload: UpdateProfileRequest): Observable<AuthUser> {
-    return this.http.put<ApiResponse<AuthUser>>(`${environment.apiBaseUrl}/profile/me`, payload).pipe(
+    return this.http.put<ApiResponse<AuthUser>>(`${environment.apiUrl}/profile/me`, payload).pipe(
       map((res) => res.data),
       tap((user) => this.currentUserSubject.next(user))
     );

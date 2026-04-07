@@ -1,0 +1,31 @@
+# Railway / production: set DB_URL (JDBC), DB_USER, DB_PASS or SPRING_DATASOURCE_* equivalents
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DB_URL:${SPRING_DATASOURCE_URL}}
+    username: ${DB_USER:${SPRING_DATASOURCE_USERNAME}}
+    password: ${DB_PASS:${SPRING_DATASOURCE_PASSWORD}}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_schema: erp_system
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    create-schemas: true
+    repair-on-migrate: true
+    schemas: erp_system
+    locations: classpath:db/migration

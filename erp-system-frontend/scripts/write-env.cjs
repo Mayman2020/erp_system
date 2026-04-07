@@ -1,8 +1,7 @@
 'use strict';
 /**
  * Injects NG_API_BASE_URL into environment.prod.ts before `ng build --configuration production`.
- * Netlify/Vercel/GitHub Actions: set NG_API_BASE_URL to your Render API root, e.g.
- * https://your-service.onrender.com/api/v1
+ * Vercel: set NG_API_BASE_URL to your Railway API root, e.g. https://your-service.up.railway.app/api/v1
  */
 const fs = require('fs');
 const path = require('path');
@@ -30,11 +29,14 @@ if (!url) {
 }
 
 const escaped = String(url).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-const content = `import type { AppEnvironment } from './environment.types';
+const content = `/**
+ * Production: injected by scripts/write-env.cjs from NG_API_BASE_URL at build time.
+ */
+import type { AppEnvironment } from './environment.types';
 
 export const environment: AppEnvironment = {
   production: true,
-  apiBaseUrl: '${escaped}',
+  apiUrl: '${escaped}',
   appVersion: '${appVersion}'
 };
 `;

@@ -33,7 +33,7 @@ export interface Navigation extends NavigationItem {
 
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
-  private readonly endpoint = `${environment.apiBaseUrl}/ui/menu`;
+  private readonly endpoint = `${environment.apiUrl}/ui/menu`;
   private readonly storageKey = 'erp_ui_menu_cache';
   private menu$?: Observable<Navigation[]>;
 

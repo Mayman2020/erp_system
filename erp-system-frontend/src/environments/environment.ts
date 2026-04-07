@@ -6,7 +6,8 @@ import type { AppEnvironment } from './environment.types';
 
 export const environment: AppEnvironment = {
   production: false,
-  apiBaseUrl: 'http://localhost:8091/api/v1',
+  /** Local Spring Boot default (see server.port in application.yml). */
+  apiUrl: 'http://localhost:8080/api/v1',
   /** Shown in shell footer (aligned with package.json for releases). */
   appVersion: '21.0.0'
 };

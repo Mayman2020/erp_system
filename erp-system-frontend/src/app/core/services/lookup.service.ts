@@ -15,7 +15,7 @@ export class LookupService {
   getLookup(type: string): Observable<LookupItem[]> {
     if (!this.cache.has(type)) {
       const request$ = this.http
-        .get<ApiResponse<LookupItem[]>>(`${environment.apiBaseUrl}/lookups/${type}`)
+        .get<ApiResponse<LookupItem[]>>(`${environment.apiUrl}/lookups/${type}`)
         .pipe(
           map((response) => response.data || []),
           shareReplay(1)

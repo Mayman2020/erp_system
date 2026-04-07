@@ -1,0 +1,9 @@
+# Railway Nixpacks: JDK 17 and Maven Wrapper build (no Docker).
+[variables]
+NIXPACKS_JDK_VERSION = "17"
+
+[phases.build]
+cmds = ["./mvnw clean package -DskipTests -B"]
+
+[start]
+cmd = "java -jar target/*.jar"

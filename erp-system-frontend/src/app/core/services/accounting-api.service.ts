@@ -39,7 +39,7 @@ import { ApiResponse, PagedResult } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
 export class AccountingApiService {
-  private readonly base = `${environment.apiBaseUrl}/accounting`;
+  private readonly base = `${environment.apiUrl}/accounting`;
 
   constructor(private http: HttpClient) {}
 

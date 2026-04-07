@@ -21,9 +21,9 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class AdminApiService {
-  private readonly accessBase = `${environment.apiBaseUrl}/admin/access`;
-  private readonly lookupsBase = `${environment.apiBaseUrl}/admin/lookups`;
-  private readonly uiBase = `${environment.apiBaseUrl}/ui/menu`;
+  private readonly accessBase = `${environment.apiUrl}/admin/access`;
+  private readonly lookupsBase = `${environment.apiUrl}/admin/lookups`;
+  private readonly uiBase = `${environment.apiUrl}/ui/menu`;
 
   constructor(private http: HttpClient) {}
 
@@ -66,22 +66,22 @@ export class AdminApiService {
   }
 
   listMenuItems(): Observable<UiMenuItemAdmin[]> {
-    return this.http.get<ApiResponse<UiMenuItemAdmin[]>>(`${environment.apiBaseUrl}/admin/ui/menu-items`).pipe(map((res) => res.data || []));
+    return this.http.get<ApiResponse<UiMenuItemAdmin[]>>(`${environment.apiUrl}/admin/ui/menu-items`).pipe(map((res) => res.data || []));
   }
 
   createMenuItem(payload: UiMenuItemAdminForm): Observable<UiMenuItemAdmin> {
-    return this.http.post<ApiResponse<UiMenuItemAdmin>>(`${environment.apiBaseUrl}/admin/ui/menu-items`, payload).pipe(map((res) => res.data));
+    return this.http.post<ApiResponse<UiMenuItemAdmin>>(`${environment.apiUrl}/admin/ui/menu-items`, payload).pipe(map((res) => res.data));
   }
 
   updateMenuItem(menuItemId: string, payload: UiMenuItemAdminForm): Observable<UiMenuItemAdmin> {
     return this.http
-      .put<ApiResponse<UiMenuItemAdmin>>(`${environment.apiBaseUrl}/admin/ui/menu-items/${encodeURIComponent(menuItemId)}`, payload)
+      .put<ApiResponse<UiMenuItemAdmin>>(`${environment.apiUrl}/admin/ui/menu-items/${encodeURIComponent(menuItemId)}`, payload)
       .pipe(map((res) => res.data));
   }
 
   deleteMenuItem(menuItemId: string): Observable<void> {
     return this.http
-      .delete<ApiResponse<unknown>>(`${environment.apiBaseUrl}/admin/ui/menu-items/${encodeURIComponent(menuItemId)}`)
+      .delete<ApiResponse<unknown>>(`${environment.apiUrl}/admin/ui/menu-items/${encodeURIComponent(menuItemId)}`)
       .pipe(map(() => undefined));
   }
 
