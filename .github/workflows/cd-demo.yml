@@ -13,16 +13,23 @@ concurrency:
 permissions:
   contents: read
   packages: write
+  actions: write
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     outputs:
-      backend_image: ${{ steps.meta_backend.outputs.tags }}
-      frontend_image: ${{ steps.meta_frontend.outputs.tags }}
+      owner_lc: ${{ steps.registry.outputs.owner_lc }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Registry owner (lowercase for GHCR)
+        id: registry
+        run: |
+          OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
+          echo "owner_lc=$OWNER_LC" >> "$GITHUB_OUTPUT"
+          echo "Using GHCR namespace: ghcr.io/$OWNER_LC"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -38,10 +45,13 @@ jobs:
         id: meta_backend
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/erp-backend
+          images: ghcr.io/${{ steps.registry.outputs.owner_lc }}/erp-backend
           tags: |
             type=sha,format=long
             type=raw,value=latest
+          labels: |
+            org.opencontainers.image.title=erp-backend
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 
       - name: Build and push backend
         uses: docker/build-push-action@v6
@@ -51,15 +61,20 @@ jobs:
           push: true
           tags: ${{ steps.meta_backend.outputs.tags }}
           labels: ${{ steps.meta_backend.outputs.labels }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
 
       - name: Docker metadata (frontend)
         id: meta_frontend
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/erp-frontend
+          images: ghcr.io/${{ steps.registry.outputs.owner_lc }}/erp-system-dubai
           tags: |
             type=sha,format=long
             type=raw,value=latest
+          labels: |
+            org.opencontainers.image.title=erp-system-dubai
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 
       - name: Build and push frontend
         uses: docker/build-push-action@v6
@@ -71,6 +86,8 @@ jobs:
           labels: ${{ steps.meta_frontend.outputs.labels }}
           build-args: |
             NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL != '' && secrets.NG_API_BASE_URL || 'http://127.0.0.1:8091/api/v1' }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
 
   deploy:
     runs-on: ubuntu-latest
@@ -78,6 +95,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Registry owner (lowercase)
+        id: registry
+        run: |
+          OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
+          echo "owner_lc=$OWNER_LC" >> "$GITHUB_OUTPUT"
 
       - name: Copy compose file to server
         uses: appleboy/scp-action@v0.1.7
@@ -97,9 +120,10 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT || '22' }}
           script: |
-            set -e
-            export BACKEND_IMAGE="ghcr.io/${{ github.repository_owner }}/erp-backend:latest"
-            export FRONTEND_IMAGE="ghcr.io/${{ github.repository_owner }}/erp-frontend:latest"
+            set -euo pipefail
+            OWNER_LC='${{ steps.registry.outputs.owner_lc }}'
+            export BACKEND_IMAGE="ghcr.io/${OWNER_LC}/erp-backend:latest"
+            export FRONTEND_IMAGE="ghcr.io/${OWNER_LC}/erp-system-dubai:latest"
             export POSTGRES_DB="${{ secrets.POSTGRES_DB }}"
             export POSTGRES_USER="${{ secrets.POSTGRES_USER }}"
             export POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}"
@@ -110,8 +134,11 @@ jobs:
             cd "${{ secrets.DEPLOY_PATH }}"
             test -f docker-compose.prod.yml
 
+            echo "Deploying BACKEND_IMAGE=${BACKEND_IMAGE}"
+            echo "Deploying FRONTEND_IMAGE=${FRONTEND_IMAGE}"
+
             docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" -p "${{ secrets.GHCR_TOKEN }}"
             docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker compose -f docker-compose.prod.yml ps
             docker image prune -f

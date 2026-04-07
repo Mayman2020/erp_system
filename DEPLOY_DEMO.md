@@ -8,11 +8,17 @@ This repository is configured to auto-deploy on every push to `main` using:
 
 ## What was added
 
+- `docker-compose.yml` — local full stack: `docker compose up --build` (UI default `http://localhost:8080`, API `http://localhost:8091/api/v1`)
 - `erp-system-frontend/Dockerfile`
 - `erp-system-frontend/nginx/default.conf`
 - `erp-system-frontend/.dockerignore`
 - `docker-compose.prod.yml`
 - `.github/workflows/cd-demo.yml`
+
+## GHCR image names
+
+- Backend: `ghcr.io/<owner-lowercase>/erp-backend`
+- Frontend (Docker summary title / image): `ghcr.io/<owner-lowercase>/erp-system-dubai`
 
 ## Required GitHub Secrets
 
