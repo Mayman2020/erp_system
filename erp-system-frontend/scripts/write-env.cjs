@@ -30,7 +30,9 @@ if (!url) {
 }
 
 const escaped = String(url).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-const content = `export const environment = {
+const content = `import type { AppEnvironment } from './environment.types';
+
+export const environment: AppEnvironment = {
   production: true,
   apiBaseUrl: '${escaped}',
   appVersion: '${appVersion}'
