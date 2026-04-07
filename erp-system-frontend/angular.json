@@ -29,7 +29,14 @@
               "src/assets"
             ],
             "styles": [
+              "src/assets/css/erp-font-faces.css",
               "src/styles.scss"
+            ],
+            "allowedCommonJsDependencies": [
+              "apexcharts",
+              "lodash",
+              "screenfull",
+              "xlsx-js-style"
             ],
             "stylePreprocessorOptions": {
               "sass": {
