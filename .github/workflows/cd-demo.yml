@@ -70,7 +70,7 @@ jobs:
           tags: ${{ steps.meta_frontend.outputs.tags }}
           labels: ${{ steps.meta_frontend.outputs.labels }}
           build-args: |
-            NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL }}
+            NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL != '' && secrets.NG_API_BASE_URL || 'http://127.0.0.1:8091/api/v1' }}
 
   deploy:
     runs-on: ubuntu-latest

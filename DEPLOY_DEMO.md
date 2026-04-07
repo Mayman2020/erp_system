@@ -18,7 +18,7 @@ This repository is configured to auto-deploy on every push to `main` using:
 
 Set these in `Settings -> Secrets and variables -> Actions`:
 
-- `NG_API_BASE_URL` (example: `https://api.example.com/api/v1`)
+- `NG_API_BASE_URL` (example: `https://api.example.com/api/v1`) — **required for a real demo**: the frontend bakes this at build time. If unset, CI uses a localhost fallback so the Docker build still passes; set the secret before relying on the deployed UI.
 - `DEPLOY_HOST`
 - `DEPLOY_PORT` (optional, default 22)
 - `DEPLOY_USER`
