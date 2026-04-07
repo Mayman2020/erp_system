@@ -1,10 +1,12 @@
-# Railway Nixpacks: JDK 17 and Maven Wrapper build (no Docker).
+# Railway Nixpacks: JDK 17 + Maven (from Nixpacks setup). Use `mvn` here instead of `mvnw`
+# because the Docker-based Nix build can omit `.mvn/wrapper/maven-wrapper.jar` (e.g. old
+# .dockerignore, or JAR not on the remote branch), which causes MavenWrapperMain errors.
+# Local/dev: keep using ./mvnw or mvnw.cmd as usual.
 [variables]
 NIXPACKS_JDK_VERSION = "17"
 
 [phases.build]
-# Windows checkouts often lack +x on mvnw; sh avoids "Permission denied" on Linux builders.
-cmds = ["chmod +x mvnw || true", "sh mvnw clean package -DskipTests -B"]
+cmds = ["mvn clean package -DskipTests -B"]
 
 [start]
 cmd = "java -jar target/*.jar"
