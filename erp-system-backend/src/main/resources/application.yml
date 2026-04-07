@@ -22,7 +22,24 @@ app:
       expiration-ms: ${JWT_EXPIRATION_MS:86400000}
       refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
 logging:
   level:
     root: INFO
     com.erp.system: DEBUG
+    org.springframework.boot: INFO
+    org.hibernate: WARN
+    org.flywaydb: INFO
