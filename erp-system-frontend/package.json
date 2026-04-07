@@ -5,7 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:production": "node scripts/write-env.cjs && ng build --configuration production",
+    "prebuild:prod:ng": "node scripts/write-env.cjs",
+    "build:prod:ng": "ng build --configuration production",
+    "build:production": "npm run build:prod:ng",
+    "build:production:ci": "node scripts/write-env.cjs && ng build --configuration production --verbose",
     "test": "ng test"
   },
   "engines": {

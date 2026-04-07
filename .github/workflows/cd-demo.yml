@@ -24,6 +24,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node.js (verify Angular build before Docker)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: erp-system-frontend/package-lock.json
+
+      - name: Install & production-build frontend (fail fast with full logs)
+        working-directory: erp-system-frontend
+        env:
+          NG_API_BASE_URL: ${{ secrets.NG_API_BASE_URL != '' && secrets.NG_API_BASE_URL || 'http://127.0.0.1:8091/api/v1' }}
+        run: |
+          npm ci
+          npm run build:production
+
       - name: Registry owner (lowercase for GHCR)
         id: registry
         run: |
