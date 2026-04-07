@@ -6,7 +6,7 @@ import { AlertModule, BreadcrumbModule, CardModule, ModalModule } from './compon
 import { DataFilterPipe } from './components/data-table/data-filter.pipe';
 import { TodoListRemoveDirective } from './components/todo/todo-list-remove.directive';
 import { TodoCardCompleteDirective } from './components/todo/todo-card-complete.directive';
-import { ClickOutsideModule } from 'ng-click-outside';
+import { ClickOutsideDirective } from './directives/click-outside.directive';
 
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { ApexChartComponent } from './components/chart/apex-chart/apex-chart.component';
@@ -24,7 +24,6 @@ import { SharedModule as ErpSharedModule } from '../../shared/shared.module';
     CardModule,
     BreadcrumbModule,
     ModalModule,
-    ClickOutsideModule,
     ErpSharedModule
   ],
   exports: [
@@ -38,13 +37,14 @@ import { SharedModule as ErpSharedModule } from '../../shared/shared.module';
     DataFilterPipe,
     TodoListRemoveDirective,
     TodoCardCompleteDirective,
-    ClickOutsideModule,
+    ClickOutsideDirective,
     SpinnerComponent,
     ApexChartComponent,
     ToastComponent,
     ErpSharedModule
   ],
   declarations: [
+    ClickOutsideDirective,
     DataFilterPipe,
     TodoListRemoveDirective,
     TodoCardCompleteDirective,

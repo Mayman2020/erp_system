@@ -1,5 +1,6 @@
 import { booleanAttribute, Component, HostBinding, Input } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
+import type { AppEnvironment } from '../../../../../environments/environment.types';
 
 @Component({
   standalone: false,
@@ -16,6 +17,6 @@ export class ShellFooterComponent {
     return this.compact;
   }
   readonly year = new Date().getFullYear();
-  readonly version = environment.appVersion ?? '';
+  readonly version = (environment as Partial<AppEnvironment>).appVersion ?? '';
   readonly envLabelKey = environment.production ? 'APP.ENV_PRODUCTION' : 'APP.ENV_LOCAL';
 }
