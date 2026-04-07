@@ -88,6 +88,14 @@
     "TOGGLE_MENU": "Toggle sidebar",
     "SIDEBAR_WELCOME": "Welcome"
   },
+  "COMMAND_PALETTE": {
+    "TITLE": "Quick find (Ctrl+K)",
+    "PLACEHOLDER": "Search pages and routes…",
+    "EMPTY": "No matches",
+    "GROUP_NAV": "Navigation",
+    "HINT_ARROWS": "Arrow keys to move",
+    "HINT_ENTER": "Enter to open"
+  },
   "STATUS": {
     "DRAFT": "Draft",
     "APPROVED": "Approved",

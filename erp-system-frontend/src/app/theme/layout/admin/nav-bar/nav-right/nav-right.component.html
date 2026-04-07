@@ -1,5 +1,14 @@
 <div class="erp-header-actions">
   <div class="erp-header-actions__rail">
+    <button
+      type="button"
+      class="erp-nav-theme-btn erp-nav-command-btn"
+      (click)="openCommandPalette()"
+      [attr.title]="'COMMAND_PALETTE.TITLE' | translate"
+      [attr.aria-label]="'COMMAND_PALETTE.TITLE' | translate"
+    >
+      <mat-icon aria-hidden="true">search</mat-icon>
+    </button>
     <app-language-switcher [compact]="true" placement="bottom-right" align="end"></app-language-switcher>
     <button
       type="button"

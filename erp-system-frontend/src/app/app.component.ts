@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { ThemeService } from './core/services/theme.service';
+import { CommandPaletteService } from './core/services/command-palette.service';
 
 @Component({ standalone: false,
   selector: 'app-root',
@@ -10,7 +11,11 @@ import { ThemeService } from './core/services/theme.service';
 })
 export class AppComponent implements OnInit {
 
-  constructor(private router: Router, private themeService: ThemeService) { }
+  constructor(
+    private router: Router,
+    private themeService: ThemeService,
+    private commandPalette: CommandPaletteService
+  ) { }
 
   ngOnInit() {
     this.themeService.init();
@@ -36,5 +41,22 @@ export class AppComponent implements OnInit {
     const on = this.isAuthRouteUrl(url);
     document.documentElement.classList.toggle('erp-auth-html-lock', on);
     document.body.classList.toggle('erp-auth-body-lock', on);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onGlobalKeydown(e: KeyboardEvent): void {
+    if (!(e.ctrlKey || e.metaKey) || (e.key !== 'k' && e.key !== 'K')) {
+      return;
+    }
+    const t = e.target as HTMLElement | null;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) {
+      return;
+    }
+    e.preventDefault();
+    const url = this.router.url || '';
+    if (this.isAuthRouteUrl(url)) {
+      return;
+    }
+    this.commandPalette.toggle();
   }
 }

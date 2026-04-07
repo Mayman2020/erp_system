@@ -25,6 +25,7 @@ import { TypeBadgeComponent } from './components/type-badge/type-badge.component
 import { ErpDatePipe } from './pipes/erp-date.pipe';
 import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
 import { ErpCountUpDirective } from './directives/erp-count-up.directive';
+import { CommandPaletteComponent } from './components/command-palette/command-palette.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { ErpCountUpDirective } from './directives/erp-count-up.directive';
     EmptyStateComponent,
     LoadingStateComponent,
     AvatarComponent,
-    ErpCountUpDirective
+    ErpCountUpDirective,
+    CommandPaletteComponent
   ],
   imports: [
     CommonModule,
@@ -91,7 +93,8 @@ import { ErpCountUpDirective } from './directives/erp-count-up.directive';
     EmptyStateComponent,
     LoadingStateComponent,
     AvatarComponent,
-    ErpCountUpDirective
+    ErpCountUpDirective,
+    CommandPaletteComponent
   ]
 })
 export class SharedModule {}

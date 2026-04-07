@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, HostListener, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NextConfig } from '../../../app-config';
 import { Location } from '@angular/common';
@@ -11,8 +11,8 @@ import { Location } from '@angular/common';
   animations: [
     trigger('erpPageTransition', [
       transition('* => *', [
-        style({ opacity: 0, transform: 'translateY(10px)' }),
-        animate('260ms cubic-bezier(0.33, 1, 0.68, 1)', style({ opacity: 1, transform: 'none' }))
+        style({ opacity: 0, transform: 'translateY(8px)' }),
+        animate('280ms cubic-bezier(0.22, 1, 0.36, 1)', style({ opacity: 1, transform: 'none' }))
       ])
     ])
   ]
@@ -67,6 +67,26 @@ export class AdminComponent implements OnInit {
     this.navSidebarHidden = false;
     this.navCollapsed = !this.navCollapsed;
     this.flatConfig.collapseMenu = this.navCollapsed;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeCloseMobileNav(): void {
+    if (window.innerWidth < 992 && this.navCollapsedMob) {
+      this.navCollapsedMob = false;
+    }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (window.innerWidth >= 992 && this.navCollapsedMob) {
+      this.navCollapsedMob = false;
+    }
+  }
+
+  closeMobileNav(): void {
+    if (window.innerWidth < 992) {
+      this.navCollapsedMob = false;
+    }
   }
 
   navMobClick() {

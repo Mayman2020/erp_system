@@ -1,0 +1,72 @@
+<div class="erp-sidebar-profile">
+  <button
+    type="button"
+    class="erp-sidebar-profile__toggle"
+    [class.erp-sidebar-profile__toggle--open]="menuOpen"
+    (click)="toggleMenu.emit()"
+    [attr.aria-label]="displayName || ('PROFILE.TITLE' | translate)"
+    [attr.aria-expanded]="menuOpen"
+    [attr.aria-haspopup]="true"
+    *ngIf="!loading; else profileSkeleton"
+  >
+    <app-avatar [src]="avatarUrl" size="44px" [alt]="'PROFILE.AVATAR_ALT' | translate"></app-avatar>
+    <span class="erp-sidebar-profile__info">
+      <strong>{{ displayName || ('NAV.HESABATY' | translate) | slice:0:18 }}</strong>
+      <small>{{ roleKey | translate }}</small>
+    </span>
+    <mat-icon aria-hidden="true" class="erp-sidebar-profile__caret">{{ menuOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+  </button>
+
+  <ng-template #profileSkeleton>
+    <div class="erp-sidebar-profile__toggle erp-sidebar-profile__skeleton">
+      <app-avatar [loading]="true" size="44px"></app-avatar>
+      <div class="erp-sidebar-profile__info">
+        <div class="skeleton-line skeleton-line--primary skeleton-pulse"></div>
+        <div class="skeleton-line skeleton-line--secondary skeleton-pulse"></div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<ng-container *ngIf="menuOpen">
+  <div
+    class="erp-sidebar-profile__overlay"
+    (click)="closeMenu.emit()"
+    [@erpProfileOverlay]
+  ></div>
+  <div
+    class="erp-sidebar-profile__panel"
+    role="menu"
+    [@erpProfilePanel]
+    (click)="$event.stopPropagation()"
+  >
+    <div class="erp-sidebar-profile__summary" *ngIf="!loading">
+      <app-avatar [src]="avatarUrl" size="48px" [alt]="'PROFILE.AVATAR_ALT' | translate"></app-avatar>
+      <div class="erp-sidebar-profile__summary-text">
+        <strong>{{ displayName || ('NAV.HESABATY' | translate) }}</strong>
+        <small>{{ roleKey | translate }}</small>
+      </div>
+    </div>
+    <div class="erp-sidebar-profile__divider" *ngIf="!loading"></div>
+
+    <a
+      class="erp-sidebar-profile__menu-link"
+      [routerLink]="['/settings']"
+      title="{{ 'PROFILE.TITLE' | translate }}"
+      (click)="profileClick.emit()"
+      role="menuitem"
+    >
+      <mat-icon aria-hidden="true">person</mat-icon>
+      <span>{{ 'PROFILE.TITLE' | translate }}</span>
+    </a>
+    <button
+      type="button"
+      class="erp-sidebar-profile__menu-link erp-sidebar-profile__menu-link--danger"
+      (click)="logoutClick.emit()"
+      role="menuitem"
+    >
+      <mat-icon aria-hidden="true">logout</mat-icon>
+      <span>{{ 'AUTH.LOGOUT' | translate }}</span>
+    </button>
+  </div>
+</ng-container>

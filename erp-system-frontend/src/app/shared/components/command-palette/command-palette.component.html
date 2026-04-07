@@ -1,0 +1,60 @@
+<div
+  class="erp-command-palette"
+  *ngIf="open"
+  aria-modal="true"
+  role="dialog"
+  [attr.aria-label]="'COMMAND_PALETTE.TITLE' | translate"
+>
+  <div class="erp-command-palette__backdrop" (click)="close()"></div>
+  <div
+    class="erp-command-palette__panel"
+    [@erpCommandPalettePanel]
+    (click)="$event.stopPropagation()"
+  >
+    <div class="erp-command-palette__search">
+      <mat-icon aria-hidden="true">search</mat-icon>
+      <input
+        #q
+        type="search"
+        class="erp-command-palette__input"
+        [attr.placeholder]="'COMMAND_PALETTE.PLACEHOLDER' | translate"
+        [value]="query"
+        (input)="onQuery($any($event.target).value)"
+        (keydown)="onPanelKeydown($event)"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <kbd class="erp-command-palette__kbd" aria-hidden="true">Esc</kbd>
+    </div>
+
+    <div class="erp-command-palette__body" *ngIf="filtered.length; else emptyTpl">
+      <div class="erp-command-palette__group" *ngFor="let g of groupedKeys">
+        <div class="erp-command-palette__group-label">{{ g | translate }}</div>
+        <ul class="erp-command-palette__list" role="listbox">
+          <li
+            *ngFor="let item of groups[g]; trackBy: trackById"
+            role="option"
+            [attr.aria-selected]="item === activeItem"
+            class="erp-command-palette__item"
+            [class.erp-command-palette__item--active]="item === activeItem"
+            (click)="go(item)"
+            (mouseenter)="activeItem = item"
+          >
+            <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+            <span>{{ item.labelKey | translate }}</span>
+            <span class="erp-command-palette__path">{{ item.path }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <ng-template #emptyTpl>
+      <div class="erp-command-palette__empty">{{ 'COMMAND_PALETTE.EMPTY' | translate }}</div>
+    </ng-template>
+
+    <div class="erp-command-palette__hint">
+      <span>{{ 'COMMAND_PALETTE.HINT_ARROWS' | translate }}</span>
+      <span class="erp-command-palette__hint-sep">·</span>
+      <span>{{ 'COMMAND_PALETTE.HINT_ENTER' | translate }}</span>
+    </div>
+  </div>
+</div>

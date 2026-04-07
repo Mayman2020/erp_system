@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService, AuthUser, resolveProfileFullName } from '../../../../../core/auth/auth.service';
 import { ThemeService } from '../../../../../core/services/theme.service';
+import { CommandPaletteService } from '../../../../../core/services/command-palette.service';
 import { TranslationService } from '../../../../../core/i18n/translation.service';
 
 @Component({ standalone: false,
@@ -26,7 +27,8 @@ export class NavRightComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private commandPalette: CommandPaletteService
   ) {}
 
   ngOnInit(): void {
@@ -40,6 +42,10 @@ export class NavRightComponent implements OnInit, OnDestroy {
 
   toggleTheme(): void {
     this.themeService.toggleTheme();
+  }
+
+  openCommandPalette(): void {
+    this.commandPalette.open();
   }
 
   toggleProfileMenu(): void {

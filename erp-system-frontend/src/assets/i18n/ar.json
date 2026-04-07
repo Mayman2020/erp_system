@@ -88,6 +88,14 @@
     "TOGGLE_MENU": "تبديل الشريط الجانبي",
     "SIDEBAR_WELCOME": "مرحبا بكم"
   },
+  "COMMAND_PALETTE": {
+    "TITLE": "بحث سريع (Ctrl+K)",
+    "PLACEHOLDER": "ابحث في الصفحات والمسارات…",
+    "EMPTY": "لا توجد نتائج",
+    "GROUP_NAV": "التنقل",
+    "HINT_ARROWS": "أسهم للتحريك",
+    "HINT_ENTER": "Enter للفتح"
+  },
   "STATUS": {
     "DRAFT": "مسودة",
     "APPROVED": "معتمد",

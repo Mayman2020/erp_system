@@ -1,0 +1,79 @@
+/**
+ * Semantic design tokens — map to existing --erp-* system.
+ * Use these for new UI; migrate legacy rules incrementally.
+ */
+:root,
+[data-theme='light'] {
+  --color-primary: var(--erp-info);
+  --color-primary-soft: var(--erp-info-soft);
+  --color-success: var(--erp-success);
+  --color-success-soft: var(--erp-success-soft);
+  --color-danger: var(--erp-danger);
+  --color-danger-soft: var(--erp-danger-soft);
+  --color-warning: var(--erp-warning);
+  --color-warning-soft: var(--erp-warning-soft);
+
+  --bg-main: var(--erp-bg);
+  --bg-surface: var(--erp-bg-elevated);
+  --bg-card: var(--erp-bg-card, var(--erp-bg-elevated));
+  --bg-muted: var(--erp-bg-muted);
+  --bg-hover: #f1f5f9;
+  --bg-overlay: rgba(15, 23, 42, 0.42);
+
+  --text-primary: var(--erp-text);
+  --text-secondary: var(--erp-text-muted);
+  --text-muted: var(--erp-text-soft);
+
+  --border-color: var(--erp-border);
+  --border-strong: var(--erp-border-strong);
+
+  --shadow-sm: var(--erp-shadow-sm);
+  --shadow-md: var(--erp-shadow-md);
+  --shadow-lg: var(--erp-shadow-lg);
+
+  --radius-sm: var(--erp-radius-sm);
+  --radius-md: var(--erp-radius-md);
+  --radius-lg: var(--erp-radius-lg);
+
+  --space-1: var(--erp-space-1, 4px);
+  --space-2: var(--erp-space-2, 8px);
+  --space-3: var(--erp-space-3, 12px);
+  --space-4: var(--erp-space-4, 16px);
+  --space-5: var(--erp-space-5, 20px);
+  --space-6: var(--erp-space-6, 24px);
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s ease;
+
+  --scale-hover: 1.02;
+  --scale-click: 0.97;
+
+  --font-heading: inherit;
+  --text-page-title: clamp(1.35rem, 2.2vw, 1.75rem);
+  --text-section-title: 1.125rem;
+  --text-card-title: 1rem;
+  --text-body: 0.9375rem;
+  --text-helper: 0.8125rem;
+  --text-caption: 0.75rem;
+}
+
+[data-theme='dark'] {
+  --bg-main: var(--erp-bg);
+  --bg-surface: var(--erp-bg-elevated);
+  --bg-card: var(--erp-bg-card, var(--erp-bg-elevated));
+  --bg-muted: var(--erp-bg-muted);
+  --bg-hover: #1e293b;
+  --bg-overlay: rgba(2, 6, 23, 0.56);
+
+  --text-primary: var(--erp-text);
+  --text-secondary: var(--erp-text-muted);
+  --text-muted: var(--erp-text-soft);
+
+  --border-color: var(--erp-border);
+  --border-strong: var(--erp-border-strong);
+
+  --shadow-sm: var(--erp-shadow-sm);
+  --shadow-md: var(--erp-shadow-md);
+  --shadow-lg: var(--erp-shadow-lg);
+}

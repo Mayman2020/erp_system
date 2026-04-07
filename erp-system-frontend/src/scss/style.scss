@@ -81,3 +81,6 @@ File: style.css
 
 // custom
 @import "themes/custom";
+
+// Semantic aliases (maps to --erp-* set in themes/custom)
+@import "design-system/semantic-tokens";

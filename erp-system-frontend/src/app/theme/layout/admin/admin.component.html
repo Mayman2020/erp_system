@@ -1,6 +1,14 @@
+<app-command-palette></app-command-palette>
 <div class="erp-admin-shell" [class.erp-admin-shell--sidebar-hidden]="navSidebarHidden"
   [class.erp-admin-shell--sidebar-collapsed]="navCollapsed && !navSidebarHidden"
   [class.erp-admin-shell--mobile-open]="navCollapsedMob">
+  <button
+    *ngIf="navCollapsedMob"
+    type="button"
+    class="erp-admin-shell__backdrop"
+    (click)="closeMobileNav()"
+    [attr.aria-label]="'COMMON.CLOSE' | translate"
+  ></button>
   <app-navigation class="pcoded-navbar erp-admin-shell__sidebar" [sidebarCollapsed]="navCollapsed && !navSidebarHidden" [ngClass]="{
       'navbar-collapsed': navCollapsed && !navSidebarHidden,
       'erp-sidebar-hidden': navSidebarHidden,

@@ -1,51 +1,46 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges
+} from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   standalone: false,
   selector: 'app-profile-card',
-  template: `
-    <div class="erp-sidebar-profile" [class.erp-sidebar-profile--open]="menuOpen" (clickOutside)="closeMenu.emit()">
-      <button
-        type="button"
-        class="erp-sidebar-profile__toggle"
-        (click)="toggleMenu.emit()"
-        [attr.aria-label]="displayName || ('PROFILE.TITLE' | translate)"
-        [attr.aria-expanded]="menuOpen"
-        *ngIf="!loading; else profileSkeleton"
-      >
-        <app-avatar [src]="avatarUrl" size="44px" [alt]="'PROFILE.AVATAR_ALT' | translate"></app-avatar>
-        <span class="erp-sidebar-profile__info">
-          <strong>{{ displayName || ('NAV.HESABATY' | translate) | slice:0:18 }}</strong>
-          <small>{{ roleKey | translate }}</small>
-        </span>
-        <mat-icon aria-hidden="true" class="erp-sidebar-profile__caret">{{ menuOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
-      </button>
-
-      <ng-template #profileSkeleton>
-        <div class="erp-sidebar-profile__toggle erp-sidebar-profile__skeleton">
-          <app-avatar [loading]="true" size="44px"></app-avatar>
-          <div class="erp-sidebar-profile__info">
-            <div class="skeleton-line skeleton-line--primary skeleton-pulse"></div>
-            <div class="skeleton-line skeleton-line--secondary skeleton-pulse"></div>
-          </div>
-        </div>
-      </ng-template>
-
-      <div class="erp-sidebar-profile__menu" *ngIf="menuOpen" role="menu">
-        <a class="erp-sidebar-profile__menu-link" [routerLink]="['/settings']" title="{{ 'PROFILE.TITLE' | translate }}" (click)="profileClick.emit()" role="menuitem">
-          <mat-icon aria-hidden="true">person</mat-icon>
-          <span>{{ 'PROFILE.TITLE' | translate }}</span>
-        </a>
-        <button type="button" class="erp-sidebar-profile__menu-link erp-sidebar-profile__menu-link--danger" (click)="logoutClick.emit()" role="menuitem">
-          <mat-icon aria-hidden="true">logout</mat-icon>
-          <span>{{ 'AUTH.LOGOUT' | translate }}</span>
-        </button>
-      </div>
-    </div>
-  `,
-  styleUrls: ['./profile-card.component.scss']
+  templateUrl: './profile-card.component.html',
+  styleUrls: ['./profile-card.component.scss'],
+  animations: [
+    trigger('erpProfileOverlay', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('220ms ease', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [animate('160ms ease', style({ opacity: 0 }))])
+    ]),
+    trigger('erpProfilePanel', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.96) translateY(-6px)' }),
+        animate(
+          '240ms cubic-bezier(0.22, 1, 0.36, 1)',
+          style({ opacity: 1, transform: 'none' })
+        )
+      ]),
+      transition(':leave', [
+        animate(
+          '180ms ease',
+          style({ opacity: 0, transform: 'scale(0.98) translateY(-4px)' })
+        )
+      ])
+    ])
+  ]
 })
-export class ProfileCardComponent {
+export class ProfileCardComponent implements OnChanges, OnDestroy {
   @Input() displayName = '';
   @Input() roleKey = 'PROFILE.TITLE';
   @Input() avatarUrl = 'assets/images/user/avatar-1.jpg';
@@ -55,4 +50,23 @@ export class ProfileCardComponent {
   @Output() closeMenu = new EventEmitter<void>();
   @Output() profileClick = new EventEmitter<void>();
   @Output() logoutClick = new EventEmitter<void>();
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentEscape(e: KeyboardEvent): void {
+    if (!this.menuOpen || e.key !== 'Escape') {
+      return;
+    }
+    e.stopPropagation();
+    this.closeMenu.emit();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['menuOpen']) {
+      document.body.classList.toggle('erp-profile-overlay-lock', this.menuOpen);
+    }
+  }
+
+  ngOnDestroy(): void {
+    document.body.classList.remove('erp-profile-overlay-lock');
+  }
 }
