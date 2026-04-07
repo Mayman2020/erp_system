@@ -39,6 +39,16 @@ jobs:
           npm ci
           npm run build:production
 
+      - name: Verify Angular dist for Docker (runtime-ci)
+        run: |
+          echo "Building from commit: $GITHUB_SHA"
+          DIST="erp-system-frontend/dist/erp-system-frontend/browser"
+          if [ ! -d "$DIST" ]; then
+            echo "::error::Missing $DIST — production build did not emit the browser bundle. Check budgets / TypeScript errors above."
+            exit 1
+          fi
+          echo "OK: $(du -sh "$DIST" | cut -f1) in $DIST"
+
       - name: Registry owner (lowercase for GHCR)
         id: registry
         run: |
@@ -96,7 +106,7 @@ jobs:
         with:
           context: ./erp-system-frontend
           file: ./erp-system-frontend/Dockerfile
-          # Reuse Angular output from the runner (previous step); no second ng build inside buildx.
+          # Must match Dockerfile stage that COPYs runner-built dist (see "Verify Angular dist" step).
           target: runtime-ci
           push: true
           tags: ${{ steps.meta_frontend.outputs.tags }}
