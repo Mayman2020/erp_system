@@ -1,10 +1,12 @@
-# Demo Auto Deploy (Docker + Push)
+# Production deploy (Docker + GHCR + VPS)
 
-This repository is configured to auto-deploy on every push to `main` using:
+This repository deploys on every push to `main` using:
 
 - Docker images pushed to `ghcr.io`
-- GitHub Actions workflow: `.github/workflows/cd-demo.yml`
+- GitHub Actions workflow: `.github/workflows/ci-cd.yml`
 - Remote server deploy via SSH + `docker compose`
+
+Pull requests to `main` run a Docker build only (no registry push, no deploy).
 
 ## What was added
 
@@ -13,22 +15,22 @@ This repository is configured to auto-deploy on every push to `main` using:
 - `erp-system-frontend/nginx/default.conf`
 - `erp-system-frontend/.dockerignore`
 - `docker-compose.prod.yml`
-- `.github/workflows/cd-demo.yml`
+- `.github/workflows/ci-cd.yml`
 
 ## GHCR image names
 
 - Backend: `ghcr.io/<owner-lowercase>/erp-backend`
 - Frontend (Docker summary title / image): `ghcr.io/<owner-lowercase>/erp-system-dubai`
 
-## Frontend build (root approach)
+## Frontend build (single path)
 
-There is **one** path: `erp-system-frontend/Dockerfile` runs `npm ci` + `npm run build:production` inside the image. GitHub Actions does **not** build Angular on the runner first — avoids duplicate builds, wrong `--target`, and stale commits. Set secret `NG_API_BASE_URL` for real deployments.
+There is **one** path: `erp-system-frontend/Dockerfile` runs `npm ci` + `npm run build:production` inside the image. GitHub Actions does **not** build Angular on the runner first. On `main`, the secret **`NG_API_BASE_URL` is required** so the production image calls your real API.
 
 ## Required GitHub Secrets
 
 Set these in `Settings -> Secrets and variables -> Actions`:
 
-- `NG_API_BASE_URL` (example: `https://api.example.com/api/v1`) — **required for a real demo**: the frontend bakes this at build time. If unset, CI uses a localhost fallback so the Docker build still passes; set the secret before relying on the deployed UI.
+- `NG_API_BASE_URL` (example: `https://your-host:8091/api/v1`) — **required** for pushes to `main`; baked into the Angular build.
 - `DEPLOY_HOST`
 - `DEPLOY_PORT` (optional, default 22)
 - `DEPLOY_USER`
@@ -40,7 +42,12 @@ Set these in `Settings -> Secrets and variables -> Actions`:
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
 - `JWT_SECRET`
-- `CORS_ALLOWED_ORIGINS` (frontend public URL)
+- `CORS_ALLOWED_ORIGINS` (must include the browser origin of your public frontend, e.g. `https://your-domain`)
+
+Optional (recommended once DNS/firewall are stable):
+
+- `DEPLOY_PUBLIC_FRONTEND_URL` — e.g. `https://your-domain/` — checked from the GitHub runner after deploy
+- `DEPLOY_PUBLIC_HEALTH_URL` — full URL returning `OK`, e.g. `https://your-host:8091/api/v1/health`
 
 ## Server prerequisites
 
@@ -54,15 +61,18 @@ Set these in `Settings -> Secrets and variables -> Actions`:
 ## Deployment flow
 
 1. Push to `main`
-2. Workflow builds backend/frontend images
-3. Images are pushed to GHCR
-4. `docker-compose.prod.yml` is copied to server
-5. Server pulls latest images and restarts containers
+2. Workflow builds backend/frontend images and pushes to GHCR (`latest` + SHA tags)
+3. `docker-compose.prod.yml` is copied to the server
+4. Server logs in to GHCR, pulls images, runs `docker compose up -d`
+5. Workflow waits for backend `http://127.0.0.1:8091/api/v1/health` and frontend on port `80` on the server
+6. If optional public URL secrets are set, the runner curls those endpoints as an extra check
+
+Manual runs: **Actions → CI/CD → Run workflow**. Enable **skip deploy** to build and push images only.
 
 ## If the `deploy` job fails (build is green)
 
 1. **SSH user + Docker** — The deploy user must run `docker` without sudo (or use a user in group `docker`). Check on the server: `docker info` and `docker compose version`.
 2. **GHCR login** — `GHCR_TOKEN` must be a classic PAT with `read:packages` (and access to this repo’s packages). `GHCR_USERNAME` is usually your GitHub username.
-3. **`DEPLOY_PATH`** — The workflow now creates this directory **before** `scp`. Use an absolute path (e.g. `/opt/erp-demo`).
-4. **Firewall / port** — `DEPLOY_PORT` if not 22; security group must allow GitHub Actions IPs (or wide SSH temporarily for testing).
+3. **`DEPLOY_PATH`** — The workflow creates this directory before `scp`. Use an absolute path (e.g. `/opt/erp-demo`).
+4. **Firewall / port** — `DEPLOY_PORT` if not 22; security group must allow GitHub Actions to reach SSH (or use a self-hosted runner in the same network).
 5. **Package visibility** — If GHCR images are private, the PAT must belong to an account that can pull them.
