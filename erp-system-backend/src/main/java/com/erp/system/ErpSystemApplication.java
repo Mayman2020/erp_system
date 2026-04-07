@@ -1,5 +1,6 @@
 package com.erp.system;
 
+import com.erp.system.common.config.RailwayDatasourceBootstrap;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,6 +12,7 @@ public class ErpSystemApplication {
         if (isRailway() && useDevProfileOnRailway()) {
             System.setProperty("spring.profiles.active", "prod");
         }
+        RailwayDatasourceBootstrap.applyIfNeeded();
         SpringApplication.run(ErpSystemApplication.class, args);
     }
 
