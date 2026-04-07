@@ -1,14 +1,14 @@
 # Railway / production:
-# - Prefer DB_URL (full JDBC) or Railway DATABASE_URL (mapped by DatabaseUrlEnvironmentPostProcessor).
-# - Railway Postgres plugin: PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD — RailwayPluginPostgresEnvironmentPostProcessor
-#   builds jdbc:postgresql://... from those (fixes SPRING_DATASOURCE_URL=jdbc:...${PGHOST}... not expanded in UI).
+# - Uses DATABASE_URL (Railway's pre-built connection string) as the primary datasource URL.
+# - Falls back to SPRING_DATASOURCE_URL if DATABASE_URL is not set.
+# - USERNAME/PASSWORD resolved from DB_USER, SPRING_DATASOURCE_USERNAME, or PGUSER.
 # - Optional query suffix: PG_JDBC_EXTRA e.g. sslmode=require (use ?sslmode=require or sslmode=require)
 spring:
   config:
     activate:
       on-profile: prod
   datasource:
-    url: ${DB_URL:${SPRING_DATASOURCE_URL:jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}}}
+    url: ${DATABASE_URL:${SPRING_DATASOURCE_URL}}
     username: ${DB_USER:${SPRING_DATASOURCE_USERNAME:${PGUSER:}}}
     password: ${DB_PASS:${SPRING_DATASOURCE_PASSWORD:${PGPASSWORD:}}}
     driver-class-name: org.postgresql.Driver
