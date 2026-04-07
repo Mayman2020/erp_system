@@ -75,12 +75,15 @@
     z-index: 1080;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-6px);
+    transform: translateY(-10px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition:
-      opacity 0.22s ease,
-      transform 0.22s ease,
-      visibility 0.22s ease,
-      box-shadow 0.2s ease;
+      opacity 0.2s ease,
+      transform 0.2s ease,
+      visibility 0.2s ease,
+      box-shadow 0.2s ease,
+      backdrop-filter 0.2s ease;
     pointer-events: none;
 
     .erp-sidebar-profile--open & {
@@ -163,23 +166,34 @@
   }
 }
 
-/* Header bar: enterprise surface (not the dark sidebar variant) */
-:host-context(.erp-header-actions) .erp-sidebar-profile__toggle {
-  background: var(--erp-bg-elevated) !important;
-  border: 1px solid var(--erp-border) !important;
+/*
+ * Gradient header shell: ghost pill like language + theme toggles (not solid elevated card).
+ * Replaces the old light-mode white pill on .erp-header-actions.
+ */
+:host-context(.erp-header-shell) .erp-sidebar-profile__toggle {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
   border-radius: 12px !important;
-  color: var(--erp-text) !important;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: var(--erp-shell-bar-text, #f8fafc) !important;
+  box-shadow: none !important;
 }
 
-:host-context(.erp-header-actions) .erp-sidebar-profile__info strong {
-  color: var(--erp-text) !important;
+:host-context(.erp-header-shell) .erp-sidebar-profile__toggle:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
 }
 
-:host-context(.erp-header-actions) .erp-sidebar-profile__info small {
-  color: var(--erp-text-muted) !important;
+:host-context(.erp-header-shell) .erp-sidebar-profile--open .erp-sidebar-profile__toggle {
+  background: rgba(255, 255, 255, 0.18) !important;
 }
 
-:host-context(.erp-header-actions) .erp-sidebar-profile__caret {
-  color: var(--erp-text-muted) !important;
+:host-context(.erp-header-shell) .erp-sidebar-profile__info strong {
+  color: rgba(248, 250, 252, 0.98) !important;
+}
+
+:host-context(.erp-header-shell) .erp-sidebar-profile__info small {
+  color: rgba(248, 250, 252, 0.75) !important;
+}
+
+:host-context(.erp-header-shell) .erp-sidebar-profile__caret {
+  color: rgba(248, 250, 252, 0.75) !important;
 }

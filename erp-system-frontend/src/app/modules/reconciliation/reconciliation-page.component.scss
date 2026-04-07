@@ -37,6 +37,34 @@
   &.active { background-color: var(--bs-primary-bg-subtle, #e7f1ff) !important; border-color: var(--bs-primary, #0d6efd); }
 }
 
+.erp-recon-line-detail__list {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1fr);
+  gap: 0.5rem 16px;
+  margin: 0;
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+  padding-inline-end: 4px;
+}
+
+.erp-recon-line-detail__list > dt {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--erp-text-muted, #64748b);
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--erp-border, rgba(148, 163, 184, 0.22));
+}
+
+.erp-recon-line-detail__list > dd {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--erp-text, #0f172a);
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--erp-border, rgba(148, 163, 184, 0.22));
+  word-break: break-word;
+}
+
 .erp-line-matched {
   opacity: 0.7;
   background: rgba(25, 135, 84, 0.05);

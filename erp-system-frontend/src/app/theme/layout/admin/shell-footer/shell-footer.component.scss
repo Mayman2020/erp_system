@@ -162,3 +162,81 @@
     display: none;
   }
 }
+
+/* —— Auth / login: shorter footer (~90% zoom feel) but readable —— */
+:host(.erp-shell-footer--compact) .erp-shell-footer {
+  border-top-left-radius: clamp(18px, 4.5vw, 44px);
+  box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.11);
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__grid {
+  padding: 10px clamp(14px, 3.2vw, 28px);
+  gap: 8px 16px;
+  align-items: flex-start;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__col {
+  flex: 1 1 168px;
+  min-width: min(100%, 148px);
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__heading {
+  font-size: 0.74rem;
+  margin: 0 0 2px;
+  letter-spacing: 0.07em;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__underline {
+  width: 52px;
+  height: 2px;
+  margin: 2px 0 8px;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__blurb,
+:host(.erp-shell-footer--compact) .erp-shell-footer__office {
+  font-size: 0.8rem;
+  line-height: 1.48;
+  max-width: 260px;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__list li {
+  margin: 3px 0;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__link {
+  font-size: 0.82rem;
+  gap: 6px;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__link mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__icons {
+  margin-top: 6px;
+  gap: 8px;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip {
+  width: 34px;
+  height: 34px;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip mat-icon {
+  font-size: 19px;
+  width: 19px;
+  height: 19px;
+}
+
+:host(.erp-shell-footer--compact) .erp-shell-footer__meta {
+  padding: 4px clamp(12px, 3vw, 28px) 8px;
+  font-size: 0.72rem;
+  gap: 4px 8px;
+}

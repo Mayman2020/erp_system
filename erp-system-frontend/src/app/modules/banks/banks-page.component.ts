@@ -17,10 +17,10 @@ export class BanksPageComponent implements OnInit {
     { key: 'bankName', title: 'BANKS.BANK_NAME', align: 'start' as 'start' },
     { key: 'accountNumber', title: 'BANKS.ACCOUNT_NUMBER', align: 'start' as 'start' },
     { key: 'currency', title: 'BANKS.CURRENCY' },
-    { key: 'openingBalance', title: 'BANKS.OPENING_BALANCE', align: 'end' as 'end' },
     { key: 'currentBalance', title: 'BANKS.CURRENT_BALANCE', align: 'end' as 'end' },
-    { key: 'linkedAccountName', title: 'BANKS.LINKED_ACCOUNT', align: 'start' as 'start' },
-    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' as const }
+    { key: 'active', title: 'COMMON.STATUS', kind: 'boolean' as const },
+    { key: 'openingBalance', title: 'BANKS.OPENING_BALANCE', align: 'end' as 'end' },
+    { key: 'linkedAccountName', title: 'BANKS.LINKED_ACCOUNT', align: 'start' as 'start' }
   ];
   private filters: Record<string, string> = {};
 

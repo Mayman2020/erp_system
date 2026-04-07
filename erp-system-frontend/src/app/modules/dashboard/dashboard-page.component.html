@@ -47,7 +47,7 @@
       </div>
       <div class="dash-kpi-card__body">
         <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_REVENUE' | translate }}</span>
-        <span class="dash-kpi-card__value">{{ formatAmount(summary.totalRevenue) }}</span>
+        <span class="dash-kpi-card__value" [erpCountUp]="summary.totalRevenue"></span>
       </div>
     </div>
   </div>
@@ -58,7 +58,7 @@
       </div>
       <div class="dash-kpi-card__body">
         <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_EXPENSES' | translate }}</span>
-        <span class="dash-kpi-card__value">{{ formatAmount(summary.totalExpenses) }}</span>
+        <span class="dash-kpi-card__value" [erpCountUp]="summary.totalExpenses"></span>
       </div>
     </div>
   </div>
@@ -69,7 +69,7 @@
       </div>
       <div class="dash-kpi-card__body">
         <span class="dash-kpi-card__label">{{ 'DASHBOARD.NET_PROFIT' | translate }}</span>
-        <span class="dash-kpi-card__value" [class.text-danger]="summary.netProfit < 0">{{ formatAmount(summary.netProfit) }}</span>
+        <span class="dash-kpi-card__value" [class.text-danger]="summary.netProfit < 0" [erpCountUp]="summary.netProfit"></span>
       </div>
     </div>
   </div>
@@ -82,7 +82,7 @@
       </div>
       <div class="dash-kpi-card__body">
         <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_ASSETS' | translate }}</span>
-        <span class="dash-kpi-card__value">{{ formatAmount(summary.totalAssets) }}</span>
+        <span class="dash-kpi-card__value" [erpCountUp]="summary.totalAssets"></span>
       </div>
     </div>
   </div>
@@ -93,7 +93,7 @@
       </div>
       <div class="dash-kpi-card__body">
         <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_LIABILITIES' | translate }}</span>
-        <span class="dash-kpi-card__value">{{ formatAmount(summary.totalLiabilities) }}</span>
+        <span class="dash-kpi-card__value" [erpCountUp]="summary.totalLiabilities"></span>
       </div>
     </div>
   </div>
@@ -104,7 +104,7 @@
       </div>
       <div class="dash-kpi-card__body">
         <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_EQUITY' | translate }}</span>
-        <span class="dash-kpi-card__value">{{ formatAmount(summary.totalEquity) }}</span>
+        <span class="dash-kpi-card__value" [erpCountUp]="summary.totalEquity"></span>
       </div>
     </div>
   </div>
@@ -215,20 +215,29 @@
 
   <!-- Tables Row: Monthly Summary + Latest Journals -->
   <div class="col-xl-6">
-    <div class="dash-chart-card">
-      <div class="dash-chart-card__header">
-        <h5>{{ 'DASHBOARD.MONTHLY_FINANCIAL_SUMMARY' | translate }}</h5>
+    <div class="erp-integrated-table">
+      <div class="erp-integrated-table__head">
+        <div class="erp-integrated-table__title">
+          <h5>{{ 'DASHBOARD.MONTHLY_FINANCIAL_SUMMARY' | translate }}</h5>
+        </div>
       </div>
-      <div class="dash-chart-card__body" *ngIf="(monthlySummaryRows$ | async) as monthRows; else monthlyEmpty">
-        <app-data-table
-          *ngIf="monthRows.length > 0; else monthlyEmpty"
-          [columns]="monthlySummaryColumns"
-          [data]="monthRows"
-          [compact]="true"
-          [exportable]="false"
-        ></app-data-table>
+      <div class="erp-integrated-table__body">
+        <ng-container *ngIf="(monthlySummaryRows$ | async) as monthRows; else monthlyWaiting">
+          <app-data-table
+            *ngIf="monthRows.length > 0; else monthlyEmpty"
+            [columns]="monthlySummaryColumns"
+            [data]="monthRows"
+            [compact]="true"
+            [exportable]="false"
+          ></app-data-table>
+          <ng-template #monthlyEmpty>
+            <div class="text-muted">{{ 'COMMON.NO_DATA' | translate }}</div>
+          </ng-template>
+        </ng-container>
+        <ng-template #monthlyWaiting>
+          <div class="text-muted">{{ 'COMMON.LOADING' | translate }}</div>
+        </ng-template>
       </div>
-      <ng-template #monthlyEmpty><div class="dash-chart-card__body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
     </div>
   </div>
 
@@ -242,18 +251,24 @@
 
   <!-- Bank Balances Table -->
   <div class="col-12" *ngIf="(bankBalanceRows$ | async) as bankRows">
-    <div class="dash-chart-card">
-      <div class="dash-chart-card__header">
-        <h5>{{ 'DASHBOARD.BANK_BALANCES' | translate }}</h5>
+    <div class="erp-integrated-table">
+      <div class="erp-integrated-table__head">
+        <div class="erp-integrated-table__title">
+          <h5>{{ 'DASHBOARD.BANK_BALANCES' | translate }}</h5>
+        </div>
       </div>
-      <div class="dash-chart-card__body" *ngIf="bankRows.length > 0; else banksEmpty">
-        <app-data-table
-          [columns]="bankBalanceColumns"
-          [data]="bankRows"
-          [exportable]="false"
-        ></app-data-table>
+      <div class="erp-integrated-table__body">
+        <ng-container *ngIf="bankRows.length > 0; else banksEmpty">
+          <app-data-table
+            [columns]="bankBalanceColumns"
+            [data]="bankRows"
+            [exportable]="false"
+          ></app-data-table>
+        </ng-container>
+        <ng-template #banksEmpty>
+          <div class="text-muted">{{ 'COMMON.NO_DATA' | translate }}</div>
+        </ng-template>
       </div>
-      <ng-template #banksEmpty><div class="dash-chart-card__body text-muted">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
     </div>
   </div>
 </div>

@@ -16,7 +16,7 @@ export class NavGroupComponent implements OnInit {
   @Input() activeId: any;
   public flatConfig: any;
   public themeLayout: string;
-  expanded = true;
+  expanded = false;
 
   constructor(private zone: NgZone, private location: Location, private router: Router) {
     this.flatConfig = NextConfig.config;
@@ -27,8 +27,9 @@ export class NavGroupComponent implements OnInit {
     return this.themeLayout === 'vertical' && this.item.collapsible !== false && !!this.item.children?.length;
   }
 
+  /** v2: default collapsed on enter; ignores older keys that always saved expanded=true */
   private storageKey(): string {
-    return `erp_nav_group_${this.item.id}`;
+    return `erp_nav_group_v2_${this.item.id}`;
   }
 
   ngOnInit() {
@@ -41,7 +42,7 @@ export class NavGroupComponent implements OnInit {
         if (saved !== null) {
           this.expanded = saved === '1';
         } else {
-          this.expanded = true;
+          this.expanded = false;
         }
       }
     }

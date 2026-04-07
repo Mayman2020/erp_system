@@ -28,6 +28,16 @@
   <link rel="alternate icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
+  <!-- Before Angular boot: lock viewport on /auth/* to prevent a one-frame page scrollbar -->
+  <script>
+    (function () {
+      var p = location.pathname || '';
+      if (/\/auth(\/|$)/.test(p)) {
+        document.documentElement.classList.add('erp-auth-html-lock');
+        document.body.classList.add('erp-auth-body-lock');
+      }
+    })();
+  </script>
   <app-root></app-root>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </body>

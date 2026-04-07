@@ -7,6 +7,8 @@ export type ThemeMode = 'light' | 'dark';
 export class ThemeService {
   private readonly key = 'erp_theme_mode';
   private readonly modeSubject = new BehaviorSubject<ThemeMode>(this.readMode());
+  /** Login/auth screens: always show dark UI without persisting or changing user preference. */
+  private authRouteDarkOnly = false;
 
   readonly mode$ = this.modeSubject.asObservable();
 
@@ -15,13 +17,22 @@ export class ThemeService {
   }
 
   init(): void {
-    this.apply(this.modeSubject.value);
+    this.applyEffective();
+  }
+
+  /**
+   * Call when entering/leaving `/auth` shell so login stays dark while stored mode
+   * (e.g. light) applies again after sign-in.
+   */
+  setAuthRouteDarkOnly(active: boolean): void {
+    this.authRouteDarkOnly = active;
+    this.applyEffective();
   }
 
   setMode(mode: ThemeMode): void {
     localStorage.setItem(this.key, mode);
     this.modeSubject.next(mode);
-    this.apply(mode);
+    this.applyEffective();
   }
 
   toggle(): void {
@@ -42,7 +53,13 @@ export class ThemeService {
     return localStorage.getItem(this.key) === 'dark' ? 'dark' : 'light';
   }
 
-  private apply(mode: ThemeMode): void {
+  private applyEffective(): void {
+    const stored = this.modeSubject.value;
+    const visual: ThemeMode = this.authRouteDarkOnly ? 'dark' : stored;
+    this.applyToDocument(visual);
+  }
+
+  private applyToDocument(mode: ThemeMode): void {
     document.documentElement.setAttribute('data-theme', mode);
     document.documentElement.style.setProperty('color-scheme', mode);
     document.body.classList.toggle('theme-light', mode === 'light');

@@ -54,6 +54,7 @@
     "COLLAPSE": "طي",
     "RELOAD": "إعادة تحميل",
     "REMOVE": "إزالة",
+    "FULL_DETAILS": "كل الحقول",
     "EXPORT_EXCEL": "تصدير إلى Excel",
     "UPGRADE_TO_PRO": "الترقية للنسخة المميزة",
     "TABLE_SHOWING": "عرض {{start}}–{{end}} من أصل {{total}}"
@@ -544,6 +545,10 @@
     "DESCRIPTION": "وصف",
     "REFERENCE": "مرجع",
     "AMOUNT": "المبلغ",
+    "LINE_TYPE": "نوع السطر",
+    "JOURNAL_LINE_ID": "معرّف سطر القيد",
+    "MATCHED_LINE_ID": "معرّف السطر المطابق",
+    "MATCHED_AMOUNT": "المبلغ المطابق",
     "FORM": {
       "BANK_ACCOUNT": "الحساب البنكي",
       "START_DATE": "بداية البيان",

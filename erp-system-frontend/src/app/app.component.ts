@@ -1,5 +1,6 @@
-import {Component, OnInit} from '@angular/core';
-import {NavigationEnd, Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { ThemeService } from './core/services/theme.service';
 
 @Component({ standalone: false,
@@ -13,11 +14,27 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.themeService.init();
-    this.router.events.subscribe((evt) => {
-      if (!(evt instanceof NavigationEnd)) {
-        return;
-      }
-      window.scrollTo(0, 0);
-    });
+    this.syncAuthViewportLock(this.router.url);
+    this.router.events
+      .pipe(filter((evt): evt is NavigationEnd => evt instanceof NavigationEnd))
+      .subscribe((evt) => {
+        const url = evt.urlAfterRedirects || evt.url || '';
+        this.syncAuthViewportLock(url);
+        if (!this.isAuthRouteUrl(url)) {
+          window.scrollTo(0, 0);
+        }
+      });
+  }
+
+  /** `/auth/...` uses a fixed viewport; skip window scroll to avoid scrollbar flicker. */
+  private isAuthRouteUrl(url: string): boolean {
+    const path = (url || '').split('?')[0] || '';
+    return path === '/auth' || path.startsWith('/auth/');
+  }
+
+  private syncAuthViewportLock(url: string): void {
+    const on = this.isAuthRouteUrl(url);
+    document.documentElement.classList.toggle('erp-auth-html-lock', on);
+    document.body.classList.toggle('erp-auth-body-lock', on);
   }
 }

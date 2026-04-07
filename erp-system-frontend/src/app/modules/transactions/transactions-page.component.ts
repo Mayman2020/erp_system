@@ -16,10 +16,10 @@ export class TransactionsPageComponent implements OnInit {
     { key: 'reference', title: 'TRANSACTIONS.REFERENCE', align: 'start' as 'start' },
     { key: 'transactionDate', title: 'TRANSACTIONS.DATE', kind: 'date' as 'date' },
     { key: 'transactionType', title: 'TRANSACTIONS.TYPE', kind: 'type' as 'type', prefix: 'TRANSACTION_TYPE.' },
-    { key: 'debitAccountName', title: 'TRANSACTIONS.DEBIT_ACCOUNT', align: 'start' as 'start' },
-    { key: 'creditAccountName', title: 'TRANSACTIONS.CREDIT_ACCOUNT', align: 'start' as 'start' },
     { key: 'amount', title: 'TRANSACTIONS.AMOUNT', align: 'end' as 'end' },
-    { key: 'status', title: 'COMMON.STATUS', kind: 'status' as const }
+    { key: 'status', title: 'COMMON.STATUS', kind: 'status' as const },
+    { key: 'debitAccountName', title: 'TRANSACTIONS.DEBIT_ACCOUNT', align: 'start' as 'start' },
+    { key: 'creditAccountName', title: 'TRANSACTIONS.CREDIT_ACCOUNT', align: 'start' as 'start' }
   ];
   private filters: Record<string, string> = {};
 

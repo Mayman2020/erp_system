@@ -36,13 +36,13 @@ export class LedgerPageComponent implements OnInit {
   accounts: AccountDto[] = [];
   accountTree: AccountTreeDto[] = [];
   columns = [
-    { key: 'transactionType', title: 'LEDGER.TRANSACTION_TYPE', align: 'start' as 'start' },
-    { key: 'journalReference', title: 'LEDGER.REFERENCE', align: 'start' as 'start' },
-    { key: 'sourceReference', title: 'LEDGER.SOURCE_REFERENCE', align: 'start' as 'start' },
     { key: 'entryDate', title: 'LEDGER.DATE', kind: 'date' as 'date' },
+    { key: 'journalReference', title: 'LEDGER.REFERENCE', align: 'start' as 'start' },
     { key: 'description', title: 'LEDGER.DESCRIPTION', align: 'start' as 'start' },
     { key: 'debit', title: 'LEDGER.DEBIT', align: 'end' as 'end' },
     { key: 'credit', title: 'LEDGER.CREDIT', align: 'end' as 'end' },
+    { key: 'transactionType', title: 'LEDGER.TRANSACTION_TYPE', align: 'start' as 'start' },
+    { key: 'sourceReference', title: 'LEDGER.SOURCE_REFERENCE', align: 'start' as 'start' },
     { key: 'runningBalance', title: 'LEDGER.RUNNING_BALANCE', align: 'end' as 'end' }
   ];
 

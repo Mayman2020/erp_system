@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import * as XLSX from 'xlsx';
+import { exportAoAToStyledExcel } from '../../../core/utils/styled-excel-export';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { DateFormatService } from '../../../core/services/date-format.service';
 
@@ -26,12 +26,17 @@ export interface DataTableAction {
 @Component({ standalone: false,
   selector: 'app-data-table',
   templateUrl: './data-table.component.html',
+  styleUrls: ['./data-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DataTableComponent implements OnChanges {
   @Input() columns: DataTableColumn[] = [];
   @Input() data: Array<Record<string, unknown>> = [];
   @Input() actions: DataTableAction[] = [];
+  /** Max data columns shown in the grid; remaining + extra row keys appear in the details dialog. */
+  @Input() maxSummaryColumns = 5;
+  /** When true and there are more than `maxSummaryColumns` columns (or extra row fields), show a details icon. */
+  @Input() rowDetailsEnabled = true;
   @Input() loading = false;
   @Input() skeletonRows = 5;
   @Input() pageSize = 5;
@@ -58,11 +63,76 @@ export class DataTableComponent implements OnChanges {
   currentPage = 1;
   readonly siblingCount = 1;
 
+  /** Row opened in the read-only details dialog */
+  detailRow: Record<string, unknown> | null = null;
+  extraDetailRows: Array<{ label: string; value: string }> = [];
+
   constructor(
     private dateFormatService: DateFormatService,
     private translationService: TranslationService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  get effectiveSummaryLimit(): number {
+    return Math.max(1, Number(this.maxSummaryColumns) || 5);
+  }
+
+  get summaryColumns(): DataTableColumn[] {
+    const cols = this.columns || [];
+    return cols.slice(0, this.effectiveSummaryLimit);
+  }
+
+  get showRowDetailControl(): boolean {
+    if (!this.rowDetailsEnabled) {
+      return false;
+    }
+    const cols = this.columns || [];
+    return cols.length > this.effectiveSummaryLimit;
+  }
+
+  get hasActionsColumn(): boolean {
+    return (this.actions?.length || 0) > 0 || this.showRowDetailControl;
+  }
+
+  openRowDetails(row: Record<string, unknown>): void {
+    this.detailRow = row;
+    const colKeys = new Set((this.columns || []).map((c) => c.key));
+    this.extraDetailRows = Object.keys(row || {})
+      .filter((k) => !colKeys.has(k) && !k.startsWith('_'))
+      .sort()
+      .map((k) => ({
+        label: this.humanizeExtraKey(k),
+        value: this.stringifyDetailValue((row as Record<string, unknown>)[k])
+      }));
+    this.cdr.markForCheck();
+  }
+
+  closeRowDetails(): void {
+    this.detailRow = null;
+    this.extraDetailRows = [];
+    this.cdr.markForCheck();
+  }
+
+  private humanizeExtraKey(key: string): string {
+    return (key || '')
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (s) => s.toUpperCase())
+      .trim();
+  }
+
+  private stringifyDetailValue(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value);
+      } catch {
+        return String(value);
+      }
+    }
+    return String(value);
+  }
 
   get processedData(): Array<Record<string, unknown>> {
     let source = this.data || [];
@@ -74,7 +144,7 @@ export class DataTableComponent implements OnChanges {
         return this.columns.some(col => {
           const val = this.formatCellValue(col, row, row[col.key]);
           return val && val.toLowerCase().includes(q);
-        });
+        }) || this.extraRowKeysMatchFilter(row, q);
       });
     }
 
@@ -249,18 +319,15 @@ export class DataTableComponent implements OnChanges {
     }
     const headers = this.columns.map(col => this.translationService.instant(col.title));
     const rows = this.data.map(row =>
-      this.columns.map(col => {
-        const val = row[col.key];
-        if (val === null || val === undefined) return '';
-        if (this.isDateColumn(col)) return this.dateFormatService.format(val);
-        return String(val);
-      })
+      this.columns.map(col => this.formatCellValue(col, row, row[col.key]))
     );
     const wsData = [headers, ...rows];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    XLSX.writeFile(wb, this.exportFileName + '.xlsx');
+    exportAoAToStyledExcel(wsData, {
+      sheetName: 'Export',
+      fileName: this.exportFileName,
+      headerRows: [0],
+      rightAlignColumns: []
+    });
   }
 
   formatCellValue(column: DataTableColumn, row: Record<string, unknown>, value: unknown): string {
@@ -400,6 +467,20 @@ export class DataTableComponent implements OnChanges {
    * When a column binds to `name` / `accountName` / `description` etc. and the row has *Ar / *En
    * siblings, show the value for the active UI language.
    */
+  private extraRowKeysMatchFilter(row: Record<string, unknown>, q: string): boolean {
+    const colKeys = new Set((this.columns || []).map((c) => c.key));
+    for (const k of Object.keys(row)) {
+      if (colKeys.has(k) || k.startsWith('_')) {
+        continue;
+      }
+      const v = row[k];
+      if (v !== null && v !== undefined && String(v).toLowerCase().includes(q)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private resolveSiblingLocalizedField(row: Record<string, unknown>, key: string): string {
     if (!key || key.endsWith('Ar') || key.endsWith('En')) {
       return '';

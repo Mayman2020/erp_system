@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { FormBuilder, Validators } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import * as XLSX from 'xlsx';
+import { exportAoAToStyledExcel } from '../../core/utils/styled-excel-export';
 import { BalanceSheetReportDto, ProfitLossReportDto } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { LookupItem } from '../../core/models/lookup.models';
@@ -132,7 +132,7 @@ export class ReportsPageComponent implements OnInit {
     ];
     const revenueRows = profitLoss.revenues.map((l) => [this.formatReportAccountCell(l), l.amount]);
     const expenseRows = profitLoss.expenses.map((l) => [this.formatReportAccountCell(l), l.amount]);
-    const data: any[][] = [
+    const data: unknown[][] = [
       headers,
       [this.translationService.instant('REPORTS.PROFIT_LOSS.REVENUE_SECTION'), ''],
       ...revenueRows,
@@ -144,10 +144,24 @@ export class ReportsPageComponent implements OnInit {
       ['', ''],
       [this.translationService.instant('REPORTS.PROFIT_LOSS.NET_RESULT'), profitLoss.netProfit]
     ];
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Profit & Loss');
-    XLSX.writeFile(wb, 'profit-loss.xlsx');
+    const boldRows: number[] = [];
+    let row = 1;
+    boldRows.push(row);
+    row += 1 + revenueRows.length;
+    boldRows.push(row);
+    row += 2;
+    boldRows.push(row);
+    row += 1 + expenseRows.length;
+    boldRows.push(row);
+    row += 2;
+    boldRows.push(row);
+    exportAoAToStyledExcel(data, {
+      sheetName: 'Profit & Loss',
+      fileName: 'profit-loss',
+      headerRows: [0],
+      rightAlignColumns: [1],
+      boldRows
+    });
   }
 
   exportBalanceSheet(): void {
@@ -160,7 +174,7 @@ export class ReportsPageComponent implements OnInit {
     const assetRows = balanceSheet.assets.map((l) => [this.formatReportAccountCell(l), l.balance]);
     const liabilityRows = balanceSheet.liabilities.map((l) => [this.formatReportAccountCell(l), l.balance]);
     const equityRows = balanceSheet.equity.map((l) => [this.formatReportAccountCell(l), l.balance]);
-    const data: any[][] = [
+    const data: unknown[][] = [
       headers,
       [this.translationService.instant('REPORTS.BALANCE_SHEET.ASSETS'), ''],
       ...assetRows,
@@ -174,10 +188,26 @@ export class ReportsPageComponent implements OnInit {
       ...equityRows,
       [this.translationService.instant('REPORTS.BALANCE_SHEET.TOTAL_EQUITY'), balanceSheet.totalEquity]
     ];
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Balance Sheet');
-    XLSX.writeFile(wb, 'balance-sheet.xlsx');
+    const boldRows: number[] = [];
+    let row = 1;
+    boldRows.push(row);
+    row += 1 + assetRows.length;
+    boldRows.push(row);
+    row += 2;
+    boldRows.push(row);
+    row += 1 + liabilityRows.length;
+    boldRows.push(row);
+    row += 2;
+    boldRows.push(row);
+    row += 1 + equityRows.length;
+    boldRows.push(row);
+    exportAoAToStyledExcel(data, {
+      sheetName: 'Balance Sheet',
+      fileName: 'balance-sheet',
+      headerRows: [0],
+      rightAlignColumns: [1],
+      boldRows
+    });
   }
 
   private isRangeValid(): boolean {

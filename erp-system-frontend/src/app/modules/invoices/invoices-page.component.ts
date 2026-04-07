@@ -16,8 +16,8 @@ export class InvoicesPageComponent implements OnInit {
     { key: 'invoiceDate', title: 'INVOICES.DATE', kind: 'date' as 'date' },
     { key: 'customerName', title: 'INVOICES.CUSTOMER', align: 'start' as 'start' },
     { key: 'totalAmount', title: 'INVOICES.TOTAL', align: 'end' as 'end' },
-    { key: 'outstandingAmount', title: 'INVOICES.OUTSTANDING', align: 'end' as 'end' },
-    { key: 'status', title: 'COMMON.STATUS', kind: 'status' as const }
+    { key: 'status', title: 'COMMON.STATUS', kind: 'status' as const },
+    { key: 'outstandingAmount', title: 'INVOICES.OUTSTANDING', align: 'end' as 'end' }
   ];
   private filters: Record<string, string> = {};
 

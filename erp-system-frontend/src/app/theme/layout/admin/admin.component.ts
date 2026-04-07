@@ -1,11 +1,21 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, NgZone, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NextConfig } from '../../../app-config';
 import { Location } from '@angular/common';
 
 @Component({ standalone: false,
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss']
+  styleUrls: ['./admin.component.scss'],
+  animations: [
+    trigger('erpPageTransition', [
+      transition('* => *', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('260ms cubic-bezier(0.33, 1, 0.68, 1)', style({ opacity: 1, transform: 'none' }))
+      ])
+    ])
+  ]
 })
 export class AdminComponent implements OnInit {
   public flatConfig: any;
@@ -15,7 +25,11 @@ export class AdminComponent implements OnInit {
   public navCollapsedMob: boolean;
   public windowWidth: number;
 
-  constructor(private zone: NgZone, private location: Location) {
+  constructor(
+    private zone: NgZone,
+    private location: Location,
+    public router: Router
+  ) {
     this.flatConfig = NextConfig.config;
     let currentURL = this.location.path();
     const baseHerf = this.location['_baseHref'];

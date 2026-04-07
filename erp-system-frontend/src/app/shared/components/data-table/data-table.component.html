@@ -1,19 +1,19 @@
-<div class="erp-table-card" [class.erp-table-card--compact]="compact">
+<div class="erp-table-card" [class.erp-table-card--compact]="compact" [class.erp-table-card--loading]="loading">
   <ng-container *ngIf="loading; else tableContent">
     <div class="erp-table-scroll">
       <table class="erp-table">
         <thead>
           <tr>
-            <th *ngFor="let column of columns">{{ column.title | translate }}</th>
-            <th *ngIf="actions.length" class="erp-table__cell--actions">{{ 'COMMON.ACTIONS' | translate }}</th>
+            <th *ngFor="let column of summaryColumns">{{ column.title | translate }}</th>
+            <th *ngIf="hasActionsColumn" class="erp-table__cell--actions">{{ 'COMMON.ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let _ of getSkeletonArray()">
-            <td *ngFor="let column of columns">
+            <td *ngFor="let column of summaryColumns">
               <div class="skeleton-box" style="height: 20px; width: 80%; border-radius: 4px;"></div>
             </td>
-            <td *ngIf="actions.length">
+            <td *ngIf="hasActionsColumn">
               <div class="skeleton-box" style="height: 20px; width: 40px; border-radius: 4px;"></div>
             </td>
           </tr>
@@ -32,8 +32,8 @@
           </div>
         </div>
         <div class="erp-table-toolbar__end" *ngIf="exportable && processedData?.length">
-          <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportToExcel()">
-            <mat-icon aria-hidden="true">file_download</mat-icon>
+          <button type="button" class="erp-excel-export-btn" (click)="exportToExcel()">
+            <mat-icon aria-hidden="true" class="erp-excel-export-btn__icon">table_chart</mat-icon>
             <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
           </button>
         </div>
@@ -43,7 +43,7 @@
         <thead>
           <tr>
             <th
-              *ngFor="let column of columns"
+              *ngFor="let column of summaryColumns"
               [class.erp-table__col--priority]="isPriorityTextColumn(column)"
               [ngClass]="column.className || null"
               [class.erp-table__cell--align-start]="column.align === 'start'"
@@ -56,13 +56,13 @@
                 {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
               </mat-icon>
             </th>
-            <th *ngIf="actions.length" class="erp-table__cell--actions">{{ 'COMMON.ACTIONS' | translate }}</th>
+            <th *ngIf="hasActionsColumn" class="erp-table__cell--actions">{{ 'COMMON.ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let row of visibleRows; trackBy: trackRowByKey">
             <td
-              *ngFor="let column of columns"
+              *ngFor="let column of summaryColumns"
               [class.erp-table__col--priority]="isPriorityTextColumn(column)"
               [ngClass]="column.className || null"
               [class.erp-table__cell--align-start]="column.align === 'start'"
@@ -88,8 +88,21 @@
                 </label>
               </ng-container>
             </td>
-            <td *ngIf="actions.length" class="erp-table__cell--actions">
+            <td *ngIf="hasActionsColumn" class="erp-table__cell--actions">
               <div class="erp-table-actions">
+                <button
+                  *ngIf="showRowDetailControl"
+                  type="button"
+                  class="erp-action-btn erp-action-btn--neutral"
+                  [ngbTooltip]="'COMMON.FULL_DETAILS' | translate"
+                  placement="top"
+                  container="body"
+                  triggers="hover focus"
+                  [attr.aria-label]="'COMMON.FULL_DETAILS' | translate"
+                  (click)="openRowDetails(row)"
+                >
+                  <mat-icon aria-hidden="true">list_alt</mat-icon>
+                </button>
                 <button
                   type="button"
                   *ngFor="let action of actions"
@@ -141,3 +154,35 @@
     </ng-template>
   </ng-template>
 </div>
+
+<app-form-dialog
+  [visible]="detailRow !== null"
+  [titleKey]="'COMMON.FULL_DETAILS'"
+  size="lg"
+  (close)="closeRowDetails()"
+>
+  <div dialog-body class="erp-data-table-detail" *ngIf="detailRow as dr">
+    <dl class="erp-data-table-detail__list">
+      <ng-container *ngFor="let col of columns">
+        <dt class="erp-data-table-detail__label">{{ col.title | translate }}</dt>
+        <dd class="erp-data-table-detail__value">
+          <ng-container [ngSwitch]="col.kind || 'text'">
+            <ng-container *ngSwitchCase="'text'">
+              <span>{{ formatCellValue(col, dr, dr[col.key]) }}</span>
+            </ng-container>
+            <span *ngSwitchCase="'date'">{{ formatCellValue(col, dr, dr[col.key]) }}</span>
+            <span *ngSwitchCase="'localized'">{{ formatCellValue(col, dr, dr[col.key]) }}</span>
+            <app-status-badge *ngSwitchCase="'status'" [status]="(dr[col.key] || 'DRAFT').toString()" [labelPrefix]="col.prefix || 'STATUS.'"></app-status-badge>
+            <app-type-badge *ngSwitchCase="'type'" [type]="(dr[col.key] || '').toString()" [labelPrefix]="col.prefix || ''"></app-type-badge>
+            <app-status-badge *ngSwitchCase="'boolean'" [status]="dr[col.key] ? 'YES' : 'NO'" [labelPrefix]="col.prefix || 'COMMON.BOOL.'"></app-status-badge>
+            <span *ngSwitchCase="'booleanToggle'">{{ dr[col.key] ? ('COMMON.BOOL.YES' | translate) : ('COMMON.BOOL.NO' | translate) }}</span>
+          </ng-container>
+        </dd>
+      </ng-container>
+      <ng-container *ngFor="let ex of extraDetailRows">
+        <dt class="erp-data-table-detail__label erp-data-table-detail__label--extra">{{ ex.label }}</dt>
+        <dd class="erp-data-table-detail__value">{{ ex.value }}</dd>
+      </ng-container>
+    </dl>
+  </div>
+</app-form-dialog>

@@ -24,11 +24,11 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
     { key: 'reference', title: 'VOUCHERS.LIST.NUMBER', align: 'start' },
     { key: 'voucherDate', title: 'VOUCHERS.LIST.DATE' },
     { key: 'partyName', title: 'VOUCHERS.LIST.PARTY', align: 'start' },
+    { key: 'amountDisplay', title: 'VOUCHERS.LIST.AMOUNT', align: 'end' },
+    { key: 'status', title: 'COMMON.STATUS', kind: 'status' },
     { key: 'paymentMethod', title: 'VOUCHERS.LIST.METHOD', prefix: 'PAYMENT_METHOD.', kind: 'type' },
     { key: 'cashAccountName', title: 'VOUCHERS.LIST.BANK_ACCOUNT', align: 'start' },
-    { key: 'amountDisplay', title: 'VOUCHERS.LIST.AMOUNT', align: 'end' },
     { key: 'currencyCode', title: 'VOUCHERS.LIST.CURRENCY' },
-    { key: 'status', title: 'COMMON.STATUS', kind: 'status' },
     { key: 'createdAt', title: 'VOUCHERS.LIST.CREATED_AT', kind: 'date' },
     { key: 'createdBy', title: 'VOUCHERS.LIST.CREATED_BY', align: 'start' }
   ];

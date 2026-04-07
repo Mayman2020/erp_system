@@ -287,7 +287,8 @@ small,
 
 /* Dashboard KPI row: equal visual weight */
 .dash-kpi-card,
-.dash-chart-card {
+.dash-chart-card,
+.erp-integrated-table {
   border-radius: var(--radius);
   min-height: 104px;
 }

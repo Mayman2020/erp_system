@@ -62,9 +62,9 @@
 
         <ng-container *ngIf="activeReport === 'profitLoss'">
           <div *ngIf="profitLoss$ | async as profitLoss" class="report-table">
-            <div class="d-flex justify-content-end mb-2">
-              <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportProfitLoss()">
-                <mat-icon aria-hidden="true">file_download</mat-icon>
+            <div class="d-flex justify-content-end mb-3 erp-report-excel-actions">
+              <button type="button" class="erp-excel-export-btn" (click)="exportProfitLoss()">
+                <mat-icon aria-hidden="true" class="erp-excel-export-btn__icon">table_chart</mat-icon>
                 <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
               </button>
             </div>
@@ -124,9 +124,9 @@
 
         <ng-container *ngIf="activeReport === 'balanceSheet'">
           <div *ngIf="balanceSheet$ | async as balanceSheet" class="report-table">
-            <div class="d-flex justify-content-end mb-2">
-              <button type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="exportBalanceSheet()">
-                <mat-icon aria-hidden="true">file_download</mat-icon>
+            <div class="d-flex justify-content-end mb-3 erp-report-excel-actions">
+              <button type="button" class="erp-excel-export-btn" (click)="exportBalanceSheet()">
+                <mat-icon aria-hidden="true" class="erp-excel-export-btn__icon">table_chart</mat-icon>
                 <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
               </button>
             </div>

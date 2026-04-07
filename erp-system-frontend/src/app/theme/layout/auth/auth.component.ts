@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   standalone: false,
@@ -6,11 +7,14 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss']
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent implements OnInit, OnDestroy {
+  constructor(private themeService: ThemeService) {}
 
-  constructor() { }
-
-  ngOnInit() {
+  ngOnInit(): void {
+    this.themeService.setAuthRouteDarkOnly(true);
   }
 
+  ngOnDestroy(): void {
+    this.themeService.setAuthRouteDarkOnly(false);
+  }
 }

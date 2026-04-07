@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, PLATFORM_ID, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, PLATFORM_ID, Inject, ViewChild, ElementRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,7 +6,6 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import gsap from 'gsap';
 import { AuthService } from '../../../core/auth/auth.service';
-import { ThemeService } from '../../../core/services/theme.service';
 
 declare var particlesJS: any;
 
@@ -16,7 +15,7 @@ declare var particlesJS: any;
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LoginComponent implements AfterViewInit, OnDestroy {
   @ViewChild('loginCard', { read: ElementRef }) loginCardRef?: ElementRef<HTMLElement>;
   @ViewChild('brandPanel', { read: ElementRef }) brandPanelRef?: ElementRef<HTMLElement>;
 
@@ -25,7 +24,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   otpLoading = false;
   hidePassword = true;
   hideNewPassword = true;
-  darkMode = false;
   mode: 'login' | 'forgot' = 'login';
   otpSent = false;
 
@@ -52,17 +50,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
-    private themeService: ThemeService,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {
-    this.darkMode = this.themeService.getCurrentTheme() === 'dark';
-  }
-
-  ngOnInit(): void {
-    this.themeService.mode$.pipe(takeUntil(this.destroy$)).subscribe((m) => {
-      this.darkMode = m === 'dark';
-    });
-  }
+  ) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -100,10 +89,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       retina_detect: true
     });
-  }
-
-  toggleTheme(): void {
-    this.themeService.toggleTheme();
   }
 
   private runLoginIntro(): void {

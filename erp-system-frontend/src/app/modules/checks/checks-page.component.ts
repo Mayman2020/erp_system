@@ -13,12 +13,12 @@ export class ChecksPageComponent implements OnInit {
   statusOptions: string[] = [];
   columns = [
     { key: 'checkNumber', title: 'CHECKS.NUMBER', align: 'start' as 'start' },
+    { key: 'dueDate', title: 'CHECKS.DUE_DATE', kind: 'date' as 'date' },
+    { key: 'amount', title: 'CHECKS.AMOUNT', align: 'end' as 'end' },
+    { key: 'status', title: 'COMMON.STATUS', kind: 'status' as const },
     { key: 'checkType', title: 'CHECKS.TYPE', kind: 'type' as 'type', prefix: 'CHECK_TYPE.' },
     { key: 'bankName', title: 'CHECKS.BANK', align: 'start' as 'start' },
-    { key: 'dueDate', title: 'CHECKS.DUE_DATE', kind: 'date' as 'date' },
-    { key: 'partyName', title: 'CHECKS.PARTY', align: 'start' as 'start' },
-    { key: 'amount', title: 'CHECKS.AMOUNT', align: 'end' as 'end' },
-    { key: 'status', title: 'COMMON.STATUS', kind: 'status' as const }
+    { key: 'partyName', title: 'CHECKS.PARTY', align: 'start' as 'start' }
   ];
   private filters: Record<string, string> = {};
 

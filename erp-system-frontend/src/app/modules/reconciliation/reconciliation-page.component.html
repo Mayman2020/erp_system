@@ -133,22 +133,21 @@
                     <thead>
                       <tr>
                         <th>{{ 'RECONCILIATION.DATE' | translate }}</th>
-                        <th>{{ 'RECONCILIATION.DESCRIPTION' | translate }}</th>
-                        <th>{{ 'RECONCILIATION.REFERENCE' | translate }}</th>
                         <th>{{ 'RECONCILIATION.AMOUNT' | translate }}</th>
                         <th>{{ 'COMMON.STATUS' | translate }}</th>
                         <th>{{ 'COMMON.ACTIONS' | translate }}</th>
                       </tr>
                     </thead>
                     <tbody *ngIf="statementLines$ | async as statementLines">
-                      <tr *ngIf="statementLines.length === 0"><td colspan="6" class="text-center text-muted py-3">{{ 'COMMON.NO_DATA' | translate }}</td></tr>
+                      <tr *ngIf="statementLines.length === 0"><td colspan="4" class="text-center text-muted py-3">{{ 'COMMON.NO_DATA' | translate }}</td></tr>
                       <tr *ngFor="let line of statementLines" (click)="pickStatement(line)" [class.table-active]="selectedStatementLineId === line.id" [class.erp-line-matched]="line.status === 'MATCHED'">
                         <td>{{ line.transactionDate | erpDate }}</td>
-                        <td>{{ line.description }}</td>
-                        <td>{{ line.sourceReference }}</td>
                         <td [ngClass]="amountClass(line)">{{ line.amount | number:'1.2-2' }}</td>
                         <td><app-status-badge [status]="line.status" labelPrefix="RECON_STATUS."></app-status-badge></td>
                         <td>
+                          <button type="button" class="erp-action-btn erp-action-btn--neutral" [ngbTooltip]="'COMMON.FULL_DETAILS' | translate" placement="top" container="body" [attr.aria-label]="'COMMON.FULL_DETAILS' | translate" (click)="openLineDetail(line, $event)">
+                            <mat-icon aria-hidden="true">list_alt</mat-icon>
+                          </button>
                           <button *ngIf="line.status === 'MATCHED' || line.status === 'PARTIALLY_MATCHED'" type="button" class="erp-action-btn erp-action-btn--danger" [ngbTooltip]="'RECONCILIATION.UNMATCH' | translate" placement="top" container="body" [disabled]="!isEditable" (click)="unmatchLine(line); $event.stopPropagation()">
                             <mat-icon aria-hidden="true">link_off</mat-icon>
                           </button>
@@ -169,22 +168,21 @@
                     <thead>
                       <tr>
                         <th>{{ 'RECONCILIATION.DATE' | translate }}</th>
-                        <th>{{ 'RECONCILIATION.DESCRIPTION' | translate }}</th>
-                        <th>{{ 'RECONCILIATION.REFERENCE' | translate }}</th>
                         <th>{{ 'RECONCILIATION.AMOUNT' | translate }}</th>
                         <th>{{ 'COMMON.STATUS' | translate }}</th>
                         <th>{{ 'COMMON.ACTIONS' | translate }}</th>
                       </tr>
                     </thead>
                     <tbody *ngIf="systemLines$ | async as systemLines">
-                      <tr *ngIf="systemLines.length === 0"><td colspan="6" class="text-center text-muted py-3">{{ 'COMMON.NO_DATA' | translate }}</td></tr>
+                      <tr *ngIf="systemLines.length === 0"><td colspan="4" class="text-center text-muted py-3">{{ 'COMMON.NO_DATA' | translate }}</td></tr>
                       <tr *ngFor="let line of systemLines" (click)="pickSystem(line)" [class.table-active]="selectedSystemLineId === line.id" [class.erp-line-matched]="line.status === 'MATCHED'">
                         <td>{{ line.transactionDate | erpDate }}</td>
-                        <td>{{ line.description }}</td>
-                        <td>{{ line.sourceReference }}</td>
                         <td [ngClass]="amountClass(line)">{{ line.amount | number:'1.2-2' }}</td>
                         <td><app-status-badge [status]="line.status" labelPrefix="RECON_STATUS."></app-status-badge></td>
                         <td>
+                          <button type="button" class="erp-action-btn erp-action-btn--neutral" [ngbTooltip]="'COMMON.FULL_DETAILS' | translate" placement="top" container="body" [attr.aria-label]="'COMMON.FULL_DETAILS' | translate" (click)="openLineDetail(line, $event)">
+                            <mat-icon aria-hidden="true">list_alt</mat-icon>
+                          </button>
                           <button *ngIf="line.status === 'MATCHED' || line.status === 'PARTIALLY_MATCHED'" type="button" class="erp-action-btn erp-action-btn--danger" [ngbTooltip]="'RECONCILIATION.UNMATCH' | translate" placement="top" container="body" [disabled]="!isEditable" (click)="unmatchLine(line); $event.stopPropagation()">
                             <mat-icon aria-hidden="true">link_off</mat-icon>
                           </button>
@@ -204,4 +202,35 @@
       </ng-template>
     </div>
   </div>
+  <app-form-dialog
+    [visible]="detailLine !== null"
+    [titleKey]="'COMMON.FULL_DETAILS'"
+    size="lg"
+    (close)="closeLineDetail()"
+  >
+    <div dialog-body class="erp-recon-line-detail" *ngIf="detailLine as dl">
+      <dl class="erp-recon-line-detail__list">
+        <dt>{{ 'RECONCILIATION.DATE' | translate }}</dt>
+        <dd>{{ dl.transactionDate | erpDate }}</dd>
+        <dt>{{ 'RECONCILIATION.AMOUNT' | translate }}</dt>
+        <dd>{{ dl.amount | number:'1.2-2' }}</dd>
+        <dt>{{ 'COMMON.STATUS' | translate }}</dt>
+        <dd><app-status-badge [status]="dl.status" labelPrefix="RECON_STATUS."></app-status-badge></dd>
+        <dt>{{ 'RECONCILIATION.DESCRIPTION' | translate }}</dt>
+        <dd>{{ dl.description || '—' }}</dd>
+        <dt>{{ 'RECONCILIATION.REFERENCE' | translate }}</dt>
+        <dd>{{ dl.sourceReference || '—' }}</dd>
+        <dt>{{ 'RECONCILIATION.LINE_TYPE' | translate }}</dt>
+        <dd>{{ dl.transactionType }}</dd>
+        <dt>{{ 'COMMON.ID' | translate }}</dt>
+        <dd>{{ dl.id }}</dd>
+        <dt *ngIf="dl.journalEntryLineId != null">{{ 'RECONCILIATION.JOURNAL_LINE_ID' | translate }}</dt>
+        <dd *ngIf="dl.journalEntryLineId != null">{{ dl.journalEntryLineId }}</dd>
+        <dt *ngIf="dl.matchedLineId != null">{{ 'RECONCILIATION.MATCHED_LINE_ID' | translate }}</dt>
+        <dd *ngIf="dl.matchedLineId != null">{{ dl.matchedLineId }}</dd>
+        <dt *ngIf="dl.matchedAmount != null">{{ 'RECONCILIATION.MATCHED_AMOUNT' | translate }}</dt>
+        <dd *ngIf="dl.matchedAmount != null">{{ dl.matchedAmount | number:'1.2-2' }}</dd>
+      </dl>
+    </div>
+  </app-form-dialog>
 </section>

@@ -14,7 +14,7 @@
       <div class="pcoded-content erp-content"
         [ngClass]="{'container': this.flatConfig.layout === 'horizontal' && this.flatConfig.subLayout === 'horizontal-2'}">
         <app-breadcrumb class="erp-breadcrumb-host"></app-breadcrumb>
-        <div class="erp-route-shell">
+        <div class="erp-route-shell" [@erpPageTransition]="router.url">
           <router-outlet></router-outlet>
         </div>
         <app-shell-footer></app-shell-footer>

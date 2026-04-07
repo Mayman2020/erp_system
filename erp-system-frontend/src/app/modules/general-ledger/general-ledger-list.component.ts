@@ -32,12 +32,12 @@ export class GeneralLedgerListComponent implements OnInit {
 
   readonly columns: DataTableColumn[] = [
     { key: 'referenceNumber', title: 'GENERAL_LEDGER.REFERENCE', align: 'start', clickable: true },
-    { key: 'description', title: 'GENERAL_LEDGER.DESCRIPTION', align: 'start', clickable: true },
     { key: 'entryDate', title: 'GENERAL_LEDGER.DATE' },
-    { key: 'sourceLabel', title: 'GENERAL_LEDGER.SOURCE_TYPE' },
+    { key: 'description', title: 'GENERAL_LEDGER.DESCRIPTION', align: 'start', clickable: true },
+    { key: 'status', title: 'COMMON.STATUS', kind: 'status' },
     { key: 'totalDebit', title: 'GENERAL_LEDGER.TOTAL_DEBIT', align: 'end' },
     { key: 'totalCredit', title: 'GENERAL_LEDGER.TOTAL_CREDIT', align: 'end' },
-    { key: 'status', title: 'COMMON.STATUS', kind: 'status' },
+    { key: 'sourceLabel', title: 'GENERAL_LEDGER.SOURCE_TYPE' },
     { key: 'createdAt', title: 'GENERAL_LEDGER.CREATED_AT', kind: 'date' },
     { key: 'createdBy', title: 'GENERAL_LEDGER.CREATED_BY', align: 'start' }
   ];

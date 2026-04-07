@@ -24,6 +24,7 @@ import { TreeSelectorComponent } from './components/tree-selector/tree-selector.
 import { TypeBadgeComponent } from './components/type-badge/type-badge.component';
 import { ErpDatePipe } from './pipes/erp-date.pipe';
 import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
+import { ErpCountUpDirective } from './directives/erp-count-up.directive';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
     PageHeaderComponent,
     EmptyStateComponent,
     LoadingStateComponent,
-    AvatarComponent
+    AvatarComponent,
+    ErpCountUpDirective
   ],
   imports: [
     CommonModule,
@@ -88,7 +90,8 @@ import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
     PageHeaderComponent,
     EmptyStateComponent,
     LoadingStateComponent,
-    AvatarComponent
+    AvatarComponent,
+    ErpCountUpDirective
   ]
 })
 export class SharedModule {}

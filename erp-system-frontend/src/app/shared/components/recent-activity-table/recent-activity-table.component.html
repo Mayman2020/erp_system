@@ -1,26 +1,26 @@
-<div class="dash-chart-card dash-chart-card--activity">
-  <div class="dash-chart-card__header dash-chart-card__header--activity">
-    <div class="dash-chart-card__header-copy">
+<div class="erp-integrated-table erp-integrated-table--activity">
+  <div class="erp-integrated-table__head erp-integrated-table__head--activity">
+    <div class="erp-integrated-table__title">
       <h5>{{ titleKey | translate }}</h5>
     </div>
-    <div class="dash-chart-card__header-actions">
+    <div class="erp-integrated-table__actions">
       <button
         type="button"
-        class="erp-icon-button"
+        class="erp-icon-button erp-integrated-table__icon-btn"
         [attr.aria-label]="'COMMON.SORT_DIRECTION' | translate"
         [attr.title]="'COMMON.SORT_DIRECTION' | translate"
         (click)="toggleSortDirection()"
       >
         <mat-icon aria-hidden="true">{{ sortDirection === 'desc' ? 'south' : 'north' }}</mat-icon>
       </button>
-      <a class="erp-button erp-button--ghost erp-button--sm" [routerLink]="viewAllLink">
+      <a class="erp-button erp-button--ghost erp-button--sm erp-integrated-table__view-link" [routerLink]="viewAllLink">
         <span>{{ 'COMMON.VIEW' | translate }}</span>
         <mat-icon aria-hidden="true">arrow_outward</mat-icon>
       </a>
     </div>
   </div>
 
-  <div class="dash-chart-card__body">
+  <div class="erp-integrated-table__body">
     <app-data-table
       [columns]="columns"
       [data]="rows"

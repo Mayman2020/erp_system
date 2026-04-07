@@ -39,6 +39,8 @@ export class ReconciliationPageComponent implements OnInit {
   selectedStatementLineId: number | null = null;
   selectedSystemLineId: number | null = null;
   statuses: string[] = [];
+  /** Full row for read-only details dialog */
+  detailLine: ReconciliationLineDto | null = null;
 
   readonly createForm = this.fb.group({
     bankAccountId: [null as number | null, Validators.required],
@@ -240,6 +242,17 @@ export class ReconciliationPageComponent implements OnInit {
           error: () => { this.errorKey = 'RECONCILIATION.CANCEL_ERROR'; }
         });
     });
+  }
+
+  openLineDetail(line: ReconciliationLineDto, ev: Event): void {
+    ev.stopPropagation();
+    this.detailLine = line;
+    this.cdr.markForCheck();
+  }
+
+  closeLineDetail(): void {
+    this.detailLine = null;
+    this.cdr.markForCheck();
   }
 
   amountClass(line: ReconciliationLineDto): string {

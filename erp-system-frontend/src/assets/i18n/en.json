@@ -54,6 +54,7 @@
     "COLLAPSE": "Collapse",
     "RELOAD": "Reload",
     "REMOVE": "Remove",
+    "FULL_DETAILS": "All fields",
     "EXPORT_EXCEL": "Export to Excel",
     "UPGRADE_TO_PRO": "Upgrade to Pro",
     "TABLE_SHOWING": "Showing {{start}}–{{end}} of {{total}}"
@@ -543,6 +544,10 @@
     "DESCRIPTION": "Description",
     "REFERENCE": "Reference",
     "AMOUNT": "Amount",
+    "LINE_TYPE": "Line type",
+    "JOURNAL_LINE_ID": "Journal line ID",
+    "MATCHED_LINE_ID": "Matched line ID",
+    "MATCHED_AMOUNT": "Matched amount",
     "FORM": {
       "BANK_ACCOUNT": "Bank Account",
       "START_DATE": "Statement Start",

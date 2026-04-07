@@ -94,7 +94,6 @@
 }
 
 .erp-btn-primary:hover {
-  transform: translateY(-1px);
   box-shadow: 0 18px 36px rgba(37, 99, 235, 0.22);
 }
 
@@ -287,6 +286,19 @@ body.rtl {
   text-align: right;
 }
 
+/* Login/auth: lock document height so the page scrollbar does not appear then disappear */
+html.erp-auth-html-lock,
+body.erp-auth-body-lock {
+  height: 100%;
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html.erp-auth-html-lock {
+  height: 100dvh;
+}
+
 button,
 input,
 select,
@@ -437,12 +449,7 @@ a:hover {
   height: 120px;
 }
 
-.btn:hover,
-.erp-button:hover,
-.erp-action-btn:hover,
-.erp-icon-button:hover {
-  transform: translateY(-1px);
-}
+/* Button hover motion: see scss/motion/_micro-interactions.scss (scale + shadow) */
 
 .btn-primary,
 .erp-button--primary {
@@ -856,6 +863,99 @@ body.rtl .erp-search-panel__actions {
   overflow: hidden;
 }
 
+/* One surface: no nested “card inside card” when the grid is already on a page card */
+.erp-unified-card > .card-body app-data-table .erp-table-card,
+.erp-admin-panel app-data-table .erp-table-card,
+.erp-integrated-table app-data-table .erp-table-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* Title + actions + table in one shell (dashboard recent activity, monthly summary, etc.) */
+.erp-integrated-table {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--erp-border);
+  border-radius: 18px;
+  background: var(--erp-bg-card);
+  box-shadow: var(--erp-shadow-sm);
+}
+
+.erp-integrated-table__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--erp-space-2);
+  flex-shrink: 0;
+  padding: var(--erp-space-4) var(--erp-space-4) var(--erp-space-3);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-integrated-table__head h5 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--erp-text);
+}
+
+.erp-integrated-table__title {
+  min-width: 0;
+}
+
+.erp-integrated-table__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--erp-space-2);
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
+.erp-integrated-table__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--erp-space-3) var(--erp-space-4) var(--erp-space-4);
+}
+
+.erp-integrated-table__body--empty {
+  justify-content: center;
+  min-height: 120px;
+}
+
+.erp-integrated-table__head--activity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--erp-space-2);
+}
+
+.erp-integrated-table__icon-btn {
+  border: 1px solid var(--erp-border);
+  border-radius: 10px;
+  background: var(--erp-bg-elevated);
+}
+
+.erp-integrated-table__view-link {
+  border: 1px solid var(--erp-border);
+  border-radius: 10px;
+  background: var(--erp-bg-elevated);
+}
+
+.erp-integrated-table app-data-table {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.dashboard-grid .erp-integrated-table {
+  height: 100%;
+}
+
 .erp-table-scroll {
   overflow: auto;
   padding: 0 8px 12px;
@@ -922,9 +1022,63 @@ body.rtl .erp-search-panel__actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 8px 16px;
+  padding: 14px 8px 16px;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+/* Excel export: Office-green glow + spreadsheet icon (all tables / reports) */
+.erp-excel-export-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0f6b3a 0%, #217346 38%, #21a366 100%);
+  box-shadow:
+    0 4px 16px rgba(33, 115, 70, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+.erp-excel-export-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 26px rgba(33, 115, 70, 0.55),
+    0 0 24px rgba(52, 211, 153, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  filter: brightness(1.05);
+}
+
+.erp-excel-export-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.erp-excel-export-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.erp-excel-export-btn__icon {
+  font-size: 22px !important;
+  width: 22px !important;
+  height: 22px !important;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.45));
+}
+
+.erp-report-excel-actions {
+  padding-top: 4px;
 }
 
 .erp-table-toolbar__start {
@@ -3215,32 +3369,6 @@ body.rtl .erp-search-panel__actions {
   min-width: 0;
 }
 
-.dash-chart-card__header--activity {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--erp-space-2);
-}
-
-.dash-chart-card__header-copy,
-.dash-chart-card__header-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--erp-space-2);
-}
-
-.dash-chart-card__header-copy {
-  min-width: 0;
-}
-
-.dash-chart-card__header-actions {
-  margin-inline-start: auto;
-}
-
-.dash-chart-card--activity .dash-chart-card__body {
-  display: grid;
-}
-
 .erp-sidebar-profile__menu-link {
   min-height: 44px;
   font-weight: 600;
@@ -3302,12 +3430,18 @@ body.rtl .erp-search-panel__actions {
     gap: var(--erp-space-3);
   }
 
-  .dash-chart-card__header--activity {
+  .erp-integrated-table__head,
+  .erp-integrated-table__body {
+    padding-left: var(--erp-space-3);
+    padding-right: var(--erp-space-3);
+  }
+
+  .erp-integrated-table__head--activity {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .dash-chart-card__header-actions {
+  .erp-integrated-table__actions {
     margin-inline-start: 0;
     justify-content: flex-end;
   }
@@ -3511,3 +3645,4 @@ ngb-datepicker.erp-datepicker-popup-wide {
 }
 
 @import 'scss/design-system/tokens';
+@import 'scss/motion/micro-interactions';

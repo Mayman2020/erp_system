@@ -1,0 +1,456 @@
+/* =============================================================================
+   ERP micro-interactions & motion tokens (transform/opacity-first, low cost)
+   ============================================================================= */
+
+:root {
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s ease;
+
+  --scale-hover: 1.02;
+  --scale-click: 0.97;
+
+  --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] {
+  --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Reusable utilities (opt-in + a few global surfaces)                         */
+/* -------------------------------------------------------------------------- */
+
+.hover-lift {
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal),
+    opacity var(--transition-fast);
+  will-change: transform;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift:hover {
+    transform: none;
+    box-shadow: inherit;
+  }
+}
+
+.fade-in {
+  animation: erp-fade-in var(--transition-normal) ease both;
+}
+
+@keyframes erp-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.scale-click:active {
+  transform: scale(var(--scale-click));
+}
+
+/* -------------------------------------------------------------------------- */
+/* Cards & panels                                                             */
+/* -------------------------------------------------------------------------- */
+
+.erp-card:not(.no-motion):not(.erp-card--static),
+.erp-table-card:not(.no-motion),
+.erp-search-panel:not(.no-motion) {
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal),
+    border-color var(--transition-fast);
+  will-change: transform;
+}
+
+.erp-card:not(.no-motion):not(.erp-card--static):hover,
+.erp-table-card:not(.no-motion):hover,
+.erp-search-panel:not(.no-motion):hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Buttons (ERP + Bootstrap .btn inside app shell)                             */
+/* -------------------------------------------------------------------------- */
+
+.erp-content .btn:not(:disabled):not(.disabled),
+.erp-content .erp-button:not(:disabled):not([disabled]),
+.erp-content .erp-action-btn:not(:disabled):not([disabled]),
+.erp-content .erp-icon-button:not(:disabled):not([disabled]),
+.erp-content .erp-icon-toolbtn:not(:disabled):not([disabled]),
+.pcoded-main-container .btn:not(:disabled):not(.disabled),
+.pcoded-main-container .erp-button:not(:disabled):not([disabled]),
+.pcoded-main-container .erp-action-btn:not(:disabled):not([disabled]),
+.pcoded-main-container .erp-icon-button:not(:disabled):not([disabled]),
+.pcoded-main-container .erp-icon-toolbtn:not(:disabled):not([disabled]),
+.cdk-overlay-container .btn:not(:disabled):not(.disabled),
+.cdk-overlay-container .erp-button:not(:disabled):not([disabled]),
+.auth-wrapper .erp-btn:not(:disabled):not([disabled]),
+.erp-page .btn:not(:disabled):not(.disabled),
+.erp-page .erp-button:not(:disabled):not([disabled]),
+.erp-page .erp-action-btn:not(:disabled):not([disabled]),
+.erp-page .erp-icon-button:not(:disabled):not([disabled]),
+.erp-page .erp-icon-toolbtn:not(:disabled):not([disabled]) {
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    opacity var(--transition-fast);
+  will-change: transform;
+}
+
+.erp-content .btn:not(:disabled):not(.disabled):hover,
+.erp-content .erp-button:not(:disabled):not([disabled]):hover,
+.erp-content .erp-action-btn:not(:disabled):not([disabled]):hover,
+.erp-content .erp-icon-button:not(:disabled):not([disabled]):hover,
+.erp-content .erp-icon-toolbtn:not(:disabled):not([disabled]):hover,
+.pcoded-main-container .btn:not(:disabled):not(.disabled):hover,
+.pcoded-main-container .erp-button:not(:disabled):not([disabled]):hover,
+.pcoded-main-container .erp-action-btn:not(:disabled):not([disabled]):hover,
+.pcoded-main-container .erp-icon-button:not(:disabled):not([disabled]):hover,
+.pcoded-main-container .erp-icon-toolbtn:not(:disabled):not([disabled]):hover,
+.cdk-overlay-container .btn:not(:disabled):not(.disabled):hover,
+.cdk-overlay-container .erp-button:not(:disabled):not([disabled]):hover,
+.auth-wrapper .erp-btn:not(:disabled):not([disabled]):hover,
+.erp-page .btn:not(:disabled):not(.disabled):hover,
+.erp-page .erp-button:not(:disabled):not([disabled]):hover,
+.erp-page .erp-action-btn:not(:disabled):not([disabled]):hover,
+.erp-page .erp-icon-button:not(:disabled):not([disabled]):hover,
+.erp-page .erp-icon-toolbtn:not(:disabled):not([disabled]):hover {
+  transform: scale(var(--scale-hover));
+  box-shadow: var(--shadow-hover);
+}
+
+.erp-content .btn:not(:disabled):not(.disabled):active,
+.erp-content .erp-button:not(:disabled):not([disabled]):active,
+.erp-content .erp-action-btn:not(:disabled):not([disabled]):active,
+.erp-content .erp-icon-button:not(:disabled):not([disabled]):active,
+.erp-content .erp-icon-toolbtn:not(:disabled):not([disabled]):active,
+.pcoded-main-container .btn:not(:disabled):not(.disabled):active,
+.pcoded-main-container .erp-button:not(:disabled):not([disabled]):active,
+.pcoded-main-container .erp-action-btn:not(:disabled):not([disabled]):active,
+.pcoded-main-container .erp-icon-button:not(:disabled):not([disabled]):active,
+.pcoded-main-container .erp-icon-toolbtn:not(:disabled):not([disabled]):active,
+.cdk-overlay-container .btn:not(:disabled):not(.disabled):active,
+.cdk-overlay-container .erp-button:not(:disabled):not([disabled]):active,
+.auth-wrapper .erp-btn:not(:disabled):not([disabled]):active,
+.erp-page .btn:not(:disabled):not(.disabled):active,
+.erp-page .erp-button:not(:disabled):not([disabled]):active,
+.erp-page .erp-action-btn:not(:disabled):not([disabled]):active,
+.erp-page .erp-icon-button:not(:disabled):not([disabled]):active,
+.erp-page .erp-icon-toolbtn:not(:disabled):not([disabled]):active {
+  transform: scale(var(--scale-click));
+}
+
+/* Preserve ripple layer behavior from global styles */
+.erp-content .btn:active::after,
+.erp-content .erp-button:active::after,
+.erp-page .btn:active::after,
+.erp-page .erp-button:active::after {
+  transition: width var(--transition-normal), height var(--transition-normal);
+}
+
+/* Loading / busy: spinner ring, no layout shift */
+.erp-button.is-loading,
+.erp-button[aria-busy='true'],
+.erp-btn.is-loading,
+.erp-btn[aria-busy='true'] {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.88;
+}
+
+.erp-button.is-loading:not(:has(.button-spinner))::before,
+.erp-button[aria-busy='true']:not(:has(.button-spinner))::before,
+.erp-btn.is-loading:not(:has(.button-spinner))::before,
+.erp-btn[aria-busy='true']:not(:has(.button-spinner))::before {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-top-color: currentColor;
+  animation: erp-spin 0.65s linear infinite;
+  z-index: 2;
+}
+
+@keyframes erp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Form controls — focus ring uses primary token                              */
+/* -------------------------------------------------------------------------- */
+
+.form-control,
+.custom-select,
+.erp-input {
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.form-control:focus,
+.custom-select:focus,
+.erp-input:focus {
+  border-color: color-mix(in srgb, var(--erp-primary) 55%, var(--erp-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--erp-primary) 22%, transparent);
+}
+
+[data-theme='dark'] .form-control:focus,
+[data-theme='dark'] .custom-select:focus,
+[data-theme='dark'] .erp-input:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--erp-primary) 18%, transparent);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Validation feedback                                                        */
+/* -------------------------------------------------------------------------- */
+
+@keyframes erp-shake-inline {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-1.5px);
+  }
+
+  40% {
+    transform: translateX(1.5px);
+  }
+
+  60% {
+    transform: translateX(-1px);
+  }
+
+  80% {
+    transform: translateX(1px);
+  }
+}
+
+.erp-form-field--invalid .erp-input,
+.erp-form-field--invalid .form-control {
+  animation: erp-shake-inline 0.4s ease;
+}
+
+@keyframes erp-success-pop {
+  from {
+    transform: scale(0.995);
+    opacity: 0.94;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.alert-success {
+  animation: erp-success-pop var(--transition-normal) ease;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Skeleton / table loading                                                    */
+/* -------------------------------------------------------------------------- */
+
+@keyframes erp-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-box {
+  background: linear-gradient(
+    110deg,
+    var(--erp-bg-muted) 0%,
+    color-mix(in srgb, var(--erp-bg-elevated) 88%, var(--erp-text) 12%) 42%,
+    var(--erp-bg-muted) 84%
+  );
+  background-size: 220% 100%;
+  animation: erp-skeleton-shimmer 1.35s ease-in-out infinite;
+}
+
+.erp-table-card--loading .erp-table tbody tr {
+  animation: erp-row-fade var(--transition-normal) ease both;
+}
+
+.erp-table-card--loading .erp-table tbody tr:nth-child(1) {
+  animation-delay: 0.02s;
+}
+
+.erp-table-card--loading .erp-table tbody tr:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.erp-table-card--loading .erp-table tbody tr:nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.erp-table-card--loading .erp-table tbody tr:nth-child(4) {
+  animation-delay: 0.11s;
+}
+
+.erp-table-card--loading .erp-table tbody tr:nth-child(5) {
+  animation-delay: 0.14s;
+}
+
+.erp-table-card--loading .erp-table tbody tr:nth-child(n + 6) {
+  animation-delay: 0.17s;
+}
+
+@keyframes erp-row-fade {
+  from {
+    opacity: 0.35;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Sidebar — icon nudge + active emphasis (dark-tuned glow)                    */
+/* -------------------------------------------------------------------------- */
+
+.pcoded-navbar .pcoded-inner-navbar > li > a .pcoded-micon,
+.pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li > a .pcoded-micon {
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.pcoded-navbar .pcoded-inner-navbar > li > a:hover .pcoded-micon,
+.pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li > a:hover .pcoded-micon,
+.erp-nav-module-group__head:hover .pcoded-micon {
+  transform: translateX(3px);
+}
+
+body.rtl .pcoded-navbar .pcoded-inner-navbar > li > a:hover .pcoded-micon,
+body.rtl .pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li > a:hover .pcoded-micon,
+body.rtl .erp-nav-module-group__head:hover .pcoded-micon {
+  transform: translateX(-3px);
+}
+
+.pcoded-navbar .pcoded-inner-navbar > li.active > a,
+.pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li.active > a {
+  transform: scale(1.012);
+  transition:
+    background var(--transition-normal),
+    color var(--transition-normal),
+    transform var(--transition-fast),
+    box-shadow var(--transition-normal);
+}
+
+body.rtl .pcoded-navbar .pcoded-inner-navbar > li.active > a,
+body.rtl .pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li.active > a {
+  transform: scale(1.012);
+}
+
+[data-theme='dark'] .pcoded-navbar .pcoded-inner-navbar > li.active > a,
+[data-theme='dark'] .pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li.active > a {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='dark'] .pcoded-navbar .pcoded-inner-navbar > li.active > a::before,
+[data-theme='dark'] .pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li.active > a::before {
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.35);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dashboard KPI / chart surfaces (match global card lift)                     */
+/* -------------------------------------------------------------------------- */
+
+.dash-kpi-card,
+.dash-chart-card,
+.erp-integrated-table {
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+  will-change: transform;
+}
+
+.dash-kpi-card:hover,
+.dash-chart-card:hover,
+.erp-integrated-table:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.dash-kpi-card__value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Reduced motion                                                             */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0.01ms;
+    --transition-normal: 0.01ms;
+    --transition-slow: 0.01ms;
+  }
+
+  .erp-card:not(.no-motion):not(.erp-card--static):hover,
+  .erp-table-card:not(.no-motion):hover,
+  .erp-search-panel:not(.no-motion):hover,
+  .dash-kpi-card:hover,
+  .dash-chart-card:hover,
+  .erp-integrated-table:hover {
+    transform: none;
+  }
+
+  .skeleton-box {
+    animation: none;
+  }
+
+  .fade-in,
+  .alert-success,
+  .erp-table-card--loading .erp-table tbody tr {
+    animation: none;
+  }
+
+  .erp-form-field--invalid .erp-input,
+  .erp-form-field--invalid .form-control {
+    animation: none;
+  }
+
+  .erp-content .btn:not(:disabled):not(.disabled):hover,
+  .erp-content .erp-button:not(:disabled):not([disabled]):hover,
+  .pcoded-main-container .btn:not(:disabled):not(.disabled):hover,
+  .pcoded-main-container .erp-button:not(:disabled):not([disabled]):hover,
+  .cdk-overlay-container .btn:not(:disabled):not(.disabled):hover,
+  .cdk-overlay-container .erp-button:not(:disabled):not([disabled]):hover,
+  .erp-page .btn:not(:disabled):not(.disabled):hover,
+  .erp-page .erp-button:not(:disabled):not([disabled]):hover,
+  .auth-wrapper .erp-btn:not(:disabled):not([disabled]):hover {
+    transform: none;
+  }
+}
