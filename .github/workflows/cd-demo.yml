@@ -101,6 +101,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate deploy secrets (avoids cryptic "missing server host")
+        run: |
+          ok=0
+          check() {
+            name="$1"
+            val="$2"
+            if [ -z "$val" ]; then
+              echo "::error::Repository secret $name is missing or empty. Add it under Settings → Secrets and variables → Actions."
+              ok=1
+            fi
+          }
+          check "DEPLOY_HOST" "${{ secrets.DEPLOY_HOST }}"
+          check "DEPLOY_USER" "${{ secrets.DEPLOY_USER }}"
+          check "DEPLOY_SSH_KEY" "${{ secrets.DEPLOY_SSH_KEY }}"
+          check "DEPLOY_PATH" "${{ secrets.DEPLOY_PATH }}"
+          check "GHCR_USERNAME" "${{ secrets.GHCR_USERNAME }}"
+          check "GHCR_TOKEN" "${{ secrets.GHCR_TOKEN }}"
+          check "POSTGRES_DB" "${{ secrets.POSTGRES_DB }}"
+          check "POSTGRES_USER" "${{ secrets.POSTGRES_USER }}"
+          check "POSTGRES_PASSWORD" "${{ secrets.POSTGRES_PASSWORD }}"
+          check "JWT_SECRET" "${{ secrets.JWT_SECRET }}"
+          check "CORS_ALLOWED_ORIGINS" "${{ secrets.CORS_ALLOWED_ORIGINS }}"
+          exit $ok
+
       - name: Registry owner (lowercase)
         id: registry
         run: |
