@@ -1,12 +1,16 @@
-# Railway / production: set DB_URL (JDBC), DB_USER, DB_PASS or SPRING_DATASOURCE_* equivalents
+# Railway / production:
+# - Prefer DB_URL (full JDBC) or Railway DATABASE_URL (mapped by DatabaseUrlEnvironmentPostProcessor).
+# - Railway Postgres plugin: PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD — RailwayPluginPostgresEnvironmentPostProcessor
+#   builds jdbc:postgresql://... from those (fixes SPRING_DATASOURCE_URL=jdbc:...${PGHOST}... not expanded in UI).
+# - Optional query suffix: PG_JDBC_EXTRA e.g. sslmode=require (use ?sslmode=require or sslmode=require)
 spring:
   config:
     activate:
       on-profile: prod
   datasource:
-    url: ${DB_URL:${SPRING_DATASOURCE_URL}}
-    username: ${DB_USER:${SPRING_DATASOURCE_USERNAME}}
-    password: ${DB_PASS:${SPRING_DATASOURCE_PASSWORD}}
+    url: ${DB_URL:${SPRING_DATASOURCE_URL:jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}}}
+    username: ${DB_USER:${SPRING_DATASOURCE_USERNAME:${PGUSER:}}}
+    password: ${DB_PASS:${SPRING_DATASOURCE_PASSWORD:${PGPASSWORD:}}}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

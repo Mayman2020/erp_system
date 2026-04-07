@@ -18,6 +18,15 @@ const isCi =
   process.env.VERCEL === '1';
 
 if (!url) {
+  // Vercel: do not fail the build — use committed environment.prod.ts (e.g. REPLACE_WITH_RAILWAY_URL).
+  // Set NG_API_BASE_URL in Project → Settings → Environment Variables to bake the real Railway API URL.
+  if (process.env.VERCEL === '1') {
+    console.warn(
+      '[write-env] NG_API_BASE_URL / API_BASE_URL not set. Build continues with existing environment.prod.ts. ' +
+        'Add NG_API_BASE_URL=https://YOUR-RAILWAY-APP.up.railway.app/api/v1 so the UI calls your backend.'
+    );
+    process.exit(0);
+  }
   if (isCi) {
     console.error(
       'NG_API_BASE_URL (or API_BASE_URL) must be set in CI so the production build points at your deployed API.'
