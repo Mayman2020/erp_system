@@ -179,16 +179,16 @@ SET
     name_ar = COALESCE(
         NULLIF(name_ar, ''),
         CASE code
-            WHEN '1000' THEN 'Ø§Ù„Ø£ØµÙˆÙ„'
-            WHEN '1100' THEN 'Ø§Ù„Ù†Ù‚Ø¯ÙŠØ© ÙˆÙ…Ø§ ÙÙŠ Ø­ÙƒÙ…Ù‡Ø§'
-            WHEN '1110' THEN 'Ø§Ù„Ù†Ù‚Ø¯ÙŠØ© Ø¨Ø§Ù„ØµÙ†Ø¯ÙˆÙ‚'
-            WHEN '1120' THEN 'Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¨Ù†ÙƒÙŠ'
-            WHEN '2000' THEN 'Ø§Ù„Ø§Ù„ØªØ²Ø§Ù…Ø§Øª'
-            WHEN '3000' THEN 'Ø­Ù‚ÙˆÙ‚ Ø§Ù„Ù…Ù„ÙƒÙŠØ©'
-            WHEN '4000' THEN 'Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ©'
-            WHEN '4100' THEN 'Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ø§Ù„Ø®Ø¯Ù…Ø§Øª'
-            WHEN '5000' THEN 'Ø§Ù„Ù…ØµØ±ÙˆÙØ§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ©'
-            WHEN '5100' THEN 'Ù…ØµØ±ÙˆÙØ§Øª Ø§Ù„Ù…ÙƒØªØ¨'
+            WHEN '1000' THEN 'الأصول'
+            WHEN '1100' THEN 'النقدية وما في حكمها'
+            WHEN '1110' THEN 'النقدية بالصندوق'
+            WHEN '1120' THEN 'الحساب البنكي'
+            WHEN '2000' THEN 'الالتزامات'
+            WHEN '3000' THEN 'حقوق الملكية'
+            WHEN '4000' THEN 'الإيرادات التشغيلية'
+            WHEN '4100' THEN 'إيرادات الخدمات'
+            WHEN '5000' THEN 'المصروفات التشغيلية'
+            WHEN '5100' THEN 'مصروفات المكتب'
             ELSE name
         END
     );
@@ -1396,28 +1396,28 @@ SET search_path TO erp_system, public;
 -- Keep compatibility with legacy schema where "name" is still NOT NULL.
 INSERT INTO accounts (code, name, name_en, name_ar, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by)
 VALUES
-('1000', 'Assets', 'Assets', 'Ø§Ù„Ø£ØµÙˆÙ„', 'ASSET', 1, 'Assets', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway'),
-('1100', 'Cash and Cash Equivalents', 'Cash and Cash Equivalents', 'Ø§Ù„Ù†Ù‚Ø¯ ÙˆÙ…Ø§ ÙÙŠ Ø­ÙƒÙ…Ù‡', 'ASSET', 2, 'Assets/Cash and Cash Equivalents', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway'),
-('1110', 'Cash on Hand', 'Cash on Hand', 'Ø§Ù„ØµÙ†Ø¯ÙˆÙ‚', 'ASSET', 3, 'Assets/Cash and Cash Equivalents/Cash on Hand', TRUE, TRUE, 2500.00, 'DEBIT', 'flyway', 'flyway'),
-('1120', 'Main Bank Account', 'Main Bank Account', 'Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¨Ù†ÙƒÙŠ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', 'ASSET', 3, 'Assets/Cash and Cash Equivalents/Main Bank Account', TRUE, TRUE, 35000.00, 'DEBIT', 'flyway', 'flyway'),
-('1130', 'Savings Bank Account', 'Savings Bank Account', 'Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¨Ù†Ùƒ Ø§Ù„Ø§Ø¯Ø®Ø§Ø±ÙŠ', 'ASSET', 3, 'Assets/Cash and Cash Equivalents/Savings Bank Account', TRUE, TRUE, 12000.00, 'DEBIT', 'flyway', 'flyway'),
-('1200', 'Accounts Receivable', 'Accounts Receivable', 'Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©', 'ASSET', 2, 'Assets/Accounts Receivable', TRUE, TRUE, 18000.00, 'DEBIT', 'flyway', 'flyway'),
-('1300', 'Inventory', 'Inventory', 'Ø§Ù„Ù…Ø®Ø²ÙˆÙ†', 'ASSET', 2, 'Assets/Inventory', TRUE, TRUE, 22000.00, 'DEBIT', 'flyway', 'flyway'),
-('1500', 'Fixed Assets', 'Fixed Assets', 'Ø§Ù„Ø£ØµÙˆÙ„ Ø§Ù„Ø«Ø§Ø¨ØªØ©', 'ASSET', 2, 'Assets/Fixed Assets', TRUE, TRUE, 85000.00, 'DEBIT', 'flyway', 'flyway'),
-('2000', 'Liabilities', 'Liabilities', 'Ø§Ù„Ø§Ù„ØªØ²Ø§Ù…Ø§Øª', 'LIABILITY', 1, 'Liabilities', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway'),
-('2100', 'Accounts Payable', 'Accounts Payable', 'Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ø¯Ø§Ø¦Ù†Ø©', 'LIABILITY', 2, 'Liabilities/Accounts Payable', TRUE, TRUE, 14000.00, 'CREDIT', 'flyway', 'flyway'),
-('2200', 'Accrued Expenses', 'Accrued Expenses', 'Ø§Ù„Ù…ØµØ±ÙˆÙØ§Øª Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø©', 'LIABILITY', 2, 'Liabilities/Accrued Expenses', TRUE, TRUE, 6000.00, 'CREDIT', 'flyway', 'flyway'),
-('3000', 'Equity', 'Equity', 'Ø­Ù‚ÙˆÙ‚ Ø§Ù„Ù…Ù„ÙƒÙŠØ©', 'EQUITY', 1, 'Equity', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway'),
-('3100', 'Owner Capital', 'Owner Capital', 'Ø±Ø£Ø³ Ø§Ù„Ù…Ø§Ù„', 'EQUITY', 2, 'Equity/Owner Capital', TRUE, TRUE, 90000.00, 'CREDIT', 'flyway', 'flyway'),
-('3200', 'Retained Earnings', 'Retained Earnings', 'Ø§Ù„Ø£Ø±Ø¨Ø§Ø­ Ø§Ù„Ù…Ø­ØªØ¬Ø²Ø©', 'EQUITY', 2, 'Equity/Retained Earnings', TRUE, TRUE, 8000.00, 'CREDIT', 'flyway', 'flyway'),
-('4000', 'Revenue', 'Revenue', 'Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª', 'INCOME', 1, 'Revenue', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway'),
-('4100', 'Sales Revenue', 'Sales Revenue', 'Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª', 'INCOME', 2, 'Revenue/Sales Revenue', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway'),
-('4200', 'Service Revenue', 'Service Revenue', 'Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ø§Ù„Ø®Ø¯Ù…Ø§Øª', 'INCOME', 2, 'Revenue/Service Revenue', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway'),
-('5000', 'Expenses', 'Expenses', 'Ø§Ù„Ù…ØµØ±ÙˆÙØ§Øª', 'EXPENSE', 1, 'Expenses', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway'),
-('5100', 'Salary Expense', 'Salary Expense', 'Ù…ØµØ±ÙˆÙ Ø§Ù„Ø±ÙˆØ§ØªØ¨', 'EXPENSE', 2, 'Expenses/Salary Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway'),
-('5200', 'Rent Expense', 'Rent Expense', 'Ù…ØµØ±ÙˆÙ Ø§Ù„Ø¥ÙŠØ¬Ø§Ø±', 'EXPENSE', 2, 'Expenses/Rent Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway'),
-('5300', 'Utilities Expense', 'Utilities Expense', 'Ù…ØµØ±ÙˆÙ Ø§Ù„Ù…Ø±Ø§ÙÙ‚', 'EXPENSE', 2, 'Expenses/Utilities Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway'),
-('5400', 'Office Supplies Expense', 'Office Supplies Expense', 'Ù…ØµØ±ÙˆÙ Ø§Ù„Ù‚Ø±Ø·Ø§Ø³ÙŠØ©', 'EXPENSE', 2, 'Expenses/Office Supplies Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway')
+('1000', 'Assets', 'Assets', 'الأصول', 'ASSET', 1, 'Assets', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway'),
+('1100', 'Cash and Cash Equivalents', 'Cash and Cash Equivalents', 'النقد وما في حكمه', 'ASSET', 2, 'Assets/Cash and Cash Equivalents', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway'),
+('1110', 'Cash on Hand', 'Cash on Hand', 'الصندوق', 'ASSET', 3, 'Assets/Cash and Cash Equivalents/Cash on Hand', TRUE, TRUE, 2500.00, 'DEBIT', 'flyway', 'flyway'),
+('1120', 'Main Bank Account', 'Main Bank Account', 'الحساب البنكي الرئيسي', 'ASSET', 3, 'Assets/Cash and Cash Equivalents/Main Bank Account', TRUE, TRUE, 35000.00, 'DEBIT', 'flyway', 'flyway'),
+('1130', 'Savings Bank Account', 'Savings Bank Account', 'حساب البنك الادخاري', 'ASSET', 3, 'Assets/Cash and Cash Equivalents/Savings Bank Account', TRUE, TRUE, 12000.00, 'DEBIT', 'flyway', 'flyway'),
+('1200', 'Accounts Receivable', 'Accounts Receivable', 'الذمم المدينة', 'ASSET', 2, 'Assets/Accounts Receivable', TRUE, TRUE, 18000.00, 'DEBIT', 'flyway', 'flyway'),
+('1300', 'Inventory', 'Inventory', 'المخزون', 'ASSET', 2, 'Assets/Inventory', TRUE, TRUE, 22000.00, 'DEBIT', 'flyway', 'flyway'),
+('1500', 'Fixed Assets', 'Fixed Assets', 'الأصول الثابتة', 'ASSET', 2, 'Assets/Fixed Assets', TRUE, TRUE, 85000.00, 'DEBIT', 'flyway', 'flyway'),
+('2000', 'Liabilities', 'Liabilities', 'الالتزامات', 'LIABILITY', 1, 'Liabilities', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway'),
+('2100', 'Accounts Payable', 'Accounts Payable', 'الذمم الدائنة', 'LIABILITY', 2, 'Liabilities/Accounts Payable', TRUE, TRUE, 14000.00, 'CREDIT', 'flyway', 'flyway'),
+('2200', 'Accrued Expenses', 'Accrued Expenses', 'المصروفات المستحقة', 'LIABILITY', 2, 'Liabilities/Accrued Expenses', TRUE, TRUE, 6000.00, 'CREDIT', 'flyway', 'flyway'),
+('3000', 'Equity', 'Equity', 'حقوق الملكية', 'EQUITY', 1, 'Equity', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway'),
+('3100', 'Owner Capital', 'Owner Capital', 'رأس المال', 'EQUITY', 2, 'Equity/Owner Capital', TRUE, TRUE, 90000.00, 'CREDIT', 'flyway', 'flyway'),
+('3200', 'Retained Earnings', 'Retained Earnings', 'الأرباح المحتجزة', 'EQUITY', 2, 'Equity/Retained Earnings', TRUE, TRUE, 8000.00, 'CREDIT', 'flyway', 'flyway'),
+('4000', 'Revenue', 'Revenue', 'الإيرادات', 'INCOME', 1, 'Revenue', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway'),
+('4100', 'Sales Revenue', 'Sales Revenue', 'إيرادات المبيعات', 'INCOME', 2, 'Revenue/Sales Revenue', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway'),
+('4200', 'Service Revenue', 'Service Revenue', 'إيرادات الخدمات', 'INCOME', 2, 'Revenue/Service Revenue', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway'),
+('5000', 'Expenses', 'Expenses', 'المصروفات', 'EXPENSE', 1, 'Expenses', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway'),
+('5100', 'Salary Expense', 'Salary Expense', 'مصروف الرواتب', 'EXPENSE', 2, 'Expenses/Salary Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway'),
+('5200', 'Rent Expense', 'Rent Expense', 'مصروف الإيجار', 'EXPENSE', 2, 'Expenses/Rent Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway'),
+('5300', 'Utilities Expense', 'Utilities Expense', 'مصروف المرافق', 'EXPENSE', 2, 'Expenses/Utilities Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway'),
+('5400', 'Office Supplies Expense', 'Office Supplies Expense', 'مصروف القرطاسية', 'EXPENSE', 2, 'Expenses/Office Supplies Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway')
 ON CONFLICT (code) DO UPDATE
 SET name = EXCLUDED.name,
     name_en = EXCLUDED.name_en,
@@ -2043,25 +2043,25 @@ WHERE name_en IS NULL;
 
 INSERT INTO lookup_types (code, name_en, name_ar, sort_order, is_active, created_by, updated_by)
 VALUES
-    ('account-types', 'Account Types', 'Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª', 1, TRUE, 'flyway', 'flyway'),
-    ('accounting-methods', 'Accounting Methods', 'Ø·Ø±Ù‚ Ø§Ù„Ù…Ø­Ø§Ø³Ø¨Ø©', 2, TRUE, 'flyway', 'flyway'),
-    ('bill-statuses', 'Bill Statuses', 'Ø­Ø§Ù„Ø§Øª Ø§Ù„ÙÙˆØ§ØªÙŠØ±', 3, TRUE, 'flyway', 'flyway'),
-    ('budget-statuses', 'Budget Statuses', 'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù…ÙˆØ§Ø²Ù†Ø§Øª', 4, TRUE, 'flyway', 'flyway'),
-    ('check-statuses', 'Check Statuses', 'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø´ÙŠÙƒØ§Øª', 5, TRUE, 'flyway', 'flyway'),
-    ('check-types', 'Check Types', 'Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø´ÙŠÙƒØ§Øª', 6, TRUE, 'flyway', 'flyway'),
-    ('currencies', 'Currencies', 'Ø§Ù„Ø¹Ù…Ù„Ø§Øª', 7, TRUE, 'flyway', 'flyway'),
-    ('entry-types', 'Journal Entry Types', 'Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ù‚ÙŠÙˆØ¯', 8, TRUE, 'flyway', 'flyway'),
-    ('journal-entry-statuses', 'Journal Entry Statuses', 'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù‚ÙŠÙˆØ¯', 9, TRUE, 'flyway', 'flyway'),
-    ('payment-methods', 'Payment Methods', 'Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹', 10, TRUE, 'flyway', 'flyway'),
-    ('reconciliation-line-statuses', 'Reconciliation Line Statuses', 'Ø­Ø§Ù„Ø§Øª Ø³Ø·ÙˆØ± Ø§Ù„Ù…Ø·Ø§Ø¨Ù‚Ø©', 11, TRUE, 'flyway', 'flyway'),
-    ('reconciliation-statuses', 'Reconciliation Statuses', 'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ø¨Ù†ÙƒÙŠØ©', 12, TRUE, 'flyway', 'flyway'),
-    ('report-periods', 'Report Periods', 'ÙØªØ±Ø§Øª Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±', 13, TRUE, 'flyway', 'flyway'),
-    ('statuses', 'Statuses', 'Ø§Ù„Ø­Ø§Ù„Ø§Øª', 14, TRUE, 'flyway', 'flyway'),
-    ('transaction-statuses', 'Transaction Statuses', 'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù…Ø¹Ø§Ù…Ù„Ø§Øª', 15, TRUE, 'flyway', 'flyway'),
-    ('transaction-types', 'Transaction Types', 'Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ù…Ø¹Ø§Ù…Ù„Ø§Øª', 16, TRUE, 'flyway', 'flyway'),
-    ('transfer-statuses', 'Transfer Statuses', 'Ø­Ø§Ù„Ø§Øª Ø§Ù„ØªØ­ÙˆÙŠÙ„', 17, TRUE, 'flyway', 'flyway'),
-    ('voucher-statuses', 'Voucher Statuses', 'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø³Ù†Ø¯Ø§Øª', 18, TRUE, 'flyway', 'flyway'),
-    ('voucher-types', 'Voucher Types', 'Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø³Ù†Ø¯Ø§Øª', 19, TRUE, 'flyway', 'flyway')
+    ('account-types', 'Account Types', 'أنواع الحسابات', 1, TRUE, 'flyway', 'flyway'),
+    ('accounting-methods', 'Accounting Methods', 'طرق المحاسبة', 2, TRUE, 'flyway', 'flyway'),
+    ('bill-statuses', 'Bill Statuses', 'حالات الفواتير', 3, TRUE, 'flyway', 'flyway'),
+    ('budget-statuses', 'Budget Statuses', 'حالات الموازنات', 4, TRUE, 'flyway', 'flyway'),
+    ('check-statuses', 'Check Statuses', 'حالات الشيكات', 5, TRUE, 'flyway', 'flyway'),
+    ('check-types', 'Check Types', 'أنواع الشيكات', 6, TRUE, 'flyway', 'flyway'),
+    ('currencies', 'Currencies', 'العملات', 7, TRUE, 'flyway', 'flyway'),
+    ('entry-types', 'Journal Entry Types', 'أنواع القيود', 8, TRUE, 'flyway', 'flyway'),
+    ('journal-entry-statuses', 'Journal Entry Statuses', 'حالات القيود', 9, TRUE, 'flyway', 'flyway'),
+    ('payment-methods', 'Payment Methods', 'طرق الدفع', 10, TRUE, 'flyway', 'flyway'),
+    ('reconciliation-line-statuses', 'Reconciliation Line Statuses', 'حالات سطور المطابقة', 11, TRUE, 'flyway', 'flyway'),
+    ('reconciliation-statuses', 'Reconciliation Statuses', 'حالات المطابقة البنكية', 12, TRUE, 'flyway', 'flyway'),
+    ('report-periods', 'Report Periods', 'فترات التقارير', 13, TRUE, 'flyway', 'flyway'),
+    ('statuses', 'Statuses', 'الحالات', 14, TRUE, 'flyway', 'flyway'),
+    ('transaction-statuses', 'Transaction Statuses', 'حالات المعاملات', 15, TRUE, 'flyway', 'flyway'),
+    ('transaction-types', 'Transaction Types', 'أنواع المعاملات', 16, TRUE, 'flyway', 'flyway'),
+    ('transfer-statuses', 'Transfer Statuses', 'حالات التحويل', 17, TRUE, 'flyway', 'flyway'),
+    ('voucher-statuses', 'Voucher Statuses', 'حالات السندات', 18, TRUE, 'flyway', 'flyway'),
+    ('voucher-types', 'Voucher Types', 'أنواع السندات', 19, TRUE, 'flyway', 'flyway')
 ON CONFLICT (code) DO UPDATE
 SET name_en = EXCLUDED.name_en,
     name_ar = EXCLUDED.name_ar,
@@ -2071,10 +2071,10 @@ SET name_en = EXCLUDED.name_en,
 
 INSERT INTO access_roles (code, name_en, name_ar, is_active, is_system, created_by, updated_by)
 VALUES
-    ('ADMIN', 'System Administrator', 'Ù…Ø¯ÙŠØ± Ø§Ù„Ù†Ø¸Ø§Ù…', TRUE, TRUE, 'flyway', 'flyway'),
-    ('ACCOUNTANT_STANDARD', 'Standard Accountant', 'Ù…Ø­Ø§Ø³Ø¨ Ù‚ÙŠØ§Ø³ÙŠ', TRUE, FALSE, 'flyway', 'flyway'),
-    ('TREASURY_OPERATOR', 'Treasury Operator', 'Ù…Ø³Ø¤ÙˆÙ„ Ø®Ø²ÙŠÙ†Ø©', TRUE, FALSE, 'flyway', 'flyway'),
-    ('REPORT_VIEWER', 'Report Viewer', 'Ù…Ø³ØªØ¹Ø±Ø¶ ØªÙ‚Ø§Ø±ÙŠØ±', TRUE, FALSE, 'flyway', 'flyway')
+    ('ADMIN', 'System Administrator', 'مدير النظام', TRUE, TRUE, 'flyway', 'flyway'),
+    ('ACCOUNTANT_STANDARD', 'Standard Accountant', 'محاسب قياسي', TRUE, FALSE, 'flyway', 'flyway'),
+    ('TREASURY_OPERATOR', 'Treasury Operator', 'مسؤول خزينة', TRUE, FALSE, 'flyway', 'flyway'),
+    ('REPORT_VIEWER', 'Report Viewer', 'مستعرض تقارير', TRUE, FALSE, 'flyway', 'flyway')
 ON CONFLICT (code) DO UPDATE
 SET name_en = EXCLUDED.name_en,
     name_ar = EXCLUDED.name_ar,
@@ -2494,7 +2494,7 @@ WHERE code = 'transfer-statuses';
 UPDATE lookup_values
 SET code = 'REVENUE',
     name_en = 'Revenue',
-    name_ar = 'Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª',
+    name_ar = 'الإيرادات',
     sort_order = 4,
     updated_by = 'flyway',
     updated_at = NOW()
@@ -2502,7 +2502,7 @@ WHERE type_code = 'account-types'
   AND code = 'INCOME';
 
 INSERT INTO lookup_values (type_code, code, sort_order, is_active, name_en, name_ar, created_by, updated_by)
-SELECT 'account-types', 'REVENUE', 4, TRUE, 'Revenue', 'Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª', 'flyway', 'flyway'
+SELECT 'account-types', 'REVENUE', 4, TRUE, 'Revenue', 'الإيرادات', 'flyway', 'flyway'
 WHERE NOT EXISTS (
     SELECT 1
     FROM lookup_values
@@ -2540,69 +2540,69 @@ RESTART IDENTITY CASCADE;
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
 VALUES
-    ('1000', 'Assets', 'Assets', 'Ø§Ù„Ø£ØµÙˆÙ„', NULL, 'ASSET', 1, 'Assets', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway', 0),
-    ('2000', 'Liabilities', 'Liabilities', 'Ø§Ù„Ø§Ù„ØªØ²Ø§Ù…Ø§Øª', NULL, 'LIABILITY', 1, 'Liabilities', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway', 0),
-    ('3000', 'Equity', 'Equity', 'Ø­Ù‚ÙˆÙ‚ Ø§Ù„Ù…Ù„ÙƒÙŠØ©', NULL, 'EQUITY', 1, 'Equity', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway', 0),
-    ('4000', 'Revenue', 'Revenue', 'Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª', NULL, 'REVENUE', 1, 'Revenue', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway', 0),
-    ('5000', 'Expenses', 'Expenses', 'Ø§Ù„Ù…ØµØ±ÙˆÙØ§Øª', NULL, 'EXPENSE', 1, 'Expenses', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway', 0);
+    ('1000', 'Assets', 'Assets', 'الأصول', NULL, 'ASSET', 1, 'Assets', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway', 0),
+    ('2000', 'Liabilities', 'Liabilities', 'الالتزامات', NULL, 'LIABILITY', 1, 'Liabilities', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway', 0),
+    ('3000', 'Equity', 'Equity', 'حقوق الملكية', NULL, 'EQUITY', 1, 'Equity', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway', 0),
+    ('4000', 'Revenue', 'Revenue', 'الإيرادات', NULL, 'REVENUE', 1, 'Revenue', TRUE, FALSE, 0, 'CREDIT', 'flyway', 'flyway', 0),
+    ('5000', 'Expenses', 'Expenses', 'المصروفات', NULL, 'EXPENSE', 1, 'Expenses', TRUE, FALSE, 0, 'DEBIT', 'flyway', 'flyway', 0);
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '1110', 'Cash on Hand', 'Cash on Hand', 'Ø§Ù„ØµÙ†Ø¯ÙˆÙ‚', parent.id, 'ASSET', 2, 'Assets/Cash on Hand', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '1110', 'Cash on Hand', 'Cash on Hand', 'الصندوق', parent.id, 'ASSET', 2, 'Assets/Cash on Hand', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '1000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '1120', 'Main Bank Account', 'Main Bank Account', 'Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¨Ù†ÙƒÙŠ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', parent.id, 'ASSET', 2, 'Assets/Main Bank Account', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '1120', 'Main Bank Account', 'Main Bank Account', 'الحساب البنكي الرئيسي', parent.id, 'ASSET', 2, 'Assets/Main Bank Account', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '1000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '1210', 'Accounts Receivable', 'Accounts Receivable', 'Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©', parent.id, 'ASSET', 2, 'Assets/Accounts Receivable', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '1210', 'Accounts Receivable', 'Accounts Receivable', 'الذمم المدينة', parent.id, 'ASSET', 2, 'Assets/Accounts Receivable', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '1000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '2110', 'Accounts Payable', 'Accounts Payable', 'Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ø¯Ø§Ø¦Ù†Ø©', parent.id, 'LIABILITY', 2, 'Liabilities/Accounts Payable', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
+SELECT '2110', 'Accounts Payable', 'Accounts Payable', 'الذمم الدائنة', parent.id, 'LIABILITY', 2, 'Liabilities/Accounts Payable', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '2000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '2210', 'Tax Payable', 'Tax Payable', 'Ø¶Ø±ÙŠØ¨Ø© Ù…Ø³ØªØ­Ù‚Ø©', parent.id, 'LIABILITY', 2, 'Liabilities/Tax Payable', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
+SELECT '2210', 'Tax Payable', 'Tax Payable', 'ضريبة مستحقة', parent.id, 'LIABILITY', 2, 'Liabilities/Tax Payable', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '2000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '3110', 'Owner Capital', 'Owner Capital', 'Ø±Ø£Ø³ Ø§Ù„Ù…Ø§Ù„', parent.id, 'EQUITY', 2, 'Equity/Owner Capital', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
+SELECT '3110', 'Owner Capital', 'Owner Capital', 'رأس المال', parent.id, 'EQUITY', 2, 'Equity/Owner Capital', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '3000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '3120', 'Retained Earnings', 'Retained Earnings', 'Ø§Ù„Ø£Ø±Ø¨Ø§Ø­ Ø§Ù„Ù…Ø­ØªØ¬Ø²Ø©', parent.id, 'EQUITY', 2, 'Equity/Retained Earnings', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
+SELECT '3120', 'Retained Earnings', 'Retained Earnings', 'الأرباح المحتجزة', parent.id, 'EQUITY', 2, 'Equity/Retained Earnings', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '3000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '4110', 'Sales Revenue', 'Sales Revenue', 'Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª', parent.id, 'REVENUE', 2, 'Revenue/Sales Revenue', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
+SELECT '4110', 'Sales Revenue', 'Sales Revenue', 'إيرادات المبيعات', parent.id, 'REVENUE', 2, 'Revenue/Sales Revenue', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '4000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '4120', 'Service Revenue', 'Service Revenue', 'Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ø§Ù„Ø®Ø¯Ù…Ø§Øª', parent.id, 'REVENUE', 2, 'Revenue/Service Revenue', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
+SELECT '4120', 'Service Revenue', 'Service Revenue', 'إيرادات الخدمات', parent.id, 'REVENUE', 2, 'Revenue/Service Revenue', TRUE, TRUE, 0, 'CREDIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '4000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5110', 'Operating Expenses', 'Operating Expenses', 'Ø§Ù„Ù…ØµØ±ÙˆÙØ§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ©', parent.id, 'EXPENSE', 2, 'Expenses/Operating Expenses', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5110', 'Operating Expenses', 'Operating Expenses', 'المصروفات التشغيلية', parent.id, 'EXPENSE', 2, 'Expenses/Operating Expenses', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '5000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5120', 'Office Supplies Expense', 'Office Supplies Expense', 'Ù…ØµØ±ÙˆÙØ§Øª Ù…ÙƒØªØ¨ÙŠØ©', parent.id, 'EXPENSE', 2, 'Expenses/Office Supplies Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5120', 'Office Supplies Expense', 'Office Supplies Expense', 'مصروفات مكتبية', parent.id, 'EXPENSE', 2, 'Expenses/Office Supplies Expense', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '5000';
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, is_postable, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5130', 'Cost of Goods Sold', 'Cost of Goods Sold', 'ØªÙƒÙ„ÙØ© Ø§Ù„Ø¨Ø¶Ø§Ø¹Ø© Ø§Ù„Ù…Ø¨Ø§Ø¹Ø©', parent.id, 'EXPENSE', 2, 'Expenses/Cost of Goods Sold', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5130', 'Cost of Goods Sold', 'Cost of Goods Sold', 'تكلفة البضاعة المباعة', parent.id, 'EXPENSE', 2, 'Expenses/Cost of Goods Sold', TRUE, TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts parent
 WHERE parent.code = '5000';
 
@@ -2751,7 +2751,7 @@ SET search_path TO erp_system, public;
 -- Ensure account-type lookup values have correct English + Arabic labels (admin UI lists both in DB; app shows one column by locale).
 UPDATE lookup_values
 SET name_en = 'Asset',
-    name_ar = 'Ø§Ù„Ø£ØµÙˆÙ„',
+    name_ar = 'الأصول',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE type_code = 'account-types'
@@ -2759,7 +2759,7 @@ WHERE type_code = 'account-types'
 
 UPDATE lookup_values
 SET name_en = 'Liability',
-    name_ar = 'Ø§Ù„Ø§Ù„ØªØ²Ø§Ù…Ø§Øª',
+    name_ar = 'الالتزامات',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE type_code = 'account-types'
@@ -2767,7 +2767,7 @@ WHERE type_code = 'account-types'
 
 UPDATE lookup_values
 SET name_en = 'Equity',
-    name_ar = 'Ø­Ù‚ÙˆÙ‚ Ø§Ù„Ù…Ù„ÙƒÙŠØ©',
+    name_ar = 'حقوق الملكية',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE type_code = 'account-types'
@@ -2775,7 +2775,7 @@ WHERE type_code = 'account-types'
 
 UPDATE lookup_values
 SET name_en = 'Revenue',
-    name_ar = 'Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª',
+    name_ar = 'الإيرادات',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE type_code = 'account-types'
@@ -2783,7 +2783,7 @@ WHERE type_code = 'account-types'
 
 UPDATE lookup_values
 SET name_en = 'Expense',
-    name_ar = 'Ø§Ù„Ù…ØµØ±ÙˆÙØ§Øª',
+    name_ar = 'المصروفات',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE type_code = 'account-types'
@@ -3282,60 +3282,60 @@ SET search_path TO erp_system, public;
 -- ============================================================
 -- V41: Nested "branch" expense accounts for UI / hierarchy tests
 -- Parent accounts are non-posting groups; only leaf accounts are intended for posting.
--- Structure: Expenses â†’ Branch operations â†’ regions â†’ branches â†’ sub-branches (leaf)
+-- Structure: Expenses → Branch operations → regions → branches → sub-branches (leaf)
 -- ============================================================
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5500', 'Branch operations', 'Branch operations', 'Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„ÙØ±ÙˆØ¹', p.id, 'EXPENSE', 2, 'Expenses/Branch operations', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5500', 'Branch operations', 'Branch operations', 'عمليات الفروع', p.id, 'EXPENSE', 2, 'Expenses/Branch operations', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5000'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5500');
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5510', 'Northern branches', 'Northern branches', 'ÙØ±ÙˆØ¹ Ø§Ù„Ø´Ù…Ø§Ù„', p.id, 'EXPENSE', 3, 'Expenses/Branch operations/Northern branches', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5510', 'Northern branches', 'Northern branches', 'فروع الشمال', p.id, 'EXPENSE', 3, 'Expenses/Branch operations/Northern branches', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5500'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5510');
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5520', 'Greater Cairo region', 'Greater Cairo region', 'Ù…Ù†Ø·Ù‚Ø© Ø§Ù„Ù‚Ø§Ù‡Ø±Ø© Ø§Ù„ÙƒØ¨Ø±Ù‰', p.id, 'EXPENSE', 3, 'Expenses/Branch operations/Greater Cairo region', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5520', 'Greater Cairo region', 'Greater Cairo region', 'منطقة القاهرة الكبرى', p.id, 'EXPENSE', 3, 'Expenses/Branch operations/Greater Cairo region', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5500'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5520');
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5511', 'Alexandria branch', 'Alexandria branch', 'ÙØ±Ø¹ Ø§Ù„Ø¥Ø³ÙƒÙ†Ø¯Ø±ÙŠØ©', p.id, 'EXPENSE', 4, 'Expenses/Branch operations/Northern branches/Alexandria branch', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5511', 'Alexandria branch', 'Alexandria branch', 'فرع الإسكندرية', p.id, 'EXPENSE', 4, 'Expenses/Branch operations/Northern branches/Alexandria branch', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5510'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5511');
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5512', 'North Coast kiosk', 'North Coast kiosk', 'ÙƒØ´Ùƒ Ø§Ù„Ø³Ø§Ø­Ù„ Ø§Ù„Ø´Ù…Ø§Ù„ÙŠ', p.id, 'EXPENSE', 4, 'Expenses/Branch operations/Northern branches/North Coast kiosk', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5512', 'North Coast kiosk', 'North Coast kiosk', 'كشك الساحل الشمالي', p.id, 'EXPENSE', 4, 'Expenses/Branch operations/Northern branches/North Coast kiosk', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5510'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5512');
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5521', 'Cairo HQ', 'Cairo HQ', 'Ù…Ù‚Ø± Ø§Ù„Ù‚Ø§Ù‡Ø±Ø©', p.id, 'EXPENSE', 4, 'Expenses/Branch operations/Greater Cairo region/Cairo HQ', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5521', 'Cairo HQ', 'Cairo HQ', 'مقر القاهرة', p.id, 'EXPENSE', 4, 'Expenses/Branch operations/Greater Cairo region/Cairo HQ', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5520'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5521');
 
 -- Branch under a branch (Giza nested under Greater Cairo)
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5530', 'Giza branch', 'Giza branch', 'ÙØ±Ø¹ Ø§Ù„Ø¬ÙŠØ²Ø©', p.id, 'EXPENSE', 4, 'Expenses/Branch operations/Greater Cairo region/Giza branch', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5530', 'Giza branch', 'Giza branch', 'فرع الجيزة', p.id, 'EXPENSE', 4, 'Expenses/Branch operations/Greater Cairo region/Giza branch', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5520'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5530');
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5531', 'Giza warehouse', 'Giza warehouse', 'Ù…Ø®Ø²Ù† Ø§Ù„Ø¬ÙŠØ²Ø©', p.id, 'EXPENSE', 5, 'Expenses/Branch operations/Greater Cairo region/Giza branch/Giza warehouse', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5531', 'Giza warehouse', 'Giza warehouse', 'مخزن الجيزة', p.id, 'EXPENSE', 5, 'Expenses/Branch operations/Greater Cairo region/Giza branch/Giza warehouse', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5530'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5531');
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '5532', 'Giza retail', 'Giza retail', 'ØªØ¬Ø²Ø¦Ø© Ø§Ù„Ø¬ÙŠØ²Ø©', p.id, 'EXPENSE', 5, 'Expenses/Branch operations/Greater Cairo region/Giza branch/Giza retail', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '5532', 'Giza retail', 'Giza retail', 'تجزئة الجيزة', p.id, 'EXPENSE', 5, 'Expenses/Branch operations/Greater Cairo region/Giza branch/Giza retail', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '5530'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '5532');
@@ -3345,17 +3345,17 @@ WHERE p.code = '5530'
 SET search_path TO erp_system, public;
 
 -- ============================================================
--- V42: Asset hierarchy â€” Banks (Ø¨Ù†ÙˆÙƒ) under Assets, Bank Muscat (Ø¨Ù†Ùƒ Ù…Ø³Ù‚Ø·) leaf + demo bank row
+-- V42: Asset hierarchy — Banks (بنوك) under Assets, Bank Muscat (بنك مسقط) leaf + demo bank row
 -- ============================================================
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '1140', 'Banks', 'Banks', 'Ø¨Ù†ÙˆÙƒ', p.id, 'ASSET', 2, 'Assets/Banks', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '1140', 'Banks', 'Banks', 'بنوك', p.id, 'ASSET', 2, 'Assets/Banks', TRUE, 0, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '1000'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '1140');
 
 INSERT INTO accounts (code, name, name_en, name_ar, parent_id, account_type, level, full_path, is_active, opening_balance, opening_balance_side, created_by, updated_by, version)
-SELECT '1141', 'Bank Muscat', 'Bank Muscat', 'Ø¨Ù†Ùƒ Ù…Ø³Ù‚Ø·', p.id, 'ASSET', 3, 'Assets/Banks/Bank Muscat', TRUE, 8750.50, 'DEBIT', 'flyway', 'flyway', 0
+SELECT '1141', 'Bank Muscat', 'Bank Muscat', 'بنك مسقط', p.id, 'ASSET', 3, 'Assets/Banks/Bank Muscat', TRUE, 8750.50, 'DEBIT', 'flyway', 'flyway', 0
 FROM accounts p
 WHERE p.code = '1140'
   AND NOT EXISTS (SELECT 1 FROM accounts a WHERE a.code = '1141');
@@ -3383,96 +3383,96 @@ SET name_en = v.name_en,
     updated_at = NOW()
 FROM (VALUES
           -- account-types (aligned with V37 bilingual labels)
-          ('account-types', 'ASSET', 'Asset', 'Ø§Ù„Ø£ØµÙˆÙ„'),
-          ('account-types', 'LIABILITY', 'Liability', 'Ø§Ù„Ø§Ù„ØªØ²Ø§Ù…Ø§Øª'),
-          ('account-types', 'EQUITY', 'Equity', 'Ø­Ù‚ÙˆÙ‚ Ø§Ù„Ù…Ù„ÙƒÙŠØ©'),
-          ('account-types', 'INCOME', 'Income', 'Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª'),
-          ('account-types', 'REVENUE', 'Revenue', 'Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª'),
-          ('account-types', 'EXPENSE', 'Expense', 'Ø§Ù„Ù…ØµØ±ÙˆÙØ§Øª'),
+          ('account-types', 'ASSET', 'Asset', 'الأصول'),
+          ('account-types', 'LIABILITY', 'Liability', 'الالتزامات'),
+          ('account-types', 'EQUITY', 'Equity', 'حقوق الملكية'),
+          ('account-types', 'INCOME', 'Income', 'الإيرادات'),
+          ('account-types', 'REVENUE', 'Revenue', 'الإيرادات'),
+          ('account-types', 'EXPENSE', 'Expense', 'المصروفات'),
           -- voucher-statuses
-          ('voucher-statuses', 'DRAFT', 'Draft', 'Ù…Ø³ÙˆØ¯Ø©'),
-          ('voucher-statuses', 'APPROVED', 'Approved', 'Ù…Ø¹ØªÙ…Ø¯'),
-          ('voucher-statuses', 'CANCELLED', 'Cancelled', 'Ù…Ù„ØºÙ‰'),
+          ('voucher-statuses', 'DRAFT', 'Draft', 'مسودة'),
+          ('voucher-statuses', 'APPROVED', 'Approved', 'معتمد'),
+          ('voucher-statuses', 'CANCELLED', 'Cancelled', 'ملغى'),
           -- voucher-types
-          ('voucher-types', 'STANDARD', 'Standard', 'Ù‚ÙŠØ§Ø³ÙŠ'),
-          ('voucher-types', 'ADVANCE', 'Advance', 'Ø³Ù„ÙØ©'),
-          ('voucher-types', 'BILL_PAYMENT', 'Bill payment', 'Ø¯ÙØ¹ ÙØ§ØªÙˆØ±Ø©'),
-          ('voucher-types', 'INVOICE_COLLECTION', 'Invoice collection', 'ØªØ­ØµÙŠÙ„ ÙØ§ØªÙˆØ±Ø©'),
+          ('voucher-types', 'STANDARD', 'Standard', 'قياسي'),
+          ('voucher-types', 'ADVANCE', 'Advance', 'سلفة'),
+          ('voucher-types', 'BILL_PAYMENT', 'Bill payment', 'دفع فاتورة'),
+          ('voucher-types', 'INVOICE_COLLECTION', 'Invoice collection', 'تحصيل فاتورة'),
           -- payment-methods
-          ('payment-methods', 'CASH', 'Cash', 'Ù†Ù‚Ø¯ÙŠ'),
-          ('payment-methods', 'BANK', 'Bank', 'Ø¨Ù†Ùƒ'),
-          ('payment-methods', 'CHECK', 'Cheque', 'Ø´ÙŠÙƒ'),
+          ('payment-methods', 'CASH', 'Cash', 'نقدي'),
+          ('payment-methods', 'BANK', 'Bank', 'بنك'),
+          ('payment-methods', 'CHECK', 'Cheque', 'شيك'),
           -- currencies (codes stay Latin; labels Arabic)
-          ('currencies', 'USD', 'US Dollar', 'Ø¯ÙˆÙ„Ø§Ø± Ø£Ù…Ø±ÙŠÙƒÙŠ'),
-          ('currencies', 'EUR', 'Euro', 'ÙŠÙˆØ±Ùˆ'),
-          ('currencies', 'GBP', 'British Pound', 'Ø¬Ù†ÙŠÙ‡ Ø¥Ø³ØªØ±Ù„ÙŠÙ†ÙŠ'),
-          ('currencies', 'AED', 'UAE Dirham', 'Ø¯Ø±Ù‡Ù… Ø¥Ù…Ø§Ø±Ø§ØªÙŠ'),
-          ('currencies', 'SAR', 'Saudi Riyal', 'Ø±ÙŠØ§Ù„ Ø³Ø¹ÙˆØ¯ÙŠ'),
-          ('currencies', 'EGP', 'Egyptian Pound', 'Ø¬Ù†ÙŠÙ‡ Ù…ØµØ±ÙŠ'),
-          ('currencies', 'OMR', 'Omani Rial', 'Ø±ÙŠØ§Ù„ Ø¹Ù…Ø§Ù†ÙŠ'),
+          ('currencies', 'USD', 'US Dollar', 'دولار أمريكي'),
+          ('currencies', 'EUR', 'Euro', 'يورو'),
+          ('currencies', 'GBP', 'British Pound', 'جنيه إسترليني'),
+          ('currencies', 'AED', 'UAE Dirham', 'درهم إماراتي'),
+          ('currencies', 'SAR', 'Saudi Riyal', 'ريال سعودي'),
+          ('currencies', 'EGP', 'Egyptian Pound', 'جنيه مصري'),
+          ('currencies', 'OMR', 'Omani Rial', 'ريال عماني'),
           -- reconciliation
-          ('reconciliation-statuses', 'OPEN', 'Open', 'Ù…ÙØªÙˆØ­Ø©'),
-          ('reconciliation-statuses', 'IN_PROGRESS', 'In progress', 'Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°'),
-          ('reconciliation-statuses', 'COMPLETED', 'Completed', 'Ù…ÙƒØªÙ…Ù„Ø©'),
-          ('reconciliation-line-statuses', 'UNMATCHED', 'Unmatched', 'ØºÙŠØ± Ù…Ø·Ø§Ø¨Ù‚'),
-          ('reconciliation-line-statuses', 'PARTIALLY_MATCHED', 'Partially matched', 'Ù…Ø·Ø§Ø¨Ù‚ Ø¬Ø²Ø¦ÙŠØ§Ù‹'),
-          ('reconciliation-line-statuses', 'MATCHED', 'Matched', 'Ù…Ø·Ø§Ø¨Ù‚'),
+          ('reconciliation-statuses', 'OPEN', 'Open', 'مفتوحة'),
+          ('reconciliation-statuses', 'IN_PROGRESS', 'In progress', 'قيد التنفيذ'),
+          ('reconciliation-statuses', 'COMPLETED', 'Completed', 'مكتملة'),
+          ('reconciliation-line-statuses', 'UNMATCHED', 'Unmatched', 'غير مطابق'),
+          ('reconciliation-line-statuses', 'PARTIALLY_MATCHED', 'Partially matched', 'مطابق جزئياً'),
+          ('reconciliation-line-statuses', 'MATCHED', 'Matched', 'مطابق'),
           -- report-periods
-          ('report-periods', 'THIS_MONTH', 'This month', 'Ù‡Ø°Ø§ Ø§Ù„Ø´Ù‡Ø±'),
-          ('report-periods', 'LAST_MONTH', 'Last month', 'Ø§Ù„Ø´Ù‡Ø± Ø§Ù„Ù…Ø§Ø¶ÙŠ'),
-          ('report-periods', 'THIS_QUARTER', 'This quarter', 'Ù‡Ø°Ø§ Ø§Ù„Ø±Ø¨Ø¹'),
-          ('report-periods', 'THIS_YEAR', 'This year', 'Ù‡Ø°Ù‡ Ø§Ù„Ø³Ù†Ø©'),
-          ('report-periods', 'CUSTOM', 'Custom', 'Ù…Ø®ØµØµ'),
+          ('report-periods', 'THIS_MONTH', 'This month', 'هذا الشهر'),
+          ('report-periods', 'LAST_MONTH', 'Last month', 'الشهر الماضي'),
+          ('report-periods', 'THIS_QUARTER', 'This quarter', 'هذا الربع'),
+          ('report-periods', 'THIS_YEAR', 'This year', 'هذه السنة'),
+          ('report-periods', 'CUSTOM', 'Custom', 'مخصص'),
           -- journal-entry-statuses
-          ('journal-entry-statuses', 'DRAFT', 'Draft', 'Ù…Ø³ÙˆØ¯Ø©'),
-          ('journal-entry-statuses', 'POSTED', 'Posted', 'Ù…Ø±Ø­Ù‘Ù„'),
-          ('journal-entry-statuses', 'APPROVED', 'Approved', 'Ù…Ø¹ØªÙ…Ø¯'),
-          ('journal-entry-statuses', 'REVERSED', 'Reversed', 'Ù…Ø¹ÙƒÙˆØ³'),
-          ('journal-entry-statuses', 'CANCELLED', 'Cancelled', 'Ù…Ù„ØºÙ‰'),
+          ('journal-entry-statuses', 'DRAFT', 'Draft', 'مسودة'),
+          ('journal-entry-statuses', 'POSTED', 'Posted', 'مرحّل'),
+          ('journal-entry-statuses', 'APPROVED', 'Approved', 'معتمد'),
+          ('journal-entry-statuses', 'REVERSED', 'Reversed', 'معكوس'),
+          ('journal-entry-statuses', 'CANCELLED', 'Cancelled', 'ملغى'),
           -- entry-types
-          ('entry-types', 'MANUAL', 'Manual', 'ÙŠØ¯ÙˆÙŠ'),
-          ('entry-types', 'ADJUSTMENT', 'Adjustment', 'ØªØ³ÙˆÙŠØ©'),
-          ('entry-types', 'OPENING', 'Opening', 'Ø§ÙØªØªØ§Ø­ÙŠ'),
-          ('entry-types', 'CLOSING', 'Closing', 'Ø¥ØºÙ„Ø§Ù‚'),
-          ('entry-types', 'REVERSAL', 'Reversal', 'Ø¹ÙƒØ³ Ù‚ÙŠØ¯'),
+          ('entry-types', 'MANUAL', 'Manual', 'يدوي'),
+          ('entry-types', 'ADJUSTMENT', 'Adjustment', 'تسوية'),
+          ('entry-types', 'OPENING', 'Opening', 'افتتاحي'),
+          ('entry-types', 'CLOSING', 'Closing', 'إغلاق'),
+          ('entry-types', 'REVERSAL', 'Reversal', 'عكس قيد'),
           -- statuses
-          ('statuses', 'ACTIVE', 'Active', 'Ù†Ø´Ø·'),
-          ('statuses', 'INACTIVE', 'Inactive', 'ØºÙŠØ± Ù†Ø´Ø·'),
+          ('statuses', 'ACTIVE', 'Active', 'نشط'),
+          ('statuses', 'INACTIVE', 'Inactive', 'غير نشط'),
           -- accounting-methods
-          ('accounting-methods', 'ACCRUAL', 'Accrual basis', 'Ø¹Ù„Ù‰ Ø£Ø³Ø§Ø³ Ø§Ù„Ø§Ø³ØªØ­Ù‚Ø§Ù‚'),
-          ('accounting-methods', 'CASH', 'Cash basis', 'Ø¹Ù„Ù‰ Ø£Ø³Ø§Ø³ Ø§Ù„Ù†Ù‚Ø¯ÙŠØ©'),
+          ('accounting-methods', 'ACCRUAL', 'Accrual basis', 'على أساس الاستحقاق'),
+          ('accounting-methods', 'CASH', 'Cash basis', 'على أساس النقدية'),
           -- transaction-types
-          ('transaction-types', 'SALE', 'Sale', 'Ø¨ÙŠØ¹'),
-          ('transaction-types', 'PURCHASE', 'Purchase', 'Ø´Ø±Ø§Ø¡'),
-          ('transaction-types', 'REFUND', 'Refund', 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯'),
-          ('transaction-types', 'ADJUSTMENT', 'Adjustment', 'ØªØ³ÙˆÙŠØ©'),
+          ('transaction-types', 'SALE', 'Sale', 'بيع'),
+          ('transaction-types', 'PURCHASE', 'Purchase', 'شراء'),
+          ('transaction-types', 'REFUND', 'Refund', 'استرداد'),
+          ('transaction-types', 'ADJUSTMENT', 'Adjustment', 'تسوية'),
           -- transaction-statuses
-          ('transaction-statuses', 'DRAFT', 'Draft', 'Ù…Ø³ÙˆØ¯Ø©'),
-          ('transaction-statuses', 'POSTED', 'Posted', 'Ù…Ø±Ø­Ù‘Ù„'),
-          ('transaction-statuses', 'PENDING', 'Pending', 'Ù‚ÙŠØ¯ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±'),
-          ('transaction-statuses', 'COMPLETED', 'Completed', 'Ù…ÙƒØªÙ…Ù„'),
-          ('transaction-statuses', 'CANCELLED', 'Cancelled', 'Ù…Ù„ØºÙ‰'),
+          ('transaction-statuses', 'DRAFT', 'Draft', 'مسودة'),
+          ('transaction-statuses', 'POSTED', 'Posted', 'مرحّل'),
+          ('transaction-statuses', 'PENDING', 'Pending', 'قيد الانتظار'),
+          ('transaction-statuses', 'COMPLETED', 'Completed', 'مكتمل'),
+          ('transaction-statuses', 'CANCELLED', 'Cancelled', 'ملغى'),
           -- bill-statuses
-          ('bill-statuses', 'DRAFT', 'Draft', 'Ù…Ø³ÙˆØ¯Ø©'),
-          ('bill-statuses', 'APPROVED', 'Approved', 'Ù…Ø¹ØªÙ…Ø¯'),
-          ('bill-statuses', 'POSTED', 'Posted', 'Ù…Ø±Ø­Ù‘Ù„'),
-          ('bill-statuses', 'PARTIALLY_PAID', 'Partially paid', 'Ù…Ø¯ÙÙˆØ¹ Ø¬Ø²Ø¦ÙŠØ§Ù‹'),
-          ('bill-statuses', 'PAID', 'Paid', 'Ù…Ø¯ÙÙˆØ¹ Ø¨Ø§Ù„ÙƒØ§Ù…Ù„'),
-          ('bill-statuses', 'CANCELLED', 'Cancelled', 'Ù…Ù„ØºÙ‰'),
+          ('bill-statuses', 'DRAFT', 'Draft', 'مسودة'),
+          ('bill-statuses', 'APPROVED', 'Approved', 'معتمد'),
+          ('bill-statuses', 'POSTED', 'Posted', 'مرحّل'),
+          ('bill-statuses', 'PARTIALLY_PAID', 'Partially paid', 'مدفوع جزئياً'),
+          ('bill-statuses', 'PAID', 'Paid', 'مدفوع بالكامل'),
+          ('bill-statuses', 'CANCELLED', 'Cancelled', 'ملغى'),
           -- budget-statuses
-          ('budget-statuses', 'DRAFT', 'Draft', 'Ù…Ø³ÙˆØ¯Ø©'),
-          ('budget-statuses', 'APPROVED', 'Approved', 'Ù…Ø¹ØªÙ…Ø¯'),
-          ('budget-statuses', 'ACTIVE', 'Active', 'Ù†Ø´Ø·'),
-          ('budget-statuses', 'CLOSED', 'Closed', 'Ù…ØºÙ„Ù‚'),
+          ('budget-statuses', 'DRAFT', 'Draft', 'مسودة'),
+          ('budget-statuses', 'APPROVED', 'Approved', 'معتمد'),
+          ('budget-statuses', 'ACTIVE', 'Active', 'نشط'),
+          ('budget-statuses', 'CLOSED', 'Closed', 'مغلق'),
           -- check-types
-          ('check-types', 'ISSUED', 'Issued', 'ØµØ§Ø¯Ø±'),
-          ('check-types', 'RECEIVED', 'Received', 'ÙˆØ§Ø±Ø¯'),
+          ('check-types', 'ISSUED', 'Issued', 'صادر'),
+          ('check-types', 'RECEIVED', 'Received', 'وارد'),
           -- check-statuses
-          ('check-statuses', 'PENDING', 'Pending', 'Ù‚ÙŠØ¯ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±'),
-          ('check-statuses', 'DEPOSITED', 'Deposited', 'Ù…ÙˆØ¯Ø¹'),
-          ('check-statuses', 'CLEARED', 'Cleared', 'Ù…Ø³Ø¯Ø¯'),
-          ('check-statuses', 'BOUNCED', 'Bounced', 'Ù…Ø±ØªØ¬Ø¹'),
-          ('check-statuses', 'CANCELLED', 'Cancelled', 'Ù…Ù„ØºÙ‰')
+          ('check-statuses', 'PENDING', 'Pending', 'قيد الانتظار'),
+          ('check-statuses', 'DEPOSITED', 'Deposited', 'مودع'),
+          ('check-statuses', 'CLEARED', 'Cleared', 'مسدد'),
+          ('check-statuses', 'BOUNCED', 'Bounced', 'مرتجع'),
+          ('check-statuses', 'CANCELLED', 'Cancelled', 'ملغى')
       ) AS v(type_code, code, name_en, name_ar)
 WHERE lv.type_code = v.type_code
   AND lv.code = v.code;
@@ -3487,10 +3487,10 @@ SET full_name = v.full_name,
     updated_at = NOW()
 FROM users u,
      (VALUES
-          ('chief.accountant', 'Ø§Ù„Ù…Ø­Ø§Ø³Ø¨ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', 'Ø´Ø±ÙƒØ© ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ù„Ù„Ù†Ø¸Ø§Ù…'),
-          ('treasury.user', 'Ù…Ø³Ø¤ÙˆÙ„ Ø§Ù„Ø®Ø²ÙŠÙ†Ø©', 'Ø´Ø±ÙƒØ© ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ù„Ù„Ù†Ø¸Ø§Ù…'),
-          ('report.viewer', 'Ù…Ø³ØªØ¹Ø±Ø¶ Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±', 'Ø´Ø±ÙƒØ© ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ù„Ù„Ù†Ø¸Ø§Ù…'),
-          ('finance.manager', 'Ù…Ø¯ÙŠØ± Ø§Ù„Ø´Ø¤ÙˆÙ† Ø§Ù„Ù…Ø§Ù„ÙŠØ©', 'Ø´Ø±ÙƒØ© ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ù„Ù„Ù†Ø¸Ø§Ù…')
+          ('chief.accountant', 'المحاسب الرئيسي', 'شركة تجريبية للنظام'),
+          ('treasury.user', 'مسؤول الخزينة', 'شركة تجريبية للنظام'),
+          ('report.viewer', 'مستعرض التقارير', 'شركة تجريبية للنظام'),
+          ('finance.manager', 'مدير الشؤون المالية', 'شركة تجريبية للنظام')
       ) AS v(username, full_name, company_name)
 WHERE p.user_id = u.id
   AND u.username = v.username;
@@ -3504,23 +3504,23 @@ SET customer_name = v.customer_name,
     updated_by = 'flyway',
     updated_at = NOW()
 FROM (VALUES
-          ('INV-2026-001', 'Ø´Ø±ÙƒØ© Ø§Ù„ØªØ¬Ø§Ø±Ø© Ø§Ù„Ø¹Ø§Ù„Ù…ÙŠØ© Ø°.Ù….Ù….', 'Ø®Ø¯Ù…Ø§Øª Ø§Ø³ØªØ´Ø§Ø±ÙŠØ© Ù„Ù„Ø±Ø¨Ø¹ Ø§Ù„Ø£ÙˆÙ„ 2026'),
-          ('INV-2026-002', 'ØªÙ‚Ù†ÙŠØ§Øª Ø§Ù„Ù…Ø­ÙŠØ· Ø§Ù„Ø£Ø²Ø±Ù‚', 'ØªØ·ÙˆÙŠØ± Ø¨Ø±Ù…Ø¬ÙŠØ§Øª - Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø£ÙˆÙ„Ù‰'),
-          ('INV-2026-003', 'Ù…Ø¤Ø³Ø³Ø© Ù†Ø¬Ù… Ø§Ù„ØµØ­Ø±Ø§Ø¡', 'ØªØ¬Ù‡ÙŠØ² Ø¨Ù†ÙŠØ© ØªÙ‚Ù†ÙŠØ© Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª'),
-          ('INV-2026-004', 'Ù…Ø¬Ù…ÙˆØ¹Ø© Ø§Ù„Ù…Ù†Ø§Ø±Ø©', 'Ø¹Ù‚Ø¯ ØµÙŠØ§Ù†Ø© Ø´Ù‡Ø±ÙŠ'),
-          ('INV-2026-005', 'ØµÙ†Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù†Ù‚Ø§Ø¡', 'Ø·Ù„Ø¨ Ù…Ù„ØºÙ‰ - ØªÙˆØ±ÙŠØ¯ Ù…Ø¹Ø¯Ø§Øª')
+          ('INV-2026-001', 'شركة التجارة العالمية ذ.م.م.', 'خدمات استشارية للربع الأول 2026'),
+          ('INV-2026-002', 'تقنيات المحيط الأزرق', 'تطوير برمجيات - المرحلة الأولى'),
+          ('INV-2026-003', 'مؤسسة نجم الصحراء', 'تجهيز بنية تقنية المعلومات'),
+          ('INV-2026-004', 'مجموعة المنارة', 'عقد صيانة شهري'),
+          ('INV-2026-005', 'صناعات العنقاء', 'طلب ملغى - توريد معدات')
       ) AS v(invoice_number, customer_name, description)
 WHERE customer_invoices.invoice_number = v.invoice_number;
 
 UPDATE customer_invoices
-SET customer_name = 'Ø¹Ù…ÙŠÙ„ ØªØ¬Ø±ÙŠØ¨ÙŠ',
-    description = 'ÙØ§ØªÙˆØ±Ø© Ø£ÙˆÙ„ÙŠØ© Ù„Ù„Ø§Ø®ØªØ¨Ø§Ø±',
+SET customer_name = 'عميل تجريبي',
+    description = 'فاتورة أولية للاختبار',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE invoice_number = 'INV-000001';
 
 UPDATE customer_invoice_lines
-SET description = 'Ø³Ø·Ø± ÙØ§ØªÙˆØ±Ø© ØªØ¬Ø±ÙŠØ¨ÙŠ',
+SET description = 'سطر فاتورة تجريبي',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE description = 'Seeded invoice line';
@@ -3533,16 +3533,16 @@ SET description = v.description,
     updated_by = 'flyway',
     updated_at = NOW()
 FROM (VALUES
-          ('TX-DEMO-0001', 'Ù…Ø¹Ø§Ù…Ù„Ø© Ø¥ÙŠØ¯Ø§Ø¹ Ø¨Ù†ÙƒÙŠ'),
-          ('TX-DEMO-0002', 'Ù…Ø¹Ø§Ù…Ù„Ø© Ø¯ÙØ¹ Ø±ÙˆØ§ØªØ¨'),
-          ('TX-DEMO-0003', 'ØªØ­ØµÙŠÙ„ Ø¯ÙØ¹Ø© ÙØ§ØªÙˆØ±Ø© Ù…Ù† Ø´Ø±ÙƒØ© Ø§Ù„ØªØ¬Ø§Ø±Ø© Ø§Ù„Ø¹Ø§Ù„Ù…ÙŠØ©'),
-          ('TX-DEMO-0004', 'Ø¯ÙØ¹Ø© Ø¬Ø²Ø¦ÙŠØ© Ù…Ù† ØªÙ‚Ù†ÙŠØ§Øª Ø§Ù„Ù…Ø­ÙŠØ· Ø§Ù„Ø£Ø²Ø±Ù‚'),
-          ('TX-DEMO-0005', 'Ø¯ÙØ¹ Ø¥ÙŠØ¬Ø§Ø± Ø§Ù„Ù…ÙƒØªØ¨'),
-          ('TX-DEMO-0006', 'Ø¯ÙØ¹ ÙÙˆØ§ØªÙŠØ± Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆØ§Ù„Ù…Ø§Ø¡'),
-          ('TX-DEMO-0007', 'Ø´Ø±Ø§Ø¡ Ù„Ø¥Ø¹Ø§Ø¯Ø© ØªØ®Ø²ÙŠÙ† Ø§Ù„Ù…Ø®Ø²ÙˆÙ†'),
-          ('TX-DEMO-0008', 'Ø´Ø±Ø§Ø¡ Ù…Ø³ØªÙ„Ø²Ù…Ø§Øª Ù…ÙƒØªØ¨ÙŠØ©'),
-          ('TX-DEMO-0009', 'Ø£ØªØ¹Ø§Ø¨ Ø§Ø³ØªØ´Ø§Ø±ÙŠØ© - Ø¹Ù…ÙŠÙ„ Ù†Ø¬Ù… Ø§Ù„ØµØ­Ø±Ø§Ø¡'),
-          ('TX-DEMO-0010', 'Ø¯ÙØ¹ Ø±ÙˆØ§ØªØ¨ Ø§Ù„Ù…ÙˆØ¸ÙÙŠÙ† - Ù…Ø§Ø±Ø³ 2026')
+          ('TX-DEMO-0001', 'معاملة إيداع بنكي'),
+          ('TX-DEMO-0002', 'معاملة دفع رواتب'),
+          ('TX-DEMO-0003', 'تحصيل دفعة فاتورة من شركة التجارة العالمية'),
+          ('TX-DEMO-0004', 'دفعة جزئية من تقنيات المحيط الأزرق'),
+          ('TX-DEMO-0005', 'دفع إيجار المكتب'),
+          ('TX-DEMO-0006', 'دفع فواتير الكهرباء والماء'),
+          ('TX-DEMO-0007', 'شراء لإعادة تخزين المخزون'),
+          ('TX-DEMO-0008', 'شراء مستلزمات مكتبية'),
+          ('TX-DEMO-0009', 'أتعاب استشارية - عميل نجم الصحراء'),
+          ('TX-DEMO-0010', 'دفع رواتب الموظفين - مارس 2026')
       ) AS v(reference, description)
 WHERE transactions.reference = v.reference;
 
@@ -3554,16 +3554,16 @@ SET description = v.description,
     updated_by = 'flyway',
     updated_at = NOW()
 FROM (VALUES
-          ('JE-DEMO-0005', 'ØªØ³ÙˆÙŠØ© Ù…Ø®Ø²ÙˆÙ† Ù…Ø¹Ù„Ù‚Ø©'),
-          ('JE-DEMO-0006', 'ØªØ³ÙˆÙŠØ© Ù…Ø³ØªØ­Ù‚Ø§Øª Ù…Ø¹ØªÙ…Ø¯Ø©'),
-          ('JE-DEMO-0007', 'Ø¥Ø«Ø¨Ø§Øª Ø¥ÙŠØ±Ø§Ø¯Ø§Øª - Ø§Ø³ØªØ´Ø§Ø±Ø§Øª'),
-          ('JE-DEMO-0008', 'Ø§Ø³ØªØ­Ù‚Ø§Ù‚ Ø±ÙˆØ§ØªØ¨ - Ù…Ø§Ø±Ø³ 2026'),
-          ('JE-DEMO-0009', 'ØªØ³ÙˆÙŠØ© Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø§ÙØªØªØ§Ø­ÙŠ')
+          ('JE-DEMO-0005', 'تسوية مخزون معلقة'),
+          ('JE-DEMO-0006', 'تسوية مستحقات معتمدة'),
+          ('JE-DEMO-0007', 'إثبات إيرادات - استشارات'),
+          ('JE-DEMO-0008', 'استحقاق رواتب - مارس 2026'),
+          ('JE-DEMO-0009', 'تسوية الرصيد الافتتاحي')
       ) AS v(reference_number, description)
 WHERE journal_entries.reference_number = v.reference_number;
 
 UPDATE journal_entry_lines jel
-SET description = 'Ø²ÙŠØ§Ø¯Ø© Ø§Ù„Ù…Ø®Ø²ÙˆÙ†',
+SET description = 'زيادة المخزون',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3573,7 +3573,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Inventory increase';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ø²ÙŠØ§Ø¯Ø© Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ø¯Ø§Ø¦Ù†Ø©',
+SET description = 'زيادة الذمم الدائنة',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3583,7 +3583,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Accounts payable increase';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ø¥Ø«Ø¨Ø§Øª Ù…ØµØ±ÙˆÙ Ù…Ø³ØªØ­Ù‚',
+SET description = 'إثبات مصروف مستحق',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3593,7 +3593,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Accrued expense recognition';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ø§Ù„ØªØ²Ø§Ù…Ø§Øª Ù…Ø³ØªØ­Ù‚Ø©',
+SET description = 'التزامات مستحقة',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3603,7 +3603,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Accrued liabilities';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ø°Ù…Ù… Ù…Ø¯ÙŠÙ†Ø© - Ù†Ø¬Ù… Ø§Ù„ØµØ­Ø±Ø§Ø¡',
+SET description = 'ذمم مدينة - نجم الصحراء',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3613,7 +3613,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Accounts receivable - Desert Star';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ø¥ÙŠØ±Ø§Ø¯ Ø®Ø¯Ù…Ø§Øª - Ø§Ø³ØªØ´Ø§Ø±Ø§Øª',
+SET description = 'إيراد خدمات - استشارات',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3623,7 +3623,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Service revenue - consulting';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ù…ØµØ±ÙˆÙ Ø±ÙˆØ§ØªØ¨',
+SET description = 'مصروف رواتب',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3633,7 +3633,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Salary expense';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ø±ÙˆØ§ØªØ¨ Ù…Ø³ØªØ­Ù‚Ø© Ø§Ù„Ø¯ÙØ¹',
+SET description = 'رواتب مستحقة الدفع',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3643,7 +3643,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Salary payable';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ø±ØµÙŠØ¯ Ù†Ù‚Ø¯ÙŠØ© Ø§ÙØªØªØ§Ø­ÙŠ',
+SET description = 'رصيد نقدية افتتاحي',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3653,7 +3653,7 @@ WHERE je.id = jel.journal_entry_id
   AND jel.description = 'Cash opening balance';
 
 UPDATE journal_entry_lines jel
-SET description = 'Ù…Ø³Ø§Ù‡Ù…Ø© Ø±Ø£Ø³ Ù…Ø§Ù„ Ø§Ù„Ù…Ø§Ù„Ùƒ',
+SET description = 'مساهمة رأس مال المالك',
     updated_by = 'flyway',
     updated_at = NOW()
 FROM journal_entries je
@@ -3664,25 +3664,25 @@ WHERE je.id = jel.journal_entry_id
 
 -- V17 legacy journal descriptions (if still present)
 UPDATE journal_entries
-SET description = 'ØªØ±Ø­ÙŠÙ„ ÙØ§ØªÙˆØ±Ø© Ø¨ÙŠØ¹ ØªØ¬Ø±ÙŠØ¨ÙŠØ©',
+SET description = 'ترحيل فاتورة بيع تجريبية',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE reference_number = 'JE-DEMO-0001' AND description = 'Demo sale invoice posting';
 
 UPDATE journal_entries
-SET description = 'Ø¯ÙØ¹ Ø±Ø§ØªØ¨ ØªØ¬Ø±ÙŠØ¨ÙŠ',
+SET description = 'دفع راتب تجريبي',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE reference_number = 'JE-DEMO-0002' AND description = 'Demo salary payment';
 
 UPDATE journal_entries
-SET description = 'Ø¥ÙŠØ¬Ø§Ø± ÙˆÙ…Ø±Ø§ÙÙ‚ ØªØ¬Ø±ÙŠØ¨ÙŠØ©',
+SET description = 'إيجار ومرافق تجريبية',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE reference_number = 'JE-DEMO-0003' AND description = 'Demo rent and utilities';
 
 UPDATE journal_entries
-SET description = 'Ø¥ÙŠØµØ§Ù„ Ø®Ø¯Ù…Ø© ØªØ¬Ø±ÙŠØ¨ÙŠ',
+SET description = 'إيصال خدمة تجريبي',
     updated_by = 'flyway',
     updated_at = NOW()
 WHERE reference_number = 'JE-DEMO-0004' AND description = 'Demo service receipt';
@@ -3696,14 +3696,14 @@ SET bank_name = v.bank_name,
     updated_by = 'flyway',
     updated_at = NOW()
 FROM (VALUES
-          ('CHK-ISS-001', 'Ø¨Ù†Ùƒ Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø¯Ø¨ÙŠ Ø§Ù„ÙˆØ·Ù†ÙŠ', 'Ø±ÙˆØ§ØªØ¨ Ø§Ù„ÙØ±ÙŠÙ‚'),
-          ('CHK-ISS-002', 'Ø¨Ù†Ùƒ Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø¯Ø¨ÙŠ Ø§Ù„ÙˆØ·Ù†ÙŠ', 'Ø§Ù„Ø³Ù„Ø§Ù… Ø§Ù„Ø¹Ù‚Ø§Ø±ÙŠØ©'),
-          ('CHK-ISS-003', 'Ù…ØµØ±Ù Ø£Ø¨ÙˆØ¸Ø¨ÙŠ Ø§Ù„Ø¥Ø³Ù„Ø§Ù…ÙŠ', 'Ø£ÙˆÙÙŠØ³ Ù…Ø§Ø±Øª Ø°.Ù….Ù….'),
-          ('CHK-RCV-001', 'Ø¨Ù†Ùƒ Ø£Ø¨ÙˆØ¸Ø¨ÙŠ Ø§Ù„ÙˆØ·Ù†ÙŠ', 'Ø¹Ù…ÙŠÙ„ Ø®Ø¯Ù…Ø§Øª Ø£ÙƒÙ…ÙŠ'),
-          ('CHK-RCV-002', 'Ù…ØµØ±Ù Ø¯Ø¨ÙŠ Ø§Ù„Ø¥Ø³Ù„Ø§Ù…ÙŠ', 'Ø§Ù„Ù…Ø­ÙŠØ· Ø§Ù„Ø£Ø²Ø±Ù‚ Ù„Ù„ØªØ¬Ø§Ø±Ø©'),
-          ('CHK-RCV-003', 'Ø¨Ù†Ùƒ Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø¯Ø¨ÙŠ Ø§Ù„ÙˆØ·Ù†ÙŠ', 'Ù…ÙˆØ±Ø¯ Ø§Ù„Ø¥ØµÙ„Ø§Ø­ Ø§Ù„Ø³Ø±ÙŠØ¹'),
-          ('CHK-ISS-004', 'Ø¨Ù†Ùƒ Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø¯Ø¨ÙŠ Ø§Ù„ÙˆØ·Ù†ÙŠ', 'Ù…ÙˆØ±Ø¯ Ù…Ù„ØºÙ‰'),
-          ('CHK-RCV-004', 'Ù…ØµØ±Ù Ø£Ø¨ÙˆØ¸Ø¨ÙŠ Ø§Ù„Ø¥Ø³Ù„Ø§Ù…ÙŠ', 'Ù…Ø¤Ø³Ø³Ø© Ù†Ø¬Ù… Ø§Ù„ØµØ­Ø±Ø§Ø¡')
+          ('CHK-ISS-001', 'بنك الإمارات دبي الوطني', 'رواتب الفريق'),
+          ('CHK-ISS-002', 'بنك الإمارات دبي الوطني', 'السلام العقارية'),
+          ('CHK-ISS-003', 'مصرف أبوظبي الإسلامي', 'أوفيس مارت ذ.م.م.'),
+          ('CHK-RCV-001', 'بنك أبوظبي الوطني', 'عميل خدمات أكمي'),
+          ('CHK-RCV-002', 'مصرف دبي الإسلامي', 'المحيط الأزرق للتجارة'),
+          ('CHK-RCV-003', 'بنك الإمارات دبي الوطني', 'مورد الإصلاح السريع'),
+          ('CHK-ISS-004', 'بنك الإمارات دبي الوطني', 'مورد ملغى'),
+          ('CHK-RCV-004', 'مصرف أبوظبي الإسلامي', 'مؤسسة نجم الصحراء')
       ) AS v(check_number, bank_name, party_name)
 WHERE checks.check_number = v.check_number;
 
@@ -3715,11 +3715,11 @@ SET bank_name = v.ar_name,
     updated_by = 'flyway',
     updated_at = NOW()
 FROM (VALUES
-          ('ERP Demo Bank', 'Ø¨Ù†Ùƒ ØªØ¬Ø±ÙŠØ¨ÙŠ Ù„Ù„Ù†Ø¸Ø§Ù…'),
-          ('Main Operating Bank', 'Ø§Ù„Ø¨Ù†Ùƒ Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ'),
-          ('Emirates NBD', 'Ø¨Ù†Ùƒ Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø¯Ø¨ÙŠ Ø§Ù„ÙˆØ·Ù†ÙŠ'),
-          ('Abu Dhabi Islamic Bank', 'Ù…ØµØ±Ù Ø£Ø¨ÙˆØ¸Ø¨ÙŠ Ø§Ù„Ø¥Ø³Ù„Ø§Ù…ÙŠ'),
-          ('Bank Muscat', 'Ø¨Ù†Ùƒ Ù…Ø³Ù‚Ø·')
+          ('ERP Demo Bank', 'بنك تجريبي للنظام'),
+          ('Main Operating Bank', 'البنك التشغيلي الرئيسي'),
+          ('Emirates NBD', 'بنك الإمارات دبي الوطني'),
+          ('Abu Dhabi Islamic Bank', 'مصرف أبوظبي الإسلامي'),
+          ('Bank Muscat', 'بنك مسقط')
       ) AS v(en_name, ar_name)
 WHERE TRIM(bank_accounts.bank_name) = v.en_name;
 
@@ -3732,9 +3732,9 @@ SET description = v.description,
     updated_by = 'flyway',
     updated_at = NOW()
 FROM (VALUES
-          ('PV-DEMO-0001', 'Ø¯ÙØ¹ Ø±ÙˆØ§ØªØ¨ Ù…Ø§Ø±Ø³', 'Ø±ÙˆØ§ØªØ¨ Ø§Ù„ÙØ±ÙŠÙ‚'),
-          ('PV-DEMO-0002', 'Ù…Ø³ØªØ­Ù‚Ø§Øª Ù‚Ø±Ø·Ø§Ø³ÙŠØ© Ù…Ø¹Ù„Ù‚Ø©', 'Ø£ÙˆÙÙŠØ³ Ù…Ø§Ø±Øª Ø°.Ù….Ù….'),
-          ('PV-DEMO-0003', 'ØªØ³ÙˆÙŠØ© Ù…ØµØ±ÙˆÙ Ù…Ø³ØªØ­Ù‚ Ù…Ø³ÙˆØ¯Ø©', 'Ù…ÙˆØ±Ø¯ Ø§Ù„Ù…Ø±Ø§ÙÙ‚')
+          ('PV-DEMO-0001', 'دفع رواتب مارس', 'رواتب الفريق'),
+          ('PV-DEMO-0002', 'مستحقات قرطاسية معلقة', 'أوفيس مارت ذ.م.م.'),
+          ('PV-DEMO-0003', 'تسوية مصروف مستحق مسودة', 'مورد المرافق')
       ) AS v(reference, description, party_name)
 WHERE payment_vouchers.reference = v.reference;
 
@@ -3744,23 +3744,23 @@ SET description = v.description,
     updated_by = 'flyway',
     updated_at = NOW()
 FROM (VALUES
-          ('RV-DEMO-0001', 'Ø¥ÙŠØµØ§Ù„ Ø¥ÙŠØ±Ø§Ø¯ Ø®Ø¯Ù…Ø§Øª', 'Ø¹Ù…ÙŠÙ„ Ø®Ø¯Ù…Ø§Øª Ø£ÙƒÙ…ÙŠ'),
-          ('RV-DEMO-0002', 'ØªØ­ØµÙŠÙ„ Ø³Ù„ÙØ© Ø¹Ù…ÙŠÙ„', 'Ø§Ù„Ù…Ø­ÙŠØ· Ø§Ù„Ø£Ø²Ø±Ù‚ Ù„Ù„ØªØ¬Ø§Ø±Ø©'),
-          ('RV-DEMO-0003', 'ØªØ­ØµÙŠÙ„ Ù†Ù‚Ø¯ÙŠ Ù…Ø³ÙˆØ¯Ø©', 'Ø¹Ù…ÙŠÙ„ Ù†Ù‚Ø¯ÙŠ')
+          ('RV-DEMO-0001', 'إيصال إيراد خدمات', 'عميل خدمات أكمي'),
+          ('RV-DEMO-0002', 'تحصيل سلفة عميل', 'المحيط الأزرق للتجارة'),
+          ('RV-DEMO-0003', 'تحصيل نقدي مسودة', 'عميل نقدي')
       ) AS v(reference, description, party_name)
 WHERE receipt_vouchers.reference = v.reference;
 
 -- V17 journal line descriptions (if those rows still exist)
 UPDATE journal_entry_lines
 SET description = CASE BTRIM(description)
-                      WHEN 'Accounts receivable debit' THEN 'Ù…Ø¯ÙŠÙ† Ø§Ù„Ø°Ù…Ù… Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©'
-                      WHEN 'Sales revenue credit' THEN 'Ø¯Ø§Ø¦Ù† Ø¥ÙŠØ±Ø§Ø¯ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª'
-                      WHEN 'Salary expense debit' THEN 'Ù…Ø¯ÙŠÙ† Ù…ØµØ±ÙˆÙ Ø§Ù„Ø±ÙˆØ§ØªØ¨'
-                      WHEN 'Bank credit' THEN 'Ø¯Ø§Ø¦Ù† Ø§Ù„Ø¨Ù†Ùƒ'
-                      WHEN 'Rent expense debit' THEN 'Ù…Ø¯ÙŠÙ† Ù…ØµØ±ÙˆÙ Ø§Ù„Ø¥ÙŠØ¬Ø§Ø±'
-                      WHEN 'Utilities expense debit' THEN 'Ù…Ø¯ÙŠÙ† Ù…ØµØ±ÙˆÙ Ø§Ù„Ù…Ø±Ø§ÙÙ‚'
-                      WHEN 'Bank debit' THEN 'Ù…Ø¯ÙŠÙ† Ø§Ù„Ø¨Ù†Ùƒ'
-                      WHEN 'Service revenue credit' THEN 'Ø¯Ø§Ø¦Ù† Ø¥ÙŠØ±Ø§Ø¯ Ø§Ù„Ø®Ø¯Ù…Ø§Øª'
+                      WHEN 'Accounts receivable debit' THEN 'مدين الذمم المدينة'
+                      WHEN 'Sales revenue credit' THEN 'دائن إيراد المبيعات'
+                      WHEN 'Salary expense debit' THEN 'مدين مصروف الرواتب'
+                      WHEN 'Bank credit' THEN 'دائن البنك'
+                      WHEN 'Rent expense debit' THEN 'مدين مصروف الإيجار'
+                      WHEN 'Utilities expense debit' THEN 'مدين مصروف المرافق'
+                      WHEN 'Bank debit' THEN 'مدين البنك'
+                      WHEN 'Service revenue credit' THEN 'دائن إيراد الخدمات'
                       ELSE description
     END,
     updated_by = 'flyway',
@@ -3816,24 +3816,24 @@ UPDATE user_profiles p
 SET full_name_en    = v.name_en,
     full_name_ar    = v.name_ar,
     company_name_en = 'ERP Demo Company',
-    company_name_ar = 'Ø´Ø±ÙƒØ© ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ù„Ù„Ù†Ø¸Ø§Ù…',
+    company_name_ar = 'شركة تجريبية للنظام',
     company_name    = 'ERP Demo Company',
     full_name       = v.name_en,
     updated_by      = 'flyway',
     updated_at      = NOW()
 FROM users u,
      (VALUES
-          ('chief.accountant', 'Chief Accountant', 'Ø§Ù„Ù…Ø­Ø§Ø³Ø¨ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ'),
-          ('treasury.user', 'Treasury Officer', 'Ù…Ø³Ø¤ÙˆÙ„ Ø§Ù„Ø®Ø²ÙŠÙ†Ø©'),
-          ('report.viewer', 'Report Viewer', 'Ù…Ø³ØªØ¹Ø±Ø¶ Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±'),
-          ('finance.manager', 'Finance Manager', 'Ù…Ø¯ÙŠØ± Ø§Ù„Ø´Ø¤ÙˆÙ† Ø§Ù„Ù…Ø§Ù„ÙŠØ©')
+          ('chief.accountant', 'Chief Accountant', 'المحاسب الرئيسي'),
+          ('treasury.user', 'Treasury Officer', 'مسؤول الخزينة'),
+          ('report.viewer', 'Report Viewer', 'مستعرض التقارير'),
+          ('finance.manager', 'Finance Manager', 'مدير الشؤون المالية')
       ) AS v(username, name_en, name_ar)
 WHERE p.user_id = u.id
   AND u.username = v.username;
 
 UPDATE user_profiles p
 SET full_name_en    = 'ERP Administrator',
-    full_name_ar    = 'Ù…Ø¯ÙŠØ± Ø§Ù„Ù†Ø¸Ø§Ù…',
+    full_name_ar    = 'مدير النظام',
     full_name       = 'ERP Administrator',
     updated_by      = 'flyway',
     updated_at      = NOW()
@@ -3880,7 +3880,7 @@ WHERE id = 'admin-group';
 SET search_path TO erp_system, public;
 
 -- "System management" as its own top-level sidebar module (same pattern as NAV.HESABATY):
--- parent_id NULL, item_type = 'group', collapsible block with children (users, roles, â€¦).
+-- parent_id NULL, item_type = 'group', collapsible block with children (users, roles, …).
 -- Not nested under hesabaty and not a lone "collapse" row at the bottom of accounting items.
 
 UPDATE ui_menu_items
