@@ -7,6 +7,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ErpSystemApplication {
 
     public static void main(String[] args) {
+        // Railway: never run the local "dev" profile (localhost Postgres) on the platform.
+        if (isRailway() && useDevProfileOnRailway()) {
+            System.setProperty("spring.profiles.active", "prod");
+        }
         SpringApplication.run(ErpSystemApplication.class, args);
+    }
+
+    private static boolean isRailway() {
+        String r = System.getenv("RAILWAY_ENVIRONMENT");
+        return r != null && !r.isBlank();
+    }
+
+    /** True when SPRING_PROFILES_ACTIVE is unset or explicitly "dev" (common copy-paste mistake). */
+    private static boolean useDevProfileOnRailway() {
+        String spa = System.getenv("SPRING_PROFILES_ACTIVE");
+        return spa == null || spa.isBlank() || "dev".equalsIgnoreCase(spa.trim());
     }
 }

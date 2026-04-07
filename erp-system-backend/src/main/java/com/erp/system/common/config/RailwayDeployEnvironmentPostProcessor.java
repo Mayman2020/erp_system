@@ -16,7 +16,8 @@ public class RailwayDeployEnvironmentPostProcessor implements EnvironmentPostPro
         if (!StringUtils.hasText(System.getenv("RAILWAY_ENVIRONMENT"))) {
             return;
         }
-        if (!StringUtils.hasText(System.getenv("SPRING_PROFILES_ACTIVE"))) {
+        String spa = System.getenv("SPRING_PROFILES_ACTIVE");
+        if (!StringUtils.hasText(spa) || "dev".equalsIgnoreCase(spa.trim())) {
             environment.setActiveProfiles("prod");
         }
         if (hasExternalJdbcConfiguration(environment)) {
