@@ -3,4 +3,5 @@ target/
 .gitignore
 .idea
 *.iml
-.mvn/wrapper/maven-wrapper.jar
+# Keep .mvn/wrapper/maven-wrapper.jar — Nixpacks/Railway use a Docker build that honors
+# .dockerignore; excluding the jar breaks `mvnw` (MavenWrapperMain not found).
