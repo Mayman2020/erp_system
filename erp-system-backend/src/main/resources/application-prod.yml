@@ -1,21 +1,17 @@
-# Railway / production:
-# - Prefer DB_URL (full JDBC) or Railway DATABASE_URL (mapped by DatabaseUrlEnvironmentPostProcessor).
-# - Railway Postgres plugin: PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD — RailwayPluginPostgresEnvironmentPostProcessor
-#   builds jdbc:postgresql://... from those (fixes SPRING_DATASOURCE_URL=jdbc:...${PGHOST}... not expanded in UI).
-# - Optional query suffix: PG_JDBC_EXTRA e.g. sslmode=require (use ?sslmode=require or sslmode=require)
 spring:
   config:
     activate:
       on-profile: prod
   datasource:
-    url: ${DB_URL:${SPRING_DATASOURCE_URL:jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}}}
-    username: ${DB_USER:${SPRING_DATASOURCE_USERNAME:${PGUSER:}}}
-    password: ${DB_PASS:${SPRING_DATASOURCE_PASSWORD:${PGPASSWORD:}}}
+    url: ${DATABASE_URL:${SPRING_DATASOURCE_URL}}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
       connection-timeout: 30000
+      auto-commit: true
   jpa:
     hibernate:
       ddl-auto: validate
@@ -23,7 +19,6 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         default_schema: erp_system
   flyway:
@@ -33,3 +28,12 @@ spring:
     repair-on-migrate: true
     schemas: erp_system
     locations: classpath:db/migration
+    out-of-order: false
+
+logging:
+  level:
+    root: INFO
+    com.erp.system: INFO
+    org.springframework.boot: INFO
+    org.hibernate: WARN
+    org.flywaydb: INFO
