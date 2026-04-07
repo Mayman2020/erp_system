@@ -58,3 +58,11 @@ Set these in `Settings -> Secrets and variables -> Actions`:
 3. Images are pushed to GHCR
 4. `docker-compose.prod.yml` is copied to server
 5. Server pulls latest images and restarts containers
+
+## If the `deploy` job fails (build is green)
+
+1. **SSH user + Docker** — The deploy user must run `docker` without sudo (or use a user in group `docker`). Check on the server: `docker info` and `docker compose version`.
+2. **GHCR login** — `GHCR_TOKEN` must be a classic PAT with `read:packages` (and access to this repo’s packages). `GHCR_USERNAME` is usually your GitHub username.
+3. **`DEPLOY_PATH`** — The workflow now creates this directory **before** `scp`. Use an absolute path (e.g. `/opt/erp-demo`).
+4. **Firewall / port** — `DEPLOY_PORT` if not 22; security group must allow GitHub Actions IPs (or wide SSH temporarily for testing).
+5. **Package visibility** — If GHCR images are private, the PAT must belong to an account that can pull them.
