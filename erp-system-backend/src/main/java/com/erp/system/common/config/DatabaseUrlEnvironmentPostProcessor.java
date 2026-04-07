@@ -8,13 +8,15 @@ import org.springframework.util.StringUtils;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Maps Railway/Heroku {@code DATABASE_URL} ({@code postgresql://...}) to Spring JDBC properties
- * when {@code DB_URL} / {@code SPRING_DATASOURCE_URL} are not set.
+ * Maps Railway/Heroku {@code DATABASE_URL} ({@code postgresql://...}) to Spring JDBC properties.
+ * <p>
+ * Railway UI does not expand {@code ${PGHOST}} inside {@code SPRING_DATASOURCE_URL}; that value is
+ * passed through literally and must be ignored so {@code DATABASE_URL} (from the Postgres service
+ * reference on the app) can be used instead.
  */
 public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
@@ -25,8 +27,11 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
         if (environment.getPropertySources().contains(SOURCE_NAME)) {
             return;
         }
-        if (StringUtils.hasText(environment.getProperty("DB_URL"))
-                || StringUtils.hasText(environment.getProperty("SPRING_DATASOURCE_URL"))) {
+        if (StringUtils.hasText(environment.getProperty("DB_URL"))) {
+            return;
+        }
+        String springDsUrl = environment.getProperty("SPRING_DATASOURCE_URL");
+        if (StringUtils.hasText(springDsUrl) && !containsUnresolvedRailwayPgPlaceholder(springDsUrl)) {
             return;
         }
         String databaseUrl = environment.getProperty("DATABASE_URL");
@@ -60,12 +65,10 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
 
             Map<String, Object> props = new LinkedHashMap<>();
             props.put("spring.datasource.url", jdbcUrl);
-            if (!StringUtils.hasText(environment.getProperty("DB_USER"))
-                    && !StringUtils.hasText(environment.getProperty("SPRING_DATASOURCE_USERNAME"))) {
+            if (shouldTakeUsernameFromDatabaseUrl(environment)) {
                 props.put("spring.datasource.username", user);
             }
-            if (!StringUtils.hasText(environment.getProperty("DB_PASS"))
-                    && !StringUtils.hasText(environment.getProperty("SPRING_DATASOURCE_PASSWORD"))) {
+            if (shouldTakePasswordFromDatabaseUrl(environment)) {
                 props.put("spring.datasource.password", pass);
             }
             environment.getPropertySources().addFirst(new MapPropertySource(SOURCE_NAME, props));
@@ -76,5 +79,40 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
 
     private static String decode(String s) {
         return java.net.URLDecoder.decode(s, StandardCharsets.UTF_8);
+    }
+
+    /** True when the value still contains Railway-style {@code ${PG...}} that was never expanded. */
+    private static boolean containsUnresolvedRailwayPgPlaceholder(String value) {
+        if (!StringUtils.hasText(value)) {
+            return false;
+        }
+        return value.contains("${PGHOST") || value.contains("${PGPORT") || value.contains("${PGDATABASE")
+                || value.contains("${PGUSER") || value.contains("${PGPASSWORD");
+    }
+
+    private static boolean hasConcreteUser(ConfigurableEnvironment environment) {
+        String dbUser = environment.getProperty("DB_USER");
+        if (StringUtils.hasText(dbUser) && !containsUnresolvedRailwayPgPlaceholder(dbUser)) {
+            return true;
+        }
+        String su = environment.getProperty("SPRING_DATASOURCE_USERNAME");
+        return StringUtils.hasText(su) && !containsUnresolvedRailwayPgPlaceholder(su);
+    }
+
+    private static boolean hasConcretePassword(ConfigurableEnvironment environment) {
+        String dbPass = environment.getProperty("DB_PASS");
+        if (StringUtils.hasText(dbPass) && !containsUnresolvedRailwayPgPlaceholder(dbPass)) {
+            return true;
+        }
+        String sp = environment.getProperty("SPRING_DATASOURCE_PASSWORD");
+        return StringUtils.hasText(sp) && !containsUnresolvedRailwayPgPlaceholder(sp);
+    }
+
+    private static boolean shouldTakeUsernameFromDatabaseUrl(ConfigurableEnvironment environment) {
+        return !hasConcreteUser(environment);
+    }
+
+    private static boolean shouldTakePasswordFromDatabaseUrl(ConfigurableEnvironment environment) {
+        return !hasConcretePassword(environment);
     }
 }
