@@ -96,13 +96,13 @@ jobs:
         with:
           context: ./erp-system-frontend
           file: ./erp-system-frontend/Dockerfile
+          # Reuse Angular output from the runner (previous step); no second ng build inside buildx.
+          target: runtime-ci
           push: true
           tags: ${{ steps.meta_frontend.outputs.tags }}
           labels: ${{ steps.meta_frontend.outputs.labels }}
-          build-args: |
-            NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL != '' && secrets.NG_API_BASE_URL || 'http://127.0.0.1:8091/api/v1' }}
-          cache-from: type=gha,scope=frontend
-          cache-to: type=gha,mode=max,scope=frontend
+          cache-from: type=gha,scope=frontend-nginx
+          cache-to: type=gha,mode=max,scope=frontend-nginx
 
   deploy:
     runs-on: ubuntu-latest
