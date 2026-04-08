@@ -1,0 +1,359 @@
+# DOCKER FILES
+
+## File: `.dockerignore`
+```dockerignore
+target/
+node_modules/
+*.log
+*.tmp
+*.swp
+*.DS_Store
+.git/
+```
+
+## File: `docker-compose.yml`
+```yaml
+version: '3.9'
+# Local / demo stack: PostgreSQL + backend + Angular (nginx).
+# Start locally with:
+#   docker compose up --build
+# Frontend browser traffic is served on http://localhost and calls API at http://localhost:8080/api/v1.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-erp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-erp}
+      POSTGRES_DB: ${POSTGRES_DB:-erp}
+    ports:
+      - "5432:5432"
+    volumes:
+      - erp_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-erp} -d ${POSTGRES_DB:-erp}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./erp-system-backend
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-erp}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-erp}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-erp}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-random-secret}
+
+  frontend:
+    build:
+      context: ./erp-system-frontend
+      args:
+        NG_API_BASE_URL: http://localhost:8080/api/v1
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  erp_pgdata:
+```
+
+## File: `docker-compose.prod.yml`
+```yaml
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - erp_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: ${BACKEND_IMAGE}
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://postgres:5432/${POSTGRES_DB}}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-${POSTGRES_USER}}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-${POSTGRES_PASSWORD}}
+      JWT_SECRET: ${JWT_SECRET}
+    restart: unless-stopped
+
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  erp_pgdata:
+```
+
+## File: `run-docker.bat`
+```bat
+@echo off
+setlocal
+cd /d %~dp0
+echo Checking Docker availability...
+where docker >nul 2>&1
+if errorlevel 1 (
+  echo ERROR: Docker is not installed or not in PATH.
+  echo Install Docker Desktop for Windows and then reopen this terminal.
+  pause
+  exit /b 1
+)
+echo Checking Docker Compose availability...
+docker compose version >nul 2>&1
+if errorlevel 1 (
+  echo ERROR: docker compose is not available.
+  echo Make sure Docker Desktop is installed and Compose is enabled.
+  pause
+  exit /b 1
+)
+echo Checking Docker compose configuration...
+if exist .env (
+  echo Loading .env file...
+) else (
+  echo Warning: .env file not found. Using defaults from docker-compose.yml and .env.example if available.
+)
+echo Validating docker-compose...
+docker compose config >nul 2>&1
+if errorlevel 1 (
+  echo ERROR: docker compose config failed. Fix the compose file first.
+  pause
+  exit /b 1
+)
+echo Docker compose is valid. Starting local Docker stack...
+docker compose up --build
+if errorlevel 1 (
+  echo.
+  echo ERROR: docker compose up failed. Review the logs above.
+  pause
+  exit /b 1
+)
+echo.
+echo Docker compose finished successfully.
+pause
+```
+
+## File: `run-docker.sh`
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+echo "Checking Docker availability..."
+if ! command -v docker >/dev/null 2>&1; then
+  echo "ERROR: Docker is not installed or not in PATH."
+  echo "Install Docker Desktop for Windows and restart your terminal."
+  exit 1
+fi
+
+echo "Checking Docker Compose availability..."
+if ! docker compose version >/dev/null 2>&1; then
+  echo "ERROR: docker compose is not available."
+  echo "Make sure Docker Desktop is installed and Compose is enabled."
+  exit 1
+fi
+
+echo "Checking Docker compose configuration..."
+
+if [ -f .env ]; then
+  echo "Loading .env file"
+  set -o allexport
+  # shellcheck disable=SC1091
+  source .env
+  set +o allexport
+else
+  echo "Warning: .env file not found. Using defaults from docker-compose.yml and .env.example if needed."
+fi
+
+echo "Validating docker-compose..."
+docker compose config >/dev/null
+
+echo "Docker compose is valid. Starting local Docker stack..."
+
+docker compose up --build
+```
+
+## File: `erp-system-backend/Dockerfile`
+```dockerfile
+# syntax=docker/dockerfile:1
+# Build: JDK + Maven Wrapper (reproducible; no global mvn install required).
+# Runtime: JRE only.
+FROM eclipse-temurin:17-jdk-jammy AS build
+WORKDIR /app
+COPY pom.xml .mvn mvnw ./
+RUN chmod +x mvnw
+COPY src ./src
+RUN ./mvnw -B clean package
+
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+ENV PORT=8080
+ENV SPRING_PROFILES_ACTIVE=prod
+COPY --from=build /app/target/erp-system-backend.jar /app/app.jar
+EXPOSE 8080
+CMD ["java", "-XX:MaxRAMPercentage=75.0", "-XX:+UseContainerSupport", "-XX:+ExitOnOutOfMemoryError", "-Dfile.encoding=UTF-8", "-jar", "/app/app.jar"]
+```
+
+## File: `erp-system-backend/.dockerignore`
+```dockerignore
+target/
+.git
+.gitignore
+.idea
+*.iml
+*.md
+.github
+# Keep .mvn/wrapper/maven-wrapper.jar — excluding it breaks ./mvnw in Docker.
+```
+
+## File: `erp-system-frontend/Dockerfile`
+```dockerfile
+# syntax=docker/dockerfile:1
+FROM node:20-bullseye-slim AS build
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+ARG NG_API_BASE_URL=http://localhost:8080/api/v1
+ENV NG_API_BASE_URL=${NG_API_BASE_URL}
+ENV CI=true
+RUN npm run build -- --prod
+
+FROM nginx:alpine
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+# Angular "application" builder output (v17+)
+COPY --from=build /app/dist/erp-system-frontend/browser /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+## File: `erp-system-frontend/.dockerignore`
+```dockerignore
+node_modules
+dist
+.angular
+.git
+.gitignore
+.idea
+*.iml
+coverage
+.github
+```
+
+## File: `scripts/install-docker.sh`
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v docker >/dev/null 2>&1; then
+  echo "Docker already installed: $(docker --version)"
+  exit 0
+fi
+
+if [ "$(id -u)" -ne 0 ]; then
+  SUDO=sudo
+else
+  SUDO=
+fi
+
+if command -v apt-get >/dev/null 2>&1; then
+  echo "Installing Docker on Debian/Ubuntu..."
+  $SUDO apt-get update
+  $SUDO apt-get install -y ca-certificates curl gnupg lsb-release
+  mkdir -p /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/$(. /etc/os-release && echo "$ID")/gpg | $SUDO gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$(. /etc/os-release && echo "$ID") $(lsb_release -cs) stable" | $SUDO tee /etc/apt/sources.list.d/docker.list > /dev/null
+  $SUDO apt-get update
+  $SUDO apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+elif command -v yum >/dev/null 2>&1 || command -v dnf >/dev/null 2>&1; then
+  echo "Installing Docker on RHEL/CentOS/AlmaLinux/Amazon Linux..."
+  if command -v amazon-linux-extras >/dev/null 2>&1; then
+    $SUDO amazon-linux-extras install docker -y
+  else
+    $SUDO yum install -y yum-utils
+    $SUDO yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    $SUDO yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  fi
+else
+  echo "Unsupported OS. Please install Docker manually using https://docs.docker.com/engine/install/." >&2
+  exit 1
+fi
+
+echo "Enabling and starting Docker service..."
+$SUDO systemctl enable docker --now
+
+echo "Docker installation complete."
+```
+
+## File: `scripts/deploy-ec2-docker.sh`
+```bash
+#!/usr/bin/env bash
+# Pull the latest backend image from GHCR and replace the running container on EC2 (or any Docker host).
+# Copy to the server (e.g. /opt/erp/deploy-ec2-docker.sh), chmod +x, then set env vars and run.
+#
+# Required env:
+#   BACKEND_IMAGE   e.g. ghcr.io/myorg/myrepo-backend:latest
+# Optional (for private GHCR):
+#   GHCR_USERNAME, GHCR_TOKEN   (PAT with read:packages)
+# Required for app runtime:
+#   SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD
+#   JWT_SECRET
+set -euo pipefail
+
+: "${BACKEND_IMAGE:?Set BACKEND_IMAGE (e.g. ghcr.io/org/repo-backend:latest)}"
+: "${SPRING_DATASOURCE_URL:?}"
+: "${SPRING_DATASOURCE_USERNAME:?}"
+: "${SPRING_DATASOURCE_PASSWORD:?}"
+: "${JWT_SECRET:?}"
+
+if [[ -n "${GHCR_TOKEN:-}" ]] && [[ -n "${GHCR_USERNAME:-}" ]]; then
+  echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+fi
+
+docker pull "$BACKEND_IMAGE"
+docker stop erp-backend 2>/dev/null || true
+docker rm erp-backend 2>/dev/null || true
+
+docker run -d \
+  --name erp-backend \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  -e PORT=8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e SPRING_DATASOURCE_URL="$SPRING_DATASOURCE_URL" \
+  -e SPRING_DATASOURCE_USERNAME="$SPRING_DATASOURCE_USERNAME" \
+  -e SPRING_DATASOURCE_PASSWORD="$SPRING_DATASOURCE_PASSWORD" \
+  -e JWT_SECRET="$JWT_SECRET" \
+  "$BACKEND_IMAGE"
+
+echo "Started erp-backend from $BACKEND_IMAGE"
+```

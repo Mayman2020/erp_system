@@ -9,11 +9,9 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    # Prefer explicit JDBC vars only. DATABASE_URL / PG* are mapped by EnvironmentPostProcessors.
-    # Do not fallback to unresolved ${PGHOST} placeholders here; that can crash startup on Railway.
-    url: ${SPRING_DATASOURCE_URL:${DB_URL:}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:${PGUSER:}}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASS:${PGPASSWORD:}}}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

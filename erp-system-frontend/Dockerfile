@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:22-bookworm-slim AS build
+FROM node:20-bullseye-slim AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -11,8 +11,9 @@ ENV NG_API_BASE_URL=${NG_API_BASE_URL}
 ENV CI=true
 RUN npm run build
 
-FROM nginx:1.27-alpine
+FROM nginx:alpine
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 # Angular "application" builder output (v17+)
 COPY --from=build /app/dist/erp-system-frontend/browser /usr/share/nginx/html
 EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

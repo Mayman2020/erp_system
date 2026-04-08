@@ -1,0 +1,7 @@
+target/
+node_modules/
+*.log
+*.tmp
+*.swp
+*.DS_Store
+.git/
