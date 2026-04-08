@@ -1,5 +1,9 @@
 # Railway / production:
+# - Listen on all interfaces so PLATFORM PORT health probes can reach the app (see Railway healthcheck docs).
 # - Prefer DB_URL (full JDBC) or Railway DATABASE_URL (mapped by DatabaseUrlEnvironmentPostProcessor).
+server:
+  address: 0.0.0.0
+  port: ${PORT:8080}
 # - Railway Postgres plugin: PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD — RailwayPluginPostgresEnvironmentPostProcessor
 #   builds jdbc:postgresql://... from those (fixes SPRING_DATASOURCE_URL=jdbc:...${PGHOST}... not expanded in UI).
 # - Optional query suffix: PG_JDBC_EXTRA e.g. sslmode=require (use ?sslmode=require or sslmode=require)
