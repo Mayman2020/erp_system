@@ -9,8 +9,9 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    # 12-factor: SPRING_DATASOURCE_* ; Railway often uses DB_URL / PG* (see application-prod header).
-    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}}}
+    # Prefer explicit JDBC vars only. DATABASE_URL / PG* are mapped by EnvironmentPostProcessors.
+    # Do not fallback to unresolved ${PGHOST} placeholders here; that can crash startup on Railway.
+    url: ${SPRING_DATASOURCE_URL:${DB_URL:}}
     username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:${PGUSER:}}}
     password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASS:${PGPASSWORD:}}}
     driver-class-name: org.postgresql.Driver
