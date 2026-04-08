@@ -126,6 +126,8 @@
     </dependencies>
 
     <build>
+        <!-- Stable JAR name for Docker/Railway start commands (avoid shell glob on target/*.jar). -->
+        <finalName>erp-system-backend</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

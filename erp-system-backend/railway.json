@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "java -XX:MaxRAMPercentage=75.0 -XX:+UseContainerSupport -XX:+ExitOnOutOfMemoryError -Dfile.encoding=UTF-8 -jar target/*.jar",
+    "startCommand": "java -XX:MaxRAMPercentage=75.0 -XX:+UseContainerSupport -XX:+ExitOnOutOfMemoryError -Dfile.encoding=UTF-8 -jar target/erp-system-backend.jar",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 300
   }

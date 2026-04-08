@@ -25,7 +25,7 @@ final class RootHealthEngineValve extends ValveBase {
             return;
         }
         response.setStatus(HttpStatus.OK.value());
-        response.setContentType("text/plain;charset=UTF-8");
-        response.getWriter().write("OK");
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"status\":\"UP\"}");
     }
 }
