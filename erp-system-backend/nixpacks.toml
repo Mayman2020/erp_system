@@ -9,4 +9,5 @@ NIXPACKS_JDK_VERSION = "17"
 cmds = ["mvn clean package -DskipTests -B"]
 
 [start]
-cmd = "java -jar target/*.jar"
+# Default container heap (~25% RAM) is often too small for Hibernate + many entities on small Railway plans.
+cmd = "java -XX:MaxRAMPercentage=75.0 -XX:+UseContainerSupport -XX:+ExitOnOutOfMemoryError -Dfile.encoding=UTF-8 -jar target/*.jar"
