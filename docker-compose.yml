@@ -1,0 +1,49 @@
+# Local / demo stack: PostgreSQL + API + Angular (nginx).
+# Usage:
+#   docker compose up --build
+# Frontend is built with NG_API_BASE_URL=http://localhost:8080/api/v1 (browser calls host port 8080).
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: erp
+      POSTGRES_PASSWORD: erp
+      POSTGRES_DB: erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - erp_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp -d erp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./erp-system-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/erp
+      SPRING_DATASOURCE_USERNAME: erp
+      SPRING_DATASOURCE_PASSWORD: erp
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-random-secret}
+
+  frontend:
+    build:
+      context: ./erp-system-frontend
+      args:
+        NG_API_BASE_URL: http://localhost:8080/api/v1
+    depends_on:
+      - backend
+    ports:
+      - "8081:80"
+
+volumes:
+  erp_pgdata:

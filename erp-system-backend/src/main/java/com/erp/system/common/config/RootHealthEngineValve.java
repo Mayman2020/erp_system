@@ -8,10 +8,17 @@ import org.apache.catalina.valves.ValveBase;
 import org.springframework.http.HttpStatus;
 
 /**
- * Answers {@code GET /health} at the Tomcat engine level (outside the servlet context-path).
- * Load balancers and platforms often probe {@code /health} while this app uses {@code /api/v1} as context path.
+ * Answers {@code GET /health} and {@code GET /actuator/health} at the Tomcat engine level (outside the servlet context-path).
+ * Platforms often probe those paths while the API uses context path {@code /api/v1}.
  */
 final class RootHealthEngineValve extends ValveBase {
+
+    private static boolean isRootHealthUri(String uri) {
+        return "/health".equals(uri)
+                || "/health/".equals(uri)
+                || "/actuator/health".equals(uri)
+                || "/actuator/health/".equals(uri);
+    }
 
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
@@ -20,7 +27,7 @@ final class RootHealthEngineValve extends ValveBase {
             return;
         }
         String uri = request.getRequestURI();
-        if (!"/health".equals(uri) && !"/health/".equals(uri)) {
+        if (!isRootHealthUri(uri)) {
             getNext().invoke(request, response);
             return;
         }

@@ -1,7 +1,9 @@
-node_modules/
-dist/
-.angular/
+node_modules
+dist
+.angular
 .git
 .gitignore
 .idea
-*.log
+*.iml
+coverage
+.github

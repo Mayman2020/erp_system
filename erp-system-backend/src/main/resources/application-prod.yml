@@ -1,25 +1,26 @@
 # Railway / production:
-# - Listen on all interfaces so PLATFORM PORT health probes can reach the app (see Railway healthcheck docs).
-# - Prefer DB_URL (full JDBC) or Railway DATABASE_URL (mapped by DatabaseUrlEnvironmentPostProcessor).
+# - Listen on all interfaces so PLATFORM PORT health probes can reach the app.
+# - Datasource: SPRING_DATASOURCE_* first; then DB_* / PG* / jdbc template (Railway bootstrap may set system properties).
 server:
   address: 0.0.0.0
   port: ${PORT:8080}
-# - Railway Postgres plugin: PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD — RailwayPluginPostgresEnvironmentPostProcessor
-#   builds jdbc:postgresql://... from those (fixes SPRING_DATASOURCE_URL=jdbc:...${PGHOST}... not expanded in UI).
-# - Optional query suffix: PG_JDBC_EXTRA e.g. sslmode=require (use ?sslmode=require or sslmode=require)
 spring:
   config:
     activate:
       on-profile: prod
   datasource:
-    url: ${DB_URL:${SPRING_DATASOURCE_URL:jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}}}
-    username: ${DB_USER:${SPRING_DATASOURCE_USERNAME:${PGUSER:}}}
-    password: ${DB_PASS:${SPRING_DATASOURCE_PASSWORD:${PGPASSWORD:}}}
+    # 12-factor: SPRING_DATASOURCE_* ; Railway often uses DB_URL / PG* (see application-prod header).
+    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:${PGUSER:}}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASS:${PGPASSWORD:}}}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
       connection-timeout: 30000
+      # Allow slow DB/network during container start (then fail instead of immediate crash loop).
+      initialization-fail-timeout: 120000
+      validation-timeout: 10000
   jpa:
     hibernate:
       ddl-auto: validate

@@ -1,14 +1,19 @@
 # syntax=docker/dockerfile:1
-# Deterministic image for Railway: JAR at a fixed path (avoids missing target/ or wrong WORKDIR after Nixpacks/Railpack).
-FROM maven:3.9.9-eclipse-temurin-17 AS build
+# Build: JDK + Maven Wrapper (reproducible; no global mvn install required).
+# Runtime: JRE only. Official openjdk:*-slim is deprecated; Eclipse Temurin is the supported replacement.
+FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
 COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw mvnw
+RUN chmod +x mvnw
 COPY src ./src
-RUN mvn -B -DskipTests clean package
+RUN ./mvnw -B -DskipTests clean package
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=build /app/target/erp-system-backend.jar /app/erp-system-backend.jar
+ENV PORT=8080
 ENV SPRING_PROFILES_ACTIVE=prod
+COPY --from=build /app/target/erp-system-backend.jar /app/app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-XX:+UseContainerSupport", "-XX:+ExitOnOutOfMemoryError", "-Dfile.encoding=UTF-8", "-jar", "/app/erp-system-backend.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-XX:+UseContainerSupport", "-XX:+ExitOnOutOfMemoryError", "-Dfile.encoding=UTF-8", "-jar", "/app/app.jar"]
