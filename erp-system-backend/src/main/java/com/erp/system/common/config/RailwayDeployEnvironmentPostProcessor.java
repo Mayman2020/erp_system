@@ -32,13 +32,29 @@ public class RailwayDeployEnvironmentPostProcessor implements EnvironmentPostPro
     }
 
     private static boolean hasExternalJdbcConfiguration(ConfigurableEnvironment environment) {
-        if (StringUtils.hasText(environment.getProperty("DB_URL"))) {
+        String dbUrl = environment.getProperty("DB_URL");
+        if (StringUtils.hasText(dbUrl) && !containsUnresolvedRailwayPgPlaceholder(dbUrl)) {
             return true;
         }
-        if (StringUtils.hasText(environment.getProperty("SPRING_DATASOURCE_URL"))) {
+        String springDsUrl = environment.getProperty("SPRING_DATASOURCE_URL");
+        if (StringUtils.hasText(springDsUrl) && !containsUnresolvedRailwayPgPlaceholder(springDsUrl)) {
+            return true;
+        }
+        // Railway Postgres plugin provides concrete PG* values even when SPRING_DATASOURCE_URL is broken.
+        if (StringUtils.hasText(System.getenv("PGHOST"))
+                && StringUtils.hasText(System.getenv("PGPORT"))
+                && StringUtils.hasText(System.getenv("PGDATABASE"))) {
             return true;
         }
         String databaseUrl = environment.getProperty("DATABASE_URL");
         return StringUtils.hasText(databaseUrl) && databaseUrl.startsWith("postgres");
+    }
+
+    private static boolean containsUnresolvedRailwayPgPlaceholder(String value) {
+        return value.contains("${PGHOST")
+                || value.contains("${PGPORT")
+                || value.contains("${PGDATABASE")
+                || value.contains("${PGUSER")
+                || value.contains("${PGPASSWORD");
     }
 }
