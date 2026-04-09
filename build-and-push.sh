@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Build and push ERP backend + frontend images to Docker Hub.
+# Usage: ./build-and-push.sh
+# Requires: docker, docker login (once per machine)
+
+set -euo pipefail
+
+# --- Configuration (override via environment or edit here) ---
+readonly DOCKER_USER="${DOCKER_USER:-mayman2020}"
+readonly IMAGE_TAG="${IMAGE_TAG:-latest}"
+readonly NG_API_BASE_URL="${NG_API_BASE_URL:-http://93.127.141.227:10080/api/v1}"
+
+readonly BACKEND_IMAGE="${DOCKER_USER}/erp-backend:${IMAGE_TAG}"
+readonly FRONTEND_IMAGE="${DOCKER_USER}/erp-frontend:${IMAGE_TAG}"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="${SCRIPT_DIR}"
+
+log() { printf '\n[%s] %s\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" "$*"; }
+die() { echo "ERROR: $*" >&2; exit 1; }
+
+command -v docker >/dev/null 2>&1 || die "docker not found in PATH"
+
+cd "${REPO_ROOT}" || die "cannot cd to ${REPO_ROOT}"
+
+log "Repository root: ${REPO_ROOT}"
+log "IMAGE_TAG=${IMAGE_TAG}"
+log "NG_API_BASE_URL=${NG_API_BASE_URL}"
+log "Backend image:  ${BACKEND_IMAGE}"
+log "Frontend image: ${FRONTEND_IMAGE}"
+
+log "Building backend..."
+docker build \
+  -t "${BACKEND_IMAGE}" \
+  -f "${REPO_ROOT}/erp-system-backend/Dockerfile" \
+  "${REPO_ROOT}/erp-system-backend"
+
+log "Pushing backend..."
+docker push "${BACKEND_IMAGE}"
+
+log "Building frontend (baking API URL into the bundle)..."
+docker build \
+  --build-arg "NG_API_BASE_URL=${NG_API_BASE_URL}" \
+  -t "${FRONTEND_IMAGE}" \
+  -f "${REPO_ROOT}/erp-system-frontend/Dockerfile" \
+  "${REPO_ROOT}/erp-system-frontend"
+
+log "Pushing frontend..."
+docker push "${FRONTEND_IMAGE}"
+
+log "Done. Images pushed:"
+log "  ${BACKEND_IMAGE}"
+log "  ${FRONTEND_IMAGE}"

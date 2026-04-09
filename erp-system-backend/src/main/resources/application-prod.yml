@@ -40,10 +40,14 @@ spring:
     locations: classpath:db/migration
 
 # Require a strong JWT secret in production (set JWT_SECRET in the environment).
+# CORS: list every browser origin that calls this API (comma-separated). Set CORS_ALLOW_ALL=true only for debugging.
 app:
   security:
     jwt:
       secret: ${JWT_SECRET}
+  cors:
+    allow-all-origins: ${CORS_ALLOW_ALL:false}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://93.127.141.227:10026}
 
 logging:
   level:
