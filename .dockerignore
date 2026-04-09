@@ -1,5 +1,6 @@
-target/
-node_modules/
+**/target/
+**/node_modules/
+erp-system-frontend/
 *.log
 *.tmp
 *.swp
