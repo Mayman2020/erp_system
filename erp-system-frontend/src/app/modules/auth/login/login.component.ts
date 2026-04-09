@@ -28,6 +28,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   otpSent = false;
 
   private loginIntroPlayed = false;
+  private particlesInitialized = false;
+  private particlesAttempts = 0;
 
   readonly form = this.fb.group({
     email: [localStorage.getItem('erp_login_email') || '', [Validators.required, Validators.email]],
@@ -66,9 +68,16 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   }
 
   private initParticles(): void {
-    if (typeof particlesJS === 'undefined') {
+    if (this.particlesInitialized) {
       return;
     }
+    if (typeof particlesJS === 'undefined') {
+      if (this.particlesAttempts++ < 40) {
+        setTimeout(() => this.initParticles(), 250);
+      }
+      return;
+    }
+    this.particlesInitialized = true;
     particlesJS('particles-js', {
       particles: {
         number: { value: 80, density: { enable: true, value_area: 800 } },

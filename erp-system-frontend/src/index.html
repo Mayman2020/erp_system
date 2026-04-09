@@ -38,6 +38,7 @@
     })();
   </script>
   <app-root></app-root>
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- async: do not block first paint over slow VPN/CDN; login falls back if particlesJS is not ready yet -->
+  <script async src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </body>
 </html>

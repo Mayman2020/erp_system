@@ -6,8 +6,11 @@ import type { AppEnvironment } from './environment.types';
 
 export const environment: AppEnvironment = {
   production: false,
-  /** Local Spring Boot default (see server.port in application.yml). */
-  apiUrl: 'http://localhost:8080/api/v1',
+  /**
+   * Dev: relative URL so `ng serve` proxy (src/proxy.conf.json) forwards to Spring Boot on 8081.
+   * Production builds use the same path when the UI is served behind a reverse proxy with the API.
+   */
+  apiUrl: '/api/v1',
   /** Shown in shell footer (aligned with package.json for releases). */
   appVersion: '21.0.0'
 };

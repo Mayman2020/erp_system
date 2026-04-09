@@ -19,6 +19,7 @@ import {
 } from '../core/models/admin.models';
 import { TranslationService } from '../core/i18n/translation.service';
 import { AdminApiService } from '../core/services/admin-api.service';
+import { LookupService } from '../core/services/lookup.service';
 import { DataTableAction, DataTableColumn } from '../shared/components/data-table/data-table.component';
 
 type PrimaryRole = 'ADMIN' | 'ACCOUNTANT';
@@ -203,6 +204,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly adminApi: AdminApiService,
+    private readonly lookupService: LookupService,
     private readonly fb: FormBuilder,
     public readonly translationService: TranslationService,
     private readonly cdr: ChangeDetectorRef,
@@ -604,6 +606,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
       next: (type) => {
         this.lookupSuccessKey = this.lookupTypeDialogMode === 'create' ? 'ACCESS_MANAGEMENT.LOOKUP_TYPE_CREATE_SUCCESS' : 'ACCESS_MANAGEMENT.LOOKUP_TYPE_UPDATE_SUCCESS';
         this.lookupTypeDialogVisible = false;
+        this.lookupService.clear();
         this.refreshLookupTypes(type.id);
       },
       error: () => {
@@ -653,6 +656,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
       next: () => {
         this.lookupSuccessKey = this.lookupValueDialogMode === 'create' ? 'ACCESS_MANAGEMENT.LOOKUP_VALUE_CREATE_SUCCESS' : 'ACCESS_MANAGEMENT.LOOKUP_VALUE_UPDATE_SUCCESS';
         this.lookupValueDialogVisible = false;
+        this.lookupService.clear();
         if (this.selectedLookupType) { this.loadLookupValues(this.selectedLookupType.code); }
       },
       error: () => {
@@ -701,10 +705,12 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
         if (target.kind === 'lookupType') {
           this.lookupSuccessKey = 'ACCESS_MANAGEMENT.LOOKUP_TYPE_DELETE_SUCCESS';
           this.closeConfirmDialog();
+          this.lookupService.clear();
           this.refreshLookupTypes(null);
         } else if (target.kind === 'lookupValue') {
           this.lookupSuccessKey = 'ACCESS_MANAGEMENT.LOOKUP_VALUE_DELETE_SUCCESS';
           this.closeConfirmDialog();
+          this.lookupService.clear();
           if (this.selectedLookupType) { this.loadLookupValues(this.selectedLookupType.code); }
         } else if (target.kind === 'role') {
           this.accessSuccessKey = 'ACCESS_MANAGEMENT.ROLE_DELETE_SUCCESS';

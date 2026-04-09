@@ -1,50 +1,64 @@
-version: '3.9'
-# Local / demo stack: PostgreSQL + backend + Angular (nginx).
-# Start locally with:
-#   docker compose up --build
-# Frontend browser traffic is served on http://localhost and calls API at http://localhost:8080/api/v1.
+# Full stack: build images locally + run (Portainer or `docker compose up --build`).
+# VPS UI: http://<host>:10081  — API: http://<host>:10080/api/v1
+# Copy .env.example to .env and set secrets before production use.
+
+name: erp
+
 services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-erp}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-erp}
-      POSTGRES_DB: ${POSTGRES_DB:-erp}
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-erp_db}
     volumes:
       - erp_pgdata:/var/lib/postgresql/data
+    networks:
+      - erp-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-erp} -d ${POSTGRES_DB:-erp}"]
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 12
+    restart: unless-stopped
 
   backend:
     build:
       context: ./erp-system-backend
-      dockerfile: docker files/Dockerfile
+      dockerfile: Dockerfile
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
-      - "8082:8080"
+      - "10080:8080"
+    networks:
+      - erp-network
     environment:
       PORT: "8080"
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-erp}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-erp}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-erp}
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-random-secret}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-erp_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./erp-system-frontend
+      dockerfile: Dockerfile
       args:
-        NG_API_BASE_URL: http://localhost:8082/api/v1
+        NG_API_BASE_URL: ${NG_API_BASE_URL:-http://93.127.141.227:10080/api/v1}
     depends_on:
       - backend
     ports:
-      - "80:80"
+      - "10081:80"
+    networks:
+      - erp-network
+    restart: unless-stopped
+
+networks:
+  erp-network:
+    driver: bridge
 
 volumes:
   erp_pgdata:

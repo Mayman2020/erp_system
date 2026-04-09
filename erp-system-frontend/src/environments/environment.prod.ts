@@ -1,11 +1,12 @@
 /**
- * Production: set `apiUrl` to your Railway API root (full URL including /api/v1), or inject at build time
- * via NG_API_BASE_URL (see scripts/write-env.cjs — used on Vercel).
+ * Production default: same-origin or relative `/api/v1`.
+ * Docker / CI: `npm run build` runs `write-env.cjs` — set NG_API_BASE_URL to the public API root
+ * (e.g. http://93.127.141.227:10080/api/v1 when the UI and API are on different ports).
  */
 import type { AppEnvironment } from './environment.types';
 
 export const environment: AppEnvironment = {
   production: true,
-  apiUrl: 'REPLACE_WITH_RAILWAY_URL',
+  apiUrl: '/api/v1',
   appVersion: '21.0.0'
 };

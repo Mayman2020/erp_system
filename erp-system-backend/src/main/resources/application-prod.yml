@@ -1,6 +1,7 @@
-# Railway / production:
-# - Listen on all interfaces so PLATFORM PORT health probes can reach the app.
-# - Datasource: SPRING_DATASOURCE_* first; then DB_* / PG* / jdbc template (Railway bootstrap may set system properties).
+# Production / Docker / VPS:
+# - Listen on all interfaces (required in containers).
+# - Datasource: set SPRING_DATASOURCE_* (no secrets in repo — use env / secrets).
+# - Defaults match typical Compose service name `postgres` and DB name `erp_db` (override via env).
 server:
   address: 0.0.0.0
   port: ${PORT:8080}
@@ -9,8 +10,8 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/erp_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
@@ -37,3 +38,14 @@ spring:
     repair-on-migrate: true
     schemas: erp_system
     locations: classpath:db/migration
+
+# Require a strong JWT secret in production (set JWT_SECRET in the environment).
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+
+logging:
+  level:
+    root: INFO
+    com.erp.system: INFO

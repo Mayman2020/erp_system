@@ -13,6 +13,7 @@ yarn-error.log*
 # Environment files
 .env
 .env.*
+!.env.example
 
 # Frontend dependencies and build output
 erp-system-frontend/node_modules/

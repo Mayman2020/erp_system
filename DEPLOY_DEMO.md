@@ -10,7 +10,7 @@ Pull requests to `main` run a Docker build only (no registry push, no deploy).
 
 ## What was added
 
-- `docker-compose.yml` — local full stack: `docker compose up --build` (UI default `http://localhost:8080`, API `http://localhost:8091/api/v1`)
+- `docker-compose.yml` — full stack build + run: `docker compose up --build` (requires `.env` from `.env.example`; UI `http://localhost:10081`, API `http://localhost:10080/api/v1`)
 - `erp-system-frontend/Dockerfile`
 - `erp-system-frontend/nginx/default.conf`
 - `erp-system-frontend/.dockerignore`

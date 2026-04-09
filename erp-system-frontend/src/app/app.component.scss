@@ -2,3 +2,35 @@
   display: block;
   min-height: 100dvh;
 }
+
+.erp-route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 10000;
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, #1abc9c, #3498db);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.erp-route-progress--active {
+  opacity: 1;
+  animation: erp-route-indeterminate 1.1s ease-in-out infinite;
+}
+
+@keyframes erp-route-indeterminate {
+  0% {
+    transform: scaleX(0.15) translateX(-5%);
+  }
+  50% {
+    transform: scaleX(0.55) translateX(40%);
+  }
+  100% {
+    transform: scaleX(0.2) translateX(120%);
+  }
+}

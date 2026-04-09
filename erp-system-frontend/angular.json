@@ -85,7 +85,10 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "erp-system-frontend:build"
+            "buildTarget": "erp-system-frontend:build",
+            "proxyConfig": "src/proxy.conf.json",
+            "host": "0.0.0.0",
+            "port": 4200
           },
           "configurations": {
             "production": {

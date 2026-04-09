@@ -11,6 +11,7 @@ import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.common.repository.LookupTypeRepository;
 import com.erp.system.common.repository.LookupValueRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class AdminLookupService {
                 .toList();
     }
 
+    @CacheEvict(cacheNames = "lookups", allEntries = true)
     @Transactional
     public AdminLookupTypeDto createLookupType(AdminLookupTypeFormDto request) {
         String code = normalizeCode(request.getCode());
@@ -55,6 +57,7 @@ public class AdminLookupService {
         return toTypeDto(lookupTypeRepository.save(type));
     }
 
+    @CacheEvict(cacheNames = "lookups", allEntries = true)
     @Transactional
     public AdminLookupTypeDto updateLookupType(Long typeId, AdminLookupTypeFormDto request) {
         LookupType type = lookupTypeRepository.findById(typeId)
@@ -82,6 +85,7 @@ public class AdminLookupService {
         return toTypeDto(saved);
     }
 
+    @CacheEvict(cacheNames = "lookups", allEntries = true)
     @Transactional
     public void deleteLookupType(Long typeId) {
         LookupType type = lookupTypeRepository.findById(typeId)
@@ -93,6 +97,7 @@ public class AdminLookupService {
         lookupTypeRepository.delete(type);
     }
 
+    @CacheEvict(cacheNames = "lookups", allEntries = true)
     @Transactional
     public AdminLookupValueDto createLookupValue(AdminLookupValueFormDto request) {
         String typeCode = normalizeTypeCode(request.getTypeCode());
@@ -113,6 +118,7 @@ public class AdminLookupService {
         return toValueDto(lookupValueRepository.save(value));
     }
 
+    @CacheEvict(cacheNames = "lookups", allEntries = true)
     @Transactional
     public AdminLookupValueDto updateLookupValue(Long valueId, AdminLookupValueFormDto request) {
         LookupValue value = lookupValueRepository.findById(valueId)
@@ -134,6 +140,7 @@ public class AdminLookupService {
         return toValueDto(lookupValueRepository.save(value));
     }
 
+    @CacheEvict(cacheNames = "lookups", allEntries = true)
     @Transactional
     public void deleteLookupValue(Long valueId) {
         LookupValue value = lookupValueRepository.findById(valueId)

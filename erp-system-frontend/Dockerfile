@@ -6,7 +6,8 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-ARG NG_API_BASE_URL=http://localhost:8080/api/v1
+# Browser-visible API root (must include /api/v1). VPS: backend published on host port 10080.
+ARG NG_API_BASE_URL=http://93.127.141.227:10080/api/v1
 ENV NG_API_BASE_URL=${NG_API_BASE_URL}
 ENV CI=true
 RUN npm run build

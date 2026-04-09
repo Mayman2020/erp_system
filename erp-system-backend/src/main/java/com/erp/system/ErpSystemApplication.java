@@ -3,8 +3,10 @@ package com.erp.system;
 import com.erp.system.common.config.RailwayDatasourceBootstrap;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
+@EnableCaching
 public class ErpSystemApplication {
 
     public static void main(String[] args) {

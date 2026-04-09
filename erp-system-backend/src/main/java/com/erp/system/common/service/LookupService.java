@@ -3,6 +3,7 @@ package com.erp.system.common.service;
 import com.erp.system.common.dto.LookupItemDto;
 import com.erp.system.common.repository.LookupValueRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,6 +56,12 @@ public class LookupService {
 
     private final LookupValueRepository lookupValueRepository;
 
+    /** Canonical key for {@link Cacheable} (aliases share one cache entry). */
+    public String cacheKeyForType(String type) {
+        return canonicalType(type);
+    }
+
+    @Cacheable(cacheNames = "lookups", key = "#root.target.cacheKeyForType(#type)")
     public List<LookupItemDto> getLookups(String type) {
         String canonicalType = canonicalType(type);
         return lookupValueRepository

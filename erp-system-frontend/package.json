@@ -9,6 +9,8 @@
     "build:prod:ng": "ng build --configuration production",
     "build:production": "npm run build:prod:ng",
     "build:production:ci": "node scripts/write-env.cjs && ng build --configuration production --verbose",
+    "build:static": "node scripts/write-env.cjs && ng build --configuration production",
+    "serve:static": "serve -s dist/erp-system-frontend/browser -l 4200",
     "test": "ng test"
   },
   "engines": {
@@ -53,6 +55,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "sass": "^1.93.2",
+    "serve": "^14.2.6",
     "typescript": "~5.9.3"
   }
 }

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Docker Hub (defaults in docker-compose.prod.yml): e.g.
+#   export BACKEND_IMAGE=mayman2020/erp-backend:latest FRONTEND_IMAGE=mayman2020/erp-frontend:latest
+#   echo "$DOCKERHUB_TOKEN" | docker login -u mayman2020 --password-stdin
+
 : "${BACKEND_IMAGE:?Set BACKEND_IMAGE=ghcr.io/OWNER/erp-system-backend:latest}"
 : "${FRONTEND_IMAGE:?Set FRONTEND_IMAGE=ghcr.io/OWNER/erp-system-frontend:latest}"
 : "${SPRING_DATASOURCE_URL:?}"

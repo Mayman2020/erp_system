@@ -1,6 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { ThemeService } from './core/services/theme.service';
 import { CommandPaletteService } from './core/services/command-palette.service';
 
@@ -10,6 +9,8 @@ import { CommandPaletteService } from './core/services/command-palette.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  /** Thin top bar during lazy route loads (complements full-screen spinner). */
+  routeNavigating = false;
 
   constructor(
     private router: Router,
@@ -20,15 +21,20 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.themeService.init();
     this.syncAuthViewportLock(this.router.url);
-    this.router.events
-      .pipe(filter((evt): evt is NavigationEnd => evt instanceof NavigationEnd))
-      .subscribe((evt) => {
-        const url = evt.urlAfterRedirects || evt.url || '';
+    this.router.events.subscribe((evt) => {
+      if (evt instanceof NavigationStart) {
+        this.routeNavigating = true;
+        return;
+      }
+      if (evt instanceof NavigationEnd || evt instanceof NavigationCancel || evt instanceof NavigationError) {
+        this.routeNavigating = false;
+        const url = evt instanceof NavigationEnd ? evt.urlAfterRedirects || evt.url || '' : this.router.url || '';
         this.syncAuthViewportLock(url);
-        if (!this.isAuthRouteUrl(url)) {
+        if (evt instanceof NavigationEnd && !this.isAuthRouteUrl(url)) {
           window.scrollTo(0, 0);
         }
-      });
+      }
+    });
   }
 
   /** `/auth/...` uses a fixed viewport; skip window scroll to avoid scrollbar flicker. */

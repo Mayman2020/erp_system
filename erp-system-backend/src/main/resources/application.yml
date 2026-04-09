@@ -3,6 +3,16 @@ spring:
     name: erp-system-backend
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+  datasource:
+    hikari:
+      maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:10}
+      minimum-idle: ${HIKARI_MIN_IDLE:2}
+      connection-timeout: 30000
+  cache:
+    type: caffeine
+    cache-names: lookups
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=10m
 
 # Actuator: full JSON at /api/v1/actuator/health (servlet context-path applies).
 # Root /health and /actuator/health are also served by Tomcat (see RootHealthEngineValve) for probes.
@@ -22,6 +32,13 @@ server:
   forward-headers-strategy: framework
   servlet:
     context-path: /api/v1
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain,text/css,application/javascript
+    min-response-size: 1024
+  tomcat:
+    keep-alive-timeout: 60s
+    max-keep-alive-requests: 100
 
 app:
   cors:
