@@ -21,6 +21,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+/**
+ * CORS is configured in {@link com.erp.system.common.config.WebConfig} ({@link CorsConfigurationSource} bean).
+ * Do not declare a second CorsConfigurationSource here — Spring would fail with non-unique bean or ignore one.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
