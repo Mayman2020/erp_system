@@ -102,6 +102,31 @@ jobs:
             ${{ steps.img.outputs.frontend }}:latest
             ${{ steps.img.outputs.frontend }}:${{ github.sha }}
 
+      - name: Login to Docker Hub (optional)
+        if: ${{ secrets.DOCKERHUB_TOKEN != '' && secrets.DOCKERHUB_USERNAME != '' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Mirror GHCR images to Docker Hub (optional)
+        if: ${{ secrets.DOCKERHUB_TOKEN != '' && secrets.DOCKERHUB_USERNAME != '' }}
+        run: |
+          set -euo pipefail
+          repo_lc=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          dh_user='${{ secrets.DOCKERHUB_USERNAME }}'
+          sha='${{ github.sha }}'
+          backend_src='${{ steps.img.outputs.backend }}'
+          frontend_src='${{ steps.img.outputs.frontend }}'
+          docker buildx imagetools create \
+            -t "docker.io/${dh_user}/${repo_lc}-backend:latest" \
+            -t "docker.io/${dh_user}/${repo_lc}-backend:${sha}" \
+            "${backend_src}:latest"
+          docker buildx imagetools create \
+            -t "docker.io/${dh_user}/${repo_lc}-frontend:latest" \
+            -t "docker.io/${dh_user}/${repo_lc}-frontend:${sha}" \
+            "${frontend_src}:latest"
+
   deploy-railway-hook:
     name: Optional Railway deploy hook
     needs: [container-images]

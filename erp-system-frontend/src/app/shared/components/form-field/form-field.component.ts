@@ -52,6 +52,8 @@ import { TranslationService } from '../../../core/i18n/translation.service';
               class="erp-input erp-input--date"
               [id]="inputId"
               type="date"
+              dir="ltr"
+              lang="en"
               [formControl]="control!"
               [readonly]="readonly"
             />

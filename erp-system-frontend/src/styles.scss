@@ -725,6 +725,11 @@ body.rtl .erp-form-field__date-button {
 
 /* Strip browser default calendar glyph on native date fields (mat-icon is the only indicator) */
 input[type='date'].erp-input {
+  /* Document is ar/rtl: without isolation, the browser's format hint (e.g. mm/dd/yyyy) is reordered by bidi and looks like garbage/Persian-like shapes on some Chrome/OS combos. */
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+
   &::-webkit-calendar-picker-indicator {
     display: none;
     -webkit-appearance: none;
