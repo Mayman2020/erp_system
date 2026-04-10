@@ -148,18 +148,134 @@
 }
 
 @media (max-width: 767px) {
+  .erp-shell-footer {
+    border-top-left-radius: clamp(16px, 5vw, 40px);
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.1);
+  }
+
   .erp-shell-footer__grid {
     flex-direction: column;
     align-items: stretch;
+    padding: 12px 12px;
+    gap: 12px 14px;
+  }
+
+  .erp-shell-footer__heading {
+    font-size: 0.72rem;
+    margin: 0 0 2px;
+  }
+
+  .erp-shell-footer__underline {
+    width: 48px;
+    height: 2px;
+    margin: 2px 0 8px;
+  }
+
+  .erp-shell-footer__blurb,
+  .erp-shell-footer__office {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    max-width: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .erp-shell-footer__list li {
+    margin: 4px 0;
   }
 
   .erp-shell-footer__meta {
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 8px;
+    padding: 0 10px 10px;
+    font-size: 0.72rem;
   }
 
   .erp-shell-footer__sep {
+    display: inline;
+  }
+
+  /* Auth: keep meta one band; avoid tall stacked copyright rows */
+  :host(.erp-shell-footer--compact) .erp-shell-footer__meta {
+    padding: 4px 10px 8px;
+    font-size: 0.68rem;
+  }
+}
+
+/* Phones: shorter footer everywhere; auth uses 2-column band under blurb */
+@media (max-width: 480px) {
+  .erp-shell-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 10px;
+    padding: 10px 10px;
+    align-items: start;
+  }
+
+  .erp-shell-footer__col:nth-child(1) {
+    grid-column: 1 / -1;
+  }
+
+  .erp-shell-footer__col:nth-child(2),
+  .erp-shell-footer__col:nth-child(3) {
+    min-width: 0;
+  }
+
+  .erp-shell-footer__meta {
+    padding: 0 8px 8px;
+    font-size: 0.68rem;
+    gap: 2px 6px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__underline {
     display: none;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__grid {
+    padding: 8px 10px;
+    gap: 6px 10px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__heading {
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    margin: 0 0 2px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__blurb,
+  :host(.erp-shell-footer--compact) .erp-shell-footer__office {
+    font-size: 0.72rem;
+    line-height: 1.3;
+    -webkit-line-clamp: 2;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__link {
+    font-size: 0.75rem;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__icons {
+    margin-top: 4px;
+    gap: 6px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip {
+    width: 30px;
+    height: 30px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip mat-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__meta {
+    padding: 3px 8px 6px;
+    font-size: 0.62rem;
   }
 }
 
