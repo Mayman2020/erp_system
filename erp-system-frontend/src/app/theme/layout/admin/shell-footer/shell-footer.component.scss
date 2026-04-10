@@ -149,32 +149,33 @@
 
 @media (max-width: 767px) {
   .erp-shell-footer {
-    border-top-left-radius: clamp(16px, 5vw, 40px);
-    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.1);
+    border-top-left-radius: clamp(12px, 4vw, 32px);
+    box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.09);
   }
 
   .erp-shell-footer__grid {
     flex-direction: column;
     align-items: stretch;
-    padding: 12px 12px;
-    gap: 12px 14px;
+    padding: 8px 10px;
+    gap: 8px 10px;
   }
 
   .erp-shell-footer__heading {
-    font-size: 0.72rem;
-    margin: 0 0 2px;
+    font-size: 0.68rem;
+    margin: 0 0 1px;
+    letter-spacing: 0.06em;
   }
 
   .erp-shell-footer__underline {
-    width: 48px;
+    width: 40px;
     height: 2px;
-    margin: 2px 0 8px;
+    margin: 1px 0 6px;
   }
 
   .erp-shell-footer__blurb,
   .erp-shell-footer__office {
-    font-size: 0.8rem;
-    line-height: 1.4;
+    font-size: 0.76rem;
+    line-height: 1.32;
     max-width: none;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -183,16 +184,43 @@
   }
 
   .erp-shell-footer__list li {
-    margin: 4px 0;
+    margin: 2px 0;
+  }
+
+  .erp-shell-footer__link {
+    font-size: 0.8rem;
+    gap: 6px;
+  }
+
+  .erp-shell-footer__link mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .erp-shell-footer__icons {
+    margin-top: 6px;
+    gap: 6px;
+  }
+
+  .erp-shell-footer__icon-chip {
+    width: 34px;
+    height: 34px;
+  }
+
+  .erp-shell-footer__icon-chip mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
   }
 
   .erp-shell-footer__meta {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 4px 8px;
-    padding: 0 10px 10px;
-    font-size: 0.72rem;
+    gap: 3px 6px;
+    padding: 0 8px 6px;
+    font-size: 0.68rem;
   }
 
   .erp-shell-footer__sep {
@@ -201,18 +229,23 @@
 
   /* Auth: keep meta one band; avoid tall stacked copyright rows */
   :host(.erp-shell-footer--compact) .erp-shell-footer__meta {
-    padding: 4px 10px 8px;
-    font-size: 0.68rem;
+    padding: 2px 8px 6px;
+    font-size: 0.64rem;
   }
 }
 
 /* Phones: shorter footer everywhere; auth uses 2-column band under blurb */
 @media (max-width: 480px) {
+  /* Decorative bars cost vertical space on small screens; keep headings only */
+  .erp-shell-footer__underline {
+    display: none;
+  }
+
   .erp-shell-footer__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px 10px;
-    padding: 10px 10px;
+    gap: 6px 8px;
+    padding: 6px 8px;
     align-items: start;
   }
 
@@ -225,69 +258,154 @@
     min-width: 0;
   }
 
-  .erp-shell-footer__meta {
-    padding: 0 8px 8px;
-    font-size: 0.68rem;
-    gap: 2px 6px;
+  .erp-shell-footer__heading {
+    font-size: 0.62rem;
+    margin: 0;
   }
 
-  :host(.erp-shell-footer--compact) .erp-shell-footer__underline {
-    display: none;
-  }
-
-  :host(.erp-shell-footer--compact) .erp-shell-footer__grid {
-    padding: 8px 10px;
-    gap: 6px 10px;
-  }
-
-  :host(.erp-shell-footer--compact) .erp-shell-footer__heading {
-    font-size: 0.65rem;
-    letter-spacing: 0.06em;
-    margin: 0 0 2px;
-  }
-
-  :host(.erp-shell-footer--compact) .erp-shell-footer__blurb,
-  :host(.erp-shell-footer--compact) .erp-shell-footer__office {
+  .erp-shell-footer__blurb,
+  .erp-shell-footer__office {
     font-size: 0.72rem;
-    line-height: 1.3;
+    line-height: 1.28;
     -webkit-line-clamp: 2;
   }
 
-  :host(.erp-shell-footer--compact) .erp-shell-footer__link {
-    font-size: 0.75rem;
+  .erp-shell-footer__meta {
+    padding: 0 6px 5px;
+    font-size: 0.62rem;
+    gap: 2px 5px;
   }
 
-  :host(.erp-shell-footer--compact) .erp-shell-footer__icons {
+  .erp-shell-footer__icons {
     margin-top: 4px;
-    gap: 6px;
+    gap: 5px;
   }
 
-  :host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip {
+  .erp-shell-footer__icon-chip {
     width: 30px;
     height: 30px;
   }
 
+  .erp-shell-footer__icon-chip mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__grid {
+    padding: 5px 8px;
+    gap: 5px 8px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__heading {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__blurb,
+  :host(.erp-shell-footer--compact) .erp-shell-footer__office {
+    font-size: 0.68rem;
+    line-height: 1.22;
+    -webkit-line-clamp: 2;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__link {
+    font-size: 0.7rem;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__icons {
+    margin-top: 3px;
+    gap: 5px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip {
+    width: 28px;
+    height: 28px;
+  }
+
   :host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip mat-icon {
-    font-size: 17px;
-    width: 17px;
-    height: 17px;
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
   }
 
   :host(.erp-shell-footer--compact) .erp-shell-footer__meta {
-    padding: 3px 8px 6px;
+    padding: 2px 6px 4px;
+    font-size: 0.58rem;
+  }
+}
+
+/* Very narrow phones (login + in-app): minimal footer height */
+@media (max-width: 380px) {
+  .erp-shell-footer {
+    border-top-left-radius: 10px;
+    box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .erp-shell-footer__grid {
+    padding: 4px 6px;
+    gap: 4px 6px;
+  }
+
+  .erp-shell-footer__heading {
+    font-size: 0.58rem;
+  }
+
+  .erp-shell-footer__blurb,
+  .erp-shell-footer__office {
+    font-size: 0.66rem;
+    line-height: 1.2;
+    -webkit-line-clamp: 2;
+  }
+
+  .erp-shell-footer__meta {
+    padding: 0 4px 4px;
+    font-size: 0.56rem;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__grid {
+    padding: 4px 6px;
+    gap: 4px 6px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__blurb,
+  :host(.erp-shell-footer--compact) .erp-shell-footer__office {
     font-size: 0.62rem;
+    -webkit-line-clamp: 1;
+    line-height: 1.25;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__link {
+    font-size: 0.65rem;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip {
+    width: 26px;
+    height: 26px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__icon-chip mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  :host(.erp-shell-footer--compact) .erp-shell-footer__meta {
+    padding: 1px 4px 3px;
+    font-size: 0.54rem;
   }
 }
 
 /* —— Auth / login: shorter footer (~90% zoom feel) but readable —— */
 :host(.erp-shell-footer--compact) .erp-shell-footer {
-  border-top-left-radius: clamp(18px, 4.5vw, 44px);
-  box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.11);
+  border-top-left-radius: clamp(14px, 3.5vw, 40px);
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.1);
 }
 
 :host(.erp-shell-footer--compact) .erp-shell-footer__grid {
-  padding: 10px clamp(14px, 3.2vw, 28px);
-  gap: 8px 16px;
+  padding: 8px clamp(12px, 2.8vw, 24px);
+  gap: 6px 14px;
   align-items: flex-start;
 }
 
@@ -315,7 +433,7 @@
   max-width: 260px;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
