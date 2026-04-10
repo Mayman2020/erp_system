@@ -55,7 +55,7 @@ jobs:
       - name: Production build
         env:
           CI: "true"
-          NG_API_BASE_URL: ${{ secrets.NG_API_BASE_URL || 'http://localhost:8080/api/v1' }}
+          NG_API_BASE_URL: ${{ secrets.NG_API_BASE_URL || '/api/v1' }}
         run: npm run build
 
   container-images:
@@ -97,7 +97,7 @@ jobs:
           context: ./erp-system-frontend
           push: true
           build-args: |
-            NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL || 'http://localhost:8080/api/v1' }}
+            NG_API_BASE_URL=${{ secrets.NG_API_BASE_URL || '/api/v1' }}
           tags: |
             ${{ steps.img.outputs.frontend }}:latest
             ${{ steps.img.outputs.frontend }}:${{ github.sha }}

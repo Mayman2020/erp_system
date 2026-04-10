@@ -1,5 +1,7 @@
 # Production on VPS: pull pre-built images from Docker Hub (no local build).
 # Requires: .env with secrets + BACKEND_IMAGE / FRONTEND_IMAGE (defaults to mayman2020/*).
+# UI image should use same-origin API (/api/v1) with nginx → backend (see erp-system-frontend/nginx/default.conf).
+# NAT panels map public ports to inner 10081 (UI) and 10080 (API); with the proxy, browsers only need the UI mapping.
 # From repo root:
 #   docker compose -f ops/docker/docker-compose.prod.yml pull && docker compose -f ops/docker/docker-compose.prod.yml up -d
 

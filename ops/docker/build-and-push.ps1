@@ -15,7 +15,7 @@ Set-StrictMode -Version Latest
 
 $DockerUser = if ($env:DOCKER_USER) { $env:DOCKER_USER } else { 'mayman2020' }
 $ImageTag = if ($env:IMAGE_TAG) { $env:IMAGE_TAG } else { 'latest' }
-$NgApiBaseUrl = if ($env:NG_API_BASE_URL) { $env:NG_API_BASE_URL } else { 'http://93.127.141.227:10080/api/v1' }
+$NgApiBaseUrl = if ($env:NG_API_BASE_URL) { $env:NG_API_BASE_URL } else { '/api/v1' }
 
 $BackendImage = "${DockerUser}/erp-backend:${ImageTag}"
 $FrontendImage = "${DockerUser}/erp-frontend:${ImageTag}"

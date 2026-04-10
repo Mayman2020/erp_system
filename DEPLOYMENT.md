@@ -137,5 +137,5 @@ See `infra/aws/ecs-task-definition.sample.json` as a starting point for Fargate.
 ## Troubleshooting
 
 - **Healthcheck “service unavailable”**: nothing listening on `PORT` — check container logs, JAR path, and JVM exit codes.
-- **Frontend calls wrong API**: rebuild the frontend image with the correct `NG_API_BASE_URL` build-arg.
+- **Frontend calls wrong API**: prefer same-origin `/api/v1` (nginx in the frontend image proxies to `backend:8080`). If you bake an absolute `NG_API_BASE_URL`, it must use the **public** host:port your users reach (not the VPS inner port). Many NAT panels map public `10027` → inner `10080`, so `http://PUBLIC_IP:10080` from a browser is wrong unless that port is published publicly.
 - **Database connection timeouts**: Hikari `initialization-fail-timeout` is extended in `application-prod.yml`; verify JDBC URL and network from the container.

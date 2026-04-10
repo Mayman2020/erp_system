@@ -6,7 +6,7 @@ set -euo pipefail
 
 readonly DOCKER_USER="${DOCKER_USER:-mayman2020}"
 readonly IMAGE_TAG="${IMAGE_TAG:-latest}"
-readonly NG_API_BASE_URL="${NG_API_BASE_URL:-http://93.127.141.227:10080/api/v1}"
+readonly NG_API_BASE_URL="${NG_API_BASE_URL:-/api/v1}"
 
 readonly BACKEND_IMAGE="${DOCKER_USER}/erp-backend:${IMAGE_TAG}"
 readonly FRONTEND_IMAGE="${DOCKER_USER}/erp-frontend:${IMAGE_TAG}"

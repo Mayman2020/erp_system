@@ -1,7 +1,7 @@
 # Full stack: build images locally + run (Portainer or `docker compose up --build`).
 # Run from repo root: `docker compose -f ops/docker/docker-compose.yml up --build`
 # Or from this directory: `docker compose up --build`
-# VPS UI: http://<host>:10081  — API: http://<host>:10080/api/v1
+# VPS UI: http://<host>:10081 — API is proxied at same origin /api/v1 (optional direct API: :10080)
 # Env: copy ops/environment/.env.example → ops/environment/.env (or repo-root .env)
 
 name: erp
@@ -51,7 +51,7 @@ services:
       context: ../../erp-system-frontend
       dockerfile: Dockerfile
       args:
-        NG_API_BASE_URL: ${NG_API_BASE_URL:-http://93.127.141.227:10080/api/v1}
+        NG_API_BASE_URL: ${NG_API_BASE_URL:-/api/v1}
     depends_on:
       - backend
     ports:
