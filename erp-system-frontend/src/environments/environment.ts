@@ -7,7 +7,7 @@ import type { AppEnvironment } from './environment.types';
 export const environment: AppEnvironment = {
   production: false,
   /**
-   * Dev: relative URL so `ng serve` proxy (src/proxy.conf.json) forwards to Spring Boot on 8081.
+   * Dev: relative URL so `ng serve` proxy (ops/frontend-run/proxy.conf.json) forwards to Spring Boot on 8081.
    * Production builds use the same path when the UI is served behind a reverse proxy with the API.
    */
   apiUrl: '/api/v1',

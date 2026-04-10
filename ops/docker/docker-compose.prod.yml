@@ -1,0 +1,61 @@
+# Production on VPS: pull pre-built images from Docker Hub (no local build).
+# Requires: .env with secrets + BACKEND_IMAGE / FRONTEND_IMAGE (defaults to mayman2020/*).
+# From repo root:
+#   docker compose -f ops/docker/docker-compose.prod.yml pull && docker compose -f ops/docker/docker-compose.prod.yml up -d
+
+name: erp
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-erp_db}
+    volumes:
+      - erp_pgdata:/var/lib/postgresql/data
+    networks:
+      - erp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  backend:
+    image: ${BACKEND_IMAGE:-mayman2020/erp-backend:latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "10080:8080"
+    networks:
+      - erp-network
+    environment:
+      PORT: "8080"
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-erp_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
+      CORS_ALLOW_ALL: ${CORS_ALLOW_ALL:-true}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://93.127.141.227:10026,http://93.127.141.227:10081}
+    restart: unless-stopped
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-mayman2020/erp-frontend:latest}
+    depends_on:
+      - backend
+    ports:
+      - "10081:80"
+    networks:
+      - erp-network
+    restart: unless-stopped
+
+networks:
+  erp-network:
+    driver: bridge
+
+volumes:
+  erp_pgdata:

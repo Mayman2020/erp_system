@@ -10,11 +10,11 @@ Pull requests to `main` run a Docker build only (no registry push, no deploy).
 
 ## What was added
 
-- `docker-compose.yml` — full stack build + run: `docker compose up --build` (requires `.env` from `.env.example`; UI `http://localhost:10081`, API `http://localhost:10080/api/v1`)
+- `ops/docker/docker-compose.yml` — full stack (root `docker-compose.yml` includes it); env from `ops/environment/.env` or repo-root `.env`; UI `http://localhost:10081`, API `http://localhost:10080/api/v1`
 - `erp-system-frontend/Dockerfile`
 - `erp-system-frontend/nginx/default.conf`
 - `erp-system-frontend/.dockerignore`
-- `docker-compose.prod.yml`
+- `ops/docker/docker-compose.prod.yml` (root `docker-compose.prod.yml` includes it)
 - `.github/workflows/ci-cd.yml`
 
 ## GHCR image names
@@ -62,7 +62,7 @@ Optional (recommended once DNS/firewall are stable):
 
 1. Push to `main`
 2. Workflow builds backend/frontend images and pushes to GHCR (`latest` + SHA tags)
-3. `docker-compose.prod.yml` is copied to the server
+3. `ops/docker/docker-compose.prod.yml` (or full repo with root `docker-compose.prod.yml` include) on the server
 4. Server logs in to GHCR, pulls images, runs `docker compose up -d`
 5. Workflow waits for backend `http://127.0.0.1:8091/api/v1/health` and frontend on port `80` on the server
 6. If optional public URL secrets are set, the runner curls those endpoints as an extra check

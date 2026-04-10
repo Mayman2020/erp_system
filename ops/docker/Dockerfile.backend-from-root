@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
-# Optional: build backend from repo root (same artifact as erp-system-backend/Dockerfile).
-# docker build -f Dockerfile -t mayman2020/erp-backend:latest .
+# Build backend JAR using repo-root context (same artifact as erp-system-backend/Dockerfile).
+# From repository root:
+#   docker build -f ops/docker/Dockerfile.backend-from-root -t mayman2020/erp-backend:latest .
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY erp-system-backend/pom.xml ./
