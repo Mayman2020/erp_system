@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build and push ERP backend + frontend images to Docker Hub.
 # Usage: ./build-and-push.sh
-# Requires: docker, docker login (once per machine)
+# Requires: docker. Login: run `docker login` once, or set DOCKERHUB_TOKEN (PAT) for non-interactive login.
 
 set -euo pipefail
 
@@ -22,6 +22,14 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 command -v docker >/dev/null 2>&1 || die "docker not found in PATH"
 
 cd "${REPO_ROOT}" || die "cannot cd to ${REPO_ROOT}"
+
+if [[ -n "${DOCKERHUB_TOKEN:-}" ]]; then
+  log "Logging in to Docker Hub as ${DOCKER_USER} (DOCKERHUB_TOKEN)..."
+  printf '%s' "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKER_USER}" --password-stdin
+elif [[ -n "${DOCKER_PASSWORD:-}" ]]; then
+  log "Logging in to Docker Hub as ${DOCKER_USER} (DOCKER_PASSWORD)..."
+  printf '%s' "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USER}" --password-stdin
+fi
 
 log "Repository root: ${REPO_ROOT}"
 log "IMAGE_TAG=${IMAGE_TAG}"

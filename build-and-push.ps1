@@ -8,6 +8,10 @@
 
 .EXAMPLE
   $env:IMAGE_TAG = "v1.0.0"; $env:NG_API_BASE_URL = "https://api.example.com/api/v1"; .\build-and-push.ps1
+
+.EXAMPLE
+  # Non-interactive Hub login (PAT from https://hub.docker.com/settings/security )
+  $env:DOCKERHUB_TOKEN = "dckr_pat_..."; .\build-and-push.ps1
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -33,6 +37,16 @@ function Write-Step {
 
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     throw "docker not found in PATH. Install Docker Desktop and ensure docker is available."
+}
+
+if ($env:DOCKERHUB_TOKEN) {
+    Write-Step "Logging in to Docker Hub as $DockerUser (DOCKERHUB_TOKEN)..."
+    $env:DOCKERHUB_TOKEN | & docker login -u $DockerUser --password-stdin
+    if ($LASTEXITCODE -ne 0) { throw "docker login failed with exit code $LASTEXITCODE" }
+} elseif ($env:DOCKER_PASSWORD) {
+    Write-Step "Logging in to Docker Hub as $DockerUser (DOCKER_PASSWORD)..."
+    $env:DOCKER_PASSWORD | & docker login -u $DockerUser --password-stdin
+    if ($LASTEXITCODE -ne 0) { throw "docker login failed with exit code $LASTEXITCODE" }
 }
 
 Write-Step "Repository root: $RepoRoot"
