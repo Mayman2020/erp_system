@@ -60,6 +60,8 @@ public class SecurityConfig {
                         .requestMatchers("/ui/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/accounting/**").hasAnyRole("ADMIN", "ACCOUNTANT")
+                        .requestMatchers("/inventory/**", "/sales/**", "/purchases/**", "/hr/**", "/crm/**", "/projects/**", "/erp/**")
+                            .hasAnyRole("ADMIN", "ACCOUNTANT")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

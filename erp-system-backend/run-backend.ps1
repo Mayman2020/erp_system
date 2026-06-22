@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Production-ready startup script that:
-    - Automatically stops any existing Java process on port 8091 (restart behavior)
+    - Automatically stops any existing Java process on the configured server port (restart behavior)
     - Configures Java/Maven environment
     - Runs Maven clean install
     - Starts Spring Boot with configurable profile
@@ -28,10 +28,18 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$DefaultPort = 8091
 $ExpectedProcess = "java"
 $ContextPath = "/api/v1"
-$BaseUrl = "http://localhost:$DefaultPort$ContextPath"
+
+# Must match application.yml / application-dev.yml server.port defaults
+function Get-BackendPort {
+    param([string]$ProfileName)
+    if ($env:PORT -and $env:PORT.Trim() -ne "") {
+        return [int]$env:PORT
+    }
+    if ($ProfileName -eq 'dev') { return 8081 }
+    return 8080
+}
 
 # ─── Script Root ─────────────────────────────────────────────────────────────
 $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
@@ -165,9 +173,11 @@ try {
     }
 } catch { }
 
-# ─── RESTART: Stop old backend on port 8091 ──────────────────────────────────
-Write-Step "Checking port $DefaultPort..." "Cyan"
-if (-not (Stop-ProcessOnPort -Port $DefaultPort -ExpectedName $ExpectedProcess)) {
+# ─── RESTART: Stop old backend on configured port ────────────────────────────
+$ServerPort = Get-BackendPort -ProfileName $Profile
+$BaseUrl = "http://localhost:$ServerPort$ContextPath"
+Write-Step "Checking port $ServerPort..." "Cyan"
+if (-not (Stop-ProcessOnPort -Port $ServerPort -ExpectedName $ExpectedProcess)) {
     exit 1
 }
 
@@ -208,7 +218,7 @@ if ($exitCode -eq 0) {
     Write-Success "Backend stopped normally."
 } else {
     Write-Err "Backend exited with failure (exit code $exitCode)."
-    Write-Info "Common causes: database not found (create erp_system, or erp_system_dev for -Profile dev), PostgreSQL not running, port in use."
+    Write-Info "Common causes: database not found (create erp_system, or erp_system_dev for -Profile dev), PostgreSQL not running, port $ServerPort in use."
     Write-Info "  Fix: Run 'psql -U postgres -c ""CREATE DATABASE $DbName""' then try again."
 }
 exit $exitCode

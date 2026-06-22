@@ -1,0 +1,68 @@
+package com.erp.system.sales.controller;
+
+import com.erp.system.common.dto.ApiResponse;
+import com.erp.system.common.enums.TransactionStatus;
+import com.erp.system.sales.dto.display.SalesInvoiceDisplayDto;
+import com.erp.system.sales.dto.form.SalesInvoiceFormDto;
+import com.erp.system.sales.service.SalesInvoiceService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping("/sales/invoices")
+@RequiredArgsConstructor
+public class SalesInvoiceController {
+
+    private final SalesInvoiceService invoiceService;
+
+    @GetMapping
+    public ApiResponse<List<SalesInvoiceDisplayDto>> getInvoices(
+            @RequestParam(required = false) TransactionStatus status,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+        return ApiResponse.success(invoiceService.getInvoices(status, search, fromDate, toDate));
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<SalesInvoiceDisplayDto> getInvoice(@PathVariable Long id) {
+        return ApiResponse.success(invoiceService.getInvoice(id));
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<SalesInvoiceDisplayDto> createInvoice(@Valid @RequestBody SalesInvoiceFormDto request) {
+        return ApiResponse.success(invoiceService.createInvoice(request));
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<SalesInvoiceDisplayDto> updateInvoice(@PathVariable Long id,
+                                                             @Valid @RequestBody SalesInvoiceFormDto request) {
+        return ApiResponse.success(invoiceService.updateInvoice(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ApiResponse<Void> deleteInvoice(@PathVariable Long id) {
+        invoiceService.deleteInvoice(id);
+        return ApiResponse.success(null);
+    }
+
+    @PostMapping("/{id}/approve")
+    public ApiResponse<SalesInvoiceDisplayDto> approveInvoice(@PathVariable Long id, @RequestParam String actor) {
+        return ApiResponse.success(invoiceService.approveInvoice(id, actor));
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ApiResponse<SalesInvoiceDisplayDto> cancelInvoice(@PathVariable Long id,
+                                                             @RequestParam String actor,
+                                                             @RequestParam(required = false) String reason) {
+        return ApiResponse.success(invoiceService.cancelInvoice(id, actor, reason));
+    }
+}
