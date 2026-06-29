@@ -1,8 +1,8 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey"></app-page-header>
 
-  <div class="card erp-unified-card">
-    <div class="card-body">
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
       <form [formGroup]="form" class="row mb-4">
         <div class="col-lg-4 col-md-6">
           <app-account-tree-picker
@@ -19,13 +19,17 @@
         <div class="col-lg-3 col-md-6">
           <app-form-field [control]="form.controls.toDate" labelKey="REPORTS.FILTER.TO_DATE" icon="event" type="date"></app-form-field>
         </div>
-        <div class="col-lg-2 col-md-6 d-flex align-items-end">
+        <div class="col-lg-2 col-md-6 d-flex align-items-end gap-2">
           <button type="button" class="erp-button erp-button--primary w-100" (click)="load()">
             <mat-icon aria-hidden="true">play_arrow</mat-icon>
             <span>{{ 'REPORTS.RUN' | translate }}</span>
           </button>
         </div>
       </form>
+      <div class="d-flex gap-2 mb-3" *ngIf="ledger$ | async">
+        <button type="button" class="erp-button erp-button--secondary" (click)="exportExcel()">{{ 'COMMON.EXPORT_EXCEL' | translate }}</button>
+        <button type="button" class="erp-button erp-button--secondary" (click)="exportPdf()">{{ 'COMMON.EXPORT_PDF' | translate }}</button>
+      </div>
 
       <div class="row mb-4" *ngIf="ledger$ | async as ledger">
         <div class="col-lg-4 col-md-6">
@@ -65,10 +69,7 @@
         </div>
       </div>
 
-      <div class="alert alert-danger alert-dismissible fade show mb-3" *ngIf="errorKey">
-        {{ errorKey | translate }}
-        <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-      </div>
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
       <app-data-table [columns]="columns" [data]="(rows$ | async) ?? []" [loading]="loading"></app-data-table>
     </div>
   </div>

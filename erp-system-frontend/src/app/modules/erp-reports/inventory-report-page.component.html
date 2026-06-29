@@ -1,0 +1,32 @@
+<section class="erp-page erp-report-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+
+  <div class="erp-card erp-report-page__card">
+    <div class="erp-card__body">
+      <app-advanced-search-bar
+        [showDateRange]="false"
+        [showStatus]="false"
+        (search)="onSearch($event)"
+      ></app-advanced-search-bar>
+
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mt-3" (dismissed)="errorKey = ''"></app-erp-alert>
+
+      <div class="erp-report-page__summary" *ngIf="!loading && !errorKey">
+        <div class="erp-report-page__metric">
+          <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_SKUS' | translate }}</div>
+          <div class="erp-report-page__metric-value">{{ summary.totalSkus }}</div>
+        </div>
+        <div class="erp-report-page__metric">
+          <div class="erp-report-page__metric-label">{{ 'ERP.LOW_STOCK_COUNT' | translate }}</div>
+          <div class="erp-report-page__metric-value">{{ summary.lowStockCount }}</div>
+        </div>
+        <div class="erp-report-page__metric">
+          <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_QUANTITY' | translate }}</div>
+          <div class="erp-report-page__metric-value">{{ summary.totalQuantity }}</div>
+        </div>
+      </div>
+
+      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+    </div>
+  </div>
+</section>

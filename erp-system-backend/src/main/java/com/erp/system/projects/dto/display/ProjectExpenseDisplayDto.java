@@ -23,6 +23,7 @@ private LocalDate expenseDate;
 private String description;
 private BigDecimal amount;
 private TransactionStatus status;
+private Long journalEntryId;
 
     private Instant createdAt;
     private Instant updatedAt;

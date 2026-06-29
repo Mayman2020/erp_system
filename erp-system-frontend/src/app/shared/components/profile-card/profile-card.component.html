@@ -1,20 +1,21 @@
-<div class="erp-sidebar-profile">
+<div class="erp-sidebar-profile" [class.erp-sidebar-profile--header-pill]="headerPill">
   <button
     type="button"
     class="erp-sidebar-profile__toggle"
     [class.erp-sidebar-profile__toggle--open]="menuOpen"
+    [class.erp-sidebar-profile__toggle--header-pill]="headerPill"
     (click)="toggleMenu.emit()"
     [attr.aria-label]="displayName || ('PROFILE.TITLE' | translate)"
     [attr.aria-expanded]="menuOpen"
     [attr.aria-haspopup]="true"
     *ngIf="!loading; else profileSkeleton"
   >
-    <app-avatar [src]="avatarUrl" size="44px" [alt]="'PROFILE.AVATAR_ALT' | translate"></app-avatar>
+    <app-avatar [src]="avatarUrl" [size]="headerPill ? '34px' : '44px'" [alt]="'PROFILE.AVATAR_ALT' | translate"></app-avatar>
     <span class="erp-sidebar-profile__info">
-      <strong>{{ displayName || ('NAV.HESABATY' | translate) | slice:0:18 }}</strong>
+      <strong>{{ displayName || ('NAV.HESABATY' | translate) | slice:0:22 }}</strong>
       <small>{{ roleKey | translate }}</small>
     </span>
-    <mat-icon aria-hidden="true" class="erp-sidebar-profile__caret">{{ menuOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+    <mat-icon *ngIf="!headerPill" aria-hidden="true" class="erp-sidebar-profile__caret">{{ menuOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
   </button>
 
   <ng-template #profileSkeleton>

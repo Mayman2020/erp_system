@@ -2,10 +2,10 @@ package com.erp.system.purchases.service;
 
 import com.erp.system.accounting.domain.Account;
 import com.erp.system.accounting.domain.JournalEntry;
-import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.repository.JournalEntryRepository;
 import com.erp.system.accounting.service.AccountingPostingService;
 import com.erp.system.accounting.support.JournalPostingNarratives;
+import com.erp.system.accounting.support.PostingAccountResolver;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
@@ -13,7 +13,12 @@ import com.erp.system.common.service.NumberingService;
 import com.erp.system.erp.service.ActivityLogService;
 import com.erp.system.inventory.service.StockService;
 import com.erp.system.purchases.domain.PurchaseInvoice;
+import com.erp.system.inventory.repository.ProductRepository;
 import com.erp.system.purchases.domain.PurchaseInvoiceLine;
+import com.erp.system.purchases.dto.form.PurchaseInvoiceLineInputDto;
+import com.erp.system.sales.support.SalesDocumentTotalsSupport;
+import com.erp.system.sales.support.SalesDocumentTotalsSupport.DocumentAmounts;
+import com.erp.system.sales.support.SalesDocumentTotalsSupport.LineAmounts;
 import com.erp.system.purchases.dto.display.PurchaseInvoiceDisplayDto;
 import com.erp.system.purchases.dto.display.PurchaseInvoiceLineDisplayDto;
 import com.erp.system.purchases.dto.form.PurchaseInvoiceFormDto;
@@ -37,11 +42,12 @@ public class PurchaseInvoiceService {
 
     private final PurchaseInvoiceRepository purchaseInvoiceRepository;
     private final PurchaseInvoiceLineRepository purchaseInvoiceLineRepository;
+    private final ProductRepository productRepository;
     private final NumberingService numberingService;
     private final ActivityLogService activityLogService;
     private final StockService stockService;
     private final AccountingPostingService accountingPostingService;
-    private final AccountRepository accountRepository;
+    private final PostingAccountResolver postingAccountResolver;
     private final JournalEntryRepository journalEntryRepository;
 
     @Transactional(readOnly = true)
@@ -64,6 +70,8 @@ public class PurchaseInvoiceService {
         invoice.setStatus(TransactionStatus.DRAFT);
         invoice.setRemainingAmount(invoice.getTotalAmount());
         invoice = purchaseInvoiceRepository.save(invoice);
+        replaceLines(invoice.getId(), request.getLines());
+        invoice = purchaseInvoiceRepository.save(invoice);
         activityLogService.log(MODULE, "CREATE", "PurchaseInvoice", invoice.getId(), invoice.getInvoiceNumber(),
                 "Created purchase invoice " + invoice.getInvoiceNumber());
         return toDisplay(invoice);
@@ -80,6 +88,8 @@ public class PurchaseInvoiceService {
             invoice.setInvoiceNumber(request.getInvoiceNumber().trim());
         }
         invoice.setRemainingAmount(invoice.getTotalAmount().subtract(invoice.getPaidAmount()).max(BigDecimal.ZERO));
+        invoice = purchaseInvoiceRepository.save(invoice);
+        replaceLines(invoice.getId(), request.getLines());
         invoice = purchaseInvoiceRepository.save(invoice);
         activityLogService.log(MODULE, "UPDATE", "PurchaseInvoice", invoice.getId(), invoice.getInvoiceNumber(),
                 "Updated purchase invoice " + invoice.getInvoiceNumber());
@@ -116,12 +126,9 @@ public class PurchaseInvoiceService {
             );
         }
 
-        Account inventoryAccount = accountRepository.findByCode("1300")
-                .orElseThrow(() -> new BusinessException("Inventory account 1300 not found"));
-        Account taxAccount = accountRepository.findByCode("2210")
-                .orElseThrow(() -> new BusinessException("Tax account 2210 not found"));
-        Account payableAccount = accountRepository.findByCode("2110")
-                .orElseThrow(() -> new BusinessException("Payables account 2110 not found"));
+        Account inventoryAccount = postingAccountResolver.inventory();
+        Account taxAccount = postingAccountResolver.taxPayable();
+        Account payableAccount = postingAccountResolver.accountsPayable();
 
         BigDecimal taxAmount = invoice.getTaxAmount() == null ? BigDecimal.ZERO : invoice.getTaxAmount();
         BigDecimal inventoryAmount = invoice.getTotalAmount().subtract(taxAmount).max(BigDecimal.ZERO);
@@ -234,16 +241,61 @@ public class PurchaseInvoiceService {
         if (request.getDueDate().isBefore(request.getInvoiceDate())) {
             throw new BusinessException("Due date cannot be before invoice date");
         }
+        if (request.getLines() == null || request.getLines().isEmpty()) {
+            throw new BusinessException("Invoice must have at least one line");
+        }
         invoice.setInvoiceDate(request.getInvoiceDate());
         invoice.setDueDate(request.getDueDate());
         invoice.setSupplierId(request.getSupplierId());
         invoice.setOrderId(request.getOrderId());
         invoice.setWarehouseId(request.getWarehouseId());
-        invoice.setSubtotal(request.getSubtotal());
-        invoice.setDiscountAmount(request.getDiscountAmount() == null ? BigDecimal.ZERO : request.getDiscountAmount());
-        invoice.setTaxAmount(request.getTaxAmount() == null ? BigDecimal.ZERO : request.getTaxAmount());
-        invoice.setTotalAmount(request.getTotalAmount());
         invoice.setNotes(request.getNotes());
+
+        BigDecimal lineNetSubtotal = BigDecimal.ZERO;
+        BigDecimal lineTaxTotal = BigDecimal.ZERO;
+        for (PurchaseInvoiceLineInputDto lineRequest : request.getLines()) {
+            LineAmounts amounts = SalesDocumentTotalsSupport.calculateLineAmounts(
+                    lineRequest.getQuantity(),
+                    lineRequest.getUnitPrice(),
+                    lineRequest.getDiscountPercent(),
+                    lineRequest.getTaxPercent());
+            lineNetSubtotal = lineNetSubtotal.add(amounts.netAmount());
+            lineTaxTotal = lineTaxTotal.add(amounts.taxAmount());
+        }
+        BigDecimal discount = request.getDiscountAmount() == null ? BigDecimal.ZERO : request.getDiscountAmount();
+        DocumentAmounts totals = SalesDocumentTotalsSupport.calculateDocumentAmounts(lineNetSubtotal, lineTaxTotal, discount);
+        invoice.setSubtotal(totals.subtotal());
+        invoice.setDiscountAmount(discount);
+        invoice.setTaxAmount(totals.taxAmount());
+        invoice.setTotalAmount(totals.totalAmount());
+    }
+
+    private void replaceLines(Long invoiceId, List<PurchaseInvoiceLineInputDto> lineRequests) {
+        List<PurchaseInvoiceLine> existing = purchaseInvoiceLineRepository.findByInvoiceIdOrderByIdAsc(invoiceId);
+        if (!existing.isEmpty()) {
+            purchaseInvoiceLineRepository.deleteAll(existing);
+        }
+        for (PurchaseInvoiceLineInputDto lineRequest : lineRequests) {
+            if (!productRepository.existsById(lineRequest.getProductId())) {
+                throw new BusinessException("Product not found: " + lineRequest.getProductId());
+            }
+            LineAmounts amounts = SalesDocumentTotalsSupport.calculateLineAmounts(
+                    lineRequest.getQuantity(),
+                    lineRequest.getUnitPrice(),
+                    lineRequest.getDiscountPercent(),
+                    lineRequest.getTaxPercent());
+            PurchaseInvoiceLine line = PurchaseInvoiceLine.builder()
+                    .invoiceId(invoiceId)
+                    .productId(lineRequest.getProductId())
+                    .description(lineRequest.getDescription())
+                    .quantity(lineRequest.getQuantity())
+                    .unitPrice(lineRequest.getUnitPrice())
+                    .discountPercent(lineRequest.getDiscountPercent() != null ? lineRequest.getDiscountPercent() : BigDecimal.ZERO)
+                    .taxPercent(lineRequest.getTaxPercent() != null ? lineRequest.getTaxPercent() : BigDecimal.ZERO)
+                    .lineTotal(amounts.lineTotal())
+                    .build();
+            purchaseInvoiceLineRepository.save(line);
+        }
     }
 
     private PurchaseInvoice loadPurchaseInvoice(Long id) {

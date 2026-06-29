@@ -1,12 +1,9 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header titleKey="GENERAL_LEDGER.TITLE"></app-page-header>
 
-  <div class="card erp-unified-card">
-    <div class="card-body">
-      <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
-        {{ errorKey | translate }}
-        <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-      </div>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" (dismissed)="errorKey = ''"></app-erp-alert>
 
       <app-advanced-search-bar
         (search)="onSearch($event)"

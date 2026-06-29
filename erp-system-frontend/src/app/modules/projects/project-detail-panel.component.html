@@ -1,0 +1,59 @@
+<app-erp-dialog [visible]="true" titleKey="MENU.PROJECTS" size="xxl" (close)="closed.emit()">
+  <div dialog-body>
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item"><button type="button" class="nav-link" [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'">{{ 'ERP.TASKS' | translate }}</button></li>
+      <li class="nav-item"><button type="button" class="nav-link" [class.active]="activeTab === 'members'" (click)="activeTab = 'members'">{{ 'ERP.MEMBERS' | translate }}</button></li>
+      <li class="nav-item"><button type="button" class="nav-link" [class.active]="activeTab === 'expenses'" (click)="activeTab = 'expenses'">{{ 'ERP.EXPENSES' | translate }}</button></li>
+    </ul>
+    <div *ngIf="activeTab === 'tasks'">
+      <form [formGroup]="taskForm" class="row mb-3">
+        <div class="col-md-4"><app-form-field [control]="taskForm.controls.title" labelKey="ERP.SUBJECT"></app-form-field></div>
+        <div class="col-md-3"><app-form-field [control]="taskForm.controls.dueDate" labelKey="COMMON.TO_DATE" type="date"></app-form-field></div>
+        <div class="col-md-2"><app-form-field [control]="taskForm.controls.status" labelKey="COMMON.STATUS"></app-form-field></div>
+        <div class="col-md-2 d-flex align-items-end"><button type="button" class="erp-button erp-button--primary mb-3" (click)="addTask()">{{ (editingTaskId ? 'COMMON.SAVE' : 'COMMON.CREATE') | translate }}</button></div>
+      </form>
+      <div *ngFor="let t of tasks" class="border-bottom py-2 d-flex justify-content-between align-items-center">
+        <span>{{ t.title }} — {{ t.status }} — {{ t.dueDate }}</span>
+        <span>
+          <button type="button" class="btn btn-sm btn-link" (click)="editTask(t)">{{ 'COMMON.EDIT' | translate }}</button>
+          <button type="button" class="btn btn-sm btn-link text-danger" (click)="deleteTask(t.id)">{{ 'COMMON.DELETE' | translate }}</button>
+        </span>
+      </div>
+    </div>
+    <div *ngIf="activeTab === 'members'">
+      <form [formGroup]="memberForm" class="row mb-3">
+        <div class="col-md-5">
+          <label class="form-label">{{ 'MENU.EMPLOYEES' | translate }}</label>
+          <select class="form-control" formControlName="employeeId">
+            <option *ngFor="let e of employeeOptions" [ngValue]="e.id">{{ e.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-3"><app-form-field [control]="memberForm.controls.role" labelKey="ERP.ROLE"></app-form-field></div>
+        <div class="col-md-2 d-flex align-items-end"><button type="button" class="erp-button erp-button--primary mb-3" (click)="addMember()">{{ 'COMMON.ADD' | translate }}</button></div>
+      </form>
+      <div *ngFor="let m of members" class="border-bottom py-2 d-flex justify-content-between">
+        <span>{{ employeeLabel(m.employeeId) }} — {{ m.role }}</span>
+        <button type="button" class="btn btn-sm btn-link text-danger" (click)="removeMember(m.id)">{{ 'COMMON.DELETE' | translate }}</button>
+      </div>
+    </div>
+    <div *ngIf="activeTab === 'expenses'">
+      <form [formGroup]="expenseForm" class="row mb-3">
+        <div class="col-md-3"><app-form-field [control]="expenseForm.controls.expenseDate" labelKey="COMMON.DATE" type="date"></app-form-field></div>
+        <div class="col-md-3"><app-form-field [control]="expenseForm.controls.amount" labelKey="ERP.AMOUNT" type="number"></app-form-field></div>
+        <div class="col-md-3"><app-form-field [control]="expenseForm.controls.description" labelKey="COMMON.DESCRIPTION"></app-form-field></div>
+        <div class="col-md-2 d-flex align-items-end"><button type="button" class="erp-button erp-button--primary mb-3" (click)="addExpense()">{{ 'COMMON.CREATE' | translate }}</button></div>
+      </form>
+      <div *ngFor="let e of expenses" class="border-bottom py-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>{{ e.expenseDate }} — {{ e.amount }} — {{ e.description }} — {{ e.status }}</span>
+          <span>
+            <button *ngIf="e.status === 'DRAFT'" type="button" class="btn btn-sm btn-link" (click)="approveExpense(e.id)">{{ 'COMMON.APPROVE' | translate }}</button>
+            <button *ngIf="e.status === 'APPROVED'" type="button" class="btn btn-sm btn-link" (click)="cancelExpense(e.id)">{{ 'COMMON.CANCEL' | translate }}</button>
+            <button *ngIf="e.status === 'DRAFT'" type="button" class="btn btn-sm btn-link text-danger" (click)="deleteExpense(e.id)">{{ 'COMMON.DELETE' | translate }}</button>
+          </span>
+        </div>
+        <app-journal-link [journalEntryId]="e.journalEntryId"></app-journal-link>
+      </div>
+    </div>
+  </div>
+</app-erp-dialog>

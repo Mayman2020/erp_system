@@ -6,71 +6,62 @@
   height: 100%;
 }
 
-:host ::ng-deep .navbar-wrapper {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
-}
-
-:host ::ng-deep .erp-nav-scroll {
-  display: block;
+.estate-sidebar-nav {
   flex: 1 1 auto;
   min-height: 0;
-  height: 100%;
-  max-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-:host ::ng-deep .erp-nav-scroll .erp-navbar-content {
-  padding-top: 0 !important;
-}
-
-:host ::ng-deep app-sidebar,
-:host ::ng-deep .erp-sidebar-layout,
-:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell,
-:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell__profile,
-:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell__menu,
-:host ::ng-deep .erp-sidebar-menu--root {
   width: 100%;
-  min-width: 0;
 }
 
-:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell {
-  gap: var(--erp-space-1);
+.estate-nav-loading {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: rgba(232, 201, 122, 0.75);
 }
 
-:host ::ng-deep .erp-sidebar-layout .erp-sidebar-shell__menu {
+.nav-section-label--static {
+  display: block;
+  padding: 20px 14px 7px;
+}
+
+.nav-item--collapse {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: inherit;
+  font: inherit;
+}
+
+.nav-collapse-arrow {
+  margin-inline-start: auto;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: rgba(232, 201, 122, 0.55);
+}
+
+.nav-subsection {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  padding-inline-start: 10px;
+  margin-bottom: 4px;
 }
 
-:host ::ng-deep .erp-sidebar-menu--root {
-  display: grid;
-  align-content: start;
-  gap: var(--erp-space-1);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.nav-subsection.is-collapsed {
+  display: none;
 }
 
-:host ::ng-deep .erp-sidebar-menu--root > app-nav-group,
-:host ::ng-deep .erp-sidebar-menu--root > app-nav-collapse,
-:host ::ng-deep .erp-sidebar-menu--root > app-nav-item,
-:host ::ng-deep .erp-sidebar-menu--root > li {
-  display: block;
-  width: 100%;
-  min-width: 0;
+.nav-icon mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
 }
 
-:host ::ng-deep .erp-sidebar-menu--root > app-nav-group > li,
-:host ::ng-deep .erp-sidebar-menu--root > app-nav-collapse > li,
-:host ::ng-deep .erp-sidebar-menu--root > app-nav-item > li {
-  width: 100%;
-  min-width: 0;
-  margin: 0;
+.nav-badge {
+  margin-inline-start: auto;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
 }

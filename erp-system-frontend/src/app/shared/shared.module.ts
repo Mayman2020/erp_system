@@ -3,6 +3,11 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { DateFieldComponent } from './components/date-field/date-field.component';
 import { NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AccountTreePickerComponent } from './components/account-tree-picker/account-tree-picker.component';
 import { AdvancedSearchBarComponent } from './components/advanced-search-bar/advanced-search-bar.component';
@@ -25,7 +30,12 @@ import { TypeBadgeComponent } from './components/type-badge/type-badge.component
 import { ErpDatePipe } from './pipes/erp-date.pipe';
 import { LegacyTranslatePipe, TranslatePipe } from './pipes/translate.pipe';
 import { ErpCountUpDirective } from './directives/erp-count-up.directive';
+import { ErpDocumentPageShellComponent } from './components/erp-document-page-shell/erp-document-page-shell.component';
+import { ErpAlertComponent } from './components/erp-alert/erp-alert.component';
+import { DocumentLinesTableComponent } from './components/document-lines-table/document-lines-table.component';
 import { CommandPaletteComponent } from './components/command-palette/command-palette.component';
+import { HasPermissionDirective } from './directives/has-permission.directive';
+import { JournalLinkComponent } from './components/journal-link/journal-link.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +61,12 @@ import { CommandPaletteComponent } from './components/command-palette/command-pa
     LoadingStateComponent,
     AvatarComponent,
     ErpCountUpDirective,
-    CommandPaletteComponent
+    CommandPaletteComponent,
+    DocumentLinesTableComponent,
+    ErpDocumentPageShellComponent,
+    ErpAlertComponent,
+    HasPermissionDirective,
+    JournalLinkComponent
   ],
   imports: [
     CommonModule,
@@ -61,7 +76,12 @@ import { CommandPaletteComponent } from './components/command-palette/command-pa
     NgbDropdownModule,
     NgbTooltipModule,
     NgbNavModule,
-    MatIconModule
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    DateFieldComponent
   ],
   exports: [
     CommonModule,
@@ -72,6 +92,11 @@ import { CommandPaletteComponent } from './components/command-palette/command-pa
     NgbTooltipModule,
     NgbNavModule,
     MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    DateFieldComponent,
     TranslatePipe,
     LegacyTranslatePipe,
     ErpDatePipe,
@@ -94,7 +119,12 @@ import { CommandPaletteComponent } from './components/command-palette/command-pa
     LoadingStateComponent,
     AvatarComponent,
     ErpCountUpDirective,
-    CommandPaletteComponent
+    CommandPaletteComponent,
+    DocumentLinesTableComponent,
+    ErpDocumentPageShellComponent,
+    ErpAlertComponent,
+    HasPermissionDirective,
+    JournalLinkComponent
   ]
 })
 export class SharedModule {}

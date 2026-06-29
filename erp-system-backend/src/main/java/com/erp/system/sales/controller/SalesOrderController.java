@@ -2,8 +2,10 @@ package com.erp.system.sales.controller;
 
 import com.erp.system.common.dto.ApiResponse;
 import com.erp.system.common.enums.TransactionStatus;
+import com.erp.system.sales.dto.display.SalesInvoiceDisplayDto;
 import com.erp.system.sales.dto.display.SalesOrderDisplayDto;
 import com.erp.system.sales.dto.form.SalesOrderFormDto;
+import com.erp.system.sales.service.SalesInvoiceService;
 import com.erp.system.sales.service.SalesOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.util.List;
 public class SalesOrderController {
 
     private final SalesOrderService orderService;
+    private final SalesInvoiceService invoiceService;
 
     @GetMapping
     public ApiResponse<List<SalesOrderDisplayDto>> getOrders(
@@ -64,5 +67,11 @@ public class SalesOrderController {
                                                          @RequestParam String actor,
                                                          @RequestParam(required = false) String reason) {
         return ApiResponse.success(orderService.cancelOrder(id, actor, reason));
+    }
+
+    @PostMapping("/{id}/convert-to-invoice")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<SalesInvoiceDisplayDto> convertToInvoice(@PathVariable Long id) {
+        return ApiResponse.success(invoiceService.createInvoice(orderService.buildInvoiceForm(id)));
     }
 }

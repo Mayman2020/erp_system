@@ -383,6 +383,32 @@ body.rtl .pcoded-navbar .pcoded-inner-navbar .pcoded-submenu li.active > a {
   box-shadow: 0 0 10px rgba(52, 211, 153, 0.35);
 }
 
+/* Estate sidebar nav (replaces PCoded menu motion) */
+.erp-estate-sidebar .nav-item .nav-icon {
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.erp-estate-sidebar .nav-item:hover .nav-icon,
+.erp-estate-sidebar .nav-item--collapse:hover .nav-icon {
+  transform: translateX(3px);
+}
+
+body.rtl .erp-estate-sidebar .nav-item:hover .nav-icon,
+body.rtl .erp-estate-sidebar .nav-item--collapse:hover .nav-icon {
+  transform: translateX(-3px);
+}
+
+.erp-estate-sidebar .nav-item.active {
+  transform: scale(1.012);
+  transition:
+    background var(--transition-normal),
+    color var(--transition-normal),
+    transform var(--transition-fast),
+    box-shadow var(--transition-normal);
+}
+
 /* -------------------------------------------------------------------------- */
 /* Dashboard KPI / chart surfaces (match global card lift)                     */
 /* -------------------------------------------------------------------------- */

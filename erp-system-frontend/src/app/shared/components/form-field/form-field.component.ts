@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TranslationService } from '../../../core/i18n/translation.service';
 
@@ -10,16 +10,18 @@ import { TranslationService } from '../../../core/i18n/translation.service';
       [class.erp-form-field--invalid]="showError"
       [class.erp-form-field--disabled]="isDisabled"
       [class.erp-form-field--has-value]="hasValue"
+      [ngClass]="extraClass"
     >
-      <label class="erp-form-field__label" [for]="inputId">{{ labelKey | translate }}</label>
+      <label class="erp-form-field__label" [for]="inputId" *ngIf="type !== 'date'">{{ labelKey | translate }}</label>
 
-      <div class="erp-form-field__control">
-        <mat-icon class="erp-form-field__icon" *ngIf="icon && type !== 'date'" aria-hidden="true">{{ icon }}</mat-icon>
+      <div class="erp-form-field__control" [class.erp-form-field__control--password]="type === 'password'">
+        <mat-icon class="erp-form-field__icon" *ngIf="icon && type !== 'date' && type !== 'password'" aria-hidden="true">{{ icon }}</mat-icon>
 
         <ng-container [ngSwitch]="type">
           <textarea
             *ngSwitchCase="'textarea'"
             class="erp-input"
+            [ngClass]="controlClass"
             [id]="inputId"
             [rows]="rows"
             [formControl]="control"
@@ -29,6 +31,7 @@ import { TranslationService } from '../../../core/i18n/translation.service';
           <select
             *ngSwitchCase="'select'"
             class="erp-input erp-input--select"
+            [ngClass]="controlClass"
             [id]="inputId"
             [formControl]="control"
             [disabled]="isDisabled"
@@ -37,31 +40,39 @@ import { TranslationService } from '../../../core/i18n/translation.service';
             <option *ngFor="let option of options" [ngValue]="optionValue(option)">{{ optionLabel(option) }}</option>
           </select>
 
-          <ng-container *ngSwitchCase="'date'">
-            <button
-              type="button"
-              class="erp-form-field__date-opener"
-              (click)="openDatePicker($event)"
-              [disabled]="isDisabled"
-              [attr.aria-label]="labelKey | translate"
-            >
-              <mat-icon aria-hidden="true">{{ dateIconGlyph }}</mat-icon>
-            </button>
+          <app-date-field
+            *ngSwitchCase="'date'"
+            [formControl]="$any(control)"
+            [labelKey]="labelKey"
+            [compact]="true"
+          ></app-date-field>
+
+          <div *ngSwitchCase="'password'" class="erp-form-field__password">
+            <mat-icon class="erp-form-field__icon erp-form-field__icon--password" *ngIf="icon" aria-hidden="true">{{ icon }}</mat-icon>
             <input
-              #dateInputRef
-              class="erp-input erp-input--date"
+              class="erp-input"
+              [ngClass]="controlClass"
               [id]="inputId"
-              type="date"
-              dir="ltr"
-              lang="en"
-              [formControl]="control!"
+              [type]="passwordHidden ? 'password' : 'text'"
+              [formControl]="control"
               [readonly]="readonly"
+              [attr.placeholder]="placeholderKey ? (placeholderKey | translate) : null"
             />
-          </ng-container>
+            <button
+              *ngIf="passwordToggle"
+              type="button"
+              class="erp-form-field__password-toggle"
+              (click)="passwordHidden = !passwordHidden"
+              [attr.aria-label]="(passwordHidden ? 'AUTH.SHOW_PASSWORD' : 'AUTH.HIDE_PASSWORD') | translate"
+            >
+              <mat-icon aria-hidden="true">{{ passwordHidden ? 'visibility' : 'visibility_off' }}</mat-icon>
+            </button>
+          </div>
 
           <input
             *ngSwitchDefault
             class="erp-input"
+            [ngClass]="controlClass"
             [id]="inputId"
             [type]="type"
             [formControl]="control"
@@ -80,8 +91,6 @@ import { TranslationService } from '../../../core/i18n/translation.service';
   `
 })
 export class FormFieldComponent {
-  @ViewChild('dateInputRef') private dateInputRef?: ElementRef<HTMLInputElement>;
-
   @Input() control: AbstractControl | null = null;
   @Input() labelKey = '';
   @Input() icon = '';
@@ -101,47 +110,14 @@ export class FormFieldComponent {
   @Input() includeEmptyOption = false;
   @Input() emptyLabelKey = 'COMMON.ALL';
   @Input() emptyValue: any = '';
+  @Input() extraClass = '';
+  @Input() controlClass = '';
+  @Input() passwordToggle = false;
   @Input() inputId = `erp-field-${Math.random().toString(36).slice(2, 10)}`;
 
+  passwordHidden = true;
+
   constructor(private translationService: TranslationService) {}
-
-  get dateIconGlyph(): string {
-    return (this.icon || 'calendar_today').trim() || 'calendar_today';
-  }
-
-  openDatePicker(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-    if (this.isDisabled) {
-      return;
-    }
-    const el = this.dateInputRef?.nativeElement;
-    if (!el) {
-      return;
-    }
-    const anyInput = el as HTMLInputElement & { showPicker?: () => void | Promise<void> };
-    if (typeof anyInput.showPicker === 'function') {
-      try {
-        const maybePromise = anyInput.showPicker() as void | Promise<void> | undefined;
-        if (maybePromise && typeof (maybePromise as Promise<void>).then === 'function') {
-          (maybePromise as Promise<void>).catch(() => this.focusDateInput(el));
-        }
-      } catch {
-        this.focusDateInput(el);
-      }
-      return;
-    }
-    this.focusDateInput(el);
-  }
-
-  private focusDateInput(el: HTMLInputElement): void {
-    el.focus();
-    try {
-      el.click();
-    } catch {
-      /* Safari / older browsers */
-    }
-  }
 
   get showError(): boolean {
     return !!this.control && this.control.invalid && (this.control.touched || this.control.dirty);

@@ -28,7 +28,19 @@ import {
   ReceiptVoucherForm,
   SortDirection,
   LedgerDto,
+  AccountingCheckForm,
+  BillDto,
+  BillForm,
+  BudgetDto,
+  BudgetForm,
   CustomerInvoiceDto,
+  CustomerInvoiceForm,
+  ExchangeRateDto,
+  ExchangeRateForm,
+  BankAccountForm,
+  AccountingTransactionForm,
+  TransferDto,
+  TransferForm,
   ReconciliationBankAccountDto,
   ReconciliationDto,
   ReconciliationLineDto,
@@ -211,14 +223,176 @@ export class AccountingApiService {
     return this.http.get<ApiResponse<CustomerInvoiceDto[]>>(`${this.base}/invoices`, { params: this.toParams(filters) }).pipe(map((res) => res.data || []));
   }
 
+  getInvoice(id: number): Observable<CustomerInvoiceDto> {
+    return this.http.get<ApiResponse<CustomerInvoiceDto>>(`${this.base}/invoices/${id}`).pipe(map((res) => res.data));
+  }
+
+  createInvoice(payload: CustomerInvoiceForm): Observable<CustomerInvoiceDto> {
+    return this.http.post<ApiResponse<CustomerInvoiceDto>>(`${this.base}/invoices`, payload).pipe(map((res) => res.data));
+  }
+
+  updateInvoice(id: number, payload: CustomerInvoiceForm): Observable<CustomerInvoiceDto> {
+    return this.http.put<ApiResponse<CustomerInvoiceDto>>(`${this.base}/invoices/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  approveInvoice(id: number, actor: string): Observable<CustomerInvoiceDto> {
+    const params = new HttpParams().set('actor', actor);
+    return this.http.post<ApiResponse<CustomerInvoiceDto>>(`${this.base}/invoices/${id}/approve`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  cancelInvoice(id: number, actor: string, reason?: string): Observable<CustomerInvoiceDto> {
+    let params = new HttpParams().set('actor', actor);
+    if (reason) {
+      params = params.set('reason', reason);
+    }
+    return this.http.post<ApiResponse<CustomerInvoiceDto>>(`${this.base}/invoices/${id}/cancel`, {}, { params }).pipe(map((res) => res.data));
+  }
+
   getChecks(filters: Record<string, string | number | boolean> = {}): Observable<AccountingCheckDto[]> {
     return this.http.get<ApiResponse<AccountingCheckDto[]>>(`${this.base}/checks`, { params: this.toParams(filters) }).pipe(map((res) => res.data || []));
+  }
+
+  getCheck(id: number): Observable<AccountingCheckDto> {
+    return this.http.get<ApiResponse<AccountingCheckDto>>(`${this.base}/checks/${id}`).pipe(map((res) => res.data));
+  }
+
+  createCheck(payload: AccountingCheckForm): Observable<AccountingCheckDto> {
+    return this.http.post<ApiResponse<AccountingCheckDto>>(`${this.base}/checks`, payload).pipe(map((res) => res.data));
+  }
+
+  updateCheck(id: number, payload: AccountingCheckForm): Observable<AccountingCheckDto> {
+    return this.http.put<ApiResponse<AccountingCheckDto>>(`${this.base}/checks/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  depositCheck(id: number, actor: string): Observable<AccountingCheckDto> {
+    const params = new HttpParams().set('actor', actor);
+    return this.http.post<ApiResponse<AccountingCheckDto>>(`${this.base}/checks/${id}/deposit`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  clearCheck(id: number, actor: string): Observable<AccountingCheckDto> {
+    const params = new HttpParams().set('actor', actor);
+    return this.http.post<ApiResponse<AccountingCheckDto>>(`${this.base}/checks/${id}/clear`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  bounceCheck(id: number, actor: string, reason?: string): Observable<AccountingCheckDto> {
+    let params = new HttpParams().set('actor', actor);
+    if (reason) {
+      params = params.set('reason', reason);
+    }
+    return this.http.post<ApiResponse<AccountingCheckDto>>(`${this.base}/checks/${id}/bounce`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  cancelCheck(id: number, actor: string, reason?: string): Observable<AccountingCheckDto> {
+    let params = new HttpParams().set('actor', actor);
+    if (reason) {
+      params = params.set('reason', reason);
+    }
+    return this.http.post<ApiResponse<AccountingCheckDto>>(`${this.base}/checks/${id}/cancel`, {}, { params }).pipe(map((res) => res.data));
   }
 
   getBankAccounts(filters: Record<string, string | number | boolean> = {}): Observable<BankAccountDto[]> {
     return this.http
       .get<ApiResponse<BankAccountDto[]>>(`${this.base}/bank-accounts`, { params: this.toParams(filters) })
       .pipe(map((res) => res.data || []));
+  }
+
+  getBankAccount(id: number): Observable<BankAccountDto> {
+    return this.http.get<ApiResponse<BankAccountDto>>(`${this.base}/bank-accounts/${id}`).pipe(map((res) => res.data));
+  }
+
+  createBankAccount(payload: BankAccountForm): Observable<BankAccountDto> {
+    return this.http.post<ApiResponse<BankAccountDto>>(`${this.base}/bank-accounts`, payload).pipe(map((res) => res.data));
+  }
+
+  updateBankAccount(id: number, payload: BankAccountForm): Observable<BankAccountDto> {
+    return this.http.put<ApiResponse<BankAccountDto>>(`${this.base}/bank-accounts/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deleteBankAccount(id: number): Observable<void> {
+    return this.http.delete<ApiResponse<void>>(`${this.base}/bank-accounts/${id}`).pipe(map(() => undefined));
+  }
+
+  getBills(filters: Record<string, string | number | boolean> = {}): Observable<BillDto[]> {
+    return this.http.get<ApiResponse<BillDto[]>>(`${this.base}/bills`, { params: this.toParams(filters) }).pipe(map((res) => res.data || []));
+  }
+
+  getBill(id: number): Observable<BillDto> {
+    return this.http.get<ApiResponse<BillDto>>(`${this.base}/bills/${id}`).pipe(map((res) => res.data));
+  }
+
+  createBill(payload: BillForm): Observable<BillDto> {
+    return this.http.post<ApiResponse<BillDto>>(`${this.base}/bills`, payload).pipe(map((res) => res.data));
+  }
+
+  updateBill(id: number, payload: BillForm): Observable<BillDto> {
+    return this.http.put<ApiResponse<BillDto>>(`${this.base}/bills/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  approveBill(id: number, actor: string): Observable<BillDto> {
+    const params = new HttpParams().set('actor', actor);
+    return this.http.post<ApiResponse<BillDto>>(`${this.base}/bills/${id}/approve`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  cancelBill(id: number, actor: string, reason?: string): Observable<BillDto> {
+    let params = new HttpParams().set('actor', actor);
+    if (reason) {
+      params = params.set('reason', reason);
+    }
+    return this.http.post<ApiResponse<BillDto>>(`${this.base}/bills/${id}/cancel`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  getBudgets(filters: Record<string, string | number | boolean> = {}): Observable<BudgetDto[]> {
+    return this.http.get<ApiResponse<BudgetDto[]>>(`${this.base}/budget`, { params: this.toParams(filters) }).pipe(map((res) => res.data || []));
+  }
+
+  getBudget(id: number): Observable<BudgetDto> {
+    return this.http.get<ApiResponse<BudgetDto>>(`${this.base}/budget/${id}`).pipe(map((res) => res.data));
+  }
+
+  createBudget(payload: BudgetForm): Observable<BudgetDto> {
+    return this.http.post<ApiResponse<BudgetDto>>(`${this.base}/budget`, payload).pipe(map((res) => res.data));
+  }
+
+  updateBudget(id: number, payload: BudgetForm): Observable<BudgetDto> {
+    return this.http.put<ApiResponse<BudgetDto>>(`${this.base}/budget/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  changeBudgetStatus(id: number, status: string): Observable<BudgetDto> {
+    const params = new HttpParams().set('status', status);
+    return this.http.post<ApiResponse<BudgetDto>>(`${this.base}/budget/${id}/status`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  getExchangeRates(): Observable<ExchangeRateDto[]> {
+    return this.http.get<ApiResponse<ExchangeRateDto[]>>(`${this.base}/exchange-rates`).pipe(map((res) => res.data || []));
+  }
+
+  createExchangeRate(payload: ExchangeRateForm): Observable<ExchangeRateDto> {
+    return this.http.post<ApiResponse<ExchangeRateDto>>(`${this.base}/exchange-rates`, payload).pipe(map((res) => res.data));
+  }
+
+  getTransaction(id: number): Observable<AccountingTransactionDto> {
+    return this.http.get<ApiResponse<AccountingTransactionDto>>(`${this.base}/transactions/${id}`).pipe(map((res) => res.data));
+  }
+
+  createTransaction(payload: AccountingTransactionForm): Observable<AccountingTransactionDto> {
+    return this.http.post<ApiResponse<AccountingTransactionDto>>(`${this.base}/transactions`, payload).pipe(map((res) => res.data));
+  }
+
+  updateTransaction(id: number, payload: AccountingTransactionForm): Observable<AccountingTransactionDto> {
+    return this.http.put<ApiResponse<AccountingTransactionDto>>(`${this.base}/transactions/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  approveTransaction(id: number, actor: string): Observable<AccountingTransactionDto> {
+    const params = new HttpParams().set('actor', actor);
+    return this.http.post<ApiResponse<AccountingTransactionDto>>(`${this.base}/transactions/${id}/approve`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  cancelTransaction(id: number, actor: string, reason?: string): Observable<AccountingTransactionDto> {
+    let params = new HttpParams().set('actor', actor);
+    if (reason) {
+      params = params.set('reason', reason);
+    }
+    return this.http.post<ApiResponse<AccountingTransactionDto>>(`${this.base}/transactions/${id}/cancel`, {}, { params }).pipe(map((res) => res.data));
   }
 
   getLedger(filters: Record<string, string | number | boolean> = {}): Observable<LedgerDto> {
@@ -323,6 +497,78 @@ export class AccountingApiService {
 
   openFiscalPeriod(id: number): Observable<FiscalPeriodDto> {
     return this.http.post<ApiResponse<FiscalPeriodDto>>(`${this.base}/settings/fiscal-periods/${id}/open`, {}).pipe(map((res) => res.data));
+  }
+
+  getTransfers(): Observable<TransferDto[]> {
+    return this.http.get<ApiResponse<TransferDto[]>>(`${this.base}/transfers`).pipe(map((res) => res.data || []));
+  }
+
+  getTransfer(id: number): Observable<TransferDto> {
+    return this.http.get<ApiResponse<TransferDto>>(`${this.base}/transfers/${id}`).pipe(map((res) => res.data));
+  }
+
+  createTransfer(payload: TransferForm): Observable<TransferDto> {
+    return this.http.post<ApiResponse<TransferDto>>(`${this.base}/transfers`, payload).pipe(map((res) => res.data));
+  }
+
+  updateTransfer(id: number, payload: TransferForm): Observable<TransferDto> {
+    return this.http.put<ApiResponse<TransferDto>>(`${this.base}/transfers/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  postTransfer(id: number, actor: string): Observable<TransferDto> {
+    return this.http.post<ApiResponse<TransferDto>>(`${this.base}/transfers/${id}/post`, {}, { params: { actor } }).pipe(map((res) => res.data));
+  }
+
+  cancelTransfer(id: number, actor: string, reason?: string): Observable<TransferDto> {
+    let params = new HttpParams().set('actor', actor);
+    if (reason) params = params.set('reason', reason);
+    return this.http.post<ApiResponse<TransferDto>>(`${this.base}/transfers/${id}/cancel`, {}, { params }).pipe(map((res) => res.data));
+  }
+
+  deleteTransfer(id: number): Observable<void> {
+    return this.http.delete<ApiResponse<void>>(`${this.base}/transfers/${id}`).pipe(map(() => undefined));
+  }
+
+  exportLedgerExcel(accountId: number, fromDate?: string, toDate?: string): Observable<Blob> {
+    return this.http.get(`${this.base}/export/ledger/excel`, {
+      params: this.toParams({ accountId, fromDate, toDate }),
+      responseType: 'blob'
+    });
+  }
+
+  exportLedgerPdf(accountId: number, fromDate?: string, toDate?: string): Observable<Blob> {
+    return this.http.get(`${this.base}/export/ledger/pdf`, {
+      params: this.toParams({ accountId, fromDate, toDate }),
+      responseType: 'blob'
+    });
+  }
+
+  exportProfitLossExcel(fromDate: string, toDate: string): Observable<Blob> {
+    return this.http.get(`${this.base}/export/profit-loss/excel`, {
+      params: this.toParams({ fromDate, toDate }),
+      responseType: 'blob'
+    });
+  }
+
+  exportProfitLossPdf(fromDate: string, toDate: string): Observable<Blob> {
+    return this.http.get(`${this.base}/export/profit-loss/pdf`, {
+      params: this.toParams({ fromDate, toDate }),
+      responseType: 'blob'
+    });
+  }
+
+  exportBalanceSheetExcel(asOfDate: string): Observable<Blob> {
+    return this.http.get(`${this.base}/export/balance-sheet/excel`, {
+      params: this.toParams({ asOfDate }),
+      responseType: 'blob'
+    });
+  }
+
+  exportBalanceSheetPdf(asOfDate: string): Observable<Blob> {
+    return this.http.get(`${this.base}/export/balance-sheet/pdf`, {
+      params: this.toParams({ asOfDate }),
+      responseType: 'blob'
+    });
   }
 
   private toParams(filters: Record<string, string | number | boolean | ''>): HttpParams {

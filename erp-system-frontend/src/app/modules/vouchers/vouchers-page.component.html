@@ -1,4 +1,4 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey">
     <div header-actions class="erp-toolbar-icons">
           <button
@@ -30,16 +30,10 @@
     </div>
   </app-page-header>
 
-  <div class="card erp-unified-card">
-    <div class="card-body">
-      <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
-        {{ successKey | translate }}
-        <button type="button" class="btn-close" (click)="successKey = ''"></button>
-      </div>
-      <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
-        {{ errorKey | translate }}
-        <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-      </div>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" (dismissed)="successKey = ''"></app-erp-alert>
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" (dismissed)="errorKey = ''"></app-erp-alert>
       <app-advanced-search-bar (search)="onSearch($event)" [showStatus]="true" [showDateRange]="true" [showAmountRange]="true" [statusOptions]="voucherStatuses"></app-advanced-search-bar>
       <app-data-table [columns]="columns" [data]="(rows$ | async) ?? []" [actions]="actions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
     </div>
@@ -48,15 +42,9 @@
 
 <app-erp-dialog [visible]="dialogVisible" [titleKey]="dialogTitle" size="xl" (close)="closeDialog()">
   <div dialog-body>
-    <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
-      {{ successKey | translate }}
-      <button type="button" class="btn-close" (click)="successKey = ''"></button>
-    </div>
-    <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
-      {{ errorKey | translate }}
-      <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-    </div>
-  <form [formGroup]="form" class="row">
+    <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" (dismissed)="successKey = ''"></app-erp-alert>
+    <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" (dismissed)="errorKey = ''"></app-erp-alert>
+  <form [formGroup]="form" class="row erp-dialog-form">
     <div class="col-md-6 mb-3">
       <app-form-field [control]="form.controls.voucherDate" labelKey="VOUCHERS.FORM.DATE" icon="calendar_month" type="date" [readonly]="readOnlyMode"></app-form-field>
     </div>
@@ -70,26 +58,44 @@
       ></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ activeVoucherType === 'payment' ? ('VOUCHERS.FORM.BENEFICIARY' | translate) : ('VOUCHERS.FORM.PAYER' | translate) }}</label>
-      <input class="form-control" formControlName="partyName" [readonly]="readOnlyMode" />
+      <app-form-field
+        [control]="form.controls.partyName"
+        [labelKey]="activeVoucherType === 'payment' ? 'VOUCHERS.FORM.BENEFICIARY' : 'VOUCHERS.FORM.PAYER'"
+        icon="person"
+        [readonly]="readOnlyMode"
+      ></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ 'VOUCHERS.FORM.METHOD' | translate }}</label>
-      <select class="form-control" formControlName="paymentMethod" [disabled]="readOnlyMode">
-        <option *ngFor="let method of paymentMethods" [value]="method">{{ ('PAYMENT_METHOD.' + method) | translate }}</option>
-      </select>
+      <app-form-field
+        [control]="form.controls.paymentMethod"
+        labelKey="VOUCHERS.FORM.METHOD"
+        icon="payments"
+        type="select"
+        [options]="paymentMethods"
+        optionLabelPrefix="PAYMENT_METHOD."
+        [disabled]="readOnlyMode"
+      ></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ 'VOUCHERS.FORM.CURRENCY' | translate }}</label>
-      <select class="form-control" formControlName="currencyCode" [disabled]="readOnlyMode">
-        <option *ngFor="let currency of currencies" [value]="currency">{{ currency }}</option>
-      </select>
+      <app-form-field
+        [control]="form.controls.currencyCode"
+        labelKey="VOUCHERS.FORM.CURRENCY"
+        icon="currency_exchange"
+        type="select"
+        [options]="currencies"
+        [disabled]="readOnlyMode"
+      ></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ 'VOUCHERS.FORM.VOUCHER_TYPE' | translate }}</label>
-      <select class="form-control" formControlName="voucherType" [disabled]="readOnlyMode">
-        <option *ngFor="let type of voucherTypes" [value]="type">{{ ('VOUCHER_TYPE.' + type) | translate }}</option>
-      </select>
+      <app-form-field
+        [control]="form.controls.voucherType"
+        labelKey="VOUCHERS.FORM.VOUCHER_TYPE"
+        icon="receipt"
+        type="select"
+        [options]="voucherTypes"
+        optionLabelPrefix="VOUCHER_TYPE."
+        [disabled]="readOnlyMode"
+      ></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
       <app-account-tree-picker
@@ -112,16 +118,32 @@
       ></app-account-tree-picker>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ 'VOUCHERS.FORM.AMOUNT' | translate }}</label>
-      <input type="number" class="form-control" formControlName="amount" [readonly]="readOnlyMode" />
+      <app-form-field
+        [control]="form.controls.amount"
+        labelKey="VOUCHERS.FORM.AMOUNT"
+        icon="payments"
+        type="number"
+        step="0.01"
+        [readonly]="readOnlyMode"
+      ></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">{{ 'VOUCHERS.FORM.REFERENCE' | translate }}</label>
-      <input class="form-control" formControlName="linkedReference" [readonly]="readOnlyMode" />
+      <app-form-field
+        [control]="form.controls.linkedReference"
+        labelKey="VOUCHERS.FORM.REFERENCE"
+        icon="link"
+        [readonly]="readOnlyMode"
+      ></app-form-field>
     </div>
     <div class="col-12 mb-3">
-      <label class="form-label">{{ 'VOUCHERS.FORM.DESCRIPTION' | translate }}</label>
-      <textarea class="form-control" rows="3" formControlName="description" [readonly]="readOnlyMode"></textarea>
+      <app-form-field
+        [control]="form.controls.description"
+        labelKey="VOUCHERS.FORM.DESCRIPTION"
+        icon="notes"
+        type="textarea"
+        [rows]="3"
+        [readonly]="readOnlyMode"
+      ></app-form-field>
     </div>
   </form>
   </div>

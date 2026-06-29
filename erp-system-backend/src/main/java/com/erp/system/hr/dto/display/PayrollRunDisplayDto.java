@@ -21,6 +21,7 @@ public class PayrollRunDisplayDto {
     private TransactionStatus status;
     private BigDecimal totalAmount;
     private String notes;
+    private Long journalEntryId;
     private List<PayrollLineDisplayDto> lines;
     private Instant createdAt;
     private Instant updatedAt;

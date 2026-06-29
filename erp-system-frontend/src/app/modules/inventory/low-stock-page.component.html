@@ -1,0 +1,9 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
+      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+    </div>
+  </div>
+</section>

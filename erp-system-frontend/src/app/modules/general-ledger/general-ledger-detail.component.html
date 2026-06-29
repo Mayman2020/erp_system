@@ -1,4 +1,4 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header titleKey="GENERAL_LEDGER.DETAIL_TITLE">
     <div header-actions>
       <button type="button" class="erp-button erp-button--ghost" (click)="goBack()">
@@ -8,10 +8,10 @@
     </div>
   </app-page-header>
 
-  <div class="card erp-unified-card" *ngIf="loading"><app-loading-state></app-loading-state></div>
+  <div class="erp-card erp-list-page__card" *ngIf="loading"><app-loading-state></app-loading-state></div>
 
-  <div class="card erp-unified-card" *ngIf="!loading && errorKey">
-    <div class="card-body text-center text-danger">
+  <div class="erp-card erp-list-page__card" *ngIf="!loading && errorKey">
+    <div class="erp-card__body text-center text-danger">
       {{ errorKey | translate }}
       <button class="erp-icon-button ms-2" type="button" (click)="goBack()">
         <mat-icon aria-hidden="true">arrow_back</mat-icon>
@@ -21,8 +21,8 @@
 
   <div *ngIf="!loading && !errorKey && (entry$ | async) as entry" class="gl-detail">
     <!-- Header Info Card -->
-    <div class="card erp-unified-card gl-detail__header-card">
-      <div class="card-body">
+    <div class="erp-card erp-list-page__card gl-detail__header-card">
+      <div class="erp-card__body">
         <div class="row">
           <div class="col-md-4 gl-detail__field">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.REFERENCE' | translate }}</span>
@@ -77,7 +77,7 @@
     </div>
 
     <!-- Lines Table -->
-    <div class="card erp-unified-card">
+    <div class="erp-card erp-list-page__card">
       <div class="card-header">
         <h5 class="card-title mb-0">{{ 'GENERAL_LEDGER.LINES' | translate }}</h5>
       </div>
@@ -110,8 +110,8 @@
     </div>
 
     <!-- Posting / Reversal Info -->
-    <div class="card erp-unified-card" *ngIf="entry.postedAt || entry.reversedAt">
-      <div class="card-body">
+    <div class="erp-card erp-list-page__card" *ngIf="entry.postedAt || entry.reversedAt">
+      <div class="erp-card__body">
         <div class="row">
           <div class="col-md-3 gl-detail__field" *ngIf="entry.postedAt">
             <span class="gl-detail__label">{{ 'GENERAL_LEDGER.POSTED_AT' | translate }}</span>

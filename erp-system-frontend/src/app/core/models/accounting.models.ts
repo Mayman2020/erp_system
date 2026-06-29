@@ -341,15 +341,59 @@ export interface AccountingTransactionDto {
   creditAccountNameAr?: string;
 }
 
+export interface DocumentLineDto {
+  id?: number;
+  accountId: number;
+  accountCode?: string;
+  accountName?: string;
+  description?: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal?: number;
+}
+
 export interface CustomerInvoiceDto {
   id: number;
   invoiceNumber: string;
   invoiceDate: string;
   dueDate: string;
   customerName: string;
+  customerReference?: string;
+  description?: string;
+  subtotal?: number;
+  taxAmount?: number;
   totalAmount: number;
+  paidAmount?: number;
   outstandingAmount: number;
   status: string;
+  receivableAccountId?: number;
+  receivableAccountCode?: string;
+  receivableAccountName?: string;
+  revenueAccountId?: number;
+  revenueAccountCode?: string;
+  revenueAccountName?: string;
+  journalEntryId?: number;
+  lines?: DocumentLineDto[];
+}
+
+export interface CustomerInvoiceLineForm {
+  accountId: number;
+  description?: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface CustomerInvoiceForm {
+  invoiceNumber?: string;
+  invoiceDate: string;
+  dueDate: string;
+  customerName?: string;
+  customerReference?: string;
+  description?: string;
+  receivableAccountId: number;
+  revenueAccountId: number;
+  taxAmount: number;
+  lines: CustomerInvoiceLineForm[];
 }
 
 export interface AccountingCheckDto {
@@ -357,10 +401,137 @@ export interface AccountingCheckDto {
   checkNumber: string;
   checkType: string;
   bankName: string;
+  issueDate?: string;
   dueDate: string;
   amount: number;
   status: string;
   partyName?: string;
+  linkedDocumentReference?: string;
+  bankAccountId?: number;
+  bankAccountNumber?: string;
+  holdingAccountId?: number;
+  holdingAccountCode?: string;
+  holdingAccountName?: string;
+}
+
+export interface AccountingCheckForm {
+  checkNumber?: string;
+  checkType: string;
+  issueDate: string;
+  dueDate: string;
+  bankName: string;
+  amount: number;
+  partyName?: string;
+  linkedDocumentReference?: string;
+  bankAccountId: number;
+  holdingAccountId: number;
+}
+
+export interface BankAccountForm {
+  bankName: string;
+  accountNumber: string;
+  iban?: string;
+  currency: string;
+  openingBalance: number;
+  linkedAccountId: number;
+  active: boolean;
+}
+
+export interface BillDto {
+  id: number;
+  billNumber: string;
+  billDate: string;
+  dueDate: string;
+  supplierName?: string;
+  supplierReference?: string;
+  description?: string;
+  subtotal?: number;
+  taxAmount?: number;
+  totalAmount: number;
+  paidAmount?: number;
+  outstandingAmount?: number;
+  status: string;
+  payableAccountId?: number;
+  payableAccountCode?: string;
+  payableAccountName?: string;
+  taxAccountId?: number;
+  lines?: DocumentLineDto[];
+}
+
+export interface BillLineForm {
+  accountId: number;
+  description?: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface BillForm {
+  billNumber?: string;
+  billDate: string;
+  dueDate: string;
+  supplierName?: string;
+  supplierReference?: string;
+  description?: string;
+  payableAccountId: number;
+  taxAccountId?: number | null;
+  taxAmount: number;
+  lines: BillLineForm[];
+}
+
+export interface BudgetDto {
+  id: number;
+  accountId: number;
+  accountCode?: string;
+  accountName?: string;
+  budgetName?: string;
+  budgetYear: number;
+  budgetMonth?: number | null;
+  plannedAmount: number;
+  actualAmount?: number;
+  variance?: number;
+  variancePercentage?: number;
+  overBudget?: boolean;
+  status: string;
+  notes?: string;
+}
+
+export interface BudgetForm {
+  accountId: number;
+  budgetName?: string;
+  budgetYear: number;
+  budgetMonth?: number | null;
+  plannedAmount: number;
+  status: string;
+  notes?: string;
+}
+
+export interface ExchangeRateDto {
+  id: number;
+  sourceCurrency: string;
+  targetCurrency: string;
+  rate: number;
+  effectiveDate: string;
+  expiryDate?: string;
+}
+
+export interface ExchangeRateForm {
+  sourceCurrency: string;
+  targetCurrency: string;
+  rate: number;
+  effectiveDate: string;
+  expiryDate?: string;
+}
+
+export interface AccountingTransactionForm {
+  transactionDate: string;
+  reference?: string;
+  description?: string;
+  transactionType: string;
+  amount: number;
+  debitAccountId?: number | null;
+  creditAccountId?: number | null;
+  originalTransactionId?: number | null;
+  relatedDocumentReference?: string;
 }
 
 export interface LedgerLineDto {
@@ -441,4 +612,33 @@ export interface FiscalPeriodFormDto {
   periodName: string;
   startDate: string;
   endDate: string;
+}
+
+export interface TransferDto {
+  id: number;
+  transferDate: string;
+  reference?: string;
+  description?: string;
+  amount: number;
+  sourceAccountId: number;
+  sourceAccountCode?: string;
+  sourceAccountName?: string;
+  destinationAccountId: number;
+  destinationAccountCode?: string;
+  destinationAccountName?: string;
+  status: string;
+  postedAt?: string;
+  postedBy?: string;
+  journalEntryId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface TransferForm {
+  transferDate: string;
+  reference?: string;
+  description?: string;
+  amount: number;
+  sourceAccountId: number;
+  destinationAccountId: number;
 }

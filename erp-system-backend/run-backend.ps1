@@ -4,13 +4,14 @@
 
 .DESCRIPTION
     Production-ready startup script that:
-    - Automatically stops any existing Java process on the configured server port (restart behavior)
+    - If the port is used by a previous Java backend, stops it automatically
+    - If the port is used by another app (e.g. Oracle TNS on 8080), picks the next free port
     - Configures Java/Maven environment
     - Runs Maven clean install
     - Starts Spring Boot with configurable profile
 
 .PARAMETER Profile
-    Spring profile to use. Default "" = erp_system DB. Use "dev" for erp_system_dev (must exist).
+    Spring profile to use. Default "" uses postgres DB with schema erp_system (see application-dev.yml when -Profile dev).
 
 .PARAMETER SkipBuild
     Skip Maven build; only run the application.
@@ -32,19 +33,67 @@ $ExpectedProcess = "java"
 $ContextPath = "/api/v1"
 
 # Must match application.yml / application-dev.yml server.port defaults
-function Get-BackendPort {
+function Get-PreferredBackendPort {
     param([string]$ProfileName)
     if ($env:PORT -and $env:PORT.Trim() -ne "") {
         return [int]$env:PORT
     }
-    if ($ProfileName -eq 'dev') { return 8081 }
-    return 8080
+    if ($ProfileName -eq 'prod') { return 8080 }
+    # application.yml defaults to dev profile; application-dev.yml uses 8081
+    return 8081
+}
+
+function Resolve-BackendPort {
+    param([string]$ProfileName)
+    $preferred = Get-PreferredBackendPort -ProfileName $ProfileName
+    $fallbacks = @(8081, 8091, 8082, 8090, 8092, 8083)
+    $candidates = @($preferred) + $fallbacks | Where-Object { $_ -gt 0 } | Select-Object -Unique
+
+    foreach ($port in $candidates) {
+        $found = Get-ProcessOnPort -Port $port
+        if (-not $found) {
+            if ($port -ne $preferred) {
+                Write-Warn "Preferred port $preferred is busy - using port $port instead."
+            } else {
+                Write-Info "Port $port is free."
+            }
+            return $port
+        }
+
+        $proc = $found.Process
+        $pidVal = $proc.Id
+        $procName = $proc.ProcessName
+        if ($procName -like "*$ExpectedProcess*") {
+            Write-Step "Port $port is in use by $procName (PID $pidVal) - stopping process..." "Yellow"
+            try {
+                Stop-Process -Id $pidVal -Force -ErrorAction Stop
+            } catch {
+                Write-Warn "Could not stop $procName on port $port - trying next port..."
+                continue
+            }
+            Start-Sleep -Seconds 2
+            if (-not (Get-ProcessOnPort -Port $port)) {
+                Write-Success "Port $port cleared."
+                return $port
+            }
+            Write-Warn "Port $port still busy after stop - trying next port..."
+            continue
+        }
+
+        Write-Warn "Port $port is in use by $procName (PID $pidVal) - trying next port..."
+    }
+
+    return $null
 }
 
 # ─── Script Root ─────────────────────────────────────────────────────────────
 $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
 $ProjectRoot = $ScriptDir
 $MvnwPath = Join-Path $ProjectRoot "mvnw.cmd"
+$ErpRoot = Split-Path -Parent $ProjectRoot
+$RuntimeDir = Join-Path $ErpRoot ".runtime"
+$RuntimeStateFile = Join-Path $RuntimeDir "launcher-state.json"
+$ProxyFile = Join-Path $ErpRoot "ops\frontend-run\proxy.conf.json"
 $SecretsFile = Join-Path $ProjectRoot "run-backend.secrets.ps1"
 
 # ─── Logging ─────────────────────────────────────────────────────────────────
@@ -95,37 +144,6 @@ function Get-ProcessOnPort {
     return $null
 }
 
-function Stop-ProcessOnPort {
-    param([int]$Port, [string]$ExpectedName)
-    $found = Get-ProcessOnPort -Port $Port
-    if (-not $found) {
-        Write-Info "Port $Port is free."
-        return $true
-    }
-    $proc = $found.Process
-    $pidVal = $proc.Id
-    $procName = $proc.ProcessName
-    $match = $procName -like "*$ExpectedName*"
-    if (-not $match) {
-        Write-Warn "Port $Port is in use by $procName (PID $pidVal), not $ExpectedName. Skipping kill for safety."
-        return $false
-    }
-    Write-Step "Port $Port is in use by $procName (PID $pidVal) → stopping process..." "Yellow"
-    try {
-        Stop-Process -Id $pidVal -Force -ErrorAction Stop
-    } catch {
-        Write-Err "Failed to stop process: $_"
-        return $false
-    }
-    Start-Sleep -Seconds 2
-    if (Get-ProcessOnPort -Port $Port) {
-        Write-Err "Process stopped but port $Port still in use."
-        return $false
-    }
-    Write-Success "Process stopped successfully."
-    return $true
-}
-
 # ─── Java setup ──────────────────────────────────────────────────────────────
 $JavaCandidates = @(
     $env:JAVA_HOME,
@@ -163,22 +181,46 @@ if (-not (Test-Path $MvnwPath)) {
 Set-Location $ProjectRoot
 
 # ─── Pre-flight: PostgreSQL port ─────────────────────────────────────────────
-$DbName = if ($Profile -eq 'dev') { 'erp_system_dev' } else { 'erp_system' }
+$DbLabel = if ($Profile -eq 'prod') { 'erp_db (schema: erp_system)' } else { 'postgres (schema: erp_system)' }
 $pgPort = 5432
 try {
     $pgListen = Get-NetTCPConnection -LocalPort $pgPort -State Listen -ErrorAction SilentlyContinue
     if (-not $pgListen) {
         Write-Warn "PostgreSQL does not appear to be listening on port $pgPort. Start PostgreSQL before running."
-        Write-Info "  Database required: $DbName. Create with: psql -U postgres -c `"CREATE DATABASE $DbName`";"
+        Write-Info "  Required DB: $DbLabel. Flyway creates schema erp_system on first run."
     }
 } catch { }
 
-# ─── RESTART: Stop old backend on configured port ────────────────────────────
-$ServerPort = Get-BackendPort -ProfileName $Profile
-$BaseUrl = "http://localhost:$ServerPort$ContextPath"
-Write-Step "Checking port $ServerPort..." "Cyan"
-if (-not (Stop-ProcessOnPort -Port $ServerPort -ExpectedName $ExpectedProcess)) {
+# ─── RESTART: Free preferred port or pick the next available one ─────────────
+$ServerPort = Resolve-BackendPort -ProfileName $Profile
+if (-not $ServerPort) {
+    Write-Err "No free port found for the backend. Stop other services or set `$env:PORT."
     exit 1
+}
+$env:PORT = "$ServerPort"
+$BaseUrl = "http://localhost:$ServerPort$ContextPath"
+
+if (-not (Test-Path $RuntimeDir)) {
+    New-Item -ItemType Directory -Path $RuntimeDir | Out-Null
+}
+@{
+    backendPort = $ServerPort
+    backendBaseUrl = $BaseUrl
+    updatedAt = (Get-Date).ToString("o")
+} | ConvertTo-Json | Set-Content -Path $RuntimeStateFile -Encoding UTF8
+Write-Info "  Runtime state: $RuntimeStateFile"
+
+if (Test-Path (Split-Path -Parent $ProxyFile)) {
+    $proxyJson = @{
+        "/api/v1" = @{
+            target = "http://127.0.0.1:$ServerPort"
+            secure = $false
+            changeOrigin = $true
+        }
+    } | ConvertTo-Json -Depth 4
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($ProxyFile, $proxyJson + [Environment]::NewLine, $utf8NoBom)
+    Write-Info "  Frontend proxy target: http://127.0.0.1:$ServerPort"
 }
 
 # ─── Maven build ─────────────────────────────────────────────────────────────
@@ -203,11 +245,11 @@ if ($Profile) {
     Write-Step "Starting backend (default config)..." "Cyan"
 }
 Write-Info "  Server: $BaseUrl"
-Write-Info "  Database: $(if ($Profile -eq 'dev') { 'erp_system_dev' } else { 'erp_system' })"
+Write-Info "  Database: $DbLabel"
 Write-Info "  Stop with Ctrl+C"
 Write-Host ""
 
-$runArgs = @("spring-boot:run")
+$runArgs = @("spring-boot:run", "-Dspring-boot.run.arguments=--server.port=$ServerPort")
 if ($Profile) { $runArgs += "-Dspring-boot.run.profiles=$Profile" }
 
 & $MvnwPath @runArgs
@@ -218,7 +260,7 @@ if ($exitCode -eq 0) {
     Write-Success "Backend stopped normally."
 } else {
     Write-Err "Backend exited with failure (exit code $exitCode)."
-    Write-Info "Common causes: database not found (create erp_system, or erp_system_dev for -Profile dev), PostgreSQL not running, port $ServerPort in use."
-    Write-Info "  Fix: Run 'psql -U postgres -c ""CREATE DATABASE $DbName""' then try again."
+    Write-Info "Common causes: PostgreSQL not running, DB password wrong (set DB_PASS), port $ServerPort in use."
+    Write-Info "  Dev DB: postgres on localhost:5432 with schema erp_system (Flyway creates it)."
 }
 exit $exitCode

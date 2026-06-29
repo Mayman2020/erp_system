@@ -325,6 +325,15 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
     return this.rolePermissionDraft.filter((permission) => !query || [permission.menuItemId, permission.url, this.translationService.instant(permission.titleKey)].join(' ').toLowerCase().includes(query));
   }
 
+  get parentScreenOptions(): Array<{ id: string; label: string }> {
+    const none = { id: '', label: this.translationService.instant('ACCESS_MANAGEMENT.PARENT_NONE') };
+    const items = (this.menuScreens || []).map((screen) => ({
+      id: screen.id,
+      label: `${screen.id} — ${this.translationService.instant(screen.titleKey)}`
+    }));
+    return [none, ...items];
+  }
+
   loadPage(): void {
     this.loading = true;
     this.lookupTypesLoading = true;

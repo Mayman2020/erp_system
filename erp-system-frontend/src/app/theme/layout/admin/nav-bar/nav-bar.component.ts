@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NextConfig } from '../../../../app-config';
 import { ThemeService, ThemeMode } from '../../../../core/services/theme.service';
+import { CommandPaletteService } from '../../../../core/services/command-palette.service';
 
 @Component({ standalone: false,
   selector: 'app-nav-bar',
@@ -21,7 +22,10 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private themeService: ThemeService) {
+  constructor(
+    private themeService: ThemeService,
+    private commandPalette: CommandPaletteService
+  ) {
     this.flatConfig = NextConfig.config;
     this.windowWidth = window.innerWidth;
   }
@@ -54,4 +58,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
     }
   }
 
+  openSearch(): void {
+    this.commandPalette.open();
+  }
 }

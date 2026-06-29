@@ -233,3 +233,29 @@
 :host-context(.erp-header-shell) .erp-sidebar-profile__caret {
   color: rgba(248, 250, 252, 0.75) !important;
 }
+
+.erp-sidebar-profile__toggle--header-pill {
+  gap: 10px;
+  min-height: 44px;
+  padding: 4px 14px 4px 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+}
+
+.erp-sidebar-profile__toggle--header-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.erp-sidebar-profile--header-pill .erp-sidebar-profile__info strong {
+  font-size: 0.84rem;
+  font-weight: 700;
+  max-width: 160px;
+}
+
+.erp-sidebar-profile--header-pill .erp-sidebar-profile__info small {
+  font-size: 0.68rem;
+  font-weight: 600;
+  max-width: 160px;
+}

@@ -46,6 +46,8 @@ export class ProfileCardComponent implements OnChanges, OnDestroy {
   @Input() avatarUrl = 'assets/images/user/avatar-1.jpg';
   @Input() loading = false;
   @Input() menuOpen = false;
+  /** Header topbar pill (mockup): rounded border, no caret */
+  @Input() headerPill = false;
   @Output() toggleMenu = new EventEmitter<void>();
   @Output() closeMenu = new EventEmitter<void>();
   @Output() profileClick = new EventEmitter<void>();

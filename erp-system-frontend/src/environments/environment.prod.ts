@@ -1,11 +1,17 @@
-/**
- * Production default: same-origin `/api/v1` — nginx in the frontend container proxies to Spring Boot.
- * CI/Docker may override via `NG_API_BASE_URL` (see scripts/write-env.cjs) for split UI/API hosting.
- */
 import type { AppEnvironment } from './environment.types';
+
+function resolveApiUrl(): string {
+  if (typeof window !== 'undefined') {
+    const runtime = (window as Window & { __ERP_API_URL__?: string }).__ERP_API_URL__?.trim();
+    if (runtime) {
+      return runtime;
+    }
+  }
+  return '/api/v1';
+}
 
 export const environment: AppEnvironment = {
   production: true,
-  apiUrl: '/api/v1',
+  apiUrl: resolveApiUrl(),
   appVersion: '21.0.0'
 };

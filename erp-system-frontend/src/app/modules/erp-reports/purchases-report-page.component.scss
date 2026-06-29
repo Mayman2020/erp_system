@@ -1,0 +1,37 @@
+.erp-report-page__card {
+  margin-top: 1rem;
+}
+
+.erp-report-page__card .erp-card__body {
+  padding: 1.25rem;
+}
+
+.erp-report-page__summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.erp-report-page__metric {
+  padding: 1rem;
+  border-radius: var(--erp-radius-md, 8px);
+  background: var(--erp-surface-muted, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--erp-border-subtle, rgba(0, 0, 0, 0.08));
+}
+
+.erp-report-page__metric-label {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-bottom: 0.35rem;
+}
+
+.erp-report-page__metric-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .erp-report-page__metric {
+  background: var(--erp-surface-elevated, rgba(255, 255, 255, 0.04));
+  border-color: var(--erp-border-subtle, rgba(255, 255, 255, 0.08));
+}

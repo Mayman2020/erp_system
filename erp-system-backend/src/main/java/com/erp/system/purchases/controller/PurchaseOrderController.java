@@ -1,8 +1,10 @@
 package com.erp.system.purchases.controller;
 
 import com.erp.system.common.dto.ApiResponse;
+import com.erp.system.purchases.dto.display.PurchaseInvoiceDisplayDto;
 import com.erp.system.purchases.dto.display.PurchaseOrderDisplayDto;
 import com.erp.system.purchases.dto.form.PurchaseOrderFormDto;
+import com.erp.system.purchases.service.PurchaseInvoiceService;
 import com.erp.system.purchases.service.PurchaseOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.List;
 public class PurchaseOrderController {
 
     private final PurchaseOrderService purchaseOrderService;
+    private final PurchaseInvoiceService purchaseInvoiceService;
 
     @GetMapping
     public ApiResponse<List<PurchaseOrderDisplayDto>> getAll() {
@@ -49,6 +52,12 @@ public class PurchaseOrderController {
                                                        @RequestParam String actor,
                                                        @RequestParam(required = false) String reason) {
         return ApiResponse.success(purchaseOrderService.cancel(id, actor, reason));
+    }
+
+    @PostMapping("/{id}/convert-to-invoice")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<PurchaseInvoiceDisplayDto> convertToInvoice(@PathVariable Long id) {
+        return ApiResponse.success(purchaseInvoiceService.create(purchaseOrderService.buildInvoiceForm(id)));
     }
 
     @DeleteMapping("/{id}")

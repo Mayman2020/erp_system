@@ -23,8 +23,36 @@
   flex-shrink: 0;
 }
 
-/* RTL: profile (reading first) before language flag */
-:host-context(body.rtl) .erp-header-actions app-profile-card {
-  order: -1;
+.erp-nav-notify-btn {
+  position: relative;
+}
+
+.erp-nav-notify-badge {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.85);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 16px;
+  text-align: center;
+  color: #fff;
+}
+
+.erp-nav-theme-btn--subtle {
+  opacity: 0.72;
+}
+
+.erp-nav-theme-btn--subtle:hover {
+  opacity: 1;
+}
+
+.erp-header-actions app-profile-card {
+  flex-shrink: 0;
 }
 

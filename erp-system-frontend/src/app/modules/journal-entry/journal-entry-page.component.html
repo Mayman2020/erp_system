@@ -1,4 +1,4 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header titleKey="JOURNAL.TITLE">
     <div header-actions>
       <button
@@ -12,17 +12,11 @@
     </div>
   </app-page-header>
 
-  <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey && !formVisible && !accountPickerVisible">
-    {{ errorKey | translate }}
-    <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-  </div>
-  <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey && !formVisible && !accountPickerVisible">
-    {{ successKey | translate }}
-    <button type="button" class="btn-close" (click)="successKey = ''"></button>
-  </div>
+  <app-erp-alert *ngIf="errorKey && !formVisible && !accountPickerVisible" type="danger" [message]="errorKey" (dismissed)="errorKey = ''"></app-erp-alert>
+  <app-erp-alert *ngIf="successKey && !formVisible && !accountPickerVisible" type="success" [message]="successKey" (dismissed)="successKey = ''"></app-erp-alert>
 
-  <div class="card erp-unified-card">
-    <div class="card-body">
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
       <app-advanced-search-bar [showStatus]="true" [showDateRange]="true" [showAmountRange]="true" [statusOptions]="statusCodes" (search)="onSearch($event)"></app-advanced-search-bar>
       <app-data-table
         [columns]="columns"
@@ -41,43 +35,45 @@
 <app-erp-dialog [visible]="formVisible" [titleKey]="'JOURNAL.FORM_TITLE_' + formMode.toUpperCase()" size="xxl" (close)="closeForm()">
   <div dialog-body>
   <form [formGroup]="form">
-    <div class="alert alert-danger alert-dismissible fade show mb-2" *ngIf="errorKey">
-      {{ errorKey | translate }}
-      <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-    </div>
-    <div class="alert alert-success alert-dismissible fade show mb-2" *ngIf="successKey">
-      {{ successKey | translate }}
-      <button type="button" class="btn-close" (click)="successKey = ''"></button>
-    </div>
-    <div class="row">
-      <div class="col-md-3 form-group">
+    <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-2" (dismissed)="errorKey = ''"></app-erp-alert>
+    <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-2" (dismissed)="successKey = ''"></app-erp-alert>
+    <div class="row erp-dialog-form">
+      <div class="col-md-3 mb-3">
         <app-form-field [control]="form.controls.entryDate" labelKey="JOURNAL.DATE" icon="calendar_month" type="date"></app-form-field>
       </div>
-      <div class="col-md-3 form-group">
-        <label>{{ 'JOURNAL.CURRENCY' | translate }}</label>
-        <select class="form-control" formControlName="currencyCode">
-          <option *ngFor="let option of currencyLookups" [value]="option.code">{{ option.code }}</option>
-        </select>
+      <div class="col-md-3 mb-3">
+        <app-form-field
+          [control]="form.controls.currencyCode"
+          labelKey="JOURNAL.CURRENCY"
+          icon="currency_exchange"
+          type="select"
+          [options]="currencyLookups"
+          optionValueField="code"
+          optionLabelField="code"
+        ></app-form-field>
       </div>
-      <div class="col-md-3 form-group">
-        <label>{{ 'JOURNAL.ENTRY_TYPE' | translate }}</label>
-        <select class="form-control" formControlName="entryType">
-          <option *ngFor="let option of entryTypeLookups" [value]="option.code">{{ ('ENTRY_TYPE.' + option.code) | translate }}</option>
-        </select>
+      <div class="col-md-3 mb-3">
+        <app-form-field
+          [control]="form.controls.entryType"
+          labelKey="JOURNAL.ENTRY_TYPE"
+          icon="category"
+          type="select"
+          [options]="entryTypeLookups"
+          optionValueField="code"
+          optionLabelPrefix="ENTRY_TYPE."
+        ></app-form-field>
       </div>
-      <div class="col-md-3 form-group">
-        <label>{{ 'JOURNAL.REFERENCE_NUMBER' | translate }}</label>
-        <input class="form-control" formControlName="externalReference" />
+      <div class="col-md-3 mb-3">
+        <app-form-field [control]="form.controls.externalReference" labelKey="JOURNAL.REFERENCE_NUMBER" icon="tag"></app-form-field>
       </div>
-      <div class="col-12 form-group">
-        <label>{{ 'JOURNAL.DESCRIPTION' | translate }}</label>
-        <input class="form-control" formControlName="description" />
+      <div class="col-12 mb-3">
+        <app-form-field [control]="form.controls.description" labelKey="JOURNAL.DESCRIPTION" icon="notes"></app-form-field>
       </div>
     </div>
 
-      <div class="card mt-2">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="mb-0">{{ 'JOURNAL.LINES' | translate }}</h6>
+      <div class="erp-card mt-2">
+      <div class="erp-card__header">
+        <h6 class="app-card-title mb-0">{{ 'JOURNAL.LINES' | translate }}</h6>
         <button
           type="button"
           class="erp-icon-button"
@@ -87,7 +83,7 @@
           <mat-icon aria-hidden="true">add</mat-icon>
         </button>
       </div>
-      <div class="card-body p-0">
+      <div class="erp-card__body p-0">
         <div class="table-responsive">
           <table class="erp-table">
             <thead>
@@ -103,7 +99,7 @@
               <tr *ngFor="let line of lines.controls; let i = index" [class.invalid-row]="lineInvalid(i)">
                 <td>
                   <div class="d-flex">
-                    <input class="form-control" [value]="line.get('accountName')?.value" readonly (focus)="pickLine(i)" />
+                    <input class="erp-input" [value]="line.get('accountName')?.value" readonly (focus)="pickLine(i)" />
                     <button
                       type="button"
                       class="erp-icon-button ml-1"
@@ -114,9 +110,9 @@
                     </button>
                   </div>
                 </td>
-                <td><input class="form-control" [formControl]="line.get('description')" /></td>
-                <td><input type="number" class="form-control" [formControl]="line.get('debit')" min="0" step="0.01" /></td>
-                <td><input type="number" class="form-control" [formControl]="line.get('credit')" min="0" step="0.01" /></td>
+                <td><input class="erp-input" [formControl]="line.get('description')" /></td>
+                <td><input type="number" class="erp-input" [formControl]="line.get('debit')" min="0" step="0.01" /></td>
+                <td><input type="number" class="erp-input" [formControl]="line.get('credit')" min="0" step="0.01" /></td>
                 <td>
                   <button
                     type="button"
@@ -158,7 +154,7 @@
 
 <app-erp-dialog [visible]="accountPickerVisible" [titleKey]="'JOURNAL.ACCOUNT'" size="xl" (close)="closeAccountSelector()">
   <div dialog-body>
-    <div class="alert alert-danger mb-2" *ngIf="errorKey">{{ errorKey | translate }}</div>
+    <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-2" [dismissible]="false"></app-erp-alert>
     <div class="journal-account-picker">
       <app-tree-selector
         [nodes]="accountTree"

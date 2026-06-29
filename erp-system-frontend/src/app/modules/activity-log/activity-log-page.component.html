@@ -1,0 +1,13 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+      <div class="d-flex justify-content-between mt-3">
+        <button type="button" class="erp-button erp-button--secondary" [disabled]="page === 0 || loading" (click)="prevPage()">{{ 'COMMON.PREVIOUS' | translate }}</button>
+        <span>{{ 'COMMON.PAGE' | translate }} {{ page + 1 }}</span>
+        <button type="button" class="erp-button erp-button--secondary" [disabled]="rows.length < pageSize || loading" (click)="nextPage()">{{ 'COMMON.NEXT' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</section>

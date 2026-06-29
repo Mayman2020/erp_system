@@ -1,29 +1,109 @@
-<div *ngIf="this.flatConfig['layout'] === 'vertical'" (clickOutside)="navMob()" [excludeBeforeClick]="true" [exclude]="'#mobile-collapse'" id="nav-ps-flat-able" class="flat-able-scroll erp-nav-scroll" [style.max-width]="'100%'">
-  <div class="navbar-content erp-navbar-content">
-    <app-sidebar class="erp-sidebar-layout">
-      <ul sidebar-menu class="nav pcoded-inner-navbar erp-sidebar-menu erp-sidebar-menu--root" (clickOutside)="fireOutClick()">
-        <li class="nav-item pcoded-menu-caption" *ngIf="menuLoading"><label>{{ 'COMMON.LOADING' | translate }}</label></li>
-        <ng-container *ngFor="let item of navigation">
-          <app-nav-group *ngIf="item.type=='group'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-group>
-          <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-collapse>
-          <app-nav-item *ngIf="item.type=='item'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-item>
-        </ng-container>
-      </ul>
-    </app-sidebar>
-  </div>
+<div id="nav-ps-flat-able" class="flat-able-scroll erp-nav-scroll" [style.max-width]="'100%'">
+  <nav class="sidebar-nav estate-sidebar-nav" aria-label="Main navigation">
+    <div *ngIf="menuLoading" class="estate-nav-loading">{{ 'COMMON.LOADING' | translate }}</div>
+
+    <ng-container *ngFor="let item of navigation; trackBy: trackById">
+      <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: item }"></ng-container>
+    </ng-container>
+  </nav>
 </div>
 
-<div *ngIf="this.flatConfig['layout'] === 'horizontal'" #navbarWrapper class="navbar-content sidenav-horizontal" id="layout-sidenav">
-  <a href="javascript:" class="sidenav-horizontal-prev" [ngClass]="prevDisabled" (click)="scrollMinus()"></a>
-  <div class="sidenav-horizontal-wrapper">
-    <ul #navbarContent id="side-nav-horizontal" class="nav pcoded-inner-navbar sidenav-inner" (clickOutside)="fireLeave()" (mouseleave)="fireLeave()">
-      <li class="nav-item pcoded-menu-caption" *ngIf="menuLoading"><label>{{ 'COMMON.LOADING' | translate }}</label></li>
-      <ng-container *ngFor="let item of navigation">
-        <app-nav-group *ngIf="item.type=='group'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-group>
-        <app-nav-collapse *ngIf="item.type=='collapse'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-collapse>
-        <app-nav-item *ngIf="item.type=='item'" [item]="item" [menuIconsOnly]="menuIconsOnly"></app-nav-item>
+<ng-template #nodeTpl let-node>
+  <ng-container *ngIf="!node.hidden && node.type === 'group'">
+    <ng-container *ngIf="isCollapsibleGroup(node); else staticGroup">
+      <button
+        *ngIf="!menuIconsOnly"
+        type="button"
+        class="nav-section-toggle"
+        (click)="toggleSection(node, $event)"
+        [attr.aria-expanded]="isSectionOpen(node)"
+      >
+        <span class="nav-section-label">{{ node.title | translate }}</span>
+        <mat-icon class="nav-section-arrow" aria-hidden="true">{{ isSectionOpen(node) ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </button>
+
+      <div class="nav-section-items" [class.is-collapsed]="!menuIconsOnly && !isSectionOpen(node)">
+        <ng-container *ngFor="let child of node.children; trackBy: trackById">
+          <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: child }"></ng-container>
+        </ng-container>
+      </div>
+    </ng-container>
+
+    <ng-template #staticGroup>
+      <span class="nav-section-label nav-section-label--static" *ngIf="!menuIconsOnly">{{ node.title | translate }}</span>
+      <div class="nav-section-items">
+        <ng-container *ngFor="let child of node.children; trackBy: trackById">
+          <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: child }"></ng-container>
+        </ng-container>
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <ng-container *ngIf="!node.hidden && node.type === 'collapse' && node.children?.length">
+    <button
+      type="button"
+      class="nav-item nav-item--collapse"
+      [class.active]="isCollapseActive(node)"
+      (click)="toggleCollapse(node, $event)"
+      [attr.aria-expanded]="isCollapseOpen(node)"
+      [attr.title]="menuIconsOnly ? null : (node.title | translate)"
+      [attr.aria-label]="node.title | translate"
+      [ngbTooltip]="menuIconsOnly ? (node.title | translate) : null"
+      placement="end"
+      container="body"
+      triggers="mouseenter:mouseleave"
+      [openDelay]="200"
+    >
+      <span class="nav-icon" *ngIf="node.icon"><mat-icon aria-hidden="true">{{ node.icon }}</mat-icon></span>
+      <span class="nav-label" *ngIf="!menuIconsOnly">{{ node.title | translate }}</span>
+      <mat-icon class="nav-collapse-arrow" *ngIf="!menuIconsOnly" aria-hidden="true">{{ isCollapseOpen(node) ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </button>
+
+    <div class="nav-subsection" [class.is-collapsed]="!isCollapseOpen(node)">
+      <ng-container *ngFor="let child of node.children; trackBy: trackById">
+        <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: child }"></ng-container>
       </ng-container>
-    </ul>
-  </div>
-  <a href="javascript:" class="sidenav-horizontal-next" [ngClass]="nextDisabled" (click)="scrollPlus()"></a>
-</div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!node.hidden && node.type === 'item'">
+    <a
+      *ngIf="node.url && !node.external"
+      class="nav-item"
+      [routerLink]="node.url"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="linkActiveOptions(node)"
+      [class.active]="isItemActive(node)"
+      (click)="onNavItemClick()"
+      [attr.title]="menuIconsOnly ? null : (node.title | translate)"
+      [attr.aria-label]="node.title | translate"
+      [ngbTooltip]="menuIconsOnly ? (node.title | translate) : null"
+      placement="end"
+      container="body"
+      triggers="mouseenter:mouseleave"
+      [openDelay]="200"
+    >
+      <span class="nav-icon" *ngIf="node.icon"><mat-icon aria-hidden="true">{{ node.icon }}</mat-icon></span>
+      <span class="nav-label" *ngIf="!menuIconsOnly">{{ node.title | translate }}</span>
+      <span *ngIf="node.badge && !menuIconsOnly" class="nav-badge badge" [ngClass]="node.badge.type">{{ node.badge.title }}</span>
+    </a>
+
+    <a
+      *ngIf="node.url && node.external"
+      class="nav-item"
+      [href]="node.url"
+      [target]="node.target ? '_blank' : '_self'"
+      [attr.title]="menuIconsOnly ? null : (node.title | translate)"
+      [attr.aria-label]="node.title | translate"
+      [ngbTooltip]="menuIconsOnly ? (node.title | translate) : null"
+      placement="end"
+      container="body"
+      triggers="mouseenter:mouseleave"
+      [openDelay]="200"
+    >
+      <span class="nav-icon" *ngIf="node.icon"><mat-icon aria-hidden="true">{{ node.icon }}</mat-icon></span>
+      <span class="nav-label" *ngIf="!menuIconsOnly">{{ node.title | translate }}</span>
+      <span *ngIf="node.badge && !menuIconsOnly" class="nav-badge badge" [ngClass]="node.badge.type">{{ node.badge.title }}</span>
+    </a>
+  </ng-container>
+</ng-template>

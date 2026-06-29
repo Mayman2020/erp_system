@@ -1,7 +1,13 @@
 <app-command-palette></app-command-palette>
-<div class="erp-admin-shell" [class.erp-admin-shell--sidebar-hidden]="navSidebarHidden"
+
+<div
+  class="app-shell erp-app-shell erp-admin-shell erp-integrated-shell"
+  [class.sidebar-collapsed]="navCollapsed && !navSidebarHidden"
   [class.erp-admin-shell--sidebar-collapsed]="navCollapsed && !navSidebarHidden"
-  [class.erp-admin-shell--mobile-open]="navCollapsedMob">
+  [class.erp-admin-shell--sidebar-hidden]="navSidebarHidden"
+  [class.mob-open]="navCollapsedMob"
+  [class.erp-admin-shell--mobile-open]="navCollapsedMob"
+>
   <button
     *ngIf="navCollapsedMob"
     type="button"
@@ -9,24 +15,27 @@
     (click)="closeMobileNav()"
     [attr.aria-label]="'COMMON.CLOSE' | translate"
   ></button>
-  <app-navigation class="pcoded-navbar erp-admin-shell__sidebar" [sidebarCollapsed]="navCollapsed && !navSidebarHidden" [ngClass]="{
-      'navbar-collapsed': navCollapsed && !navSidebarHidden,
-      'erp-sidebar-hidden': navSidebarHidden,
-      'theme-horizontal': this.flatConfig['layout'] === 'horizontal',
-      'mob-open': navCollapsedMob
-    }" (onNavMobCollapse)="navMobClick()" (onNavCollapse)="toggleSidebarCollapsed()"></app-navigation>
-  <div class="erp-admin-shell__workspace">
-    <app-nav-bar class="navbar pcoded-header navbar-expand-lg navbar-light erp-admin-shell__header"
-      (onNavCollapse)="toggleSidebarCollapsed()" (onNavHeaderMobCollapse)="navMobClick()"></app-nav-bar>
-    <div class="pcoded-main-container erp-main-container erp-admin-shell__main">
-      <div class="pcoded-content erp-content"
-        [ngClass]="{'container': this.flatConfig.layout === 'horizontal' && this.flatConfig.subLayout === 'horizontal-2'}">
-        <app-breadcrumb class="erp-breadcrumb-host"></app-breadcrumb>
-        <div class="erp-route-shell" [@erpPageTransition]="router.url">
-          <router-outlet></router-outlet>
-        </div>
-        <app-shell-footer></app-shell-footer>
+
+  <app-navigation
+    class="erp-estate-sidebar erp-admin-shell__sidebar"
+    [sidebarCollapsed]="navCollapsed && !navSidebarHidden"
+    (onNavMobCollapse)="navMobClick()"
+    (onNavCollapse)="toggleSidebarCollapsed()"
+  ></app-navigation>
+
+  <div class="main-area erp-admin-shell__workspace">
+    <app-nav-bar
+      class="erp-estate-topbar erp-admin-shell__header"
+      (onNavCollapse)="toggleSidebarCollapsed()"
+      (onNavHeaderMobCollapse)="navMobClick()"
+    ></app-nav-bar>
+
+    <main class="main-content erp-admin-shell__main">
+      <app-breadcrumb class="erp-breadcrumb-host"></app-breadcrumb>
+      <div class="erp-route-shell" [@erpPageTransition]="router.url">
+        <router-outlet></router-outlet>
       </div>
-    </div>
+      <app-shell-footer class="erp-shell-footer--integrated"></app-shell-footer>
+    </main>
   </div>
 </div>

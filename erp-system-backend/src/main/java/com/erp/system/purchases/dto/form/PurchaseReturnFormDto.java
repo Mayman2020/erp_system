@@ -1,12 +1,14 @@
 package com.erp.system.purchases.dto.form;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -16,30 +18,25 @@ import java.util.List;
 @Builder
 public class PurchaseReturnFormDto {
 
-@Size(max = 50)
-private String returnNumber;
+    @Size(max = 50)
+    private String returnNumber;
 
-@NotNull
-private LocalDate returnDate;
+    @NotNull
+    private LocalDate returnDate;
 
-@NotNull
-private Long supplierId;
+    @NotNull
+    private Long supplierId;
 
-private Long invoiceId;
-private Long warehouseId;
+    private Long invoiceId;
+    private Long warehouseId;
 
-@NotNull
-@DecimalMin("0.0")
-private BigDecimal subtotal;
+    @DecimalMin("0.0")
+    private BigDecimal taxAmount;
 
-@DecimalMin("0.0")
-private BigDecimal taxAmount;
+    @Size(max = 500)
+    private String notes;
 
-@NotNull
-@DecimalMin("0.0")
-private BigDecimal totalAmount;
-
-@Size(max = 500)
-private String notes;
-
+    @Valid
+    @NotEmpty(message = "VALIDATION.REQUIRED")
+    private List<PurchaseReturnLineInputDto> lines;
 }

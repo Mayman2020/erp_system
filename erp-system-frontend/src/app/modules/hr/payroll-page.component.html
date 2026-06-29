@@ -1,0 +1,76 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+
+  <app-page-header [titleKey]="titleKey"><div header-actions><button class="erp-button erp-button--primary" type="button" (click)="openCreate()"><mat-icon>add</mat-icon><span>{{ 'ERP.CREATE_PAYROLL' | translate }}</span></button></div></app-page-header>
+
+  <div class="erp-card erp-list-page__card"><div class="erp-card__body">
+
+    <app-advanced-search-bar [showStatus]="true" [statusOptions]="statusOptions" (search)="onSearch($event)"></app-advanced-search-bar>
+
+    <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+
+  </div></div>
+
+</section>
+
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'ERP.CREATE_PAYROLL' : 'COMMON.EDIT'" size="lg" (close)="closeForm()">
+
+  <div dialog-body><form [formGroup]="form"><div class="row">
+
+    <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.payrollNumber" labelKey="ERP.NUMBER" [readonly]="readOnly"></app-form-field></div>
+
+    <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.periodStart" labelKey="COMMON.FROM_DATE" type="date" [readonly]="readOnly"></app-form-field></div>
+
+    <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.periodEnd" labelKey="COMMON.TO_DATE" type="date" [readonly]="readOnly"></app-form-field></div>
+
+    <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.totalAmount" labelKey="ERP.AMOUNT" type="number" step="0.01" min="0" [readonly]="readOnly"></app-form-field></div>
+
+    <div class="col-12 mb-3"><app-form-field [control]="form.controls.notes" labelKey="INVOICES.NOTES" type="textarea" [rows]="2" [readonly]="readOnly"></app-form-field></div>
+
+    <div class="col-12"><app-journal-link [journalEntryId]="currentJournalEntryId"></app-journal-link></div>
+
+  </div></form></div>
+
+  <div dialog-footer class="d-flex gap-2 justify-content-end"><button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button><button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button></div>
+
+</app-erp-dialog>
+
+
+
+<app-erp-dialog [visible]="linesPanelVisible" titleKey="ERP.PAYROLL_LINES" size="xl" (close)="closeLinesPanel()">
+
+  <div dialog-body>
+
+    <app-journal-link *ngIf="currentJournalEntryId" [journalEntryId]="currentJournalEntryId" class="mb-3 d-block"></app-journal-link>
+
+    <form [formGroup]="lineForm" class="row mb-3">
+
+      <div class="col-md-3">
+
+        <label class="form-label">{{ 'MENU.EMPLOYEES' | translate }}</label>
+
+        <select class="form-control" formControlName="employeeId">
+
+          <option *ngFor="let e of employeeOptions" [ngValue]="e.id">{{ e.label }}</option>
+
+        </select>
+
+      </div>
+
+      <div class="col-md-2"><app-form-field [control]="lineForm.controls.basicSalary" labelKey="ERP.BASIC_SALARY" type="number"></app-form-field></div>
+
+      <div class="col-md-2"><app-form-field [control]="lineForm.controls.allowances" labelKey="ERP.ALLOWANCES" type="number"></app-form-field></div>
+
+      <div class="col-md-2"><app-form-field [control]="lineForm.controls.deductions" labelKey="ERP.DEDUCTIONS" type="number"></app-form-field></div>
+
+      <div class="col-md-2"><app-form-field [control]="lineForm.controls.netSalary" labelKey="ERP.NET_SALARY" type="number" [readonly]="true"></app-form-field></div>
+
+      <div class="col-md-1 d-flex align-items-end"><button type="button" class="erp-button erp-button--primary mb-3" (click)="addLine()">{{ 'COMMON.ADD' | translate }}</button></div>
+
+    </form>
+
+    <app-data-table [columns]="lineColumns" [data]="lineRows"></app-data-table>
+
+  </div>
+
+</app-erp-dialog>
+

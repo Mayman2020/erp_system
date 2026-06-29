@@ -1,0 +1,205 @@
+/* Estate OS — global tokens (Property_Managments parity) */
+
+:root,
+[data-theme='light'] {
+  --navy-900: #0e1f33;
+  --navy-800: #14283f;
+  --navy-700: #1b3553;
+  --navy-600: #28476b;
+  --navy-500: #3d6290;
+
+  --brass-600: #8e6a2b;
+  --brass-500: #b48a40;
+  --brass-400: #cca55b;
+  --brass-300: #e2c27e;
+  --brass-100: #f4e7c4;
+
+  --paper: #f6f2ea;
+  --paper-2: #efeae0;
+  --paper-3: #e8e0d1;
+  --ink-900: #0e1f33;
+  --ink-700: #334a67;
+  --ink-500: #6b7f96;
+  --ink-400: #95a4b8;
+  --ink-300: #b9c3d2;
+  --line: #dfd7c7;
+  --line-2: #e9e2d2;
+
+  --surface: #fffdf8;
+  --surface-2: #fbf7ee;
+
+  --ok: #2f6a3a;
+  --ok-bg: #e4efd8;
+  --warn: #b8651a;
+  --warn-bg: #f7e6c9;
+  --bad: #a8332b;
+  --bad-bg: #f4dad4;
+  --info: #2a5079;
+  --info-bg: #dce5f1;
+
+  --accent: var(--brass-500);
+  --accent-soft: var(--brass-100);
+
+  --e-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --e-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 160ms;
+  --t-med: 320ms;
+  --t-slow: 520ms;
+
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+
+  --density: 1;
+  --pad-card: calc(20px * var(--density));
+  --pad-row: calc(14px * var(--density));
+
+  --sidebar-w: 248px;
+  --sidebar-w-collapsed: 76px;
+  --topbar-height: 64px;
+
+  --font-display: 'Instrument Serif', 'Playfair Display', Georgia, serif;
+  --font-ui: 'Inter', 'IBM Plex Sans Arabic', 'Cairo', -apple-system, system-ui, sans-serif;
+  --font-body: var(--font-ui);
+  --font-ar: 'IBM Plex Sans Arabic', 'Cairo', var(--font-ui);
+  --font-mono: 'JetBrains Mono', 'Geist Mono', ui-monospace, monospace;
+
+  --text-main: var(--ink-900);
+  --text-muted: var(--ink-500);
+  --text-subtle: var(--ink-400);
+
+  --header-bg: var(--surface);
+  --header-border: var(--line);
+
+  --sidebar-bg: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 100%);
+  --sidebar-text: rgba(233, 223, 200, 0.78);
+  --sidebar-text-active: #f4e7c4;
+  --sidebar-item-hover: rgba(255, 255, 255, 0.06);
+  --sidebar-item-active: rgba(204, 165, 91, 0.22);
+  --sidebar-accent: var(--brass-400);
+  --sidebar-width: var(--sidebar-w);
+  --sidebar-collapsed-width: var(--sidebar-w-collapsed);
+
+  --card-border: var(--line);
+  --card-hover-border: var(--brass-300);
+  --card-bg: var(--surface);
+  --shadow-soft: 0 10px 30px rgba(14, 31, 51, 0.06);
+  --shadow-hover: 0 14px 36px rgba(14, 31, 51, 0.1);
+  --shadow-card: none;
+
+  --btn-primary-bg: var(--navy-900);
+  --btn-primary-color: var(--brass-100);
+  --btn-outline-bg: var(--surface);
+  --btn-outline-hover: var(--paper-2);
+
+  --input-bg: var(--surface);
+  --input-border: var(--line);
+  --input-focus-border: var(--brass-500);
+
+  --table-border: var(--line);
+  --table-header-bg: var(--paper-2);
+  --table-header-color: var(--ink-500);
+  --table-row-hover: var(--paper-2);
+  --table-row-even: var(--surface);
+
+  --icon-btn-hover: var(--paper-2);
+  --line-strong: var(--line-2);
+
+  --empty-state-bg: var(--paper-2);
+  --empty-state-border: var(--line);
+  --empty-state-text: var(--ink-400);
+
+  --motion-fast: var(--t-fast);
+  --motion-base: var(--t-med);
+  --motion-slow: var(--t-slow);
+  --ease: var(--e-out);
+
+  /* Legacy ERP bridge */
+  --erp-bg: var(--paper);
+  --erp-bg-elevated: var(--surface);
+  --erp-bg-card: var(--surface);
+  --erp-bg-muted: var(--paper-2);
+  --erp-bg-soft: var(--surface-2);
+  --erp-text: var(--text-main);
+  --erp-text-muted: var(--text-muted);
+  --erp-text-secondary: var(--text-muted);
+  --erp-text-soft: var(--text-subtle);
+  --erp-border: var(--line);
+  --erp-border-strong: var(--line-2);
+  --erp-border-soft: color-mix(in srgb, var(--line) 55%, transparent);
+  --erp-primary: var(--navy-900);
+  --erp-primary-strong: var(--navy-700);
+  --erp-primary-soft: rgba(204, 165, 91, 0.14);
+  --erp-info: var(--info);
+  --erp-info-soft: var(--info-bg);
+  --erp-success: var(--ok);
+  --erp-success-soft: var(--ok-bg);
+  --erp-warning: var(--warn);
+  --erp-warning-soft: var(--warn-bg);
+  --erp-danger: var(--bad);
+  --erp-danger-soft: var(--bad-bg);
+  --erp-shell-bar-gradient: var(--header-bg);
+  --erp-shell-sidebar-gradient: var(--sidebar-bg);
+  --erp-shell-bar-text: var(--text-main);
+  --erp-shell-bar-text-muted: var(--text-muted);
+  --bg-primary: var(--paper);
+  --bg-card: var(--surface);
+  --bg-hover: var(--paper-2);
+  --bg-muted: var(--paper-2);
+  --border-color: var(--line);
+  --text-primary: var(--text-main);
+  --text-secondary: var(--text-muted);
+  --primary-color: var(--navy-900);
+  --secondary-color: var(--brass-500);
+  --bg-color: var(--paper);
+  --card-bg: var(--surface);
+  --erp-sidebar-width: var(--sidebar-w);
+  --erp-sidebar-width-collapsed: var(--sidebar-w-collapsed);
+  --erp-header-height: var(--topbar-height);
+  --erp-content-max: 1400px;
+  --erp-radius-card: var(--r);
+  --erp-radius-input: var(--r-sm);
+  --erp-radius-button: var(--r-sm);
+  --erp-radius-dialog: var(--r-lg);
+  --erp-transition: var(--t-fast) var(--e-out);
+  --erp-primary-rgb: 14, 31, 51;
+  --erp-info-rgb: 42, 80, 121;
+  --erp-success-rgb: 47, 106, 58;
+  --erp-warning-rgb: 184, 101, 26;
+  --erp-danger-rgb: 168, 51, 43;
+  --erp-shadow-sm: var(--shadow-soft);
+  --erp-shadow-md: var(--shadow-hover);
+  --dash-surface: var(--surface-2);
+}
+
+[data-theme='dark'] {
+  --paper: #0b1624;
+  --paper-2: #0f1d2f;
+  --paper-3: #13253a;
+  --surface: #152739;
+  --surface-2: #1a2e44;
+  --ink-900: #efe7d6;
+  --ink-700: #b6c3d4;
+  --ink-500: #7a8ea7;
+  --ink-400: #5d7290;
+  --ink-300: #3e5472;
+  --line: #223a55;
+  --line-2: #1b314a;
+  --ok-bg: rgba(47, 106, 58, 0.18);
+  --warn-bg: rgba(184, 101, 26, 0.2);
+  --bad-bg: rgba(168, 51, 43, 0.2);
+  --info-bg: rgba(42, 80, 121, 0.28);
+  --brass-100: rgba(228, 194, 126, 0.15);
+  --accent-soft: rgba(228, 194, 126, 0.15);
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.32);
+  --shadow-hover: 0 14px 36px rgba(0, 0, 0, 0.42);
+  --sidebar-item-active: rgba(204, 165, 91, 0.26);
+  --icon-btn-hover: var(--surface-2);
+  --table-row-hover: var(--paper-2);
+  --table-header-bg: var(--paper-2);
+  --btn-outline-bg: var(--surface-2);
+  --btn-outline-hover: var(--paper-3);
+  --input-bg: var(--surface-2);
+}

@@ -3,8 +3,8 @@
 </div>
 
 <ng-template #mainHeader>
-  <div class="erp-header-shell">
-    <div class="erp-header-shell__brand">
+  <div class="erp-header-shell topbar">
+    <div class="erp-header-shell__brand topbar-start">
       <button
         type="button"
         class="erp-header-toggle"
@@ -16,9 +16,11 @@
         <mat-icon aria-hidden="true">menu</mat-icon>
       </button>
 
+      <h1 class="erp-header-shell__title">{{ 'DASHBOARD.ERP_TITLE' | translate }}</h1>
+
       <a
         [routerLink]="['/dashboard']"
-        class="erp-header-brand-pill erp-header-brand-pill--mark-only"
+        class="erp-header-brand-pill erp-header-brand-pill--mark-only erp-header-brand-pill--mobile-only"
         [attr.title]="'APP.BRAND' | translate"
         [attr.aria-label]="'APP.BRAND' | translate"
       >
@@ -28,7 +30,14 @@
       </a>
     </div>
 
-    <div class="erp-header-shell__actions">
+    <div class="erp-header-shell__center">
+      <button type="button" class="erp-header-search" (click)="openSearch()">
+        <mat-icon aria-hidden="true">search</mat-icon>
+        <span class="erp-header-search__placeholder">{{ 'NAV.SEARCH_PLACEHOLDER' | translate }}</span>
+      </button>
+    </div>
+
+    <div class="erp-header-shell__actions topbar-end">
       <app-nav-right></app-nav-right>
     </div>
   </div>

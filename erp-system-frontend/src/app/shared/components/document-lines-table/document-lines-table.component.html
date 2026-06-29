@@ -1,0 +1,56 @@
+<div class="erp-card erp-document-lines mt-2">
+  <div class="erp-card__header">
+    <h6 class="app-card-title mb-0">{{ 'INVOICES.LINES' | translate }}</h6>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--ghost erp-button--sm" (click)="addLine()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      <span>{{ 'INVOICES.ADD_LINE' | translate }}</span>
+    </button>
+  </div>
+  <div class="erp-card__body p-0">
+    <table class="erp-table erp-table--compact mb-0">
+      <thead>
+        <tr>
+          <th>{{ 'ERP.PRODUCT' | translate }}</th>
+          <th *ngIf="!simple">{{ 'INVOICES.DESCRIPTION' | translate }}</th>
+          <th>{{ 'ERP.QUANTITY' | translate }}</th>
+          <th>{{ 'INVOICES.UNIT_PRICE' | translate }}</th>
+          <th *ngIf="!simple">{{ 'INVOICES.DISCOUNT_PERCENT' | translate }}</th>
+          <th *ngIf="!simple">{{ 'INVOICES.TAX_PERCENT' | translate }}</th>
+          <th class="text-end">{{ 'INVOICES.LINE_TOTAL' | translate }}</th>
+          <th *ngIf="!readOnly"></th>
+        </tr>
+      </thead>
+      <tbody formArrayName="lines">
+        <tr *ngFor="let line of lines.controls; let i = index" [formGroupName]="i">
+          <td>
+            <select class="erp-input erp-input--sm" formControlName="productId" (change)="onProductChange(i)">
+              <option [ngValue]="null">—</option>
+              <option *ngFor="let p of products" [ngValue]="p.id">{{ p.code }} - {{ p.name || p.nameEn }}</option>
+            </select>
+          </td>
+          <td *ngIf="!simple">
+            <input class="erp-input erp-input--sm" formControlName="description" [readonly]="readOnly" />
+          </td>
+          <td>
+            <input class="erp-input erp-input--sm" type="number" min="0.0001" step="0.0001" formControlName="quantity" [readonly]="readOnly" (input)="linesChanged.emit()" />
+          </td>
+          <td>
+            <input class="erp-input erp-input--sm" type="number" min="0" step="0.01" formControlName="unitPrice" [readonly]="readOnly" (input)="linesChanged.emit()" />
+          </td>
+          <td *ngIf="!simple">
+            <input class="erp-input erp-input--sm" type="number" min="0" step="0.01" formControlName="discountPercent" [readonly]="readOnly" (input)="linesChanged.emit()" />
+          </td>
+          <td *ngIf="!simple">
+            <input class="erp-input erp-input--sm" type="number" min="0" step="0.01" formControlName="taxPercent" [readonly]="readOnly" (input)="linesChanged.emit()" />
+          </td>
+          <td class="text-end">{{ lineTotal(i) | number:'1.2-2' }}</td>
+          <td *ngIf="!readOnly">
+            <button type="button" class="erp-action-btn erp-action-btn--danger" (click)="removeLine(i)" [disabled]="lines.length <= 1">
+              <mat-icon aria-hidden="true">delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

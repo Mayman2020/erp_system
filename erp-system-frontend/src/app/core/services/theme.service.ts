@@ -50,7 +50,11 @@ export class ThemeService {
   }
 
   private readMode(): ThemeMode {
-    return localStorage.getItem(this.key) === 'dark' ? 'dark' : 'light';
+    const stored = localStorage.getItem(this.key);
+    if (stored === 'dark' || stored === 'light') {
+      return stored;
+    }
+    return 'dark';
   }
 
   private applyEffective(): void {

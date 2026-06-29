@@ -15,7 +15,8 @@ interface LanguageOption {
       <button
         type="button"
         class="erp-language-switcher__trigger"
-        [class.erp-language-switcher__trigger--compact]="compact"
+        [class.erp-language-switcher__trigger--compact]="compact && !headerStyle"
+        [class.erp-language-switcher__trigger--header]="headerStyle"
         ngbDropdownToggle
         [attr.aria-label]="ariaLabelKey | translate"
         [attr.title]="ariaLabelKey | translate"
@@ -25,11 +26,12 @@ interface LanguageOption {
           [attr.alt]="currentLanguageOption.labelKey | translate"
           class="erp-language-switcher__flag"
         />
-        <span *ngIf="!compact" class="erp-language-switcher__label">
+        <mat-icon *ngIf="headerStyle" class="erp-language-switcher__globe" aria-hidden="true">language</mat-icon>
+        <span *ngIf="!compact || headerStyle" class="erp-language-switcher__label">
           {{ currentLanguageOption.labelKey | translate }}
         </span>
-        <span class="sr-only" *ngIf="compact">{{ currentLanguageOption.labelKey | translate }}</span>
-        <mat-icon aria-hidden="true" class="erp-language-switcher__caret" *ngIf="!compact">expand_more</mat-icon>
+        <span class="sr-only" *ngIf="compact && !headerStyle">{{ currentLanguageOption.labelKey | translate }}</span>
+        <mat-icon aria-hidden="true" class="erp-language-switcher__caret" *ngIf="!compact && !headerStyle">expand_more</mat-icon>
       </button>
 
       <div
@@ -60,6 +62,7 @@ interface LanguageOption {
 })
 export class LanguageSwitcherComponent {
   @Input() compact = false;
+  @Input() headerStyle = false;
   @Input() placement = 'bottom-right';
   @Input() align: 'start' | 'end' = 'end';
   @Input() ariaLabelKey = 'PROFILE.LANGUAGE';

@@ -4,6 +4,7 @@ import com.erp.system.common.dto.ApiResponse;
 import com.erp.system.crm.dto.display.CrmLeadDisplayDto;
 import com.erp.system.crm.dto.form.CrmLeadFormDto;
 import com.erp.system.crm.service.CrmLeadService;
+import com.erp.system.sales.dto.display.CustomerDisplayDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,11 @@ public class CrmLeadController {
     public ApiResponse<Void> delete(@PathVariable Long id) {
         crmLeadService.delete(id);
         return ApiResponse.success(null);
+    }
+
+    @PostMapping("/{id}/convert")
+    public ApiResponse<CustomerDisplayDto> convertToCustomer(@PathVariable Long id) {
+        return ApiResponse.success(crmLeadService.convertToCustomer(id));
     }
 
 }

@@ -22,4 +22,7 @@ public class ErpDashboardDisplayDto {
     private List<TopProductDto> topProducts;
     private List<LowStockItemDto> lowStockItems;
     private List<ActivityLogDisplayDto> recentActivities;
+    private List<DepartmentRevenueDto> revenueByDepartment;
+    private List<EmployeePerformanceDto> employeePerformance;
+    private BigDecimal ordersGrowthPercent;
 }

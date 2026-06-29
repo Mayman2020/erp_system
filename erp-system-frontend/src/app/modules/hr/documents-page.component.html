@@ -1,0 +1,45 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions>
+      <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        <span>{{ 'ERP.CREATE_DOCUMENT' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label">{{ 'MENU.EMPLOYEES' | translate }}</label>
+          <select class="form-control" [ngModel]="filterEmployeeId" (ngModelChange)="onEmployeeFilterChange($event)">
+            <option [ngValue]="null">{{ 'COMMON.ALL' | translate }}</option>
+            <option *ngFor="let e of employeeOptions.slice(1)" [ngValue]="e.id">{{ e.label }}</option>
+          </select>
+        </div>
+      </div>
+      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+    </div>
+  </div>
+</section>
+
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'ERP.CREATE_DOCUMENT' : 'COMMON.EDIT'" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="mb-3">
+        <label class="form-label">{{ 'MENU.EMPLOYEES' | translate }}</label>
+        <select class="form-control" formControlName="employeeId" [disabled]="readOnly">
+          <option *ngFor="let e of employeeOptions" [ngValue]="e.id">{{ e.label }}</option>
+        </select>
+      </div>
+      <app-form-field [control]="form.controls.documentType" labelKey="ERP.DOCUMENT_TYPE" [readonly]="readOnly"></app-form-field>
+      <app-form-field [control]="form.controls.fileName" labelKey="ERP.FILE_NAME" [readonly]="readOnly"></app-form-field>
+      <app-form-field [control]="form.controls.filePath" labelKey="ERP.FILE_PATH" [readonly]="readOnly"></app-form-field>
+      <app-form-field [control]="form.controls.expiryDate" labelKey="ERP.EXPIRY_DATE" type="date" [readonly]="readOnly"></app-form-field>
+    </form>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

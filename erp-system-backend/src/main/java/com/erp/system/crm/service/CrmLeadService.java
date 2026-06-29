@@ -1,17 +1,21 @@
 package com.erp.system.crm.service;
 
+import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
+import com.erp.system.crm.domain.LeadStatus;
 import com.erp.system.erp.service.ActivityLogService;
 import com.erp.system.crm.domain.CrmLead;
 import com.erp.system.crm.dto.display.CrmLeadDisplayDto;
 import com.erp.system.crm.dto.form.CrmLeadFormDto;
 import com.erp.system.crm.repository.CrmLeadRepository;
+import com.erp.system.sales.dto.display.CustomerDisplayDto;
+import com.erp.system.sales.dto.form.CustomerFormDto;
+import com.erp.system.sales.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import com.erp.system.crm.domain.LeadStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,7 @@ public class CrmLeadService {
 
     private final CrmLeadRepository crmLeadRepository;
     private final ActivityLogService activityLogService;
+    private final CustomerService customerService;
 
     @Transactional(readOnly = true)
     public List<CrmLeadDisplayDto> getAll() {
@@ -60,6 +65,29 @@ public class CrmLeadService {
         crmLeadRepository.delete(crmLead);
         activityLogService.log(MODULE, "DELETE", "CrmLead", id, String.valueOf(id),
                 "Deleted CrmLead " + id);
+    }
+
+    @Transactional
+    public CustomerDisplayDto convertToCustomer(Long id) {
+        CrmLead lead = loadCrmLead(id);
+        if (lead.getCustomerId() != null) {
+            throw new BusinessException("Lead is already linked to a customer");
+        }
+        if (lead.getStatus() == LeadStatus.LOST) {
+            throw new BusinessException("Lost leads cannot be converted");
+        }
+        CustomerFormDto form = new CustomerFormDto();
+        form.setNameEn(lead.getName());
+        form.setEmail(lead.getEmail());
+        form.setPhone(lead.getPhone());
+        form.setActive(true);
+        CustomerDisplayDto customer = customerService.createCustomer(form);
+        lead.setCustomerId(customer.getId());
+        lead.setStatus(LeadStatus.WON);
+        crmLeadRepository.save(lead);
+        activityLogService.log(MODULE, "CONVERT", "CrmLead", lead.getId(), lead.getLeadNumber(),
+                "Converted lead " + lead.getLeadNumber() + " to customer " + customer.getCode());
+        return customer;
     }
 
     private CrmLead loadCrmLead(Long id) {

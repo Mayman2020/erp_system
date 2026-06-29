@@ -2,9 +2,9 @@ package com.erp.system.sales.service;
 
 import com.erp.system.accounting.domain.Account;
 import com.erp.system.accounting.domain.JournalEntry;
-import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.service.AccountingPostingService;
 import com.erp.system.accounting.support.JournalPostingNarratives;
+import com.erp.system.accounting.support.PostingAccountResolver;
 import com.erp.system.common.enums.StockMovementType;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.common.exception.BusinessException;
@@ -47,11 +47,6 @@ public class SalesInvoiceService {
 
     private static final String MODULE = "SALES";
     private static final String REFERENCE_TYPE = "SALES_INVOICE";
-    private static final String DEFAULT_RECEIVABLE_CODE = "1200";
-    private static final String REVENUE_CODE = "4100";
-    private static final String TAX_PAYABLE_CODE = "2210";
-    private static final String COGS_CODE = "5130";
-    private static final String INVENTORY_CODE = "1300";
 
     private final SalesInvoiceRepository invoiceRepository;
     private final SalesOrderService orderService;
@@ -59,10 +54,10 @@ public class SalesInvoiceService {
     private final ProductRepository productRepository;
     private final WarehouseRepository warehouseRepository;
     private final StockService stockService;
-    private final AccountRepository accountRepository;
     private final NumberingService numberingService;
     private final AccountingPostingService accountingPostingService;
     private final ActivityLogService activityLogService;
+    private final PostingAccountResolver postingAccountResolver;
 
     @Transactional(readOnly = true)
     public List<SalesInvoiceDisplayDto> getInvoices(TransactionStatus status, String search,
@@ -172,11 +167,11 @@ public class SalesInvoiceService {
                 JournalPostingNarratives.SALES_INVOICE,
                 invoice.getInvoiceNumber());
 
-        Account receivableAccount = resolveReceivableAccount(invoice.getCustomer());
-        Account revenueAccount = resolveAccountByCode(REVENUE_CODE, "Revenue");
-        Account taxAccount = resolveTaxAccount(revenueAccount);
-        Account cogsAccount = resolveAccountByCode(COGS_CODE, "COGS");
-        Account inventoryAccount = resolveAccountByCode(INVENTORY_CODE, "Inventory");
+        Account receivableAccount = postingAccountResolver.receivable(invoice.getCustomer().getReceivableAccount());
+        Account revenueAccount = postingAccountResolver.salesRevenue();
+        Account taxAccount = postingAccountResolver.taxPayable();
+        Account cogsAccount = postingAccountResolver.cogs();
+        Account inventoryAccount = postingAccountResolver.inventory();
 
         BigDecimal revenueAmount = invoice.getSubtotal().subtract(invoice.getDiscountAmount()).max(BigDecimal.ZERO)
                 .setScale(2, RoundingMode.HALF_UP);
@@ -365,25 +360,6 @@ public class SalesInvoiceService {
         invoice.setRemainingAmount(invoice.getTotalAmount().subtract(invoice.getPaidAmount()).max(BigDecimal.ZERO));
     }
 
-    private Account resolveReceivableAccount(Customer customer) {
-        Account receivable = customer.getReceivableAccount();
-        if (receivable != null && receivable.isActive()) {
-            return receivable;
-        }
-        return resolveAccountByCode(DEFAULT_RECEIVABLE_CODE, "Accounts Receivable");
-    }
-
-    private Account resolveTaxAccount(Account revenueFallback) {
-        return accountRepository.findByCode(TAX_PAYABLE_CODE)
-                .filter(Account::isActive)
-                .orElse(revenueFallback);
-    }
-
-    private Account resolveAccountByCode(String code, String label) {
-        return accountRepository.findByCode(code)
-                .filter(Account::isActive)
-                .orElseThrow(() -> new BusinessException("Active " + label + " account (" + code + ") is required"));
-    }
 
     private String resolveInvoiceNumber(String invoiceNumber) {
         String normalized = normalizeOptional(invoiceNumber);

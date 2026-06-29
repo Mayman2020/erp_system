@@ -34,7 +34,7 @@ export interface Navigation extends NavigationItem {
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
   private readonly endpoint = `${environment.apiUrl}/ui/menu`;
-  private readonly storageKey = 'erp_ui_menu_cache';
+  private readonly storageKey = 'erp_ui_menu_cache_v2';
   private menu$?: Observable<Navigation[]>;
 
   constructor(private http: HttpClient) {}
@@ -61,9 +61,18 @@ export class NavigationService {
   private normalize(items: Navigation[] | null | undefined): Navigation[] {
     return (items || []).map((item) => ({
       ...item,
+      type: this.normalizeType(item.type),
       classes: item.classes || 'nav-item',
       children: this.normalize(item.children)
     }));
+  }
+
+  private normalizeType(type: NavigationItem['type'] | string | undefined): NavigationItem['type'] {
+    const value = (type || 'item').toString().toLowerCase();
+    if (value === 'group' || value === 'collapse' || value === 'item') {
+      return value;
+    }
+    return 'item';
   }
 
   private readCache(): Navigation[] {

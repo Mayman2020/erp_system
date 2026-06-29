@@ -1,11 +1,34 @@
-<div class="navbar-wrapper" [ngClass]="{'container': this.flatConfig.layout === 'horizontal' && this.flatConfig.subLayout === 'horizontal-2'}">
-  <div class="sidebar-brand">
-    <button type="button" class="collapse-btn" (click)="navCollapse()" [attr.aria-label]="'NAV.TOGGLE_MENU' | translate">
-      <mat-icon>{{ sidebarCollapsed ? 'menu_open' : 'menu' }}</mat-icon>
+<div class="erp-estate-sidebar__inner">
+  <div class="sidebar-brand" [class.sidebar-brand--collapsed]="sidebarCollapsed">
+    <div class="brand-icon">
+      <img
+        src="assets/images/brand/coreerp-mark-light.svg"
+        [alt]="'APP.BRAND' | translate"
+        class="brand-icon__mark"
+      />
+    </div>
+    <div class="brand-text" *ngIf="!sidebarCollapsed">
+      <span class="brand-name">{{ 'DASHBOARD.ERP_TITLE' | translate }}</span>
+      <span class="brand-tagline">{{ 'NAV.ERP_TAGLINE' | translate }}</span>
+    </div>
+    <button
+      *ngIf="!sidebarCollapsed"
+      type="button"
+      class="collapse-btn"
+      (click)="navCollapse()"
+      [attr.aria-label]="'NAV.TOGGLE_MENU' | translate"
+      [attr.title]="'NAV.TOGGLE_MENU' | translate"
+    >
+      <mat-icon>{{ sidebarCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
     </button>
-    <span class="sidebar-welcome">{{ 'NAV.SIDEBAR_WELCOME' | translate }}</span>
   </div>
-  <div class="sidebar-divider"></div>
-  <app-nav-content [menuIconsOnly]="sidebarCollapsed" (onNavMobCollapse)="navMobCollapse()"></app-nav-content>
-</div>
 
+  <div class="erp-sidebar-chrome erp-sidebar-chrome__nav">
+    <app-nav-content [menuIconsOnly]="sidebarCollapsed" (onNavMobCollapse)="navMobCollapse()"></app-nav-content>
+
+    <div class="erp-sidebar-footer" *ngIf="!sidebarCollapsed">
+      <div class="erp-sidebar-divider"></div>
+      <app-sidebar-calendar></app-sidebar-calendar>
+    </div>
+  </div>
+</div>

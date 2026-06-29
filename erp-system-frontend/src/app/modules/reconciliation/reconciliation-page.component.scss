@@ -26,15 +26,20 @@
 }
 
 .erp-summary-card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s;
-  &:hover { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1); }
+  transition: box-shadow var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
+}
+
+.erp-summary-card--danger {
+  border-color: var(--bad) !important;
 }
 
 .erp-recon-list-item {
   cursor: pointer;
   transition: background 0.15s;
-  &.active { background-color: var(--bs-primary-bg-subtle, #e7f1ff) !important; border-color: var(--bs-primary, #0d6efd); }
+  &.active {
+    background-color: rgba(204, 165, 91, 0.12) !important;
+    border-color: var(--brass-500);
+  }
 }
 
 .erp-recon-line-detail__list {
@@ -71,8 +76,6 @@
 }
 
 .table-hover tbody tr { cursor: pointer; }
-
-.card { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06); }
 
 @media (max-width: 767px) {
   .erp-reconciliation-actions .erp-button { width: 100%; }

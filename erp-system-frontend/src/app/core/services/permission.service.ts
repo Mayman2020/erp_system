@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, shareReplay, tap } from 'rxjs/operators';
 import { UiPermission } from '../models/admin.models';
+import { AuthService } from '../auth/auth.service';
 import { AdminApiService } from './admin-api.service';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
   private permissions$?: Observable<Map<string, UiPermission>>;
 
-  constructor(private adminApi: AdminApiService) {}
+  constructor(private adminApi: AdminApiService, private authService: AuthService) {}
 
   getPermissions(): Observable<Map<string, UiPermission>> {
     if (!this.permissions$) {
@@ -27,6 +28,11 @@ export class PermissionService {
   }
 
   can(menuItemId: string, action: keyof UiPermission): Observable<boolean> {
+    const user = this.authService.currentUser;
+    const roles = user?.roles || (user?.role ? [user.role] : []);
+    if (roles.includes('ADMIN')) {
+      return of(true);
+    }
     return this.getPermissions().pipe(map((permissions) => !!permissions.get(menuItemId)?.[action]));
   }
 }

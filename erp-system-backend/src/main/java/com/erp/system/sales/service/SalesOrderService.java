@@ -15,6 +15,8 @@ import com.erp.system.sales.domain.SalesOrderLine;
 import com.erp.system.sales.domain.SalesQuotation;
 import com.erp.system.sales.dto.display.SalesOrderDisplayDto;
 import com.erp.system.sales.dto.display.SalesOrderLineDisplayDto;
+import com.erp.system.sales.dto.form.SalesInvoiceFormDto;
+import com.erp.system.sales.dto.form.SalesInvoiceLineFormDto;
 import com.erp.system.sales.dto.form.SalesOrderFormDto;
 import com.erp.system.sales.dto.form.SalesOrderLineFormDto;
 import com.erp.system.sales.repository.SalesOrderRepository;
@@ -148,6 +150,41 @@ public class SalesOrderService {
         return toDisplay(order);
     }
 
+    @Transactional(readOnly = true)
+    public SalesInvoiceFormDto buildInvoiceForm(Long id) {
+        SalesOrder order = loadOrder(id);
+        if (order.getStatus() != TransactionStatus.APPROVED) {
+            throw new BusinessException("Only approved orders can be converted to invoices");
+        }
+        if (order.getLines() == null || order.getLines().isEmpty()) {
+            throw new BusinessException("Order must have at least one line");
+        }
+
+        SalesInvoiceFormDto form = new SalesInvoiceFormDto();
+        LocalDate invoiceDate = LocalDate.now();
+        form.setInvoiceDate(invoiceDate);
+        form.setDueDate(invoiceDate.plusDays(30));
+        form.setCustomerId(order.getCustomer().getId());
+        form.setOrderId(order.getId());
+        Long warehouseId = order.getWarehouse() != null
+                ? order.getWarehouse().getId()
+                : resolveDefaultWarehouseId();
+        form.setWarehouseId(warehouseId);
+        form.setDiscountAmount(order.getDiscountAmount());
+        form.setNotes(normalizeOptional(order.getNotes()));
+        form.setLines(order.getLines().stream().map(line -> {
+            SalesInvoiceLineFormDto mapped = new SalesInvoiceLineFormDto();
+            mapped.setProductId(line.getProduct().getId());
+            mapped.setDescription(line.getDescription());
+            mapped.setQuantity(line.getQuantity());
+            mapped.setUnitPrice(line.getUnitPrice());
+            mapped.setDiscountPercent(line.getDiscountPercent());
+            mapped.setTaxPercent(line.getTaxPercent());
+            return mapped;
+        }).toList());
+        return form;
+    }
+
     private Product loadProduct(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", id));
@@ -156,6 +193,16 @@ public class SalesOrderService {
     private Warehouse loadWarehouse(Long id) {
         return warehouseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Warehouse", id));
+    }
+
+    Long resolveDefaultWarehouseId() {
+        List<Warehouse> active = warehouseRepository.findByActiveTrueOrderByCodeAsc();
+        return active.stream()
+                .filter(w -> "WH-MAIN".equalsIgnoreCase(w.getCode()))
+                .findFirst()
+                .or(() -> active.stream().findFirst())
+                .map(Warehouse::getId)
+                .orElseThrow(() -> new BusinessException("No active warehouse configured"));
     }
 
     SalesOrder loadOrder(Long id) {

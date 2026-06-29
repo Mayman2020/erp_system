@@ -41,4 +41,7 @@ private BigDecimal amount;
 @Builder.Default
 private com.erp.system.common.enums.TransactionStatus status = com.erp.system.common.enums.TransactionStatus.DRAFT;
 
+@Column(name = "journal_entry_id")
+private Long journalEntryId;
+
 }

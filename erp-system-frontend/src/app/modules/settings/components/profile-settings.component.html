@@ -93,8 +93,8 @@
   </div>
 
   <div class="profile-footer-sticky">
-    <div *ngIf="errorKey" class="alert-inline alert-danger">{{ errorKey | translate }}</div>
-    <div *ngIf="successKey" class="alert-inline alert-success">{{ successKey | translate }}</div>
+    <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-0" [dismissible]="false"></app-erp-alert>
+    <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-0" [dismissible]="false"></app-erp-alert>
     <button type="button" class="erp-button erp-button--primary" [disabled]="saving || form.invalid" (click)="onSave()">
       <mat-icon>save</mat-icon>
       <span>{{ 'PROFILE.SAVE_CHANGES' | translate }}</span>

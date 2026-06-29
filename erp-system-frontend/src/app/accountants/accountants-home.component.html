@@ -1,4 +1,4 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey" [subtitleKey]="subtitleKey" eyebrowKey="NAV.ACCESS_MANAGEMENT">
     <div header-actions>
       <button type="button" class="erp-button erp-button--ghost" (click)="loadPage()">
@@ -8,15 +8,15 @@
     </div>
   </app-page-header>
 
-  <div class="card erp-unified-card">
-    <div class="card-body">
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
       <app-loading-state *ngIf="loading && lookupTypesLoading"></app-loading-state>
 
       <div *ngIf="!loading || !lookupTypesLoading">
-        <div *ngIf="accessErrorKey" class="alert alert-danger mb-3">{{ accessErrorKey | translate }}</div>
-        <div *ngIf="accessSuccessKey" class="alert alert-success mb-3">{{ accessSuccessKey | translate }}</div>
-        <div *ngIf="lookupErrorKey" class="alert alert-danger mb-3">{{ lookupErrorKey | translate }}</div>
-        <div *ngIf="lookupSuccessKey" class="alert alert-success mb-3">{{ lookupSuccessKey | translate }}</div>
+        <app-erp-alert *ngIf="accessErrorKey" type="danger" [message]="accessErrorKey" extraClass="mb-3" [dismissible]="false"></app-erp-alert>
+        <app-erp-alert *ngIf="accessSuccessKey" type="success" [message]="accessSuccessKey" extraClass="mb-3" [dismissible]="false"></app-erp-alert>
+        <app-erp-alert *ngIf="lookupErrorKey" type="danger" [message]="lookupErrorKey" extraClass="mb-3" [dismissible]="false"></app-erp-alert>
+        <app-erp-alert *ngIf="lookupSuccessKey" type="success" [message]="lookupSuccessKey" extraClass="mb-3" [dismissible]="false"></app-erp-alert>
 
         <div class="erp-admin-kpis">
           <article class="erp-admin-kpi">
@@ -302,14 +302,8 @@
 
 <app-form-dialog [visible]="userDialogVisible" [titleKey]="userDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_USER' : 'ACCESS_MANAGEMENT.EDIT_USER'" size="xl" (close)="closeUserDialog()">
   <div dialog-body>
-    <div class="alert alert-success alert-dismissible fade show" *ngIf="accessSuccessKey">
-      {{ accessSuccessKey | translate }}
-      <button type="button" class="close" (click)="accessSuccessKey=''"><span>&times;</span></button>
-    </div>
-    <div class="alert alert-danger alert-dismissible fade show" *ngIf="accessErrorKey">
-      {{ accessErrorKey | translate }}
-      <button type="button" class="close" (click)="accessErrorKey=''"><span>&times;</span></button>
-    </div>
+    <app-erp-alert *ngIf="accessSuccessKey" type="success" [message]="accessSuccessKey" (dismissed)="accessSuccessKey=''"></app-erp-alert>
+    <app-erp-alert *ngIf="accessErrorKey" type="danger" [message]="accessErrorKey" (dismissed)="accessErrorKey=''"></app-erp-alert>
     <form [formGroup]="userForm" class="row">
       <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.fullNameEn" labelKey="PROFILE.FULL_NAME_EN" icon="badge"></app-form-field></div>
       <div class="col-md-6 mb-3"><app-form-field [control]="userForm.controls.fullNameAr" labelKey="PROFILE.FULL_NAME_AR" icon="badge"></app-form-field></div>
@@ -352,14 +346,8 @@
 
 <app-form-dialog [visible]="roleDialogVisible" [titleKey]="roleDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_ROLE' : 'ACCESS_MANAGEMENT.EDIT_ROLE'" size="xxl" (close)="closeRoleDialog()">
   <div dialog-body>
-    <div class="alert alert-success alert-dismissible fade show" *ngIf="accessSuccessKey">
-      {{ accessSuccessKey | translate }}
-      <button type="button" class="close" (click)="accessSuccessKey=''"><span>&times;</span></button>
-    </div>
-    <div class="alert alert-danger alert-dismissible fade show" *ngIf="accessErrorKey">
-      {{ accessErrorKey | translate }}
-      <button type="button" class="close" (click)="accessErrorKey=''"><span>&times;</span></button>
-    </div>
+    <app-erp-alert *ngIf="accessSuccessKey" type="success" [message]="accessSuccessKey" (dismissed)="accessSuccessKey=''"></app-erp-alert>
+    <app-erp-alert *ngIf="accessErrorKey" type="danger" [message]="accessErrorKey" (dismissed)="accessErrorKey=''"></app-erp-alert>
     <form [formGroup]="roleForm" class="row">
       <div class="col-md-4 mb-3"><app-form-field [control]="roleForm.controls.code" labelKey="ACCESS_MANAGEMENT.ROLE_CODE" icon="vpn_key"></app-form-field></div>
       <div class="col-md-4 mb-3"><app-form-field [control]="roleForm.controls.nameEn" labelKey="ACCESS_MANAGEMENT.NAME_EN" icon="translate"></app-form-field></div>
@@ -420,14 +408,8 @@
 
 <app-form-dialog [visible]="lookupTypeDialogVisible" [titleKey]="lookupTypeDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_LOOKUP_TYPE' : 'ACCESS_MANAGEMENT.EDIT_LOOKUP_TYPE'" size="lg" (close)="closeLookupTypeDialog()">
   <div dialog-body>
-    <div class="alert alert-success alert-dismissible fade show" *ngIf="lookupSuccessKey">
-      {{ lookupSuccessKey | translate }}
-      <button type="button" class="close" (click)="lookupSuccessKey=''"><span>&times;</span></button>
-    </div>
-    <div class="alert alert-danger alert-dismissible fade show" *ngIf="lookupErrorKey">
-      {{ lookupErrorKey | translate }}
-      <button type="button" class="close" (click)="lookupErrorKey=''"><span>&times;</span></button>
-    </div>
+    <app-erp-alert *ngIf="lookupSuccessKey" type="success" [message]="lookupSuccessKey" (dismissed)="lookupSuccessKey=''"></app-erp-alert>
+    <app-erp-alert *ngIf="lookupErrorKey" type="danger" [message]="lookupErrorKey" (dismissed)="lookupErrorKey=''"></app-erp-alert>
     <form [formGroup]="lookupTypeForm" class="row">
       <div class="col-md-6 mb-3"><app-form-field [control]="lookupTypeForm.controls.code" labelKey="ACCESS_MANAGEMENT.TYPE_CODE" icon="tag"></app-form-field></div>
       <div class="col-md-6 mb-3"><app-form-field [control]="lookupTypeForm.controls.sortOrder" labelKey="ACCESS_MANAGEMENT.SORT_ORDER" icon="format_list_numbered" type="number"></app-form-field></div>
@@ -446,14 +428,8 @@
 
 <app-form-dialog [visible]="lookupValueDialogVisible" [titleKey]="lookupValueDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_LOOKUP_VALUE' : 'ACCESS_MANAGEMENT.EDIT_LOOKUP_VALUE'" size="lg" (close)="closeLookupValueDialog()">
   <div dialog-body>
-    <div class="alert alert-success alert-dismissible fade show" *ngIf="lookupSuccessKey">
-      {{ lookupSuccessKey | translate }}
-      <button type="button" class="close" (click)="lookupSuccessKey=''"><span>&times;</span></button>
-    </div>
-    <div class="alert alert-danger alert-dismissible fade show" *ngIf="lookupErrorKey">
-      {{ lookupErrorKey | translate }}
-      <button type="button" class="close" (click)="lookupErrorKey=''"><span>&times;</span></button>
-    </div>
+    <app-erp-alert *ngIf="lookupSuccessKey" type="success" [message]="lookupSuccessKey" (dismissed)="lookupSuccessKey=''"></app-erp-alert>
+    <app-erp-alert *ngIf="lookupErrorKey" type="danger" [message]="lookupErrorKey" (dismissed)="lookupErrorKey=''"></app-erp-alert>
     <form [formGroup]="lookupValueForm" class="row">
       <div class="col-md-6 mb-3">
         <app-form-field [control]="lookupValueForm.controls.typeCode" labelKey="ACCESS_MANAGEMENT.LOOKUP_TYPE" icon="category" type="select" [options]="lookupTypes" optionValueField="code" optionLabelField="nameEn"></app-form-field>
@@ -475,16 +451,20 @@
 
 <app-form-dialog [visible]="screenDialogVisible" [titleKey]="screenDialogMode === 'create' ? 'ACCESS_MANAGEMENT.CREATE_SCREEN' : 'ACCESS_MANAGEMENT.EDIT_SCREEN'" size="xl" (close)="closeScreenDialog()">
   <div dialog-body>
-    <div class="alert alert-danger mb-2" *ngIf="accessErrorKey">{{ accessErrorKey | translate }}</div>
+    <app-erp-alert *ngIf="accessErrorKey" type="danger" [message]="accessErrorKey" extraClass="mb-2" [dismissible]="false"></app-erp-alert>
     <form [formGroup]="screenForm" class="row">
       <div class="col-md-6 mb-3"><app-form-field [control]="screenForm.controls.id" labelKey="ACCESS_MANAGEMENT.SCREEN_ID" icon="tag"></app-form-field></div>
       <div class="col-md-6 mb-3"><app-form-field [control]="screenForm.controls.sortOrder" labelKey="ACCESS_MANAGEMENT.SORT_ORDER" icon="format_list_numbered" type="number"></app-form-field></div>
       <div class="col-md-6 mb-3">
-        <label class="d-block mb-1">{{ 'ACCESS_MANAGEMENT.PARENT_ID' | translate }}</label>
-        <select class="form-control" formControlName="parentId">
-          <option value="">{{ 'ACCESS_MANAGEMENT.PARENT_NONE' | translate }}</option>
-          <option *ngFor="let s of menuScreens" [value]="s.id">{{ s.id }} — {{ s.titleKey | translate }}</option>
-        </select>
+        <app-form-field
+          [control]="screenForm.controls.parentId"
+          labelKey="ACCESS_MANAGEMENT.PARENT_ID"
+          icon="account_tree"
+          type="select"
+          [options]="parentScreenOptions"
+          optionValueField="id"
+          optionLabelField="label"
+        ></app-form-field>
       </div>
       <div class="col-md-6 mb-3">
         <app-form-field

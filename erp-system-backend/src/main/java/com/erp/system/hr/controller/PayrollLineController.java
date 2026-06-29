@@ -19,8 +19,8 @@ public class PayrollLineController {
     private final PayrollLineService payrollLineService;
 
     @GetMapping
-    public ApiResponse<List<PayrollLineDisplayDto>> getAll() {
-        return ApiResponse.success(payrollLineService.getAll());
+    public ApiResponse<List<PayrollLineDisplayDto>> getAll(@RequestParam(required = false) Long payrollId) {
+        return ApiResponse.success(payrollLineService.getAll(payrollId));
     }
 
     @GetMapping("/{id}")

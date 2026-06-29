@@ -23,8 +23,11 @@ public class PayrollLineService {
     private final ActivityLogService activityLogService;
 
     @Transactional(readOnly = true)
-    public List<PayrollLineDisplayDto> getAll() {
-        return payrollLineRepository.findAllByOrderByIdDesc().stream()
+    public List<PayrollLineDisplayDto> getAll(Long payrollId) {
+        List<PayrollLine> rows = payrollId == null
+                ? payrollLineRepository.findAllByOrderByIdDesc()
+                : payrollLineRepository.findByPayrollIdOrderByIdAsc(payrollId);
+        return rows.stream()
                 .map(this::toDisplay)
                 .toList();
     }

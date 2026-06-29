@@ -55,8 +55,12 @@ public class UiMenuService {
             out.add(toDto(root, byParent, visibleIds));
         }
         return out.stream()
-                .filter(node -> node.getType() == null || !"group".equals(node.getType()) || (node.getChildren() != null && !node.getChildren().isEmpty()))
+                .filter(node -> node.getType() == null || !"group".equalsIgnoreCase(node.getType()) || (node.getChildren() != null && !node.getChildren().isEmpty()))
                 .collect(Collectors.toList());
+    }
+
+    private static String normalizeItemType(String itemType) {
+        return itemType == null ? null : itemType.trim().toLowerCase();
     }
 
     private MenuNodeDto toDto(UiMenuItem row, Map<String, List<UiMenuItem>> byParent, Set<String> visibleIds) {
@@ -70,7 +74,7 @@ public class UiMenuService {
         return MenuNodeDto.builder()
                 .id(row.getId())
                 .title(row.getTitleKey())
-                .type(row.getItemType())
+                .type(normalizeItemType(row.getItemType()))
                 .icon(row.getIcon())
                 .url(row.getUrl())
                 .external(Boolean.TRUE.equals(row.getExternal()))

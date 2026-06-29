@@ -2,6 +2,7 @@ package com.erp.system.sales.controller;
 
 import com.erp.system.common.dto.ApiResponse;
 import com.erp.system.common.enums.TransactionStatus;
+import com.erp.system.sales.dto.display.SalesOrderDisplayDto;
 import com.erp.system.sales.dto.display.SalesQuotationDisplayDto;
 import com.erp.system.sales.dto.form.SalesQuotationFormDto;
 import com.erp.system.sales.service.SalesQuotationService;
@@ -65,5 +66,11 @@ public class SalesQuotationController {
                                                                  @RequestParam String actor,
                                                                  @RequestParam(required = false) String reason) {
         return ApiResponse.success(quotationService.cancelQuotation(id, actor, reason));
+    }
+
+    @PostMapping("/{id}/convert-to-order")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<SalesOrderDisplayDto> convertToOrder(@PathVariable Long id) {
+        return ApiResponse.success(quotationService.convertToOrder(id));
     }
 }

@@ -1,0 +1,34 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions>
+      <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        <span>{{ 'EXCHANGE_RATES.CREATE' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-3" (dismissed)="successKey = ''"></app-erp-alert>
+      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+    </div>
+  </div>
+</section>
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'EXCHANGE_RATES.CREATE' : 'COMMON.VIEW'" size="md" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.sourceCurrency" labelKey="EXCHANGE_RATES.SOURCE" icon="currency_exchange" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.targetCurrency" labelKey="EXCHANGE_RATES.TARGET" icon="currency_exchange" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.rate" labelKey="EXCHANGE_RATES.RATE" icon="trending_up" type="number" step="0.0001" min="0.000001" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.effectiveDate" labelKey="EXCHANGE_RATES.EFFECTIVE" icon="event" type="date" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.expiryDate" labelKey="EXCHANGE_RATES.EXPIRY" icon="event_busy" type="date" [readonly]="readOnly"></app-form-field></div>
+      </div>
+    </form>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

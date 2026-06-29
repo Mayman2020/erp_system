@@ -1,144 +1,68 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef,
   EventEmitter,
   Input,
-  NgZone,
   OnChanges,
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
-  ViewChild
+  SimpleChanges
 } from '@angular/core';
-import { Navigation, NavigationService } from '../navigation';
+import { Navigation, NavigationItem, NavigationService } from '../navigation';
 import { NextConfig } from '../../../../../app-config';
-import { Location } from '@angular/common';
+import { NavigationEnd, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 
-@Component({ standalone: false,
+@Component({
+  standalone: false,
   selector: 'app-nav-content',
   templateUrl: './nav-content.component.html',
   styleUrls: ['./nav-content.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NavContentComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class NavContentComponent implements OnInit, OnChanges, OnDestroy {
   public flatConfig: any;
   public navigation: Navigation[] = [];
-  public prevDisabled: string;
-  public nextDisabled: string;
-  public contentWidth: number;
-  public wrapperWidth: any;
-  public scrollWidth: any;
   public windowWidth: number;
   public menuLoading = false;
 
   private readonly destroy$ = new Subject<void>();
+  private readonly sectionExpanded: Record<string, boolean> = {};
+  private readonly collapseExpanded: Record<string, boolean> = {};
+  private currentUrl = '';
 
-  @Output() onNavMobCollapse = new EventEmitter();
+  @Output() onNavMobCollapse = new EventEmitter<void>();
 
-  /** True when sidebar is collapsed to icons only (show tooltips on items). */
   @Input() menuIconsOnly = false;
-
-  @ViewChild('navbarContent') navbarContent: ElementRef;
-  @ViewChild('navbarWrapper') navbarWrapper: ElementRef;
 
   constructor(
     private navigationService: NavigationService,
-    private zone: NgZone,
-    private location: Location,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {
     this.flatConfig = NextConfig.config;
     this.windowWidth = window.innerWidth;
-    this.prevDisabled = 'disabled';
-    this.nextDisabled = '';
-    this.scrollWidth = 0;
-    this.contentWidth = 0;
+    this.currentUrl = this.normalizePath(this.router.url);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadNavigation();
-    if (this.windowWidth < 992) {
-      this.flatConfig['layout'] = 'vertical';
-      setTimeout(() => {
-        document.querySelector('.pcoded-navbar').classList.add('menupos-static');
-        (document.querySelector('#nav-ps-flat-able') as HTMLElement).style.maxHeight = '100%';
-      }, 500);
-    }
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((e) => {
+        this.currentUrl = this.normalizePath(e.urlAfterRedirects || e.url);
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnChanges(_changes: SimpleChanges): void {
     this.cdr.markForCheck();
-  }
-
-  ngAfterViewInit() {
-    this.refreshHorizontalDimensions();
-  }
-
-  scrollPlus() {
-    this.scrollWidth = this.scrollWidth + (this.wrapperWidth - 80);
-    if (this.scrollWidth > (this.contentWidth - this.wrapperWidth)) {
-      this.scrollWidth = this.contentWidth - this.wrapperWidth + 80;
-      this.nextDisabled = 'disabled';
-    }
-    this.prevDisabled = '';
-    if(this.flatConfig.rtlLayout) {
-      (document.querySelector('#side-nav-horizontal') as HTMLElement).style.marginRight = '-' + this.scrollWidth + 'px';
-    } else {
-      (document.querySelector('#side-nav-horizontal') as HTMLElement).style.marginLeft = '-' + this.scrollWidth + 'px';
-    }
-  }
-
-  scrollMinus() {
-    this.scrollWidth = this.scrollWidth - this.wrapperWidth;
-    if (this.scrollWidth < 0) {
-      this.scrollWidth = 0;
-      this.prevDisabled = 'disabled';
-    }
-    this.nextDisabled = '';
-    if(this.flatConfig.rtlLayout) {
-      (document.querySelector('#side-nav-horizontal') as HTMLElement).style.marginRight = '-' + this.scrollWidth + 'px';
-    } else {
-      (document.querySelector('#side-nav-horizontal') as HTMLElement).style.marginLeft = '-' + this.scrollWidth + 'px';
-    }
-
-  }
-
-  fireLeave() {
-    const sections = document.querySelectorAll('.pcoded-hasmenu');
-    for (let i = 0; i < sections.length; i++) {
-      sections[i].classList.remove('active');
-      sections[i].classList.remove('pcoded-trigger');
-    }
-
-    let current_url = this.location.path();
-    if (this.location['_baseHref']) {
-      current_url = this.location['_baseHref'] + this.location.path();
-    }
-    const link = "a.nav-link[ href='" + current_url + "' ]";
-    const ele = document.querySelector(link);
-    if (ele !== null && ele !== undefined) {
-      const parent = ele.parentElement;
-      const up_parent = parent.parentElement.parentElement;
-      const last_parent = up_parent.parentElement;
-      if (parent.classList.contains('pcoded-hasmenu')) {
-        parent.classList.add('active');
-      } else if(up_parent.classList.contains('pcoded-hasmenu')) {
-        up_parent.classList.add('active');
-      } else if (last_parent.classList.contains('pcoded-hasmenu')) {
-        last_parent.classList.add('active');
-      }
-    }
-  }
-
-  navMob() {
-    // Keep sidebar open after user explicitly opens it.
-    // This prevents accidental auto-hide on outside clicks.
   }
 
   ngOnDestroy(): void {
@@ -146,33 +70,74 @@ export class NavContentComponent implements OnInit, OnChanges, AfterViewInit, On
     this.destroy$.complete();
   }
 
-  fireOutClick() {
-    let current_url = this.location.path();
-    if (this.location['_baseHref']) {
-      current_url = this.location['_baseHref'] + this.location.path();
+  trackById(_index: number, item: NavigationItem): string {
+    return item.id;
+  }
+
+  isCollapsibleGroup(item: NavigationItem): boolean {
+    return item.collapsible !== false && !!item.children?.length;
+  }
+
+  isSectionOpen(item: NavigationItem): boolean {
+    if (this.menuIconsOnly) {
+      return true;
     }
-    const link = "a.nav-link[ href='" + current_url + "' ]";
-    const ele = document.querySelector(link);
-    if (ele !== null && ele !== undefined) {
-      const parent = ele.parentElement;
-      const up_parent = parent.parentElement.parentElement;
-      const last_parent = up_parent.parentElement;
-      if (parent.classList.contains('pcoded-hasmenu')) {
-        if (this.flatConfig['layout'] === 'vertical') {
-          parent.classList.add('pcoded-trigger');
-        }
-        parent.classList.add('active');
-      } else if(up_parent.classList.contains('pcoded-hasmenu')) {
-        if (this.flatConfig['layout'] === 'vertical') {
-          up_parent.classList.add('pcoded-trigger');
-        }
-        up_parent.classList.add('active');
-      } else if (last_parent.classList.contains('pcoded-hasmenu')) {
-        if (this.flatConfig['layout'] === 'vertical') {
-          last_parent.classList.add('pcoded-trigger');
-        }
-        last_parent.classList.add('active');
-      }
+    if (this.sectionExpanded[item.id] !== undefined) {
+      return this.sectionExpanded[item.id];
+    }
+    return this.hasActiveDescendant(item);
+  }
+
+  toggleSection(item: NavigationItem, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const next = !this.isSectionOpen(item);
+    this.sectionExpanded[item.id] = next;
+    this.persistToggle(`erp_nav_group_v2_${item.id}`, next);
+    this.cdr.markForCheck();
+  }
+
+  isCollapseOpen(item: NavigationItem): boolean {
+    if (this.menuIconsOnly) {
+      return true;
+    }
+    if (this.collapseExpanded[item.id] !== undefined) {
+      return this.collapseExpanded[item.id];
+    }
+    return this.hasActiveDescendant(item);
+  }
+
+  toggleCollapse(item: NavigationItem, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const next = !this.isCollapseOpen(item);
+    this.collapseExpanded[item.id] = next;
+    this.persistToggle(`erp_nav_collapse_v2_${item.id}`, next);
+    this.cdr.markForCheck();
+  }
+
+  isCollapseActive(item: NavigationItem): boolean {
+    return this.hasActiveDescendant(item);
+  }
+
+  linkActiveOptions(item: NavigationItem): { exact: boolean } {
+    return { exact: item.exactMatch === true };
+  }
+
+  isItemActive(item: NavigationItem): boolean {
+    if (!item.url) {
+      return false;
+    }
+    const path = this.currentUrl;
+    if (item.exactMatch) {
+      return path === item.url;
+    }
+    return path === item.url || path.startsWith(item.url + '/');
+  }
+
+  onNavItemClick(): void {
+    if (this.windowWidth < 992) {
+      this.onNavMobCollapse.emit();
     }
   }
 
@@ -184,17 +149,74 @@ export class NavContentComponent implements OnInit, OnChanges, AfterViewInit, On
       .subscribe((items) => {
         this.navigation = items || [];
         this.menuLoading = false;
+        this.hydrateExpandedState(this.navigation);
         this.cdr.markForCheck();
-        setTimeout(() => this.refreshHorizontalDimensions());
       });
   }
 
-  private refreshHorizontalDimensions(): void {
-    if (this.flatConfig['layout'] !== 'horizontal' || !this.navbarContent || !this.navbarWrapper) {
-      return;
+  private hydrateExpandedState(items: NavigationItem[]): void {
+    for (const item of items) {
+      if (item.type === 'group' && this.isCollapsibleGroup(item) && !this.hasActiveDescendant(item)) {
+        const saved = localStorage.getItem(`erp_nav_group_v2_${item.id}`);
+        if (saved !== null) {
+          this.sectionExpanded[item.id] = saved === '1';
+        } else {
+          this.sectionExpanded[item.id] = false;
+        }
+      }
+      if (item.type === 'collapse' && item.children?.length && !this.hasActiveDescendant(item)) {
+        const saved = localStorage.getItem(`erp_nav_collapse_v2_${item.id}`);
+        if (saved !== null) {
+          this.collapseExpanded[item.id] = saved === '1';
+        } else {
+          this.collapseExpanded[item.id] = false;
+        }
+      }
+      if (item.children?.length) {
+        this.hydrateExpandedState(item.children);
+      }
     }
+  }
 
-    this.contentWidth = this.navbarContent.nativeElement.clientWidth;
-    this.wrapperWidth = this.navbarWrapper.nativeElement.clientWidth;
+  private hasActiveDescendant(item: NavigationItem): boolean {
+    return this.matchChildren(item.children, this.currentUrl);
+  }
+
+  private matchChildren(children: NavigationItem[] | undefined, path: string): boolean {
+    if (!children) {
+      return false;
+    }
+    for (const child of children) {
+      if (child.type === 'item' && child.url) {
+        if (this.isPathMatch(child.url, path, child.exactMatch === true)) {
+          return true;
+        }
+      }
+      if ((child.type === 'group' || child.type === 'collapse') && child.children?.length) {
+        if (this.matchChildren(child.children, path)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private isPathMatch(url: string, path: string, exact: boolean): boolean {
+    if (exact) {
+      return path === url;
+    }
+    return path === url || path.startsWith(url + '/');
+  }
+
+  private normalizePath(url: string): string {
+    return (url || '').split('?')[0] || '';
+  }
+
+  private persistToggle(key: string, expanded: boolean): void {
+    try {
+      localStorage.setItem(key, expanded ? '1' : '0');
+    } catch {
+      // Ignore storage quota / private mode.
+    }
   }
 }

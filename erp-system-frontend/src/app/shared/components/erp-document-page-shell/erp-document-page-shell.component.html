@@ -1,0 +1,156 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions>
+      <button class="erp-button erp-button--primary" type="button" (click)="create.emit()">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        <span>{{ 'INVOICES.CREATE' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-advanced-search-bar [showDateRange]="true" [showStatus]="true" [statusOptions]="statusOptions" (search)="search.emit($event)"></app-advanced-search-bar>
+
+      <app-erp-alert *ngIf="errorKey && !formVisible" type="danger" [message]="errorKey" extraClass="mt-3" (dismissed)="clearError.emit()"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey && !formVisible" type="success" [message]="successKey" extraClass="mt-3" (dismissed)="clearSuccess.emit()"></app-erp-alert>
+
+      <app-data-table [columns]="columns" [data]="rows" [actions]="actions" [loading]="loading" (actionClick)="tableAction.emit($event)"></app-data-table>
+    </div>
+  </div>
+</section>
+
+<app-erp-dialog
+  [visible]="formVisible"
+  [titleKey]="formMode === 'create' ? 'INVOICES.CREATE' : (formMode === 'edit' ? 'INVOICES.EDIT' : 'INVOICES.VIEW')"
+  size="xxl"
+  (close)="closeForm.emit()"
+>
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-2" (dismissed)="clearError.emit()"></app-erp-alert>
+
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <app-form-field
+            [control]="numberControl"
+            [labelKey]="numberLabelKey"
+            icon="tag"
+            [readonly]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3 mb-3">
+          <app-form-field
+            [control]="dateControl"
+            [labelKey]="dateLabelKey"
+            icon="event"
+            type="date"
+            [readonly]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3 mb-3" *ngIf="showDueDate">
+          <app-form-field
+            [control]="dueDateControl"
+            [labelKey]="dueDateLabelKey"
+            icon="event_available"
+            type="date"
+            [readonly]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3 mb-3" *ngIf="showValidUntil">
+          <app-form-field
+            [control]="validUntilControl"
+            labelKey="DOCUMENTS.VALID_UNTIL"
+            icon="event_available"
+            type="date"
+            [readonly]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3 mb-3">
+          <app-form-field
+            [control]="partyControl"
+            [labelKey]="partyLabelKey"
+            icon="person"
+            type="select"
+            [options]="partySelectOptions"
+            optionValueField="id"
+            optionLabelField="label"
+            [disabled]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3 mb-3" *ngIf="showWarehouse">
+          <app-form-field
+            [control]="warehouseControl"
+            labelKey="INVOICES.WAREHOUSE"
+            icon="warehouse"
+            type="select"
+            [options]="warehouseOptions"
+            optionValueField="id"
+            optionLabelField="label"
+            [disabled]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3 mb-3" *ngIf="showInvoiceLink">
+          <app-form-field
+            [control]="invoiceIdControl"
+            labelKey="DOCUMENTS.INVOICE_ID"
+            icon="receipt_long"
+            type="number"
+            [readonly]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3 mb-3" *ngIf="showDiscount">
+          <app-form-field
+            [control]="discountControl"
+            labelKey="INVOICES.DISCOUNT"
+            icon="percent"
+            type="number"
+            step="0.01"
+            min="0"
+            [readonly]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3 mb-3" *ngIf="showHeaderTax">
+          <app-form-field
+            [control]="taxControl"
+            labelKey="INVOICES.TAX"
+            icon="request_quote"
+            type="number"
+            step="0.01"
+            min="0"
+            [readonly]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-6 mb-3">
+          <app-form-field
+            [control]="notesControl"
+            labelKey="INVOICES.NOTES"
+            icon="notes"
+            [readonly]="readOnly"
+          ></app-form-field>
+        </div>
+      </div>
+
+      <app-document-lines-table
+        [parentForm]="form"
+        [products]="products"
+        [readOnly]="readOnly"
+        [simple]="isReturnMode"
+        [priceField]="priceField"
+        (linesChanged)="linesChanged.emit()"
+      ></app-document-lines-table>
+
+      <div class="d-flex justify-content-end gap-3 mt-3 invoice-totals">
+        <div><strong>{{ 'INVOICES.SUBTOTAL' | translate }}:</strong> {{ totals.subtotal | number:'1.2-2' }}</div>
+        <div><strong>{{ 'INVOICES.TAX' | translate }}:</strong> {{ totals.tax | number:'1.2-2' }}</div>
+        <div><strong>{{ 'INVOICES.TOTAL' | translate }}:</strong> {{ totals.total | number:'1.2-2' }}</div>
+      </div>
+    </form>
+  </div>
+
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm.emit()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="formMode === 'view' && selectedId" type="button" class="erp-button erp-button--success" (click)="approve.emit()">{{ 'COMMON.APPROVE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save.emit()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

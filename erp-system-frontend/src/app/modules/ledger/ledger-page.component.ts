@@ -134,4 +134,29 @@ export class LedgerPageComponent implements OnInit {
         }
       });
   }
+
+  exportExcel(): void {
+    const accountId = Number(this.form.controls.accountId.value || 0);
+    if (!accountId) return;
+    this.api.exportLedgerExcel(accountId, this.form.controls.fromDate.value || '', this.form.controls.toDate.value || '').subscribe({
+      next: (blob) => this.downloadBlob(blob, 'ledger.xlsx')
+    });
+  }
+
+  exportPdf(): void {
+    const accountId = Number(this.form.controls.accountId.value || 0);
+    if (!accountId) return;
+    this.api.exportLedgerPdf(accountId, this.form.controls.fromDate.value || '', this.form.controls.toDate.value || '').subscribe({
+      next: (blob) => this.downloadBlob(blob, 'ledger.pdf')
+    });
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
 }

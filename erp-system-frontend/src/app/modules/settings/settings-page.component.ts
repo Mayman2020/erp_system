@@ -17,6 +17,7 @@ import { AccountingApiService } from '../../core/services/accounting-api.service
 import { LookupService } from '../../core/services/lookup.service';
 import { ThemeMode, ThemeService } from '../../core/services/theme.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
+import { PermissionService } from '../../core/services/permission.service';
 
 @Component({ standalone: false,
   selector: 'app-settings-page',
@@ -47,6 +48,7 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
   accountingMethodOptions: LookupItem[] = [];
   currencyOptions: LookupItem[] = [];
   accountingSettings: AccountingSettingsDto | null = null;
+  canViewAccounting = false;
 
   constructor(
     private authService: AuthService,
@@ -55,6 +57,7 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     public translationService: TranslationService,
     private confirmDialog: ConfirmDialogService,
+    private permissionService: PermissionService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -70,7 +73,18 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
     });
 
     this.authService.refreshCurrentUser();
-    this.loadAccountingContext();
+    this.permissionService.can('settings', 'canView').subscribe((allowed) => {
+      this.canViewAccounting = allowed;
+      if (!allowed && this.activeTabId === 'accounting') {
+        this.activeTabId = 'profile';
+      }
+      if (allowed) {
+        this.loadAccountingContext();
+      } else {
+        this.accountingLoading = false;
+      }
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnDestroy(): void {

@@ -3,6 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './theme/layout/admin/admin.component';
 import {AuthComponent} from './theme/layout/auth/auth.component';
 import { AuthGuard } from './core/auth/auth.guard';
+import { AdminGuard } from './core/auth/admin.guard';
+import { PermissionGuard } from './core/auth/permission.guard';
 
 const routes: Routes = [
   {
@@ -86,6 +88,38 @@ const routes: Routes = [
         loadChildren: () => import('./modules/reports/reports.module').then(module => module.ReportsModule)
       },
       {
+        path: 'inventory',
+        loadChildren: () => import('./modules/inventory/inventory.module').then(module => module.InventoryModule)
+      },
+      {
+        path: 'sales',
+        loadChildren: () => import('./modules/sales/sales.module').then(module => module.SalesModule)
+      },
+      {
+        path: 'purchases',
+        loadChildren: () => import('./modules/purchases/purchases.module').then(module => module.PurchasesModule)
+      },
+      {
+        path: 'hr',
+        loadChildren: () => import('./modules/hr/hr.module').then(module => module.HrModule)
+      },
+      {
+        path: 'crm',
+        loadChildren: () => import('./modules/crm/crm.module').then(module => module.CrmModule)
+      },
+      {
+        path: 'manufacturing',
+        loadChildren: () => import('./modules/manufacturing/manufacturing.module').then(module => module.ManufacturingModule)
+      },
+      {
+        path: 'projects',
+        loadChildren: () => import('./modules/projects/projects.module').then(module => module.ProjectsModule)
+      },
+      {
+        path: 'erp-reports',
+        loadChildren: () => import('./modules/erp-reports/erp-reports.module').then(module => module.ErpReportsModule)
+      },
+      {
         path: 'banks',
         redirectTo: 'bank-accounts',
         pathMatch: 'full'
@@ -95,8 +129,48 @@ const routes: Routes = [
         loadChildren: () => import('./modules/banks/banks.module').then(module => module.BanksModule)
       },
       {
+        path: 'bills',
+        loadChildren: () => import('./modules/bills/bills.module').then(module => module.BillsModule)
+      },
+      {
+        path: 'accounting/bills',
+        redirectTo: 'bills',
+        pathMatch: 'full'
+      },
+      {
+        path: 'budget',
+        loadChildren: () => import('./modules/budget/budget.module').then(module => module.BudgetModule)
+      },
+      {
+        path: 'accounting/budget',
+        redirectTo: 'budget',
+        pathMatch: 'full'
+      },
+      {
+        path: 'exchange-rates',
+        loadChildren: () => import('./modules/exchange-rates/exchange-rates.module').then(module => module.ExchangeRatesModule)
+      },
+      {
+        path: 'accounting/exchange-rates',
+        redirectTo: 'exchange-rates',
+        pathMatch: 'full'
+      },
+      {
         path: 'reconciliation',
         loadChildren: () => import('./modules/reconciliation/reconciliation.module').then(module => module.ReconciliationModule)
+      },
+      {
+        path: 'transfers',
+        loadChildren: () => import('./modules/transfers/transfers.module').then(module => module.TransfersModule)
+      },
+      {
+        path: 'registers',
+        redirectTo: 'ledger',
+        pathMatch: 'full'
+      },
+      {
+        path: 'erp/activity-log',
+        loadChildren: () => import('./modules/activity-log/activity-log.module').then(module => module.ActivityLogModule)
       },
       {
         path: 'settings',
@@ -104,6 +178,7 @@ const routes: Routes = [
       },
       {
         path: 'accountants',
+        canActivate: [AdminGuard],
         loadChildren: () => import('./accountants/accountants.module').then(module => module.AccountantsModule)
       }
     ]

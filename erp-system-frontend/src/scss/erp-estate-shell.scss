@@ -1,0 +1,433 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Estate app-shell — Property_Managments layout (replaces PCoded shell DOM)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.app-shell,
+.erp-app-shell {
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.app-shell .main-area,
+.erp-app-shell .erp-admin-shell__workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  width: auto !important;
+}
+
+.app-shell .main-content,
+.erp-app-shell .erp-admin-shell__main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.erp-app-shell .erp-route-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ── Sidebar host (app-navigation) ──────────────────────────────────────── */
+app-navigation.erp-estate-sidebar,
+.erp-estate-sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: var(--sidebar-w, var(--erp-sidebar-width));
+  height: 100vh;
+  height: 100dvh;
+  background: var(--sidebar-bg);
+  transition: width var(--t-med) var(--e-out);
+  overflow: hidden;
+  position: relative;
+  z-index: 100;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+app-navigation.erp-estate-sidebar::before,
+.erp-estate-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(600px 300px at 20% 0%, rgba(204, 165, 91, 0.08), transparent 60%);
+  z-index: 0;
+}
+
+.erp-estate-sidebar__inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.erp-estate-sidebar .sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+.erp-estate-sidebar .sidebar-brand--collapsed {
+  justify-content: center;
+  padding: 20px 0 14px;
+  gap: 0;
+}
+
+.erp-estate-sidebar .brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #1a1408;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.erp-estate-sidebar .brand-icon__mark {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.erp-estate-sidebar .brand-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.erp-estate-sidebar .brand-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: #f4e7c4;
+  line-height: 1.2;
+}
+
+.erp-estate-sidebar .brand-tagline {
+  font-size: 11px;
+  color: rgba(232, 98, 42, 0.85);
+  margin-top: 3px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.erp-estate-sidebar .collapse-btn {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.76);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.erp-estate-sidebar .collapse-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+[dir='rtl'] .erp-estate-sidebar .collapse-btn mat-icon {
+  transform: scaleX(-1);
+}
+
+.app-shell.sidebar-collapsed app-navigation.erp-estate-sidebar,
+.erp-app-shell.sidebar-collapsed .erp-estate-sidebar {
+  width: var(--sidebar-w-collapsed, var(--erp-sidebar-width-collapsed));
+  min-width: var(--sidebar-w-collapsed, var(--erp-sidebar-width-collapsed));
+  max-width: var(--sidebar-w-collapsed, var(--erp-sidebar-width-collapsed));
+}
+
+.app-shell.sidebar-collapsed .erp-estate-sidebar .brand-text,
+.app-shell.sidebar-collapsed .erp-estate-sidebar .collapse-btn,
+.app-shell.sidebar-collapsed .erp-estate-sidebar .erp-sidebar-footer {
+  display: none;
+}
+
+.app-shell.sidebar-collapsed .erp-estate-sidebar .sidebar-brand {
+  justify-content: center;
+  padding: 20px 0 14px;
+}
+
+/* Estate sidebar nav (Property pattern) */
+.erp-estate-sidebar .erp-nav-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(204, 165, 91, 0.42) transparent;
+}
+
+.erp-estate-sidebar .sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.erp-estate-sidebar .nav-section-label {
+  font-size: 13px;
+  color: rgba(232, 201, 122, 0.9);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.erp-estate-sidebar .nav-section-label::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #e8c97a, rgba(232, 201, 122, 0.3));
+  flex-shrink: 0;
+}
+
+[dir='rtl'] .erp-estate-sidebar .nav-section-label::before {
+  background: linear-gradient(270deg, #e8c97a, rgba(232, 201, 122, 0.3));
+}
+
+.erp-estate-sidebar .nav-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px 14px 7px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.erp-estate-sidebar .nav-section-arrow {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: rgba(232, 201, 122, 0.55);
+}
+
+.erp-estate-sidebar .nav-section-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.erp-estate-sidebar .nav-section-items.is-collapsed {
+  display: none;
+}
+
+.erp-estate-sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background var(--t-fast) var(--e-out), color var(--t-fast) var(--e-out);
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+}
+
+.erp-estate-sidebar .nav-item:hover {
+  background: var(--sidebar-item-hover);
+  color: #f4e7c4;
+}
+
+.erp-estate-sidebar .nav-item.active {
+  background: linear-gradient(135deg, rgba(204, 165, 91, 0.22) 0%, rgba(196, 152, 42, 0.14) 100%);
+  color: #fff;
+  font-weight: 700;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(232, 201, 122, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.erp-estate-sidebar .nav-item.active .nav-icon {
+  color: var(--brass-300, #e8c97a);
+  opacity: 1;
+}
+
+.erp-estate-sidebar .nav-item.active::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 5px;
+  border-radius: 0 5px 5px 0;
+  background: linear-gradient(180deg, #f0d87a, #c4982a);
+  box-shadow: 0 0 14px rgba(204, 165, 91, 0.9);
+}
+
+[dir='rtl'] .erp-estate-sidebar .nav-item.active::before {
+  border-radius: 5px 0 0 5px;
+}
+
+.erp-estate-sidebar .nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: rgba(232, 201, 122, 0.72);
+}
+
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-label,
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-badge,
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-section-label,
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-section-toggle,
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-collapse-arrow {
+  display: none;
+}
+
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-item,
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-item--collapse {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-subsection {
+  padding-inline-start: 0;
+}
+
+/* ── Topbar host (app-nav-bar) ──────────────────────────────────────────── */
+app-nav-bar.erp-estate-topbar,
+.erp-estate-topbar {
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.erp-estate-topbar .topbar,
+.erp-estate-topbar .erp-header-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--topbar-height, 64px);
+  min-height: var(--topbar-height, 64px);
+  padding: 0 28px;
+  background: var(--header-bg) !important;
+  border-bottom: 1px solid var(--header-border) !important;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  margin: 0 !important;
+}
+
+.erp-estate-topbar .erp-header-shell__brand,
+.erp-estate-topbar .topbar-start {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.erp-estate-topbar .erp-header-shell__center {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.erp-estate-topbar .erp-header-shell__actions,
+.erp-estate-topbar .topbar-end {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.erp-estate-topbar .erp-header-toggle,
+.erp-estate-topbar .tb-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.erp-estate-topbar .erp-header-toggle:hover,
+.erp-estate-topbar .tb-action-btn:hover {
+  background: var(--icon-btn-hover);
+  border-color: var(--line);
+}
+
+/* Mobile drawer */
+@media (max-width: 991px) {
+  .app-shell,
+  .erp-app-shell {
+    position: relative;
+  }
+
+  app-navigation.erp-estate-sidebar,
+  .erp-estate-sidebar {
+    position: fixed;
+    top: 0;
+    inset-inline-start: 0;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.25s var(--e-out), width var(--t-med) var(--e-out);
+    box-shadow: var(--shadow-hover);
+  }
+
+  [dir='rtl'] app-navigation.erp-estate-sidebar,
+  [dir='rtl'] .erp-estate-sidebar {
+    transform: translateX(100%);
+  }
+
+  .app-shell.mob-open app-navigation.erp-estate-sidebar,
+  .erp-app-shell.mob-open .erp-estate-sidebar,
+  .erp-app-shell--mobile-open .erp-estate-sidebar {
+    transform: translateX(0);
+  }
+
+  .erp-estate-topbar .topbar,
+  .erp-estate-topbar .erp-header-shell {
+    padding: 0 14px;
+  }
+}

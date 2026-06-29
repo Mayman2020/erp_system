@@ -1,15 +1,40 @@
-<section class="erp-page">
-  <app-page-header [titleKey]="titleKey"></app-page-header>
-
-  <div class="card erp-unified-card">
-    <div class="card-body">
-      <app-advanced-search-bar [showDateRange]="true" [showStatus]="true" [statusOptions]="statusOptions" (search)="onSearch($event)"></app-advanced-search-bar>
-      <div class="alert alert-danger alert-dismissible fade show mt-3" *ngIf="errorKey">
-        {{ errorKey | translate }}
-        <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-      </div>
-      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions>
+      <button *appHasPermission="'checks'; appHasPermissionAction: 'canCreate'" class="erp-button erp-button--primary" type="button" (click)="openCreate()">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        <span>{{ 'CHECKS.CREATE' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-3" (dismissed)="successKey = ''"></app-erp-alert>
+      <app-advanced-search-bar [showStatus]="showStatus" [showDateRange]="showDateRange" [statusOptions]="statusOptions" (search)="onSearch($event)"></app-advanced-search-bar>
+      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
     </div>
   </div>
 </section>
-
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'CHECKS.CREATE' : (formMode === 'view' ? 'COMMON.VIEW' : 'COMMON.EDIT')" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.checkNumber" labelKey="CHECKS.NUMBER" icon="tag" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.checkType" labelKey="CHECKS.TYPE" icon="swap_horiz" type="select" [options]="checkTypes" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.amount" labelKey="CHECKS.AMOUNT" icon="attach_money" type="number" step="0.01" min="0.01" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.issueDate" labelKey="CHECKS.ISSUE_DATE" icon="event" type="date" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.dueDate" labelKey="CHECKS.DUE_DATE" icon="event" type="date" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.bankName" labelKey="CHECKS.BANK" icon="account_balance" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.bankAccountId" labelKey="BANKS.TITLE" icon="account_balance_wallet" type="select" [options]="bankAccountOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.holdingAccountId" labelKey="CHECKS.HOLDING_ACCOUNT" icon="savings" type="select" [options]="accountOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.partyName" labelKey="CHECKS.PARTY" icon="person" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.linkedDocumentReference" labelKey="CHECKS.LINKED_DOC" icon="link" [readonly]="readOnly"></app-form-field></div>
+      </div>
+    </form>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

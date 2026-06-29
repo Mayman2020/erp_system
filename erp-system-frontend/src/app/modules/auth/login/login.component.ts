@@ -22,8 +22,6 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   errorKey = '';
   loading = false;
   otpLoading = false;
-  hidePassword = true;
-  hideNewPassword = true;
   mode: 'login' | 'forgot' = 'login';
   otpSent = false;
 

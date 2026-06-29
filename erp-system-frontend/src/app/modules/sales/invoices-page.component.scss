@@ -1,0 +1,16 @@
+.erp-list-page__card {
+  margin-top: 1rem;
+}
+
+.erp-list-page__card .erp-card__body {
+  padding: 1.25rem;
+}
+
+.invoice-totals {
+  font-size: 0.95rem;
+}
+
+[data-theme='dark'] .erp-list-page__card {
+  background: var(--erp-surface-elevated, rgba(255, 255, 255, 0.04));
+  border-color: var(--erp-border-subtle, rgba(255, 255, 255, 0.08));
+}

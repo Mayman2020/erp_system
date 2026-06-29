@@ -50,13 +50,8 @@
   }
 }
 
-.premium-card {
-  box-shadow: var(--erp-shadow-md);
-  border: 1px solid var(--erp-border-strong);
-  
-  .card-body {
-    padding: 2rem;
-  }
+.erp-card .erp-card__body {
+  padding: 2rem;
 }
 
 .erp-settings__section-label {

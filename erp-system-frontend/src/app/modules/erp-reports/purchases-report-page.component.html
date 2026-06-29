@@ -1,0 +1,36 @@
+<section class="erp-page erp-report-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+
+  <div class="erp-card erp-report-page__card">
+    <div class="erp-card__body">
+      <app-advanced-search-bar
+        [showDateRange]="true"
+        [showStatus]="false"
+        (search)="onSearch($event)"
+      ></app-advanced-search-bar>
+
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mt-3" (dismissed)="errorKey = ''"></app-erp-alert>
+
+      <div class="erp-report-page__summary" *ngIf="!loading && !errorKey">
+        <div class="erp-report-page__metric">
+          <div class="erp-report-page__metric-label">{{ 'ERP.REPORT_FROM' | translate }}</div>
+          <div class="erp-report-page__metric-value">{{ summary.fromDate }}</div>
+        </div>
+        <div class="erp-report-page__metric">
+          <div class="erp-report-page__metric-label">{{ 'ERP.REPORT_TO' | translate }}</div>
+          <div class="erp-report-page__metric-value">{{ summary.toDate }}</div>
+        </div>
+        <div class="erp-report-page__metric">
+          <div class="erp-report-page__metric-label">{{ 'ERP.INVOICE_COUNT' | translate }}</div>
+          <div class="erp-report-page__metric-value">{{ summary.invoiceCount }}</div>
+        </div>
+        <div class="erp-report-page__metric">
+          <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_PURCHASES' | translate }}</div>
+          <div class="erp-report-page__metric-value">{{ summary.totalPurchases }}</div>
+        </div>
+      </div>
+
+      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+    </div>
+  </div>
+</section>

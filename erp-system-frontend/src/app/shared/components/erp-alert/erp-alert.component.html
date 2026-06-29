@@ -1,0 +1,22 @@
+<div
+  *ngIf="message"
+  class="erp-alert"
+  [class.erp-alert--success]="type === 'success'"
+  [class.erp-alert--danger]="type === 'danger'"
+  [class.erp-alert--warning]="type === 'warning'"
+  [class.erp-alert--info]="type === 'info'"
+  [ngClass]="extraClass"
+  role="alert"
+>
+  <mat-icon class="erp-alert__icon" aria-hidden="true">{{ icon }}</mat-icon>
+  <span class="erp-alert__text">{{ message | translate }}</span>
+  <button
+    *ngIf="dismissible"
+    type="button"
+    class="erp-alert__close"
+    (click)="onDismiss()"
+    [attr.aria-label]="'COMMON.CLOSE' | translate"
+  >
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+</div>

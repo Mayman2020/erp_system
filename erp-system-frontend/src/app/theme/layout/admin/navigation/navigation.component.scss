@@ -1,57 +1,31 @@
-/* Brand row: hamburger is absolute; welcome stays visually centered in the rail */
-:host:not(.navbar-collapsed) .sidebar-brand {
+:host {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  min-height: 52px;
-  padding: 8px 48px;
-  margin-bottom: 6px;
-  position: relative;
-  overflow: visible;
-}
-
-/* Premium accent aligned to brand primary (not ad-hoc neon greens) */
-:host .sidebar-welcome {
-  display: block;
+  flex-direction: column;
   flex: 1 1 auto;
-  min-width: 0;
-  max-width: 100%;
-  font-weight: 800;
-  font-size: clamp(13px, 2.4vw, 17px);
-  line-height: 1.25;
-  text-align: center;
-  letter-spacing: 0.04em;
-  color: color-mix(in srgb, var(--erp-primary) 92%, #ffffff 8%);
-  text-shadow: 0 1px 18px color-mix(in srgb, var(--erp-primary) 35%, transparent);
-  animation: erp-sidebar-welcome-soft 5s ease-in-out infinite;
+  min-height: 0;
+  height: 100%;
 }
 
-@keyframes erp-sidebar-welcome-soft {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.82;
-  }
+.erp-sidebar-chrome {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
-/* Collapsed rail: avoid broken vertical Arabic wrap — icon-only chrome */
-:host(.navbar-collapsed) .sidebar-welcome {
-  display: none;
+.erp-sidebar-chrome__nav {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.erp-sidebar-footer {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding-bottom: 10px;
 }
 
-:host(.navbar-collapsed) .sidebar-brand {
-  min-height: 52px;
-  padding: 8px 6px;
-  margin-bottom: 4px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :host .sidebar-welcome {
-    animation: none;
-    opacity: 1;
-  }
+.erp-sidebar-divider {
+  height: 1px;
+  margin: 0 14px 12px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
 }

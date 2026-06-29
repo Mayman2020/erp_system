@@ -1,15 +1,55 @@
-<section class="erp-page">
-  <app-page-header [titleKey]="titleKey"></app-page-header>
-
-  <div class="card erp-unified-card">
-    <div class="card-body">
-      <app-advanced-search-bar [showDateRange]="true" [showStatus]="true" [statusOptions]="statusOptions" (search)="onSearch($event)"></app-advanced-search-bar>
-      <div class="alert alert-danger alert-dismissible fade show mt-3" *ngIf="errorKey">
-        {{ errorKey | translate }}
-        <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-      </div>
-      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions>
+      <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        <span>{{ 'INVOICES.CREATE' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert type="info" message="INVOICES.ACCOUNTING_NOTE" extraClass="mb-3" [dismissible]="false"></app-erp-alert>
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-3" (dismissed)="successKey = ''"></app-erp-alert>
+      <app-advanced-search-bar [showStatus]="showStatus" [showDateRange]="showDateRange" [statusOptions]="statusOptions" (search)="onSearch($event)"></app-advanced-search-bar>
+      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
     </div>
   </div>
 </section>
-
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'INVOICES.CREATE' : (formMode === 'view' ? 'COMMON.VIEW' : 'COMMON.EDIT')" size="xl" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-3 mb-3"><app-form-field [control]="form.controls.invoiceNumber" labelKey="INVOICES.NUMBER" icon="tag" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-3 mb-3"><app-form-field [control]="form.controls.invoiceDate" labelKey="INVOICES.DATE" icon="event" type="date" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-3 mb-3"><app-form-field [control]="form.controls.dueDate" labelKey="INVOICES.DUE_DATE" icon="event" type="date" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-3 mb-3"><app-form-field [control]="form.controls.taxAmount" labelKey="INVOICES.TAX" icon="percent" type="number" step="0.01" min="0" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.customerName" labelKey="INVOICES.CUSTOMER" icon="person" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.customerReference" labelKey="INVOICES.CUSTOMER_REF" icon="badge" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.description" labelKey="INVOICES.DESCRIPTION" icon="notes" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.receivableAccountId" labelKey="INVOICES.RECEIVABLE_ACCOUNT" icon="account_balance" type="select" [options]="receivableOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.revenueAccountId" labelKey="INVOICES.REVENUE_ACCOUNT" icon="trending_up" type="select" [options]="revenueOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+      </div>
+      <h6 class="erp-form-section-title">{{ 'INVOICES.LINES' | translate }}</h6>
+      <div formArrayName="lines">
+        <div class="row align-items-end mb-2" *ngFor="let line of lines.controls; let i = index" [formGroupName]="i">
+          <div class="col-md-4 mb-2"><app-form-field [control]="line.get('accountId')" labelKey="JOURNAL.ACCOUNT_NAME" icon="account_tree" type="select" [options]="lineAccountOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+          <div class="col-md-3 mb-2"><app-form-field [control]="line.get('description')" labelKey="INVOICES.DESCRIPTION" icon="notes" [readonly]="readOnly"></app-form-field></div>
+          <div class="col-md-2 mb-2"><app-form-field [control]="line.get('quantity')" labelKey="ERP.QUANTITY" icon="pin" type="number" step="0.01" min="0.01" [readonly]="readOnly"></app-form-field></div>
+          <div class="col-md-2 mb-2"><app-form-field [control]="line.get('unitPrice')" labelKey="INVOICES.UNIT_PRICE" icon="attach_money" type="number" step="0.01" min="0" [readonly]="readOnly"></app-form-field></div>
+          <div class="col-md-1 mb-2" *ngIf="!readOnly && lines.length > 1">
+            <button type="button" class="erp-button erp-button--danger erp-button--icon" (click)="removeLine(i)"><mat-icon>delete</mat-icon></button>
+          </div>
+        </div>
+      </div>
+      <button *ngIf="!readOnly" type="button" class="erp-button erp-button--secondary btn-sm" (click)="addLine()">
+        <mat-icon>add</mat-icon> {{ 'INVOICES.ADD_LINE' | translate }}
+      </button>
+    </form>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

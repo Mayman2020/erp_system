@@ -28,6 +28,7 @@ private BigDecimal discountAmount;
 private BigDecimal taxAmount;
 private BigDecimal totalAmount;
 private String notes;
+private List<PurchaseOrderLineDisplayDto> lines;
 
     private Instant createdAt;
     private Instant updatedAt;

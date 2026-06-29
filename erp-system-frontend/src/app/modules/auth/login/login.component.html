@@ -1,13 +1,4 @@
-<section class="login-shell login-shell--immersive erp-bg-animated">
-  <div class="login-bg-fx" aria-hidden="true">
-    <div class="login-brand-visual">
-      <div class="login-brand-visual__orb login-brand-visual__orb--a"></div>
-      <div class="login-brand-visual__orb login-brand-visual__orb--b"></div>
-      <div class="login-brand-visual__wave"></div>
-    </div>
-    <div id="particles-js"></div>
-  </div>
-
+<section class="login-shell login-shell--estate">
   <div class="login-shell__grid">
     <main class="login-side login-side--form">
       <div class="login-form-panel">
@@ -24,20 +15,26 @@
           </div>
 
           <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="mode === 'login'" class="login-form login-gsap-stagger">
-            <div class="field erp-form-field">
-              <label>{{ 'AUTH.EMAIL' | translate }}</label>
-              <input type="email" class="erp-input login-input" formControlName="email" [attr.placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate" />
-            </div>
+            <app-form-field
+              [control]="form.controls.email"
+              labelKey="AUTH.EMAIL"
+              icon="mail"
+              type="email"
+              placeholderKey="AUTH.EMAIL_PLACEHOLDER"
+              controlClass="login-input"
+              extraClass="login-field"
+            ></app-form-field>
 
-            <div class="field erp-form-field">
-              <label>{{ 'AUTH.PASSWORD' | translate }}</label>
-              <div class="password-wrapper">
-                <input [type]="hidePassword ? 'password' : 'text'" class="erp-input login-input" formControlName="password" [attr.placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate" />
-                <button type="button" class="eye-btn" (click)="hidePassword = !hidePassword" [attr.aria-label]="(hidePassword ? 'AUTH.SHOW_PASSWORD' : 'AUTH.HIDE_PASSWORD') | translate">
-                  <mat-icon>{{ hidePassword ? 'visibility' : 'visibility_off' }}</mat-icon>
-                </button>
-              </div>
-            </div>
+            <app-form-field
+              [control]="form.controls.password"
+              labelKey="AUTH.PASSWORD"
+              icon="lock"
+              type="password"
+              placeholderKey="AUTH.PASSWORD_PLACEHOLDER"
+              controlClass="login-input"
+              extraClass="login-field"
+              [passwordToggle]="true"
+            ></app-form-field>
 
             <div class="meta-row">
               <label class="remember">
@@ -47,10 +44,10 @@
               <a class="forgot" (click)="mode = 'forgot'">{{ 'AUTH.FORGOT' | translate }}</a>
             </div>
 
-            <div class="text-danger error-msg" *ngIf="errorKey">{{ errorKey | translate }}</div>
+            <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" [dismissible]="false"></app-erp-alert>
 
             <div class="login-actions">
-              <button class="erp-btn erp-btn-primary login-submit" type="submit" [disabled]="loading">
+              <button class="erp-button erp-button--primary login-submit" type="submit" [disabled]="loading">
                 <span *ngIf="!loading">{{ 'AUTH.LOGIN' | translate }}</span>
                 <div class="button-spinner" *ngIf="loading"></div>
               </button>
@@ -59,11 +56,18 @@
 
           <div *ngIf="mode === 'forgot'" class="login-form login-form--forgot login-gsap-stagger">
             <form [formGroup]="forgotForm" (ngSubmit)="sendOtp()" *ngIf="!otpSent">
-              <div class="field erp-form-field">
-                <label>{{ 'AUTH.EMAIL' | translate }}</label>
-                <input type="email" class="erp-input login-input" formControlName="email" />
-              </div>
-              <button class="erp-btn erp-btn-primary login-submit" type="submit" [disabled]="otpLoading">
+              <app-form-field
+                [control]="forgotForm.controls.email"
+                labelKey="AUTH.EMAIL"
+                icon="mail"
+                type="email"
+                controlClass="login-input"
+                extraClass="login-field"
+              ></app-form-field>
+
+              <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" [dismissible]="false"></app-erp-alert>
+
+              <button class="erp-button erp-button--primary login-submit" type="submit" [disabled]="otpLoading">
                 <span *ngIf="!otpLoading">{{ 'AUTH.SEND_OTP' | translate }}</span>
                 <div class="button-spinner" *ngIf="otpLoading"></div>
               </button>
@@ -71,15 +75,27 @@
             </form>
 
             <form [formGroup]="resetForm" (ngSubmit)="resetPassword()" *ngIf="otpSent">
-              <div class="field erp-form-field">
-                <label>{{ 'AUTH.OTP_CODE' | translate }}</label>
-                <input class="erp-input login-input" formControlName="otpCode" />
-              </div>
-              <div class="field erp-form-field">
-                <label>{{ 'AUTH.NEW_PASSWORD' | translate }}</label>
-                <input [type]="hideNewPassword ? 'password' : 'text'" class="erp-input login-input" formControlName="newPassword" />
-              </div>
-              <button class="erp-btn erp-btn-primary login-submit" type="submit" [disabled]="otpLoading">
+              <app-form-field
+                [control]="resetForm.controls.otpCode"
+                labelKey="AUTH.OTP_CODE"
+                icon="pin"
+                controlClass="login-input"
+                extraClass="login-field"
+              ></app-form-field>
+
+              <app-form-field
+                [control]="resetForm.controls.newPassword"
+                labelKey="AUTH.NEW_PASSWORD"
+                icon="lock"
+                type="password"
+                controlClass="login-input"
+                extraClass="login-field"
+                [passwordToggle]="true"
+              ></app-form-field>
+
+              <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" [dismissible]="false"></app-erp-alert>
+
+              <button class="erp-button erp-button--primary login-submit" type="submit" [disabled]="otpLoading">
                 <span *ngIf="!otpLoading">{{ 'AUTH.RESET_PASSWORD' | translate }}</span>
                 <div class="button-spinner" *ngIf="otpLoading"></div>
               </button>
@@ -95,6 +111,14 @@
     </main>
 
     <aside class="login-side login-side--brand" aria-hidden="false">
+      <div class="login-bg-fx" aria-hidden="true">
+        <div class="login-brand-visual">
+          <div class="login-brand-visual__orb login-brand-visual__orb--a"></div>
+          <div class="login-brand-visual__orb login-brand-visual__orb--b"></div>
+          <div class="login-brand-visual__wave"></div>
+        </div>
+        <div id="particles-js"></div>
+      </div>
       <div #brandPanel class="login-side__content">
         <span class="vision-badge">{{ 'login.visionBadge' | t }}</span>
         <h2 class="login-hero-title">{{ 'login.heroTitle' | t }}</h2>

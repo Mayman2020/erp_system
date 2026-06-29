@@ -29,6 +29,7 @@ private BigDecimal taxAmount;
 private BigDecimal totalAmount;
 private String notes;
 private Long journalEntryId;
+private List<PurchaseReturnLineDisplayDto> lines;
 
     private Instant createdAt;
     private Instant updatedAt;

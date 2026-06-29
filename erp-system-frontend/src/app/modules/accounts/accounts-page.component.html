@@ -1,4 +1,4 @@
-<section class="erp-page accounts-page">
+<section class="erp-page erp-list-page erp-estate-fade-up accounts-page">
   <app-page-header titleKey="ACCOUNTS.TITLE">
     <div header-actions class="erp-toolbar-icons">
       <button class="erp-button erp-button--ghost" type="button" (click)="toggleTreeView()">
@@ -12,14 +12,8 @@
     </div>
   </app-page-header>
 
-  <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
-    {{ successKey | translate }}
-    <button type="button" class="btn-close" (click)="successKey = ''"></button>
-  </div>
-  <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
-    {{ errorKey | translate }}
-    <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-  </div>
+  <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" (dismissed)="successKey = ''"></app-erp-alert>
+  <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" (dismissed)="errorKey = ''"></app-erp-alert>
 
   <section class="accounts-page__controls erp-surface" *ngIf="viewMode === 'table'">
     <app-advanced-search-bar
@@ -110,14 +104,8 @@
   (close)="closeDialog()"
 >
   <div dialog-body>
-    <div class="alert alert-success alert-dismissible fade show" *ngIf="successKey">
-      {{ successKey | translate }}
-      <button type="button" class="btn-close" (click)="successKey = ''"></button>
-    </div>
-    <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorKey">
-      {{ errorKey | translate }}
-      <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-    </div>
+    <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" (dismissed)="successKey = ''"></app-erp-alert>
+    <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" (dismissed)="errorKey = ''"></app-erp-alert>
 
     <form [formGroup]="form" class="accounts-dialog__form">
       <div class="accounts-dialog__grid">

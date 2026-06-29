@@ -1,5 +1,5 @@
 <footer class="erp-shell-footer" role="contentinfo">
-  <div class="erp-shell-footer__grid">
+  <div class="erp-shell-footer__grid erp-shell-footer__grid--rich">
     <div class="erp-shell-footer__col">
       <h2 class="erp-shell-footer__heading">{{ 'NAV.GROUP' | translate }}</h2>
       <div class="erp-shell-footer__underline" aria-hidden="true"><span></span></div>
@@ -31,7 +31,13 @@
       </div>
     </div>
   </div>
-  <div class="erp-shell-footer__meta">
+
+  <div class="erp-shell-footer__bar erp-shell-footer__bar--integrated">
+    <span class="erp-shell-footer__version">{{ 'APP.VERSION_LABEL' | translate }} {{ version }}</span>
+    <span class="erp-shell-footer__copyright">{{ footerIntegratedText }}</span>
+  </div>
+
+  <div class="erp-shell-footer__meta erp-shell-footer__meta--rich">
     <span>{{ 'login.footerCopyright' | translate: { year: year } }}</span>
     <span class="erp-shell-footer__sep" aria-hidden="true">&middot;</span>
     <span>{{ 'APP.VERSION_LABEL' | translate }} {{ version }}</span>

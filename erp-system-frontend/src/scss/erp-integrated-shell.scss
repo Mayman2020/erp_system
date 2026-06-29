@@ -1,0 +1,539 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ERP Integrated Shell — Estate OS (Property_Managments pattern)
+   Warm paper workspace · navy sidebar · brass accents · smooth motion
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  --erp-sidebar-width: var(--sidebar-w, 248px);
+  --erp-sidebar-width-collapsed: var(--sidebar-w-collapsed, 76px);
+  --erp-header-height: var(--topbar-height, 64px);
+}
+
+/* ── App shell (Property main-layout) ─────────────────────────────────────── */
+.erp-integrated-shell.erp-admin-shell {
+  background: var(--paper);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.erp-integrated-shell .erp-admin-shell__workspace {
+  background: var(--paper);
+  transition: background var(--t-med) var(--e-out);
+}
+
+.erp-integrated-shell .pcoded-content.erp-content {
+  padding: 24px 32px 0;
+  background: transparent !important;
+}
+
+.erp-integrated-shell .erp-main-container,
+.erp-integrated-shell .erp-route-shell {
+  background: transparent;
+  color: var(--text-main);
+}
+
+.erp-integrated-shell .erp-content:has(.erp-integrated-dashboard) .erp-breadcrumb-host {
+  display: none;
+}
+
+.erp-integrated-shell .erp-breadcrumb-host .page-header-title h5,
+.erp-integrated-shell .erp-breadcrumb-host .breadcrumb-item,
+.erp-integrated-shell .erp-breadcrumb-host .breadcrumb-item a {
+  color: var(--text-muted);
+}
+
+.erp-integrated-shell .erp-breadcrumb-host .breadcrumb-item.active {
+  color: var(--text-main);
+}
+
+/* ── Topbar (Property topbar — light surface) ───────────────────────────── */
+.erp-integrated-shell .pcoded-header.navbar-light,
+.erp-integrated-shell .erp-admin-shell__header.navbar {
+  background: var(--header-bg) !important;
+  border-bottom: 1px solid var(--header-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.erp-integrated-shell .erp-header-shell {
+  min-height: var(--erp-header-height);
+  height: var(--erp-header-height);
+  padding: 0 28px;
+  background: var(--header-bg) !important;
+  border-bottom: 1px solid var(--header-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  color: var(--text-main);
+  transition: background var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
+}
+
+.erp-integrated-shell .erp-header-shell__title {
+  font-size: clamp(15px, 1.8vw, 17px);
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.erp-integrated-shell .erp-header-shell__center {
+  padding: 0 16px;
+}
+
+.erp-integrated-shell .erp-header-search {
+  width: min(420px, 100%);
+  min-height: 40px;
+  border-radius: 12px;
+  background: var(--paper-2) !important;
+  border: 1px solid transparent !important;
+  padding: 0 14px;
+  color: var(--text-main);
+  transition:
+    background var(--t-fast) var(--e-out),
+    border-color var(--t-fast) var(--e-out),
+    transform var(--t-fast) var(--e-out);
+}
+
+.erp-integrated-shell .erp-header-search:hover,
+.erp-integrated-shell .erp-header-search:focus-within {
+  background: var(--surface) !important;
+  border-color: var(--brass-500) !important;
+  transform: none;
+}
+
+.erp-integrated-shell .erp-header-search__placeholder {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.erp-integrated-shell .erp-header-shell .erp-header-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-main);
+  transition: background var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
+}
+
+.erp-integrated-shell .erp-header-shell .erp-header-toggle:hover {
+  background: var(--icon-btn-hover);
+  border-color: var(--line);
+}
+
+.erp-integrated-shell .erp-header-actions {
+  gap: 8px;
+}
+
+.erp-integrated-shell .erp-language-switcher__trigger--header,
+.erp-integrated-shell .erp-nav-theme-btn {
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
+}
+
+.erp-integrated-shell .erp-language-switcher__trigger--header:hover,
+.erp-integrated-shell .erp-nav-theme-btn:hover {
+  background: var(--icon-btn-hover);
+  border-color: var(--line);
+}
+
+.erp-integrated-shell .erp-nav-notify-badge--count {
+  top: 2px;
+  inset-inline-end: 2px;
+  border: 2px solid var(--surface);
+  background: var(--bad);
+}
+
+/* Profile pill — Property tb-user-btn */
+.erp-integrated-shell .erp-header-shell .erp-sidebar-profile__toggle {
+  border: 1px solid var(--line) !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--text-main) !important;
+  transition: background var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
+}
+
+.erp-integrated-shell .erp-header-shell .erp-sidebar-profile__toggle:hover {
+  background: var(--icon-btn-hover) !important;
+  border-color: var(--line-2) !important;
+}
+
+.erp-integrated-shell .erp-header-shell .erp-sidebar-profile__info strong {
+  color: var(--text-main) !important;
+}
+
+.erp-integrated-shell .erp-header-shell .erp-sidebar-profile__info small {
+  color: var(--text-muted) !important;
+}
+
+/* ── Sidebar (Property sidebar) ─────────────────────────────────────────── */
+.erp-integrated-shell .erp-estate-sidebar {
+  padding: 0;
+  background: var(--sidebar-bg) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.04) !important;
+  box-shadow: none !important;
+  color: var(--sidebar-text);
+  transition: width var(--t-med) var(--e-out);
+}
+
+.erp-integrated-shell app-nav-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.erp-integrated-shell .erp-nav-scroll,
+.erp-integrated-shell .flat-able-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(204, 165, 91, 0.42) transparent;
+}
+
+.erp-integrated-shell .erp-nav-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.erp-integrated-shell .erp-nav-scroll::-webkit-scrollbar-thumb {
+  background: rgba(204, 165, 91, 0.42);
+  border-radius: 999px;
+}
+
+.erp-integrated-shell .erp-sidebar-footer {
+  flex-shrink: 0;
+  padding: 0 12px 12px;
+}
+
+.erp-integrated-shell .erp-sidebar-calendar {
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.erp-integrated-shell .erp-sidebar-calendar__day--today {
+  background: var(--brass-500) !important;
+  color: var(--navy-900) !important;
+  box-shadow: 0 4px 14px rgba(204, 165, 91, 0.45) !important;
+}
+
+/* ── Dashboard (estate-stat-card pattern) ───────────────────────────────── */
+.erp-integrated-shell .erp-integrated-dashboard {
+  padding-bottom: 12px;
+}
+
+.erp-integrated-shell .dashboard-grid {
+  --bs-gutter-x: 20px;
+  --bs-gutter-y: 20px;
+}
+
+.erp-integrated-shell .dash-kpi-card,
+.erp-integrated-shell .dash-chart-card,
+.erp-integrated-shell .erp-integrated-table {
+  border-radius: var(--r) !important;
+  border: 1px solid var(--card-border) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-card) !important;
+  transition:
+    transform var(--t-med) var(--e-out),
+    box-shadow var(--t-med) var(--e-out),
+    border-color var(--t-med) var(--e-out);
+}
+
+.erp-integrated-shell .dash-kpi-card:hover,
+.erp-integrated-shell .dash-chart-card:hover,
+.erp-integrated-shell .erp-integrated-table:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover) !important;
+  border-color: var(--card-hover-border) !important;
+}
+
+.erp-integrated-shell .dash-kpi-card {
+  padding: 20px;
+  gap: 16px;
+}
+
+.erp-integrated-shell .dash-kpi-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.erp-integrated-shell .dash-kpi-card--revenue .dash-kpi-card__icon {
+  background: var(--navy-900);
+  color: var(--brass-400);
+}
+
+.erp-integrated-shell .dash-kpi-card--expense .dash-kpi-card__icon {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.erp-integrated-shell .dash-kpi-card--profit .dash-kpi-card__icon {
+  background: rgba(228, 194, 126, 0.15);
+  color: var(--brass-600);
+}
+
+.erp-integrated-shell .dash-kpi-card--orders .dash-kpi-card__icon {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.erp-integrated-shell .dash-kpi-card__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.erp-integrated-shell .dash-kpi-card__value {
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.erp-integrated-shell .dash-kpi-card__growth-hint {
+  color: var(--text-subtle);
+  font-size: 11px;
+}
+
+.erp-integrated-shell .dash-kpi-card__growth--up {
+  color: var(--ok);
+  background: var(--ok-bg);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+}
+
+.erp-integrated-shell .dash-kpi-card__growth--down {
+  color: var(--bad);
+  background: var(--bad-bg);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+}
+
+.erp-integrated-shell .dash-chart-card__header h5,
+.erp-integrated-shell .erp-integrated-table__head h5 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.erp-integrated-shell .dash-quick-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+
+.erp-integrated-shell .dash-quick-action {
+  min-height: 96px;
+  border-radius: 12px;
+  background: var(--surface-2) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-main) !important;
+  transition:
+    transform var(--t-med) var(--e-out),
+    box-shadow var(--t-med) var(--e-out),
+    border-color var(--t-med) var(--e-out),
+    background var(--t-fast) var(--e-out);
+}
+
+.erp-integrated-shell .dash-quick-action:hover {
+  transform: translateY(-2px);
+  background: var(--surface) !important;
+  border-color: var(--brass-300) !important;
+  box-shadow: var(--shadow-hover);
+}
+
+.erp-integrated-shell .dash-quick-action__label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.erp-integrated-shell .dash-quick-action__icon {
+  border-radius: 12px;
+}
+
+.erp-integrated-shell .dash-activity-item__dot {
+  background: var(--brass-500);
+  box-shadow: 0 0 0 4px rgba(180, 138, 64, 0.15);
+}
+
+.erp-integrated-shell .dash-activity-item:hover {
+  background: rgba(200, 154, 61, 0.08);
+  border-radius: 10px;
+}
+
+.erp-integrated-shell .dash-activity-item__content p {
+  color: var(--text-main);
+}
+
+.erp-integrated-shell .dash-activity-item__content small {
+  color: var(--text-muted);
+}
+
+/* ── List / tables ──────────────────────────────────────────────────────── */
+.erp-integrated-shell .erp-list-page__card,
+.erp-integrated-shell .erp-card.erp-list-page__card,
+.erp-integrated-shell .erp-unified-card {
+  border-radius: var(--r);
+  border: 1px solid var(--card-border);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform var(--t-med) var(--e-out),
+    box-shadow var(--t-med) var(--e-out),
+    border-color var(--t-med) var(--e-out);
+}
+
+.erp-integrated-shell .erp-list-page__card:hover,
+.erp-integrated-shell .erp-unified-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--card-hover-border);
+}
+
+.erp-integrated-shell .erp-table thead th {
+  background: var(--table-header-bg);
+  border-color: var(--line);
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.erp-integrated-shell .erp-table tbody td {
+  background: var(--surface);
+  border-color: var(--line-2);
+  color: var(--text-main);
+  transition: background var(--t-fast) var(--e-out);
+}
+
+.erp-integrated-shell .erp-table tbody tr:hover td {
+  background: var(--table-row-hover);
+}
+
+.erp-integrated-shell .form-control,
+.erp-integrated-shell select.form-control {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  border-radius: var(--r-sm);
+  color: var(--text-main);
+  transition: border-color var(--t-fast) var(--e-out), box-shadow var(--t-fast) var(--e-out);
+}
+
+.erp-integrated-shell .form-control:focus,
+.erp-integrated-shell select.form-control:focus {
+  border-color: var(--brass-500) !important;
+  box-shadow: 0 0 0 3px rgba(180, 138, 64, 0.15) !important;
+}
+
+/* ── Charts ─────────────────────────────────────────────────────────────── */
+.erp-integrated-shell .apexcharts-tooltip {
+  border-radius: var(--r-sm) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--text-main) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.erp-integrated-shell .apexcharts-legend-text {
+  color: var(--text-muted) !important;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.erp-integrated-shell .erp-shell-footer {
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  color: var(--text-muted);
+}
+
+/* ── RTL sidebar nav ────────────────────────────────────────────────────── */
+body.rtl .erp-integrated-shell .erp-estate-sidebar .nav-item,
+body.rtl .erp-integrated-shell .erp-estate-sidebar .nav-item--collapse {
+  flex-direction: row-reverse;
+}
+
+body.rtl .erp-integrated-shell .erp-estate-sidebar .nav-label {
+  text-align: right;
+  flex: 1 1 auto;
+}
+
+.erp-integrated-shell .dash-table-card--low-stock .erp-table tbody td:nth-child(2) {
+  color: var(--bad);
+  font-weight: 700;
+}
+
+.erp-integrated-shell .dash-table-card--performance .erp-table tbody td:nth-child(3) {
+  color: var(--ok);
+  font-weight: 700;
+}
+
+.erp-integrated-shell .dash-table-card .erp-table thead th,
+.erp-integrated-shell .dash-table-card .erp-table tbody td {
+  border-color: var(--line-2);
+  background: transparent;
+}
+
+@media (max-width: 1199px) {
+  .erp-integrated-shell .dash-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991px) {
+  .erp-integrated-shell .erp-header-shell {
+    height: auto;
+    min-height: var(--erp-header-height);
+    padding: 10px 14px;
+    flex-wrap: wrap;
+  }
+
+  .erp-integrated-shell .erp-header-shell__center {
+    order: 3;
+    width: 100%;
+    padding: 0;
+  }
+
+  .erp-integrated-shell .pcoded-content.erp-content {
+    padding: 16px 16px 0;
+  }
+}
+
+@media (max-width: 575px) {
+  .erp-integrated-shell .dash-quick-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .erp-estate-fade-up {
+    animation: none;
+  }
+
+  .erp-integrated-shell .dash-kpi-card:hover,
+  .erp-integrated-shell .dash-chart-card:hover,
+  .erp-integrated-shell .dash-quick-action:hover,
+  .erp-integrated-shell .erp-unified-card:hover {
+    transform: none;
+  }
+}

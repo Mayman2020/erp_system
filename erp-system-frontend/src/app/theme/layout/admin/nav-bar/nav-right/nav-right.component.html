@@ -1,29 +1,28 @@
 <div class="erp-header-actions">
   <div class="erp-header-actions__rail">
+    <app-language-switcher [headerStyle]="true" placement="bottom-end" align="end"></app-language-switcher>
     <button
       type="button"
-      class="erp-nav-theme-btn erp-nav-command-btn"
-      (click)="openCommandPalette()"
-      [attr.title]="'COMMAND_PALETTE.TITLE' | translate"
-      [attr.aria-label]="'COMMAND_PALETTE.TITLE' | translate"
+      class="erp-nav-theme-btn erp-nav-notify-btn"
+      [attr.title]="'NAV.MESSAGES' | translate"
+      [attr.aria-label]="'NAV.MESSAGES' | translate"
     >
-      <mat-icon aria-hidden="true">search</mat-icon>
+      <mat-icon aria-hidden="true">chat_bubble_outline</mat-icon>
     </button>
-    <app-language-switcher [compact]="true" placement="bottom-right" align="end"></app-language-switcher>
-    <button
-      type="button"
-      class="erp-nav-theme-btn"
-      (click)="toggleTheme()"
-      [attr.title]="'NAV.TOGGLE_THEME' | translate"
-      [attr.aria-label]="'NAV.TOGGLE_THEME' | translate"
+    <a
+      routerLink="/erp/activity-log"
+      class="erp-nav-theme-btn erp-nav-notify-btn"
+      [attr.title]="'NAV.NOTIFICATIONS' | translate"
+      [attr.aria-label]="'NAV.NOTIFICATIONS' | translate"
     >
-      <mat-icon aria-hidden="true">{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
-    </button>
+      <mat-icon aria-hidden="true">notifications_none</mat-icon>
+    </a>
   </div>
 
   <ng-container *ngIf="authenticated$ | async">
     <ng-container *ngIf="{ user: user$ | async, loading: loadingProfile$ | async } as profile">
       <app-profile-card
+        [headerPill]="true"
         [displayName]="resolveDisplayName(profile.user)"
         [roleKey]="resolveRoleKey(profile.user)"
         [avatarUrl]="resolveAvatarUrl(profile.user)"

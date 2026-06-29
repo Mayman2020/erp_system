@@ -72,7 +72,7 @@
 >
   <div dialog-body>
     <p class="text-muted mb-3" *ngIf="detailLoading">{{ 'COMMON.LOADING' | translate }}</p>
-    <div class="alert alert-danger py-2" *ngIf="detailErrorKey && !detailLoading">{{ detailErrorKey | translate }}</div>
+    <app-erp-alert *ngIf="detailErrorKey && !detailLoading" type="danger" [message]="detailErrorKey" extraClass="py-2" [dismissible]="false"></app-erp-alert>
     <dl class="erp-account-detail" *ngIf="detailAccount && !detailLoading">
       <div class="erp-account-detail__row">
         <dt>{{ 'ACCOUNTS.CODE' | translate }}</dt>

@@ -1,8 +1,8 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey"></app-page-header>
 
-  <div class="card erp-unified-card mb-3">
-    <div class="card-body">
+  <div class="erp-card erp-list-page__card mb-3">
+    <div class="erp-card__body">
       <app-advanced-search-bar (search)="onSearch($event)" [showDateRange]="true" [showStatus]="true" [statusOptions]="statuses"></app-advanced-search-bar>
       <div class="d-flex gap-2 mb-3">
         <button type="button" class="erp-button erp-button--primary" (click)="toggleCreateForm()">
@@ -37,22 +37,18 @@
     </div>
   </div>
 
-  <div *ngIf="successKey" class="alert alert-success alert-dismissible fade show mb-3">
-    {{ successKey | translate }}
-    <button type="button" class="btn-close" (click)="successKey = ''"></button>
-  </div>
-  <div *ngIf="errorKey" class="alert alert-danger alert-dismissible fade show mb-3">
-    {{ errorKey | translate }}
-    <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-  </div>
+  <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-3" (dismissed)="successKey = ''"></app-erp-alert>
+  <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
 
   <app-loading-state *ngIf="loading"></app-loading-state>
 
   <div class="row" *ngIf="!loading">
     <div class="col-md-3 mb-3">
-      <div class="card h-100">
-        <div class="card-header fw-semibold">{{ 'RECONCILIATION.LIST' | translate }}</div>
-        <div class="card-body p-0">
+      <div class="erp-card h-100">
+        <div class="erp-card__header">
+          <h6 class="app-card-title mb-0">{{ 'RECONCILIATION.LIST' | translate }}</h6>
+        </div>
+        <div class="erp-card__body p-0">
           <ng-container *ngIf="reconciliations$ | async as reconciliations">
             <app-empty-state *ngIf="reconciliations.length === 0" icon="rule" titleKey="COMMON.NO_DATA" descriptionKey="COMMON.NO_RESULTS_HINT"></app-empty-state>
             <ul class="list-group list-group-flush" *ngIf="reconciliations.length > 0">
@@ -74,32 +70,32 @@
         <ng-container *ngIf="summary$ | async as summary">
           <div class="row mb-3">
             <div class="col-md-3">
-              <div class="card text-center erp-summary-card">
-                <div class="card-body py-2">
+              <div class="erp-card erp-summary-card text-center h-100">
+                <div class="erp-card__body py-2">
                   <small class="text-muted">{{ 'RECONCILIATION.FORM.OPENING_BALANCE' | translate }}</small>
                   <div class="fw-bold">{{ summary.openingBalance || 0 | number:'1.2-2' }}</div>
                 </div>
               </div>
             </div>
             <div class="col-md-3">
-              <div class="card text-center erp-summary-card">
-                <div class="card-body py-2">
+              <div class="erp-card erp-summary-card text-center h-100">
+                <div class="erp-card__body py-2">
                   <small class="text-muted">{{ 'RECONCILIATION.FORM.CLOSING_BALANCE' | translate }}</small>
                   <div class="fw-bold">{{ summary.closingBalance || 0 | number:'1.2-2' }}</div>
                 </div>
               </div>
             </div>
             <div class="col-md-3">
-              <div class="card text-center erp-summary-card">
-                <div class="card-body py-2">
+              <div class="erp-card erp-summary-card text-center h-100">
+                <div class="erp-card__body py-2">
                   <small class="text-muted">{{ 'RECONCILIATION.SUMMARY.MATCHED' | translate }}</small>
                   <div class="fw-bold text-success">{{ summary.matchedCount || 0 }}</div>
                 </div>
               </div>
             </div>
             <div class="col-md-3">
-              <div class="card text-center erp-summary-card" [ngClass]="{'border-danger': (summary.difference || 0) !== 0}">
-                <div class="card-body py-2">
+              <div class="erp-card erp-summary-card text-center h-100" [class.erp-summary-card--danger]="(summary.difference || 0) !== 0">
+                <div class="erp-card__body py-2">
                   <small class="text-muted">{{ 'RECONCILIATION.SUMMARY.DIFFERENCE' | translate }}</small>
                   <div class="fw-bold" [ngClass]="(summary.difference || 0) === 0 ? 'text-success' : 'text-danger'">{{ summary.difference || 0 | number:'1.2-2' }}</div>
                 </div>
@@ -125,9 +121,11 @@
 
         <div class="row">
           <div class="col-md-6">
-            <div class="card">
-              <div class="card-header fw-semibold">{{ 'RECONCILIATION.STATEMENT_LINES' | translate }}</div>
-              <div class="card-body p-0">
+            <div class="erp-card">
+              <div class="erp-card__header">
+                <h6 class="app-card-title mb-0">{{ 'RECONCILIATION.STATEMENT_LINES' | translate }}</h6>
+              </div>
+              <div class="erp-card__body p-0">
                 <div class="table-responsive erp-unified-table-wrap">
                   <table class="erp-table">
                     <thead>
@@ -160,9 +158,11 @@
             </div>
           </div>
           <div class="col-md-6">
-            <div class="card">
-              <div class="card-header fw-semibold">{{ 'RECONCILIATION.SYSTEM_TRANSACTIONS' | translate }}</div>
-              <div class="card-body p-0">
+            <div class="erp-card">
+              <div class="erp-card__header">
+                <h6 class="app-card-title mb-0">{{ 'RECONCILIATION.SYSTEM_TRANSACTIONS' | translate }}</h6>
+              </div>
+              <div class="erp-card__body p-0">
                 <div class="table-responsive erp-unified-table-wrap">
                   <table class="erp-table">
                     <thead>

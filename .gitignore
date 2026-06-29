@@ -24,6 +24,7 @@ erp-system-frontend/.angular/
 
 # Backend build output
 erp-system-backend/target/
+**/run-backend.secrets.ps1
 
 # Coverage and test output
 coverage/

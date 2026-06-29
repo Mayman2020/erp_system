@@ -23,8 +23,11 @@ public class EmployeeDocumentService {
     private final ActivityLogService activityLogService;
 
     @Transactional(readOnly = true)
-    public List<EmployeeDocumentDisplayDto> getAll() {
-        return employeeDocumentRepository.findAllByOrderByIdDesc().stream()
+    public List<EmployeeDocumentDisplayDto> getAll(Long employeeId) {
+        List<EmployeeDocument> rows = employeeId == null
+                ? employeeDocumentRepository.findAllByOrderByIdDesc()
+                : employeeDocumentRepository.findByEmployeeIdOrderByIdDesc(employeeId);
+        return rows.stream()
                 .map(this::toDisplay)
                 .toList();
     }

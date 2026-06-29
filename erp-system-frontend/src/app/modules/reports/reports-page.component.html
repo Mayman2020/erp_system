@@ -1,8 +1,8 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey"></app-page-header>
 
-  <div class="card erp-unified-card">
-    <div class="card-body">
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
         <div class="row mb-3">
           <div class="col-md-4" *ngFor="let card of reportCards">
             <div class="report-card" [class.active]="activeReport === card.id">
@@ -55,10 +55,7 @@
         </form>
 
         <app-loading-state *ngIf="loading"></app-loading-state>
-        <div *ngIf="!loading && errorKey" class="alert alert-danger alert-dismissible fade show mb-3">
-          {{ errorKey | translate }}
-          <button type="button" class="btn-close" (click)="errorKey = ''"></button>
-        </div>
+        <app-erp-alert *ngIf="!loading && errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
 
         <ng-container *ngIf="activeReport === 'profitLoss'">
           <div *ngIf="profitLoss$ | async as profitLoss" class="report-table">

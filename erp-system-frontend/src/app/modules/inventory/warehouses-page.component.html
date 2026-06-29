@@ -1,0 +1,57 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions>
+      <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        <span>{{ 'ERP.CREATE_WAREHOUSE' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-advanced-search-bar
+        *ngIf="showSearch"
+        [showDateRange]="showDateRange"
+        [showStatus]="showStatus"
+        [statusOptions]="statusOptions"
+        (search)="onSearch($event)"
+      ></app-advanced-search-bar>
+
+      <app-erp-alert *ngIf="errorKey && !formVisible" type="danger" [message]="errorKey" extraClass="mt-3" (dismissed)="errorKey = ''"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey && !formVisible" type="success" [message]="successKey" extraClass="mt-3" (dismissed)="successKey = ''"></app-erp-alert>
+
+      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+    </div>
+  </div>
+</section>
+
+<app-erp-dialog
+  [visible]="formVisible"
+  [titleKey]="formMode === 'create' ? 'ERP.CREATE_WAREHOUSE' : (formMode === 'edit' ? 'COMMON.EDIT' : 'COMMON.VIEW')"
+  size="lg"
+  (close)="closeForm()"
+>
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <app-form-field [control]="form.controls.code" labelKey="ERP.CODE" icon="edit" type="text" [readonly]="readOnly" ></app-form-field>
+        </div>
+        <div class="col-md-6 mb-3">
+          <app-form-field [control]="form.controls.nameEn" labelKey="COMMON.NAME" icon="edit" type="text" [readonly]="readOnly" ></app-form-field>
+        </div>
+        <div class="col-md-6 mb-3">
+          <app-form-field [control]="form.controls.nameAr" labelKey="ERP.NAME_AR" icon="edit" type="text" [readonly]="readOnly" ></app-form-field>
+        </div>
+        <div class="col-md-6 mb-3">
+          <app-form-field [control]="form.controls.location" labelKey="ERP.LOCATION" icon="edit" type="text" [readonly]="readOnly" ></app-form-field>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

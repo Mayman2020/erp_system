@@ -139,15 +139,18 @@ public class AccessControlService {
                 .filter(code -> !code.isBlank())
                 .collect(LinkedHashSet::new, Set::add, Set::addAll);
 
+        boolean fullAccess = normalizedRoles.contains("ADMIN") || normalizedRoles.contains("ACCOUNTANT");
+        boolean viewOnly = normalizedRoles.contains("REPORT_VIEWER") && !fullAccess;
+
         return uiMenuItemRepository.findAllByOrderByParentIdAscSortOrderAsc().stream()
                 .filter(menu -> canSeeFallback(menu, normalizedRoles))
                 .filter(menu -> "item".equalsIgnoreCase(menu.getItemType()))
                 .map(menu -> MenuActionPermissionDto.builder()
                         .menuItemId(menu.getId())
                         .canView(true)
-                        .canCreate(true)
-                        .canEdit(true)
-                        .canDelete(true)
+                        .canCreate(fullAccess && !viewOnly)
+                        .canEdit(fullAccess && !viewOnly)
+                        .canDelete(fullAccess && !viewOnly)
                         .build())
                 .toList();
     }

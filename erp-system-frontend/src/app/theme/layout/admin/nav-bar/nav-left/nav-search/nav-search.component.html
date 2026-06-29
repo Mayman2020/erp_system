@@ -1,6 +1,6 @@
 <a href="javascript:" class="pop-search" (click)="isSearch = true"><mat-icon aria-hidden="true">search</mat-icon></a>
 <div class="search-bar" *ngIf="isSearch">
-  <input type="text" class="form-control border-0 shadow-none" [placeholder]="'COMMON.SEARCH' | translate">
+  <input type="text" class="erp-input border-0 shadow-none" [placeholder]="'COMMON.SEARCH' | translate">
   <button type="button" class="close" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="isSearch = false">
     <mat-icon aria-hidden="true">close</mat-icon>
   </button>

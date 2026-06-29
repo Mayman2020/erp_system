@@ -1,0 +1,191 @@
+/* Estate OS — auth / login (Property_Managments parity) */
+
+.login-shell--estate {
+  background: var(--paper);
+  color: var(--text-main);
+  font-family: var(--font-body);
+}
+
+.login-shell--estate .login-shell__grid {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.login-shell--estate .login-side--form {
+  background: var(--paper);
+}
+
+.login-shell--estate .login-side--brand {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--navy-900) 0%, var(--navy-700) 60%, var(--navy-600) 100%);
+  color: var(--brass-100);
+}
+
+.login-shell--estate .login-side--brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'%3E%3Cpath d='M 10 150 L 10 82 Q 10 20 60 20 Q 110 20 110 82 L 110 150 Z' fill='none' stroke='rgba(204,165,91,0.22)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 120px 160px;
+}
+
+.login-shell--estate .login-bg-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.login-shell--estate .login-brand-visual__orb--a {
+  background: rgba(204, 165, 91, 0.28);
+}
+
+.login-shell--estate .login-brand-visual__orb--b {
+  background: rgba(180, 138, 64, 0.22);
+}
+
+.login-shell--estate .login-side__content {
+  position: relative;
+  z-index: 1;
+}
+
+.login-shell--estate .vision-badge {
+  color: var(--brass-300);
+  border-color: rgba(204, 165, 91, 0.35);
+  background: rgba(204, 165, 91, 0.12);
+}
+
+.login-shell--estate .login-hero-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #fbf2d9;
+  -webkit-text-fill-color: #fbf2d9;
+  text-shadow: none;
+}
+
+.login-shell--estate .login-side__lead,
+.login-shell--estate .feature-card__text strong,
+.login-shell--estate .feature-card__text span,
+.login-shell--estate .feature-icon .mat-icon {
+  color: rgba(244, 231, 196, 0.88);
+  -webkit-text-fill-color: rgba(244, 231, 196, 0.88);
+  background: none;
+  text-shadow: none;
+}
+
+.login-shell--estate .feature-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(204, 165, 91, 0.2);
+}
+
+.login-shell--estate .feature-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(204, 165, 91, 0.32);
+}
+
+.login-shell--estate .feature-icon {
+  background: rgba(204, 165, 91, 0.16);
+  border: 1px solid rgba(204, 165, 91, 0.24);
+}
+
+.login-shell--estate .login-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: var(--shadow-soft) !important;
+  backdrop-filter: none;
+}
+
+.login-shell--estate .login-head h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--ink-900);
+  letter-spacing: -0.02em;
+}
+
+.login-shell--estate .login-head .sub,
+.login-shell--estate .login-brand__tag {
+  color: var(--ink-500);
+}
+
+.login-shell--estate .login-field .erp-form-field__label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ink-500);
+}
+
+.login-shell--estate .login-input {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  color: var(--ink-900) !important;
+}
+
+.login-shell--estate .login-input:focus {
+  border-color: var(--brass-500) !important;
+  box-shadow: 0 0 0 3px rgba(180, 138, 64, 0.15) !important;
+}
+
+.login-shell--estate .forgot,
+.login-shell--estate .back-link {
+  color: var(--brass-600);
+}
+
+.login-shell--estate .forgot:hover,
+.login-shell--estate .back-link:hover {
+  color: var(--brass-500);
+}
+
+.login-shell--estate .remember,
+.login-shell--estate .security-badge {
+  color: var(--ink-500);
+}
+
+.login-shell--estate .security-badge .mat-icon {
+  color: var(--brass-500);
+}
+
+.login-shell--estate .login-submit.erp-button--primary {
+  background: linear-gradient(180deg, var(--brass-400), var(--brass-500));
+  border: 0;
+  color: var(--navy-900);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 4px 12px rgba(180, 138, 64, 0.25);
+}
+
+.login-shell--estate .login-submit.erp-button--primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, var(--brass-300), var(--brass-400));
+  color: var(--navy-900);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 8px 20px rgba(180, 138, 64, 0.35);
+}
+
+.login-shell--estate .button-spinner {
+  border-color: rgba(14, 31, 51, 0.18);
+  border-top-color: var(--navy-900);
+}
+
+[data-theme='dark'] .login-shell--estate {
+  background: var(--paper);
+}
+
+[data-theme='dark'] .login-shell--estate .login-side--form {
+  background: var(--paper);
+}
+
+[data-theme='dark'] .login-shell--estate .login-card {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+@media (max-width: 1024px) {
+  .login-shell--estate .login-side--brand {
+    display: none;
+  }
+
+  .login-shell--estate .login-shell__grid {
+    grid-template-columns: 1fr;
+  }
+}

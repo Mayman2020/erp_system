@@ -1,0 +1,17 @@
+<div class="erp-sidebar-calendar" role="group" [attr.aria-label]="monthTitle">
+  <div class="erp-sidebar-calendar__head">
+    <mat-icon aria-hidden="true">calendar_month</mat-icon>
+    <span>{{ monthTitle }}</span>
+  </div>
+  <div class="erp-sidebar-calendar__week" aria-hidden="true">
+    <span *ngFor="let label of weekHeaders">{{ label }}</span>
+  </div>
+  <div class="erp-sidebar-calendar__grid" aria-hidden="true">
+    <span
+      *ngFor="let cell of cells"
+      class="erp-sidebar-calendar__day"
+      [class.erp-sidebar-calendar__day--muted]="cell.muted"
+      [class.erp-sidebar-calendar__day--today]="cell.today"
+    >{{ cell.muted ? '' : cell.day }}</span>
+  </div>
+</div>

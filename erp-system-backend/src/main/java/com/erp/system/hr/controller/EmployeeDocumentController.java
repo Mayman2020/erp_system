@@ -19,8 +19,8 @@ public class EmployeeDocumentController {
     private final EmployeeDocumentService employeeDocumentService;
 
     @GetMapping
-    public ApiResponse<List<EmployeeDocumentDisplayDto>> getAll() {
-        return ApiResponse.success(employeeDocumentService.getAll());
+    public ApiResponse<List<EmployeeDocumentDisplayDto>> getAll(@RequestParam(required = false) Long employeeId) {
+        return ApiResponse.success(employeeDocumentService.getAll(employeeId));
     }
 
     @GetMapping("/{id}")

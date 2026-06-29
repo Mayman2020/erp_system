@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -89,12 +89,17 @@ export interface UpdateProfileRequest {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly tokenKey = 'erp_auth_token';
-  private readonly menuCacheKey = 'erp_ui_menu_cache';
+  private readonly refreshTokenKey = 'erp_auth_refresh_token';
+  private readonly menuCacheKey = 'erp_ui_menu_cache_v2';
   private readonly authenticatedSubject = new BehaviorSubject<boolean>(!!localStorage.getItem(this.tokenKey));
   private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
   private readonly loadingUserSubject = new BehaviorSubject<boolean>(false);
 
-  constructor(private http: HttpClient, private permissionService: PermissionService) {}
+  constructor(private http: HttpClient, private injector: Injector) {}
+
+  private refreshPermissions(): void {
+    this.injector.get(PermissionService).refresh().subscribe({ error: () => undefined });
+  }
 
   get isAuthenticated$(): Observable<boolean> {
     return this.authenticatedSubject.asObservable();
@@ -126,9 +131,13 @@ export class AuthService {
       map((res) => res.data),
       tap((response) => {
         localStorage.setItem(this.tokenKey, response.token);
+        if (response.refreshToken) {
+          localStorage.setItem(this.refreshTokenKey, response.refreshToken);
+        }
         localStorage.removeItem(this.menuCacheKey);
+        localStorage.removeItem('erp_ui_menu_cache');
         this.authenticatedSubject.next(true);
-        this.permissionService.refresh().subscribe({ error: () => undefined });
+        this.refreshPermissions();
         this.refreshCurrentUser();
       })
     );
@@ -154,10 +163,12 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.menuCacheKey);
+    localStorage.removeItem('erp_ui_menu_cache');
     this.authenticatedSubject.next(false);
     this.currentUserSubject.next(null);
-    this.permissionService.refresh().subscribe({ error: () => undefined });
+    this.refreshPermissions();
   }
 
   refreshCurrentUser(): void {

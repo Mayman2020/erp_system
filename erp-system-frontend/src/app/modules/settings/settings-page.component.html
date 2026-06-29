@@ -1,4 +1,4 @@
-<section class="erp-page">
+<section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey"></app-page-header>
 
   <div class="settings-premium-container">
@@ -15,6 +15,7 @@
         <span>{{ 'PROFILE.PERSONAL_INFO' | translate }}</span>
       </button>
       <button 
+        *ngIf="canViewAccounting"
         type="button" 
         class="nav-pill" 
         [class.is-active]="activeTabId === 'accounting'"

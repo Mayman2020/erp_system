@@ -10,8 +10,11 @@ import com.erp.system.inventory.repository.ProductRepository;
 import com.erp.system.sales.domain.Customer;
 import com.erp.system.sales.domain.SalesQuotation;
 import com.erp.system.sales.domain.SalesQuotationLine;
+import com.erp.system.sales.dto.display.SalesOrderDisplayDto;
 import com.erp.system.sales.dto.display.SalesQuotationDisplayDto;
 import com.erp.system.sales.dto.display.SalesQuotationLineDisplayDto;
+import com.erp.system.sales.dto.form.SalesOrderFormDto;
+import com.erp.system.sales.dto.form.SalesOrderLineFormDto;
 import com.erp.system.sales.dto.form.SalesQuotationFormDto;
 import com.erp.system.sales.dto.form.SalesQuotationLineFormDto;
 import com.erp.system.sales.repository.SalesQuotationRepository;
@@ -39,6 +42,7 @@ public class SalesQuotationService {
     private final ProductRepository productRepository;
     private final NumberingService numberingService;
     private final ActivityLogService activityLogService;
+    private final SalesOrderService salesOrderService;
 
     @Transactional(readOnly = true)
     public List<SalesQuotationDisplayDto> getQuotations(TransactionStatus status, String search,
@@ -140,6 +144,36 @@ public class SalesQuotationService {
         }
         activityLogService.log(MODULE, "CANCEL", "SalesQuotation", quotation.getId(), quotation.getQuotationNumber(), description);
         return toDisplay(quotation);
+    }
+
+    @Transactional
+    public SalesOrderDisplayDto convertToOrder(Long id) {
+        SalesQuotation quotation = loadQuotation(id);
+        if (quotation.getStatus() != TransactionStatus.APPROVED) {
+            throw new BusinessException("Only approved quotations can be converted to orders");
+        }
+        if (quotation.getLines() == null || quotation.getLines().isEmpty()) {
+            throw new BusinessException("Quotation must have at least one line");
+        }
+
+        SalesOrderFormDto orderForm = new SalesOrderFormDto();
+        orderForm.setOrderDate(LocalDate.now());
+        orderForm.setCustomerId(quotation.getCustomer().getId());
+        orderForm.setQuotationId(quotation.getId());
+        orderForm.setWarehouseId(salesOrderService.resolveDefaultWarehouseId());
+        orderForm.setDiscountAmount(quotation.getDiscountAmount());
+        orderForm.setNotes(normalizeOptional(quotation.getNotes()));
+        orderForm.setLines(quotation.getLines().stream().map(line -> {
+            SalesOrderLineFormDto mapped = new SalesOrderLineFormDto();
+            mapped.setProductId(line.getProduct().getId());
+            mapped.setDescription(line.getDescription());
+            mapped.setQuantity(line.getQuantity());
+            mapped.setUnitPrice(line.getUnitPrice());
+            mapped.setDiscountPercent(line.getDiscountPercent());
+            mapped.setTaxPercent(line.getTaxPercent());
+            return mapped;
+        }).toList());
+        return salesOrderService.createOrder(orderForm);
     }
 
     private void applyForm(SalesQuotation quotation, SalesQuotationFormDto request) {

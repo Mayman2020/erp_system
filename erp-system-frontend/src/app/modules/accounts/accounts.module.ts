@@ -1,4 +1,4 @@
-﻿import { NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { SharedModule } from '../../shared/shared.module';
 import { AccountsRoutingModule } from './accounts-routing.module';
 import { AccountsPageComponent } from './accounts-page.component';

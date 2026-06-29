@@ -50,13 +50,7 @@ export class AdminComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.windowWidth < 992) {
-      this.flatConfig.layout = 'vertical';
-      setTimeout(() => {
-        document.querySelector('.pcoded-navbar').classList.add('menupos-static');
-        (document.querySelector('#nav-ps-flat-able') as HTMLElement).style.maxHeight = '100%'; // 100% amit
-      }, 500);
-    }
+    // Estate shell: vertical layout only; no PCoded menu positioning hacks.
   }
 
   /** Desktop: toggle narrow icon-only sidebar (labels hidden; tooltips show titles). */
@@ -91,14 +85,7 @@ export class AdminComponent implements OnInit {
 
   navMobClick() {
     if (this.windowWidth < 992) {
-      if (this.navCollapsedMob && !(document.querySelector('app-navigation.pcoded-navbar').classList.contains('mob-open'))) {
-        this.navCollapsedMob = !this.navCollapsedMob;
-        setTimeout(() => {
-          this.navCollapsedMob = !this.navCollapsedMob;
-        }, 100);
-      } else {
-        this.navCollapsedMob = !this.navCollapsedMob;
-      }
+      this.navCollapsedMob = !this.navCollapsedMob;
     }
   }
 

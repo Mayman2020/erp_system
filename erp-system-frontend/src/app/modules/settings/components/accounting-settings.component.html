@@ -8,8 +8,8 @@
           {{ 'SETTINGS.ACCOUNTING_FORM_TITLE' | translate }}
         </h4>
         
-        <div class="card premium-card">
-          <div class="card-body">
+        <div class="erp-card">
+          <div class="erp-card__body">
             <form [formGroup]="accountingForm" class="row">
               <div class="col-md-6 mb-3">
                 <app-form-field
@@ -54,9 +54,9 @@
                 </div>
               </div>
 
-              <div class="col-12 d-flex justify-content-end gap-3">
-                <div *ngIf="successKey" class="alert-inline alert-success">{{ successKey | translate }}</div>
-                <div *ngIf="errorKey" class="alert-inline alert-danger">{{ errorKey | translate }}</div>
+              <div class="col-12 d-flex justify-content-end align-items-center gap-3 flex-wrap">
+                <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-0" [dismissible]="false"></app-erp-alert>
+                <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-0" [dismissible]="false"></app-erp-alert>
                 <button type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="onSaveAccounting()">
                   <mat-icon>save</mat-icon>
                   <span>{{ 'COMMON.SAVE' | translate }}</span>
@@ -75,14 +75,17 @@
               <mat-icon>calendar_add_on</mat-icon>
               {{ 'SETTINGS.FISCAL_YEAR_FORM_TITLE' | translate }}
             </h4>
-            <div class="card premium-card h-100">
-              <div class="card-body">
+            <div class="erp-card h-100">
+              <div class="erp-card__body">
                 <form [formGroup]="fiscalYearForm" class="row">
-                  <div class="col-12 mb-3 erp-settings-year-select">
-                    <label class="erp-form-field__label" for="fiscal-year-select">{{ 'SETTINGS.YEAR' | translate }}</label>
-                    <select id="fiscal-year-select" class="erp-input" formControlName="year">
-                      <option *ngFor="let y of fiscalYearSelectOptions" [ngValue]="y">{{ y }}</option>
-                    </select>
+                  <div class="col-12 mb-3">
+                    <app-form-field
+                      [control]="fiscalYearForm.controls.year"
+                      labelKey="SETTINGS.YEAR"
+                      icon="calendar_today"
+                      type="select"
+                      [options]="fiscalYearSelectOptions"
+                    ></app-form-field>
                   </div>
                   <div class="col-12 mb-3 fiscal-form-date">
                     <app-form-field
@@ -118,8 +121,8 @@
               <mat-icon>history_toggle_off</mat-icon>
               {{ 'SETTINGS.FISCAL_PERIOD_FORM_TITLE' | translate }}
             </h4>
-            <div class="card premium-card h-100">
-              <div class="card-body">
+            <div class="erp-card h-100">
+              <div class="erp-card__body">
                 <form [formGroup]="fiscalPeriodForm" class="row">
                   <div class="col-12 mb-3">
                     <app-form-field

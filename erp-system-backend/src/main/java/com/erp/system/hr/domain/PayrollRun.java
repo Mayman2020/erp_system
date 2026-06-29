@@ -41,4 +41,7 @@ public class PayrollRun extends BaseEntity {
 
     @Column(name = "notes", length = 500)
     private String notes;
+
+    @Column(name = "journal_entry_id")
+    private Long journalEntryId;
 }

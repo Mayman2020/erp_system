@@ -7,24 +7,27 @@
 
 .settings-nav-pills {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.5rem;
   padding: 0.5rem;
-  background: var(--erp-bg-muted);
-  border-radius: 18px;
+  background: var(--paper-2, var(--erp-bg-muted));
+  border-radius: var(--r, 14px);
   width: fit-content;
-  border: 1px solid var(--erp-border);
+  border: 1px solid var(--line, var(--erp-border));
 
   .nav-pill {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.8rem 1.75rem;
-    border-radius: 14px;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--r-sm, 10px);
     border: none;
     background: transparent;
-    color: var(--erp-text-soft);
-    font-weight: 700;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-muted, var(--erp-text-soft));
+    font-weight: 600;
+    transition:
+      background var(--t-fast, 160ms) var(--e-out, ease),
+      color var(--t-fast, 160ms) var(--e-out, ease),
+      box-shadow var(--t-fast, 160ms) var(--e-out, ease);
     cursor: pointer;
 
     mat-icon {
@@ -34,15 +37,14 @@
     }
 
     &:hover {
-      color: var(--erp-text);
-      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main, var(--erp-text));
+      background: var(--surface-2, var(--erp-bg-elevated));
     }
 
     &.is-active {
-      background: var(--erp-bg-elevated);
-      color: var(--erp-primary);
-      box-shadow: var(--erp-shadow-sm);
-      transform: scale(1.02);
+      background: var(--navy-900, var(--erp-primary));
+      color: var(--brass-100, #f4e7c4);
+      box-shadow: 0 4px 12px rgba(14, 31, 51, 0.2);
     }
   }
 }

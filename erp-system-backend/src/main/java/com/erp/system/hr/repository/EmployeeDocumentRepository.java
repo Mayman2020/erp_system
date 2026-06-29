@@ -8,4 +8,6 @@ import java.util.List;
 public interface EmployeeDocumentRepository extends JpaRepository<EmployeeDocument, Long> {
     List<EmployeeDocument> findAllByOrderByIdDesc();
 
+    List<EmployeeDocument> findByEmployeeIdOrderByIdDesc(Long employeeId);
+
 }
