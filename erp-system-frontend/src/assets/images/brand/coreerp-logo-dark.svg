@@ -1,12 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 40" fill="none" role="img" aria-label="CoreERP">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40" fill="none" role="img" aria-label="ELEVON ERP">
   <defs>
-    <linearGradient id="cedg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#7dd3fc"/>
-      <stop offset="45%" stop-color="#3b82f6"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
+    <linearGradient id="elevLogoDHex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1f33"/>
+      <stop offset="100%" stop-color="#0a1824"/>
     </linearGradient>
+    <linearGradient id="elevLogoDGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5e490"/>
+      <stop offset="100%" stop-color="#d4a84b"/>
+    </linearGradient>
+    <filter id="elevWordGlow" x="-5%" y="-30%" width="110%" height="160%">
+      <feGaussianBlur stdDeviation="0.8" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
-  <path fill="url(#cedg)" d="M18 3 32.5 11.4v15.2L18 35 3.5 26.6V11.4L18 3z"/>
-  <text x="18" y="25" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="800" font-size="15" fill="#f8fafc">C</text>
-  <text x="44" y="27" font-family="Segoe UI, system-ui, sans-serif" font-weight="700" font-size="20" fill="#e8eef7" letter-spacing="-0.02em">CoreERP</text>
+
+  <!-- Hex mark -->
+  <path fill="url(#elevLogoDHex)" d="M18 3.5 31 11v16L18 35 5 27V11L18 3.5z"/>
+  <path fill="none" stroke="url(#elevLogoDGold)" stroke-width="1"
+        d="M18 3.5 31 11v16L18 35 5 27V11L18 3.5z"/>
+
+  <!-- "E" mark in bright gold -->
+  <g fill="url(#elevLogoDGold)">
+    <rect x="12" y="12" width="12" height="2.2" rx="1.1"/>
+    <rect x="12" y="17.9" width="9.5" height="2" rx="1"/>
+    <rect x="12" y="23.8" width="12" height="2.2" rx="1.1"/>
+    <rect x="12" y="12" width="2.2" height="14" rx="1.1"/>
+  </g>
+
+  <!-- "ELEVON" wordmark - white on dark -->
+  <text x="44" y="24" font-family="'Segoe UI', Inter, system-ui, sans-serif"
+        font-weight="800" font-size="17" fill="#f0f4fa" letter-spacing="-0.01em">ELEVON</text>
+
+  <!-- "ERP" in gold -->
+  <text x="148" y="24" font-family="'Segoe UI', Inter, system-ui, sans-serif"
+        font-weight="700" font-size="17" fill="url(#elevLogoDGold)" letter-spacing="-0.01em"> ERP</text>
 </svg>

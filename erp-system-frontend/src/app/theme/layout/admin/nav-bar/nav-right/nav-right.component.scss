@@ -9,50 +9,92 @@
 .erp-header-actions {
   display: flex;
   align-items: center;
-  gap: var(--erp-space-2);
+  gap: 8px;
   justify-content: flex-end;
   position: relative;
   overflow: visible;
 }
 
-/* Language flag + theme toggle: same size, flush, icons optically centered */
+/* Icon buttons rail: language, notifications, messages */
 .erp-header-actions__rail {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Integrated (light) rail */
+.erp-integrated-shell .erp-header-actions__rail {
+  background: var(--paper-2, rgba(0, 0, 0, 0.03));
+  border-color: var(--line, rgba(0, 0, 0, 0.08));
+}
+
+/* Nav icon buttons */
+.erp-nav-theme-btn,
+.erp-nav-notify-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  text-decoration: none;
+  position: relative;
+}
+
+.erp-nav-theme-btn:hover,
+.erp-nav-notify-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.erp-integrated-shell .erp-nav-theme-btn:hover,
+.erp-integrated-shell .erp-nav-notify-btn:hover {
+  background: var(--icon-btn-hover);
+  color: var(--text-main);
+}
+
+.erp-nav-theme-btn mat-icon,
+.erp-nav-notify-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 1;
+}
+
+/* Notification badge */
 .erp-nav-notify-btn {
   position: relative;
 }
 
 .erp-nav-notify-badge {
   position: absolute;
-  top: 4px;
-  inset-inline-end: 4px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  top: 5px;
+  inset-inline-end: 5px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
   border-radius: 999px;
   background: #ef4444;
-  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.85);
-  font-size: 10px;
+  border: 2px solid transparent;
+  font-size: 9px;
   font-weight: 800;
-  line-height: 16px;
+  line-height: 11px;
   text-align: center;
   color: #fff;
-}
-
-.erp-nav-theme-btn--subtle {
-  opacity: 0.72;
-}
-
-.erp-nav-theme-btn--subtle:hover {
-  opacity: 1;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
 }
 
 .erp-header-actions app-profile-card {
   flex-shrink: 0;
 }
-

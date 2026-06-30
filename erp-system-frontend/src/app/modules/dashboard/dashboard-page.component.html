@@ -1,77 +1,132 @@
 <section class="erp-page erp-integrated-dashboard erp-estate-fade-up">
   <div class="row dashboard-grid" *ngIf="!loading && !errorKey && (summary$ | async) as summary; else dashboardState">
-    <div class="col-xl-3 col-md-6">
+
+    <!-- ── KPI Row (5 cards matching reference image) ───────────────────── -->
+    <div class="col-xl-col-kpi col-lg-4 col-md-6">
       <div class="dash-kpi-card dash-kpi-card--revenue">
-        <div class="dash-kpi-card__icon"><mat-icon>trending_up</mat-icon></div>
+        <div class="dash-kpi-card__icon-wrap">
+          <div class="dash-kpi-card__icon"><mat-icon>trending_up</mat-icon></div>
+        </div>
         <div class="dash-kpi-card__body">
           <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_REVENUE' | translate }}</span>
           <span class="dash-kpi-card__value" [erpCountUp]="summary.totalSales"></span>
           <span class="dash-kpi-card__growth-row">
-            <span class="dash-kpi-card__growth" [ngClass]="growthClass(summary.salesGrowthPercent)">{{ formatGrowth(summary.salesGrowthPercent) }}</span>
-            <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
-          </span>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="dash-kpi-card dash-kpi-card--expense">
-        <div class="dash-kpi-card__icon"><mat-icon>trending_down</mat-icon></div>
-        <div class="dash-kpi-card__body">
-          <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_EXPENSES' | translate }}</span>
-          <span class="dash-kpi-card__value" [erpCountUp]="summary.totalPurchases"></span>
-          <span class="dash-kpi-card__growth-row">
-            <span class="dash-kpi-card__growth" [ngClass]="growthClass(summary.purchasesGrowthPercent)">{{ formatGrowth(summary.purchasesGrowthPercent) }}</span>
-            <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
-          </span>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="dash-kpi-card dash-kpi-card--profit">
-        <div class="dash-kpi-card__icon"><mat-icon>monitoring</mat-icon></div>
-        <div class="dash-kpi-card__body">
-          <span class="dash-kpi-card__label">{{ 'DASHBOARD.NET_PROFIT' | translate }}</span>
-          <span class="dash-kpi-card__value" [erpCountUp]="summary.netProfit"></span>
-          <span class="dash-kpi-card__growth-row">
-            <span class="dash-kpi-card__growth" [ngClass]="growthClass(summary.profitGrowthPercent)">{{ formatGrowth(summary.profitGrowthPercent) }}</span>
-            <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
-          </span>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="dash-kpi-card dash-kpi-card--orders">
-        <div class="dash-kpi-card__icon"><mat-icon>shopping_cart</mat-icon></div>
-        <div class="dash-kpi-card__body">
-          <span class="dash-kpi-card__label">{{ 'DASHBOARD.NEW_ORDERS' | translate }}</span>
-          <span class="dash-kpi-card__value">{{ summary.newOrders }}</span>
-          <span class="dash-kpi-card__growth-row">
-            <span class="dash-kpi-card__growth" [ngClass]="growthClass(summary.ordersGrowthPercent)">{{ formatGrowth(summary.ordersGrowthPercent) }}</span>
+            <span class="dash-kpi-card__growth dash-kpi-card__growth--chip" [ngClass]="growthClass(summary.salesGrowthPercent)">
+              <mat-icon>{{ (summary.salesGrowthPercent || 0) >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+              {{ formatGrowth(summary.salesGrowthPercent) }}
+            </span>
             <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
           </span>
         </div>
       </div>
     </div>
 
+    <div class="col-xl-col-kpi col-lg-4 col-md-6">
+      <div class="dash-kpi-card dash-kpi-card--customers">
+        <div class="dash-kpi-card__icon-wrap">
+          <div class="dash-kpi-card__icon"><mat-icon>people</mat-icon></div>
+        </div>
+        <div class="dash-kpi-card__body">
+          <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_CUSTOMERS' | translate }}</span>
+          <span class="dash-kpi-card__value" [erpCountUp]="summary.newOrders"></span>
+          <span class="dash-kpi-card__growth-row">
+            <span class="dash-kpi-card__growth dash-kpi-card__growth--chip" [ngClass]="growthClass(summary.ordersGrowthPercent)">
+              <mat-icon>{{ (summary.ordersGrowthPercent || 0) >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+              {{ formatGrowth(summary.ordersGrowthPercent) }}
+            </span>
+            <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-col-kpi col-lg-4 col-md-6">
+      <div class="dash-kpi-card dash-kpi-card--profit">
+        <div class="dash-kpi-card__icon-wrap">
+          <div class="dash-kpi-card__icon"><mat-icon>monitoring</mat-icon></div>
+        </div>
+        <div class="dash-kpi-card__body">
+          <span class="dash-kpi-card__label">{{ 'DASHBOARD.NET_PROFIT' | translate }}</span>
+          <span class="dash-kpi-card__value" [erpCountUp]="summary.netProfit"></span>
+          <span class="dash-kpi-card__growth-row">
+            <span class="dash-kpi-card__growth dash-kpi-card__growth--chip" [ngClass]="growthClass(summary.profitGrowthPercent)">
+              <mat-icon>{{ (summary.profitGrowthPercent || 0) >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+              {{ formatGrowth(summary.profitGrowthPercent) }}
+            </span>
+            <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-col-kpi col-lg-4 col-md-6">
+      <div class="dash-kpi-card dash-kpi-card--expense">
+        <div class="dash-kpi-card__icon-wrap">
+          <div class="dash-kpi-card__icon"><mat-icon>inventory_2</mat-icon></div>
+        </div>
+        <div class="dash-kpi-card__body">
+          <span class="dash-kpi-card__label">{{ 'DASHBOARD.LOW_STOCK' | translate }}</span>
+          <span class="dash-kpi-card__value">{{ summary.lowStockCount }}</span>
+          <span class="dash-kpi-card__growth-row">
+            <span class="dash-kpi-card__growth dash-kpi-card__growth--chip" [ngClass]="summary.lowStockCount > 10 ? 'dash-kpi-card__growth--down' : 'dash-kpi-card__growth--up'">
+              <mat-icon>{{ summary.lowStockCount > 10 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+              {{ summary.lowStockCount > 10 ? 'مرتفع' : 'طبيعي' }}
+            </span>
+            <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.CURRENT_STOCK' | translate }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-col-kpi col-lg-4 col-md-6">
+      <div class="dash-kpi-card dash-kpi-card--orders">
+        <div class="dash-kpi-card__icon-wrap">
+          <div class="dash-kpi-card__icon"><mat-icon>shopping_cart</mat-icon></div>
+        </div>
+        <div class="dash-kpi-card__body">
+          <span class="dash-kpi-card__label">{{ 'DASHBOARD.TOTAL_EXPENSES' | translate }}</span>
+          <span class="dash-kpi-card__value" [erpCountUp]="summary.totalPurchases"></span>
+          <span class="dash-kpi-card__growth-row">
+            <span class="dash-kpi-card__growth dash-kpi-card__growth--chip" [ngClass]="growthClass(summary.purchasesGrowthPercent)">
+              <mat-icon>{{ (summary.purchasesGrowthPercent || 0) >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+              {{ formatGrowth(summary.purchasesGrowthPercent) }}
+            </span>
+            <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Charts Row 1 ─────────────────────────────────────────────────── -->
     <div class="col-xl-3 col-lg-4">
       <div class="dash-chart-card">
-        <div class="dash-chart-card__header"><h5>{{ 'DASHBOARD.TOP_PRODUCTS' | translate }}</h5></div>
+        <div class="dash-chart-card__header">
+          <h5>{{ 'DASHBOARD.TOP_PRODUCTS' | translate }}</h5>
+          <span class="dash-chart-card__badge">{{ 'DASHBOARD.THIS_MONTH' | translate }}</span>
+        </div>
         <div class="dash-chart-card__body"><app-apex-chart [chartID]="topProductsChartId" [chartConfig]="topProductsChartConfig"></app-apex-chart></div>
       </div>
     </div>
     <div class="col-xl-5 col-lg-8">
       <div class="dash-chart-card">
-        <div class="dash-chart-card__header"><h5>{{ 'DASHBOARD.SALES_OVERVIEW' | translate }}</h5></div>
+        <div class="dash-chart-card__header">
+          <h5>{{ 'DASHBOARD.SALES_OVERVIEW' | translate }}</h5>
+          <span class="dash-chart-card__badge">{{ 'DASHBOARD.ANNUAL_OVERVIEW' | translate }}</span>
+        </div>
         <div class="dash-chart-card__body"><app-apex-chart [chartID]="salesOverviewChartId" [chartConfig]="salesOverviewChartConfig"></app-apex-chart></div>
       </div>
     </div>
     <div class="col-xl-4 col-lg-12">
       <div class="dash-chart-card">
-        <div class="dash-chart-card__header"><h5>{{ 'DASHBOARD.REVENUE_BY_DEPARTMENT' | translate }}</h5></div>
+        <div class="dash-chart-card__header">
+          <h5>{{ 'DASHBOARD.REVENUE_BY_DEPARTMENT' | translate }}</h5>
+          <span class="dash-chart-card__badge">{{ 'DASHBOARD.DISTRIBUTION' | translate }}</span>
+        </div>
         <div class="dash-chart-card__body"><app-apex-chart [chartID]="revenueDeptChartId" [chartConfig]="revenueDeptChartConfig"></app-apex-chart></div>
       </div>
     </div>
 
+    <!-- ── Quick Actions ─────────────────────────────────────────────────── -->
     <div class="col-xl-8 col-lg-7">
       <div class="dash-chart-card dash-quick-card">
         <div class="dash-chart-card__header"><h5>{{ 'DASHBOARD.QUICK_ACTIONS' | translate }}</h5></div>
@@ -84,9 +139,16 @@
       </div>
     </div>
 
+    <!-- ── Recent Activity ───────────────────────────────────────────────── -->
     <div class="col-xl-4 col-lg-5">
       <div class="dash-chart-card dash-activity-card">
-        <div class="dash-chart-card__header"><h5>{{ 'DASHBOARD.RECENT_ACTIVITIES' | translate }}</h5></div>
+        <div class="dash-chart-card__header">
+          <h5>{{ 'DASHBOARD.RECENT_ACTIVITIES' | translate }}</h5>
+          <span class="dash-chart-card__badge dash-chart-card__badge--live">
+            <span class="dash-live-dot"></span>
+            {{ 'DASHBOARD.LIVE' | translate }}
+          </span>
+        </div>
         <ul class="dash-activity-list">
           <li class="dash-activity-item" *ngFor="let activity of summary.recentActivities || []">
             <span class="dash-activity-item__dot"></span>
@@ -102,9 +164,13 @@
       </div>
     </div>
 
+    <!-- ── Tables Row ────────────────────────────────────────────────────── -->
     <div class="col-xl-3 col-lg-6">
       <div class="erp-integrated-table dash-table-card dash-table-card--low-stock">
-        <div class="erp-integrated-table__head"><h5>{{ 'DASHBOARD.LOW_STOCK' | translate }}</h5></div>
+        <div class="erp-integrated-table__head">
+          <h5>{{ 'DASHBOARD.LOW_STOCK' | translate }}</h5>
+          <a routerLink="/inventory/products" class="dash-view-all">{{ 'COMMON.VIEW_ALL' | translate }}</a>
+        </div>
         <div class="erp-integrated-table__body">
           <app-data-table *ngIf="lowStockRows(summary).length; else lowStockEmpty" [columns]="lowStockColumns" [data]="lowStockRows(summary)" [compact]="true" [exportable]="false"></app-data-table>
           <ng-template #lowStockEmpty><div class="text-muted p-3">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
@@ -114,7 +180,10 @@
 
     <div class="col-xl-3 col-lg-6">
       <div class="erp-integrated-table dash-table-card dash-table-card--performance">
-        <div class="erp-integrated-table__head"><h5>{{ 'DASHBOARD.EMPLOYEE_PERFORMANCE' | translate }}</h5></div>
+        <div class="erp-integrated-table__head">
+          <h5>{{ 'DASHBOARD.EMPLOYEE_PERFORMANCE' | translate }}</h5>
+          <a routerLink="/hr/employees" class="dash-view-all">{{ 'COMMON.VIEW_ALL' | translate }}</a>
+        </div>
         <div class="erp-integrated-table__body">
           <app-data-table *ngIf="employeeRows(summary).length; else employeeEmpty" [columns]="employeeColumns" [data]="employeeRows(summary)" [compact]="true" [exportable]="false"></app-data-table>
           <ng-template #employeeEmpty><div class="text-muted p-3">{{ 'COMMON.NO_DATA' | translate }}</div></ng-template>
@@ -124,10 +193,14 @@
 
     <div class="col-xl-6 col-lg-12">
       <div class="dash-chart-card">
-        <div class="dash-chart-card__header"><h5>{{ 'DASHBOARD.CHART_CASH_FLOW' | translate }}</h5></div>
+        <div class="dash-chart-card__header">
+          <h5>{{ 'DASHBOARD.CHART_CASH_FLOW' | translate }}</h5>
+          <span class="dash-chart-card__badge">{{ 'DASHBOARD.ANNUAL_OVERVIEW' | translate }}</span>
+        </div>
         <div class="dash-chart-card__body"><app-apex-chart [chartID]="cashFlowChartId" [chartConfig]="cashFlowChartConfig"></app-apex-chart></div>
       </div>
     </div>
+
   </div>
 
   <ng-template #dashboardState>

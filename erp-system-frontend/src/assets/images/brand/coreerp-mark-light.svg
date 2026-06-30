@@ -1,11 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none" role="img" aria-label="CoreERP">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none" role="img" aria-label="ELEVON ERP">
   <defs>
-    <linearGradient id="cemLg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8"/>
-      <stop offset="50%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#1e3a8a"/>
+    <linearGradient id="elevHexBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1f33"/>
+      <stop offset="50%" stop-color="#152d4a"/>
+      <stop offset="100%" stop-color="#0a1824"/>
     </linearGradient>
+    <linearGradient id="elevGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0d87a"/>
+      <stop offset="50%" stop-color="#e8c97a"/>
+      <stop offset="100%" stop-color="#cca55b"/>
+    </linearGradient>
+    <linearGradient id="elevGoldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0d87a" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#cca55b" stop-opacity="0.65"/>
+    </linearGradient>
+    <filter id="elevGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.2" result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
-  <path fill="url(#cemLg)" d="M18 2 32.5 10.4v15.2L18 34 3.5 25.6V10.4L18 2z"/>
-  <text x="18" y="24" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="800" font-size="15" fill="#fff">C</text>
+
+  <!-- Hexagon background -->
+  <path fill="url(#elevHexBg)" d="M18 2.5 31.5 10v16L18 33.5 4.5 26V10L18 2.5z"/>
+
+  <!-- Hexagon gold border -->
+  <path fill="none" stroke="url(#elevGoldStroke)" stroke-width="1.2"
+        d="M18 2.5 31.5 10v16L18 33.5 4.5 26V10L18 2.5z"/>
+
+  <!-- Inner subtle glow ring -->
+  <path fill="none" stroke="rgba(240,216,122,0.12)" stroke-width="3"
+        d="M18 5.5 28.5 11.5v13L18 30.5 7.5 24.5v-13L18 5.5z"/>
+
+  <!-- "E" lettermark in gold -->
+  <g filter="url(#elevGlow)" fill="url(#elevGold)">
+    <!-- Top bar -->
+    <rect x="11.5" y="11" width="13" height="2.5" rx="1.2"/>
+    <!-- Middle bar (shorter) -->
+    <rect x="11.5" y="16.8" width="10.5" height="2.3" rx="1.2"/>
+    <!-- Bottom bar -->
+    <rect x="11.5" y="22.5" width="13" height="2.5" rx="1.2"/>
+    <!-- Vertical stem -->
+    <rect x="11.5" y="11" width="2.5" height="14" rx="1.2"/>
+  </g>
 </svg>

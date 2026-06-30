@@ -1,4 +1,4 @@
-{
+﻿{
   "COMMON": {
     "ID": "المعرف",
     "NAME": "اسم",
@@ -99,7 +99,7 @@
     "TOGGLE_MENU": "تبديل الشريط الجانبي",
     "SIDEBAR_WELCOME": "مرحبا بكم",
     "SEARCH_PLACEHOLDER": "بحث…",
-    "ERP_TAGLINE": "منظومة أعمال متكاملة",
+    "ERP_TAGLINE": "منظومة متكاملة لإدارة أعمالك بكفاءة وذكاء",
     "NOTIFICATIONS": "الإشعارات",
     "MESSAGES": "الرسائل"
   },
@@ -220,7 +220,7 @@
   },
   "DASHBOARD": {
     "TITLE": "لوحة التحكم",
-    "ERP_TITLE": "نظام ERP المتكامل",
+    "ERP_TITLE": "ELEVON ERP System",
     "ERP_SUBTITLE": "نظرة شاملة على المبيعات والمشتريات والمخزون والموارد البشرية والمحاسبة",
     "TOTAL_REVENUE": "إجمالي الإيرادات",
     "TOTAL_EXPENSES": "إجمالي المصروفات",
@@ -244,6 +244,13 @@
     "SALES_AMOUNT": "المبيعات",
     "PERFORMANCE": "الأداء",
     "SALES": "المبيعات",
+    "TOTAL_CUSTOMERS": "إجمالي العملاء",
+    "CURRENT_STOCK": "المخزون الحالي",
+    "LIVE": "مباشر",
+    "ANNUAL_OVERVIEW": "نظرة سنوية",
+    "DISTRIBUTION": "التوزيع",
+    "THIS_MONTH": "هذا الشهر",
+    "VIEW_ALL": "عرض الكل",
     "CASH_IN": "التدفقات الداخلة",
     "CASH_OUT": "التدفقات الخارجة",
     "QA_SALES_INVOICE": "فاتورة مبيعات",
@@ -913,11 +920,11 @@
     "LOAD_ERROR": "فشل تحميل بيانات إدارة الصلاحيات."
   },
   "APP": {
-    "BRAND": "CoreERP",
+    "BRAND": "ELEVON ERP",
     "RIGHTS_RESERVED": "جميع الحقوق محفوظة",
-    "FOOTER_COPYRIGHT": "© {{year}} CoreERP",
+    "FOOTER_COPYRIGHT": "© {{year}} ELEVON ERP",
     "VERSION_LABEL": "الإصدار",
-    "FOOTER_INTEGRATED": "© نظام ERP المتكامل — جميع الحقوق محفوظة {{year}}",
+    "FOOTER_INTEGRATED": "© {{year}} ELEVON ERP — جميع الحقوق محفوظة",
     "ENV_LOCAL": "محلي",
     "ENV_PRODUCTION": "إنتاج"
   },
@@ -935,6 +942,13 @@
   },
   "MENU": {
     "SALES": "المبيعات",
+    "TOTAL_CUSTOMERS": "إجمالي العملاء",
+    "CURRENT_STOCK": "المخزون الحالي",
+    "LIVE": "مباشر",
+    "ANNUAL_OVERVIEW": "نظرة سنوية",
+    "DISTRIBUTION": "التوزيع",
+    "THIS_MONTH": "هذا الشهر",
+    "VIEW_ALL": "عرض الكل",
     "PURCHASES": "المشتريات",
     "INVENTORY": "المخزون",
     "MANUFACTURING": "التصنيع",
@@ -1109,3 +1123,5 @@
     "MEMBER": "عضو"
   }
 }
+
+

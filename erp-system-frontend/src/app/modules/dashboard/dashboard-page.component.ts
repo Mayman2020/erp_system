@@ -208,63 +208,91 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     const monthLabels = (summary.monthlySales || []).map((m) => m.month);
     const departments = summary.revenueByDepartment || [];
 
-    const axisColor = '#6b7f96';
-    const gridColor = 'rgba(14, 31, 51, 0.08)';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+      || document.body.classList.contains('theme-dark');
+
+    const axisColor = isDark ? '#7a8ea7' : '#6b7f96';
+    const gridColor = isDark ? 'rgba(26, 46, 72, 0.8)' : 'rgba(14, 31, 51, 0.08)';
+    const tooltipTheme = isDark ? 'dark' : 'light';
+    const strokeColor = isDark ? '#111e30' : '#fffdf8';
+
+    /* Premium ELEVON color palette */
+    const palette = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+
+    const baseChart = {
+      toolbar: { show: false },
+      fontFamily: 'inherit',
+      background: 'transparent',
+      animations: { enabled: true, easing: 'easeinout', speed: 600 }
+    };
 
     this.topProductsChartConfig = {
-      chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily: 'inherit', background: 'transparent' },
+      chart: { ...baseChart, type: 'bar', height: 240 },
       plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '58%', distributed: true } },
       series: [{ name: t('DASHBOARD.SALES'), data: topProducts.map((p) => p.totalRevenue) }],
       xaxis: { categories: topProducts.map((p) => p.productName), labels: { style: { colors: axisColor, fontSize: '11px' } } },
       yaxis: { labels: { style: { colors: axisColor, fontSize: '11px' } } },
-      colors: ['#3d6290', '#2f6a3a', '#b48a40', '#2a5079', '#8e6a2b'],
+      colors: palette,
       dataLabels: { enabled: false },
       grid: { borderColor: gridColor, strokeDashArray: 4 },
-      theme: { mode: 'light' }
+      tooltip: { theme: tooltipTheme },
+      theme: { mode: tooltipTheme }
     };
 
     this.salesOverviewChartConfig = {
-      chart: { type: 'line', height: 280, toolbar: { show: false }, fontFamily: 'inherit', background: 'transparent' },
-      stroke: { width: 3, curve: 'smooth' },
+      chart: { ...baseChart, type: 'area', height: 240 },
+      stroke: { width: [3, 2], curve: 'smooth' },
+      fill: {
+        type: 'gradient',
+        gradient: { shadeIntensity: 1, opacityFrom: isDark ? 0.3 : 0.2, opacityTo: 0.02, stops: [0, 95, 100] }
+      },
       series: [
         { name: t('DASHBOARD.TOTAL_REVENUE'), data: monthlySales },
         { name: t('DASHBOARD.TOTAL_EXPENSES'), data: monthlyExpenses }
       ],
       xaxis: { categories: monthLabels, labels: { style: { colors: axisColor, fontSize: '11px' } } },
       yaxis: { labels: { style: { colors: axisColor, fontSize: '11px' } } },
-      colors: ['#3d6290', '#2f6a3a'],
+      colors: ['#3b82f6', '#f59e0b'],
       dataLabels: { enabled: false },
       legend: { position: 'top', labels: { colors: axisColor } },
       grid: { borderColor: gridColor, strokeDashArray: 4 },
-      theme: { mode: 'light' }
+      markers: { size: 4 },
+      tooltip: { theme: tooltipTheme },
+      theme: { mode: tooltipTheme }
     };
 
     this.revenueDeptChartConfig = {
-      chart: { type: 'donut', height: 280, fontFamily: 'inherit', background: 'transparent' },
+      chart: { ...baseChart, type: 'donut', height: 240 },
       series: departments.map((d) => Number(d.percent || 0)),
       labels: departments.map((d) => d.departmentName),
-      colors: ['#3d6290', '#b48a40', '#8e6a2b', '#2f6a3a', '#2a5079'],
+      colors: palette,
       legend: { position: 'left', fontSize: '12px', labels: { colors: axisColor } },
-      dataLabels: { enabled: true, style: { colors: ['#0e1f33'] }, formatter: (val: number) => `${val.toFixed(0)}%` },
-      plotOptions: { pie: { donut: { size: '62%' } } },
-      stroke: { colors: ['#fffdf8'] },
-      theme: { mode: 'light' }
+      dataLabels: {
+        enabled: true,
+        style: { colors: ['#ffffff'], fontSize: '11px', fontWeight: 700 },
+        formatter: (val: number) => `${val.toFixed(0)}%`
+      },
+      plotOptions: { pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: '100%', color: axisColor } } } } },
+      stroke: { colors: [strokeColor], width: 2 },
+      tooltip: { theme: tooltipTheme },
+      theme: { mode: tooltipTheme }
     };
 
     this.cashFlowChartConfig = {
-      chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily: 'inherit', background: 'transparent' },
-      plotOptions: { bar: { borderRadius: 6, columnWidth: '36%' } },
+      chart: { ...baseChart, type: 'bar', height: 240 },
+      plotOptions: { bar: { borderRadius: 6, columnWidth: '38%', borderRadiusApplication: 'end' } },
       series: [
         { name: t('DASHBOARD.CASH_IN'), data: monthlySales },
         { name: t('DASHBOARD.CASH_OUT'), data: monthlyExpenses }
       ],
       xaxis: { categories: monthLabels, labels: { style: { colors: axisColor, fontSize: '11px' } } },
       yaxis: { labels: { style: { colors: axisColor, fontSize: '11px' } } },
-      colors: ['#2f6a3a', '#a8332b'],
+      colors: ['#10b981', '#ef4444'],
       dataLabels: { enabled: false },
       legend: { position: 'top', labels: { colors: axisColor } },
       grid: { borderColor: gridColor, strokeDashArray: 4 },
-      theme: { mode: 'light' }
+      tooltip: { theme: tooltipTheme },
+      theme: { mode: tooltipTheme }
     };
   }
 }

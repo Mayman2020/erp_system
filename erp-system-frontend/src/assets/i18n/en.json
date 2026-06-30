@@ -1,4 +1,4 @@
-{
+﻿{
   "COMMON": {
     "ID": "ID",
     "NAME": "Name",
@@ -99,7 +99,7 @@
     "TOGGLE_MENU": "Toggle sidebar",
     "SIDEBAR_WELCOME": "Welcome",
     "SEARCH_PLACEHOLDER": "Search…",
-    "ERP_TAGLINE": "Integrated business suite",
+    "ERP_TAGLINE": "Integrated Enterprise Resource Planning",
     "NOTIFICATIONS": "Notifications",
     "MESSAGES": "Messages"
   },
@@ -219,7 +219,7 @@
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
-    "ERP_TITLE": "Integrated ERP System",
+    "ERP_TITLE": "ELEVON ERP System",
     "ERP_SUBTITLE": "Overview of sales, purchases, inventory, HR, and accounting",
     "TOTAL_REVENUE": "Total Revenue",
     "TOTAL_EXPENSES": "Total Expenses",
@@ -243,6 +243,13 @@
     "SALES_AMOUNT": "Sales",
     "PERFORMANCE": "Performance",
     "SALES": "Sales",
+    "TOTAL_CUSTOMERS": "Total Customers",
+    "CURRENT_STOCK": "Current Stock",
+    "LIVE": "Live",
+    "ANNUAL_OVERVIEW": "Annual Overview",
+    "DISTRIBUTION": "Distribution",
+    "THIS_MONTH": "This Month",
+    "VIEW_ALL": "View All",
     "CASH_IN": "Cash In",
     "CASH_OUT": "Cash Out",
     "QA_SALES_INVOICE": "Sales Invoice",
@@ -912,9 +919,9 @@
     "LOAD_ERROR": "Failed to load access management data."
   },
   "APP": {
-    "BRAND": "CoreERP",
+    "BRAND": "ELEVON ERP",
     "RIGHTS_RESERVED": "All rights reserved",
-    "FOOTER_COPYRIGHT": "© {{year}} CoreERP",
+    "FOOTER_COPYRIGHT": "© {{year}} ELEVON ERP",
     "VERSION_LABEL": "Version",
     "FOOTER_INTEGRATED": "© Integrated ERP System — All rights reserved {{year}}",
     "ENV_LOCAL": "Local",
@@ -934,6 +941,13 @@
   },
   "MENU": {
     "SALES": "Sales",
+    "TOTAL_CUSTOMERS": "Total Customers",
+    "CURRENT_STOCK": "Current Stock",
+    "LIVE": "Live",
+    "ANNUAL_OVERVIEW": "Annual Overview",
+    "DISTRIBUTION": "Distribution",
+    "THIS_MONTH": "This Month",
+    "VIEW_ALL": "View All",
     "PURCHASES": "Purchases",
     "INVENTORY": "Inventory",
     "MANUFACTURING": "Manufacturing",
@@ -1109,3 +1123,5 @@
     "MEMBER": "Member"
   }
 }
+
+

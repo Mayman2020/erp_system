@@ -1,12 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 40" fill="none" role="img" aria-label="CoreERP">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40" fill="none" role="img" aria-label="ELEVON ERP">
   <defs>
-    <linearGradient id="celg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8"/>
-      <stop offset="50%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#1e3a8a"/>
+    <linearGradient id="elevLogoHex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1f33"/>
+      <stop offset="100%" stop-color="#0a1824"/>
+    </linearGradient>
+    <linearGradient id="elevLogoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0d87a"/>
+      <stop offset="100%" stop-color="#cca55b"/>
+    </linearGradient>
+    <linearGradient id="elevWordGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b48a40"/>
+      <stop offset="100%" stop-color="#8a6420"/>
     </linearGradient>
   </defs>
-  <path fill="url(#celg)" d="M18 3 32.5 11.4v15.2L18 35 3.5 26.6V11.4L18 3z"/>
-  <text x="18" y="25" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="800" font-size="15" fill="#fff">C</text>
-  <text x="44" y="27" font-family="Segoe UI, system-ui, sans-serif" font-weight="700" font-size="20" fill="#0b1220" letter-spacing="-0.02em">CoreERP</text>
+
+  <!-- Hex mark -->
+  <path fill="url(#elevLogoHex)" d="M18 3.5 31 11v16L18 35 5 27V11L18 3.5z"/>
+  <path fill="none" stroke="url(#elevLogoGold)" stroke-width="1"
+        d="M18 3.5 31 11v16L18 35 5 27V11L18 3.5z"/>
+
+  <!-- "E" mark -->
+  <g fill="url(#elevLogoGold)">
+    <rect x="12" y="12" width="12" height="2.2" rx="1.1"/>
+    <rect x="12" y="17.9" width="9.5" height="2" rx="1"/>
+    <rect x="12" y="23.8" width="12" height="2.2" rx="1.1"/>
+    <rect x="12" y="12" width="2.2" height="14" rx="1.1"/>
+  </g>
+
+  <!-- "ELEVON" wordmark - dark navy on light -->
+  <text x="44" y="24" font-family="'Segoe UI', Inter, system-ui, sans-serif"
+        font-weight="800" font-size="17" fill="#0e1f33" letter-spacing="-0.01em">ELEVON</text>
+
+  <!-- "ERP" in gold accent -->
+  <text x="148" y="24" font-family="'Segoe UI', Inter, system-ui, sans-serif"
+        font-weight="700" font-size="17" fill="url(#elevWordGold)" letter-spacing="-0.01em"> ERP</text>
 </svg>

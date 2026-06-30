@@ -175,31 +175,54 @@
 }
 
 [data-theme='dark'] {
-  --paper: #0b1624;
-  --paper-2: #0f1d2f;
-  --paper-3: #13253a;
-  --surface: #152739;
-  --surface-2: #1a2e44;
-  --ink-900: #efe7d6;
-  --ink-700: #b6c3d4;
+  /* Deep premium navy — matches ELEVON reference image */
+  --paper: #070e1b;
+  --paper-2: #0a1525;
+  --paper-3: #0e1d30;
+  --surface: #111e30;
+  --surface-2: #162540;
+  --ink-900: #eef2f8;
+  --ink-700: #b8c5d6;
   --ink-500: #7a8ea7;
-  --ink-400: #5d7290;
-  --ink-300: #3e5472;
-  --line: #223a55;
-  --line-2: #1b314a;
-  --ok-bg: rgba(47, 106, 58, 0.18);
-  --warn-bg: rgba(184, 101, 26, 0.2);
-  --bad-bg: rgba(168, 51, 43, 0.2);
-  --info-bg: rgba(42, 80, 121, 0.28);
-  --brass-100: rgba(228, 194, 126, 0.15);
-  --accent-soft: rgba(228, 194, 126, 0.15);
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.32);
-  --shadow-hover: 0 14px 36px rgba(0, 0, 0, 0.42);
-  --sidebar-item-active: rgba(204, 165, 91, 0.26);
+  --ink-400: #5a7090;
+  --ink-300: #374e6b;
+  --line: #1a2e48;
+  --line-2: #162440;
+
+  --ok-bg: rgba(47, 106, 58, 0.2);
+  --warn-bg: rgba(184, 101, 26, 0.22);
+  --bad-bg: rgba(168, 51, 43, 0.22);
+  --info-bg: rgba(42, 80, 121, 0.3);
+
+  --brass-100: rgba(228, 194, 126, 0.12);
+  --brass-300: #c4962a;
+  --accent-soft: rgba(228, 194, 126, 0.12);
+
+  /* Deeper, more dramatic shadows for premium feel */
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.55), 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  --sidebar-bg: linear-gradient(180deg, #05101e 0%, #070e1b 50%, #060c18 100%);
+  --header-bg: rgba(7, 14, 27, 0.96);
+  --header-border: rgba(26, 46, 72, 0.8);
+  --card-bg: var(--surface);
+  --card-border: var(--line);
+
+  --sidebar-item-active: rgba(204, 165, 91, 0.28);
+  --sidebar-item-hover: rgba(255, 255, 255, 0.055);
   --icon-btn-hover: var(--surface-2);
   --table-row-hover: var(--paper-2);
-  --table-header-bg: var(--paper-2);
+  --table-header-bg: rgba(10, 21, 37, 0.85);
   --btn-outline-bg: var(--surface-2);
   --btn-outline-hover: var(--paper-3);
-  --input-bg: var(--surface-2);
+  --input-bg: var(--surface);
+
+  /* ERP bridge overrides for dark */
+  --erp-bg: var(--paper);
+  --erp-bg-elevated: var(--surface);
+  --erp-bg-card: var(--surface);
+  --erp-bg-muted: var(--paper-2);
+  --erp-border: var(--line);
+  --erp-border-strong: var(--line-2);
 }
