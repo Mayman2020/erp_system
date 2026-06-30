@@ -308,17 +308,25 @@ a:hover {
 .erp-icon-button,
 .erp-action-btn,
 .erp-icon-toolbtn {
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
   padding: 0;
-  border-radius: 12px;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--erp-border);
-  background: var(--erp-bg-elevated);
-  color: var(--erp-text);
+  border: 1px solid var(--line, var(--erp-border));
+  background: var(--surface, var(--erp-bg-elevated));
+  color: var(--text-main, var(--erp-text));
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.erp-action-btn:hover:not(:disabled) {
+  background: var(--paper-2, var(--erp-bg-muted));
+  border-color: var(--brass-300, #e8c97a);
+  box-shadow: 0 2px 8px rgba(14, 31, 51, 0.1);
 }
 
 .erp-icon-button--ghost {
@@ -885,33 +893,56 @@ body.rtl .erp-search-panel__actions {
   gap: 12px;
 }
 
+/* ── Table search — Property_Managments directory-search style ───────────── */
 .erp-table-search {
-  position: relative;
-  max-width: 300px;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 380px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--paper-2, var(--erp-bg-muted));
+  border: 1px solid var(--line, var(--erp-border));
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.erp-table-search:focus-within {
+  border-color: var(--brass-400, #cca55b);
+  background: var(--surface, var(--erp-bg-elevated));
+  box-shadow: 0 0 0 3px rgba(204, 165, 91, 0.1);
 }
 
 .erp-table-search .mat-icon {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  transform: translateY(-50%);
-  color: var(--erp-text-soft);
+  color: var(--text-muted, var(--erp-text-soft));
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
   pointer-events: none;
 }
 
-body.rtl .erp-table-search .mat-icon {
-  left: auto;
-  right: 12px;
+.erp-table-search .erp-input,
+.erp-table-search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text-main, var(--erp-text));
+  font-size: 13.5px;
+  font-family: inherit;
+  padding: 0;
 }
 
-.erp-table-search .erp-input {
-  padding-left: 40px;
+.erp-table-search .erp-input::placeholder,
+.erp-table-search input::placeholder {
+  color: var(--text-muted, var(--erp-text-soft));
 }
 
-body.rtl .erp-table-search .erp-input {
-  padding-left: 14px;
-  padding-right: 40px;
+[dir='rtl'] .erp-table-search .mat-icon {
+  order: 1;
 }
 
 .erp-table__sort-icon {
@@ -1126,71 +1157,91 @@ body.rtl .erp-table-actions__dropdown {
   display: none;
 }
 
+/* ── Pagination — navy+gold (matches Property_Managments) ─────────────────── */
+.erp-table-pagination {
+  background: var(--card-bg, var(--erp-bg-card));
+  border-top-color: var(--line, var(--erp-border));
+}
+
 .erp-pagination-btn {
-  width: 40px;
-  min-width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  border: 1px solid var(--erp-border);
-  background: var(--erp-bg-elevated);
-  color: var(--erp-text);
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-main, var(--erp-text));
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 13.5px;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
   user-select: none;
 }
 
 .erp-pagination-btn:hover:not(:disabled):not(.is-active) {
-  background: var(--erp-bg-muted);
-  border-color: var(--erp-primary);
-  color: var(--erp-primary);
+  background: var(--paper-2, var(--erp-bg-muted));
+  border-color: var(--brass-300, #e8c97a);
+  color: var(--text-main, var(--erp-text));
 }
 
 .erp-pagination-btn:active:not(:disabled) {
   transform: scale(0.95);
 }
 
+/* Nav (Prev / Next) buttons */
 .erp-pagination-btn--nav {
   width: auto;
-  min-width: 112px;
+  min-width: 36px;
   padding: 0 14px;
-  border-radius: 999px;
+  border-radius: 10px;
+  border-color: var(--line, var(--erp-border));
+  background: var(--surface, var(--erp-bg-elevated));
   gap: 6px;
   font-size: 13px;
   font-weight: 600;
 }
 
 .erp-pagination-btn--nav:hover:not(:disabled) {
-  background: var(--erp-bg-muted);
-  border-color: var(--erp-primary);
-  color: var(--erp-primary);
+  background: var(--paper-2, var(--erp-bg-muted));
+  border-color: var(--brass-300, #e8c97a);
+  color: var(--text-main, var(--erp-text));
 }
 
+/* Active page — navy+brass */
 .erp-pagination-btn.is-active {
-  background: var(--erp-primary);
-  border-color: var(--erp-primary);
-  color: #ffffff;
-  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+  background: var(--navy-900, #0e1f33);
+  border-color: var(--navy-900, #0e1f33);
+  color: var(--brass-100, #f4e7c4);
+  box-shadow: 0 4px 14px rgba(14, 31, 51, 0.28);
+  font-weight: 700;
   cursor: default;
 }
 
+/* Dark mode active */
+[data-theme='dark'] .erp-pagination-btn.is-active {
+  background: linear-gradient(135deg, var(--navy-900, #0e1f33), var(--navy-700, #1b3553));
+  border-color: rgba(204, 165, 91, 0.4);
+  color: var(--brass-100, #f4e7c4);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(204, 165, 91, 0.2) inset;
+}
+
 .erp-pagination-btn:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .erp-pagination-btn:focus-visible {
-  outline: 2px solid var(--erp-primary);
+  outline: 2px solid var(--brass-400, #cca55b);
   outline-offset: 2px;
 }
 
 .erp-pager-ellipsis {
-  color: var(--erp-text-muted);
+  color: var(--text-subtle, var(--erp-text-muted));
   font-weight: 700;
+  padding-inline: 4px;
 }
 
 .erp-dialog {

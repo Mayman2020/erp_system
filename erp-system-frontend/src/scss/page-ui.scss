@@ -64,12 +64,12 @@
   flex-shrink: 0;
 }
 
-/* ── Premium card surface ────────────────────────────────────────────────── */
+/* ── Premium card surface — Property_Managments app-card style ───────────── */
 .erp-list-page__card,
 .erp-card {
   background: var(--card-bg, var(--surface)) !important;
   border: 1px solid var(--card-border, var(--line)) !important;
-  border-radius: 16px !important;
+  border-radius: 14px !important;
   box-shadow: var(--shadow-soft) !important;
   overflow: hidden;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
@@ -78,6 +78,24 @@
 .erp-list-page__card:hover,
 .erp-card:hover {
   box-shadow: var(--shadow-hover) !important;
+}
+
+/* Card header — toolbar/title area inside card */
+.erp-card__header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--line-2, var(--card-border));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.erp-card__header-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
 }
 
 .erp-card__body {
@@ -112,26 +130,28 @@
   padding: 16px 20px !important;
 }
 
-/* ── Table header upgrade ───────────────────────────────────────────────── */
+/* ── Table header upgrade — Property_Managments style ───────────────────── */
 .erp-table thead th {
   background: var(--table-header-bg, var(--paper-2)) !important;
-  color: var(--text-muted, var(--ink-500)) !important;
-  font-size: 11px !important;
+  color: var(--table-header-color, var(--text-muted)) !important;
+  font-size: 10.5px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.07em !important;
+  letter-spacing: 0.14em !important;
   text-transform: uppercase !important;
   padding: 12px 16px !important;
-  border-color: var(--line, var(--erp-border)) !important;
-  border-bottom-width: 2px !important;
+  border-color: var(--table-border, var(--line)) !important;
+  border-bottom-width: 1px !important;
   white-space: nowrap;
+  text-align: center;
 }
 
 .erp-table tbody td {
-  padding: 13px 16px !important;
+  padding: 14px 16px !important;
   border-color: var(--line-2, var(--erp-border)) !important;
   color: var(--text-main);
   font-size: 13.5px;
   vertical-align: middle;
+  text-align: center;
 }
 
 /* Zebra rows */
@@ -167,6 +187,10 @@
   border-color: var(--line) !important;
 }
 
+[data-theme='dark'] .erp-card__header {
+  border-bottom-color: var(--line) !important;
+}
+
 [data-theme='dark'] .erp-search-panel {
   background: var(--paper-2) !important;
   border-bottom-color: var(--line) !important;
@@ -183,6 +207,11 @@
 
 [data-theme='dark'] .erp-table tbody tr:nth-child(even) td {
   background: rgba(255, 255, 255, 0.015) !important;
+}
+
+[data-theme='dark'] .erp-table-pagination {
+  background: var(--surface) !important;
+  border-top-color: var(--line) !important;
 }
 
 
