@@ -1,0 +1,175 @@
+---
+description: ELEVON ERP API contracts — endpoint table, auth flow, guards, token handling, backend port. Read when adding or modifying API calls.
+alwaysApply: false
+---
+
+# ELEVON ERP — API Contracts
+
+## Backend
+
+- **Technology:** Spring Boot (Java / Maven)
+- **Source:** `erp-system-backend/`
+- **Dev port:** `8081`
+- **API context path:** `/api/v1`
+- **Full dev base URL:** `http://127.0.0.1:8081/api/v1`
+- **Frontend proxy:** `ops/frontend-run/proxy.conf.json` → `/api/v1` → `http://127.0.0.1:8081`
+- **Runtime override:** `window.__ERP_API_URL__` (written by `run-frontend.ps1` from `.runtime/launcher-state.json`)
+
+## Environment config pattern
+
+```typescript
+// src/environments/environment.ts
+export const environment: AppEnvironment = {
+  production: false,
+  apiUrl: (window as any).__ERP_API_URL__ ?? '/api/v1',
+  appVersion: '21.0.0'
+};
+```
+
+Never hardcode `http://localhost:8081` — always use `environment.apiUrl`.
+
+## Auth endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/auth/login` | None | Login → returns JWT token |
+| POST | `/auth/login/roles` | None | Fetch available roles for user |
+| POST | `/auth/password/otp/send` | None | Send OTP for password reset |
+| POST | `/auth/password/otp/reset` | None | Verify OTP + set new password |
+| GET  | `/profile/me` | Bearer | Get current user profile |
+| PUT  | `/profile/me` | Bearer | Update current user profile |
+
+## Auth flow
+
+1. User POSTs credentials to `/auth/login`
+2. Response: `{ token, refreshToken, user: { id, fullName, ... } }`
+3. Store: `localStorage.setItem('erp_auth_token', token)`
+4. Store: `localStorage.setItem('erp_auth_refresh_token', refreshToken)`
+5. All subsequent requests: `Authorization: Bearer <token>` (added by HTTP interceptor)
+6. Menu cache stored in `localStorage` key `erp_ui_menu_cache_v2`
+
+## HTTP interceptor
+
+Located at `src/app/core/interceptors/` — auto-attaches Bearer token to every request except `/auth/*` paths.
+
+## User profile model
+
+```typescript
+interface UserProfile {
+  id: number;
+  userId: number;
+  fullName: string;
+  fullNameEn: string;
+  fullNameAr: string;
+  profileImage?: string;
+  nationalId?: string;
+  companyName: string;
+  companyNameEn: string;
+  companyNameAr: string;
+}
+```
+
+## User roles
+
+```typescript
+type UserRole = 'ADMIN' | 'ACCOUNTANT';
+```
+
+## Guards summary
+
+```typescript
+// AuthGuard — use on ALL protected routes
+canActivate: [AuthGuard]
+
+// AdminGuard — use on admin-only routes (/accountants)
+canActivate: [AuthGuard, AdminGuard]
+
+// PermissionGuard — use for fine-grained module permissions
+canActivate: [AuthGuard, PermissionGuard]
+data: { menuItemId: 'SALES', permissionAction: 'canView' }  // or canCreate / canEdit / canDelete
+```
+
+## Adding a new API service (pattern)
+
+```typescript
+// src/app/modules/my-module/services/my.service.ts
+@Injectable({ providedIn: 'root' })
+export class MyService {
+  private readonly base = `${environment.apiUrl}/my-resource`;
+
+  constructor(private http: HttpClient) {}
+
+  getAll(params?: any): Observable<PageResponse<MyModel>> {
+    return this.http.get<PageResponse<MyModel>>(this.base, { params });
+  }
+
+  create(dto: CreateMyDto): Observable<MyModel> {
+    return this.http.post<MyModel>(this.base, dto);
+  }
+
+  update(id: number, dto: UpdateMyDto): Observable<MyModel> {
+    return this.http.put<MyModel>(`${this.base}/${id}`, dto);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
+  }
+}
+```
+
+## PageResponse model
+
+```typescript
+interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;     // current page (0-based)
+  size: number;       // page size
+}
+```
+
+## Error handling pattern
+
+- HTTP errors are handled globally by the interceptor (401 → logout, 403 → permission denied toast)
+- Component-level: show `<app-erp-alert>` for caught errors
+- Never swallow errors silently
+
+## Key API module paths (known endpoints structure)
+
+| Module | Base path |
+|--------|-----------|
+| Auth | `/auth` |
+| Profile | `/profile` |
+| Dashboard | `/dashboard` |
+| Accounts | `/accounts` |
+| Journal Entries | `/journal-entries` |
+| General Ledger | `/general-ledger` |
+| Vouchers | `/vouchers` |
+| Transactions | `/transactions` |
+| Invoices | `/invoices` |
+| Checks | `/checks` |
+| Ledger | `/ledger` |
+| Inventory | `/inventory` |
+| Sales | `/sales` |
+| Purchases | `/purchases` |
+| HR | `/hr` |
+| CRM | `/crm` |
+| Manufacturing | `/manufacturing` |
+| Projects | `/projects` |
+| Reports | `/reports` |
+| Bank Accounts | `/bank-accounts` |
+| Bills | `/bills` |
+| Budget | `/budget` |
+| Exchange Rates | `/exchange-rates` |
+| Reconciliation | `/reconciliation` |
+| Transfers | `/transfers` |
+| Activity Log | `/activity-log` |
+| Settings | `/settings` |
+| Accountants | `/accountants` |
+
+## DO NOT
+- Call `HttpClient` directly in components — always use a service
+- Hardcode backend port or URL in components or services
+- Store sensitive data beyond `erp_auth_token` in localStorage
+- Skip the interceptor — never manually add the Authorization header in services

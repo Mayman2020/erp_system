@@ -1,0 +1,281 @@
+---
+description: ELEVON ERP Angular 21 conventions — module pattern, standalone component boilerplate, common imports, service patterns, guards, type-check commands.
+alwaysApply: false
+---
+
+# ELEVON ERP — Angular 21 Conventions
+
+## Module pattern (existing lazy-loaded modules)
+
+This project uses **NgModule-based lazy loading** (not standalone-first), matching Angular 14–21 compatibility:
+
+```typescript
+// my-module/my.module.ts
+@NgModule({
+  declarations: [MyListComponent, MyFormComponent],
+  imports: [
+    CommonModule,
+    RouterModule.forChild(MY_ROUTES),
+    ReactiveFormsModule,
+    TranslateModule,
+    MaterialModule,   // re-exported Angular Material
+    SharedModule,     // re-exported shared components
+  ]
+})
+export class MyModule {}
+```
+
+## Routing pattern
+
+```typescript
+// my-module/my-routing.module.ts
+export const MY_ROUTES: Routes = [
+  { path: '', component: MyListComponent },
+  { path: 'create', component: MyFormComponent },
+  { path: ':id/edit', component: MyFormComponent },
+];
+```
+
+App-level lazy load in `app-routing.module.ts`:
+```typescript
+{
+  path: 'my-feature',
+  loadChildren: () => import('./modules/my-feature/my.module').then(m => m.MyModule),
+  canActivate: [AuthGuard]
+}
+```
+
+## Component file convention
+
+```
+my-feature/
+├── my-feature.module.ts
+├── my-feature-routing.module.ts
+├── components/
+│   ├── my-list/
+│   │   ├── my-list.component.ts
+│   │   ├── my-list.component.html
+│   │   └── my-list.component.scss
+│   └── my-form/
+│       ├── my-form.component.ts
+│       ├── my-form.component.html
+│       └── my-form.component.scss
+├── models/
+│   └── my-model.ts
+└── services/
+    └── my.service.ts
+```
+
+## List page component boilerplate
+
+```typescript
+@Component({
+  selector: 'app-my-list',
+  templateUrl: './my-list.component.html',
+  styleUrls: ['./my-list.component.scss']
+})
+export class MyListComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  columns: TableColumn[] = [
+    { key: 'id', title: 'COMMON.ID' },
+    { key: 'name', title: 'MY_MODULE.NAME' },
+    { key: 'status', title: 'COMMON.STATUS', kind: 'status', prefix: 'STATUS.' },
+  ];
+
+  actions: TableAction[] = [
+    { key: 'edit',   labelKey: 'COMMON.EDIT',   icon: 'edit',   tone: 'info' },
+    { key: 'delete', labelKey: 'COMMON.DELETE', icon: 'delete', tone: 'danger' },
+  ];
+
+  data: MyModel[] = [];
+  loading = false;
+
+  constructor(private myService: MyService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  load(): void {
+    this.loading = true;
+    this.myService.getAll()
+      .pipe(takeUntil(this.destroy$), finalize(() => this.loading = false))
+      .subscribe({ next: res => this.data = res.content ?? res });
+  }
+
+  onTableAction(event: { action: TableAction; row: MyModel }): void {
+    if (event.action.key === 'edit')   this.router.navigate(['/my-feature', event.row.id, 'edit']);
+    if (event.action.key === 'delete') this.confirmDelete(event.row);
+  }
+}
+```
+
+## List page HTML boilerplate
+
+```html
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="'MY_MODULE.TITLE'" [subtitleKey]="'MY_MODULE.SUBTITLE'">
+    <div header-actions>
+      <button type="button" class="erp-button erp-button--primary" routerLink="create">
+        <mat-icon>add</mat-icon>
+        {{ 'MY_MODULE.CREATE' | translate }}
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-data-table
+        [columns]="columns"
+        [data]="data"
+        [actions]="actions"
+        [loading]="loading"
+        (actionClick)="onTableAction($event)"
+      ></app-data-table>
+    </div>
+  </div>
+</section>
+```
+
+## Common imports reference
+
+```typescript
+// Template directives
+import { CommonModule, NgIf, NgFor, NgClass } from '@angular/common';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+// RxJS
+import { Subject, finalize, takeUntil } from 'rxjs';
+
+// i18n
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+// Angular Material (use via SharedModule/MaterialModule, not direct)
+import { MatIconModule } from '@angular/material/icon';
+
+// ng-bootstrap (for datepickers, dropdowns)
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+```
+
+## Service pattern
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class MyService {
+  private readonly url = `${environment.apiUrl}/my-resource`;
+  constructor(private http: HttpClient) {}
+  // ...methods
+}
+```
+
+Provide at root level (`providedIn: 'root'`) unless the service is module-specific and should be destroyed with the module — then provide in the module's `providers` array.
+
+## Form pattern
+
+```typescript
+this.form = this.fb.group({
+  name:   ['', [Validators.required, Validators.maxLength(200)]],
+  amount: [null, [Validators.required, Validators.min(0)]],
+  date:   [null, Validators.required],
+  status: ['ACTIVE'],
+});
+```
+
+- Use `ReactiveFormsModule` — never template-driven forms
+- Date inputs: use `<app-erp-ngb-date-input>` or `<app-date-field>` (ng-bootstrap based)
+- Validation errors: show via `<app-form-field>` wrapper component
+
+## Dialogs / modals
+
+- Use `<app-form-dialog>` for form modals (create/edit)
+- Use `<app-confirm-dialog>` for delete confirmations
+- Never use `window.confirm()` or browser native dialogs
+
+## Error display
+
+```html
+<app-erp-alert *ngIf="errorMessage" [message]="errorMessage" type="danger"></app-erp-alert>
+```
+
+## Loading state
+
+```html
+<!-- Inside app-data-table: pass [loading]="true" -->
+<!-- For page-level: -->
+<app-loading-state *ngIf="loading"></app-loading-state>
+```
+
+## Type-check & build commands
+
+```powershell
+# Type check only (fast)
+cd erp-system-frontend
+npx tsc --noEmit
+
+# Dev build
+npx ng build
+
+# Production build
+npx ng build --configuration=production
+
+# Dev server
+npx ng serve --proxy-config ../ops/frontend-run/proxy.conf.json
+# OR use the launcher:
+.\run-frontend.ps1
+```
+
+## Code quality rules
+
+- Every component must implement `OnDestroy` with `takeUntil(this.destroy$)` for subscriptions
+- No `console.log` in production code — use dev-mode-only logging or remove
+- No hardcoded strings in templates — use translation keys
+- No direct DOM manipulation — use Angular renderer or CSS classes
+- Prefer `signal()` / `computed()` for new reactive state (Angular 17+), but don't refactor existing code unless asked
+- File names: `kebab-case.component.ts`, `kebab-case.service.ts`, `kebab-case.model.ts`
+
+## Translation key convention
+
+```json
+{
+  "MODULE_NAME": {
+    "TITLE": "...",
+    "SUBTITLE": "...",
+    "CREATE": "...",
+    "EDIT": "...",
+    "DELETE": "...",
+    "FIELD_NAME": "..."
+  }
+}
+```
+
+Always add keys to BOTH `ar.json` AND `en.json` at the same time.
+
+## SCSS component rules
+
+```scss
+/* component.scss */
+:host {
+  display: block;   /* always declare display */
+}
+
+/* Use CSS variables from tokens — never hardcode colors */
+.my-element {
+  color: var(--text-main);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+/* Dark mode overrides */
+[data-theme='dark'] :host .my-element {
+  /* override if needed */
+}
+```
+
+Component SCSS budget: **warning at 20kb, error at 22kb** (angular.json budget).

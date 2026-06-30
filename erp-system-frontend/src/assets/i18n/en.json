@@ -209,7 +209,7 @@
     "footerLinksTitle": "Quick links",
     "footerOfficeTitle": "Trust",
     "footerOfficeLine": "Encrypted sign-in · role-based access · audit-ready workflows",
-    "footerCopyright": "© {{year}} — Hesabaty ERP"
+    "footerCopyright": "© {{year}} ELEVON ERP"
   },
   "LANG": {
     "EN": "EN",
@@ -1123,5 +1123,6 @@
     "MEMBER": "Member"
   }
 }
+
 
 

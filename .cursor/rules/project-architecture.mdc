@@ -1,0 +1,166 @@
+---
+description: ELEVON ERP system — stack, folder structure, ports, scripts, user roles, and module routes. Read this before every task.
+alwaysApply: true
+---
+
+# ELEVON ERP — Project Architecture
+
+## Stack
+
+| Layer | Technology | Version |
+|-------|-----------|---------|
+| Frontend | Angular | 21.2.7 |
+| TypeScript | TypeScript | 5.9.3 |
+| UI Kit | Angular Material + ng-bootstrap | 21.2.5 / 20.0.0 |
+| Charts | ApexCharts | 5.3.5 |
+| CSS | Bootstrap 4.6.2 + Custom SCSS tokens | — |
+| Backend | Spring Boot (Java/Maven) | `erp-system-backend/` |
+| i18n | ngx-translate | ar.json + en.json |
+| Export | xlsx-js-style | 1.2.0 |
+| Animation | GSAP | 3.14.2 |
+| Node | Node.js | 20+ required |
+
+## Project root layout
+
+```
+erp Project/
+├── erp-system-frontend/      ← Angular app (work here)
+├── erp-system-backend/       ← Spring Boot backend
+├── ops/
+│   ├── frontend-run/         ← proxy.conf.json, run-frontend.ps1
+│   └── docker/               ← build-and-push scripts
+├── scripts/                  ← deployment utils
+├── infra/                    ← infrastructure config
+└── .runtime/                 ← launcher-state.json (runtime backend URL)
+```
+
+## How to run
+
+### Frontend
+```powershell
+# From project root:
+.\run-frontend.ps1      # or run-frontend.bat
+# Auto-detects port 4200–4210 | Reads backend URL from .runtime/launcher-state.json
+```
+
+### Backend
+- Located at `erp-system-backend/` (Spring Boot / Maven)
+- Backend port: **8081**
+- API base: `http://127.0.0.1:8081/api/v1`
+
+### Dev proxy
+`ops/frontend-run/proxy.conf.json` proxies `/api/v1` → `http://127.0.0.1:8081`
+
+## API base URL
+
+```typescript
+// environment.ts / environment.prod.ts
+apiUrl = window.__ERP_API_URL__ ?? '/api/v1'
+```
+
+## Frontend folder structure
+
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── auth/           ← AuthService, AuthGuard, AdminGuard, PermissionGuard
+│   │   ├── constants/      ← app constants
+│   │   ├── i18n/           ← translate setup
+│   │   ├── interceptors/   ← HTTP interceptors (auth token)
+│   │   ├── models/         ← TypeScript interfaces
+│   │   ├── services/       ← ThemeService, PermissionService, etc.
+│   │   └── utils/
+│   ├── modules/            ← 27 lazy-loaded feature modules (see below)
+│   ├── shared/
+│   │   ├── components/     ← 27 reusable components (see below)
+│   │   └── directives/
+│   └── theme/
+│       └── layout/admin/
+│           ├── nav-bar/    ← Topbar (nav-bar.component, nav-right/)
+│           └── navigation/ ← Sidebar (navigation.component)
+├── assets/
+│   ├── i18n/               ← ar.json, en.json
+│   ├── images/brand/       ← ELEVON logo SVGs (coreerp-*.svg kept as filenames)
+│   └── fonts/
+└── scss/
+    ├── erp-estate-tokens.scss     ← ALL design tokens (use this as source of truth)
+    ├── erp-estate-shell.scss      ← sidebar + topbar shell layout
+    ├── erp-estate-utilities.scss  ← utility classes + animations
+    ├── page-ui.scss               ← shared page/card/table/pagination styles
+    └── design-system/tokens.scss  ← legacy token bridge
+```
+
+## 27 ERP modules (lazy-loaded routes)
+
+| Route path | Module folder |
+|-----------|---------------|
+| `/dashboard` | dashboard |
+| `/accounts` | accounts |
+| `/journal-entries` | journal-entry |
+| `/general-ledger` | general-ledger |
+| `/vouchers` | vouchers |
+| `/transactions` | transactions |
+| `/invoices` | invoices |
+| `/checks` | checks |
+| `/ledger` | ledger |
+| `/reports` | reports |
+| `/inventory` | inventory |
+| `/sales` | sales |
+| `/purchases` | purchases |
+| `/hr` | hr |
+| `/crm` | crm |
+| `/manufacturing` | manufacturing |
+| `/projects` | projects |
+| `/erp-reports` | erp-reports |
+| `/bank-accounts` | banks |
+| `/bills` | bills |
+| `/budget` | budget |
+| `/exchange-rates` | exchange-rates |
+| `/reconciliation` | reconciliation |
+| `/transfers` | transfers |
+| `/erp/activity-log` | activity-log |
+| `/settings` | settings |
+| `/accountants` | accountants (AdminGuard) |
+
+## 27 Shared components
+
+`data-table`, `page-header`, `form-dialog`, `confirm-dialog`, `advanced-search-bar`,
+`status-badge`, `type-badge`, `empty-state`, `loading-state`, `erp-alert`,
+`avatar`, `profile-card`, `sidebar`, `language-switcher`, `tabs`,
+`account-tree-picker`, `tree-selector`, `document-lines-table`, `date-field`,
+`erp-ngb-date-input`, `erp-document-page-shell`, `form-field`, `journal-link`,
+`recent-activity-table`, `ds-card`, `command-palette`
+
+## Auth guards
+
+| Guard | File | Behavior |
+|-------|------|----------|
+| `AuthGuard` | `core/auth/auth.guard.ts` | Requires valid token → else `/auth/signin` |
+| `AdminGuard` | `core/auth/admin.guard.ts` | Requires role `ADMIN` → else `/dashboard` |
+| `PermissionGuard` | `core/auth/permission.guard.ts` | Checks `menuItemId` + `permissionAction` in route data |
+
+## User roles
+
+| Role | Access |
+|------|--------|
+| `ADMIN` | All modules including `/accountants` |
+| `ACCOUNTANT` | All modules except `/accountants` |
+
+## localStorage keys
+
+| Key | Value |
+|-----|-------|
+| `erp_auth_token` | JWT access token |
+| `erp_auth_refresh_token` | Refresh token |
+| `erp_theme_mode` | `'dark'` \| `'light'` (default: `'dark'`) |
+| `erp_ui_menu_cache_v2` | Sidebar menu cache |
+
+## Critical rules — do not break
+
+- **Never touch backend** unless frontend compilation requires a small interface fix
+- **Never break routing** — all 27 routes must remain navigable
+- **Never remove features** — only add or improve
+- **Login screen** — layout is locked; only visual (colors, shadow, glassmorphism) changes allowed
+- **API calls** — always go through services in `core/services/` or module services; never call `HttpClient` directly from components
+- **i18n** — all user-facing strings must use `translate` pipe or `TranslateService`; never hardcode Arabic/English text

@@ -210,7 +210,7 @@
     "footerLinksTitle": "روابط سريعة",
     "footerOfficeTitle": "الثقة",
     "footerOfficeLine": "تسجيل دخول مشفّر · صلاحيات حسب الدور · سير عمل جاهز للتدقيق",
-    "footerCopyright": "© {{year}} — حساباتي ERP"
+    "footerCopyright": "© {{year}} ELEVON ERP"
   },
   "LANG": {
     "EN": "EN",
@@ -1123,5 +1123,6 @@
     "MEMBER": "عضو"
   }
 }
+
 
 
