@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { ExchangeRateDto, ExchangeRateForm } from '../../core/models/accounting.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { DataTableColumn } from '../../shared/components/data-table/data-table.component';
-import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-master-page.base';
+import { DataTableAction, DataTableColumn } from '../../shared/components/data-table/data-table.component';
+import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../shared/utils/erp-master-page.base';
 
 @Component({
   standalone: false,
@@ -52,8 +51,8 @@ export class ExchangeRatesPageComponent extends ErpMasterPageBase<ExchangeRateDt
     super(authService, confirmDialog, cdr);
   }
 
-  get tableActions() {
-    return [{ id: 'view', labelKey: 'COMMON.VIEW', className: 'erp-action-secondary' }];
+  get tableActions(): DataTableAction[] {
+    return MASTER_CRUD_ACTIONS;
   }
 
   ngOnInit(): void {
@@ -74,27 +73,19 @@ export class ExchangeRatesPageComponent extends ErpMasterPageBase<ExchangeRateDt
   }
 
   protected fetchOne(id: number): Observable<ExchangeRateDto> {
-    return this.api.getExchangeRates().pipe(
-      map((rows) => {
-        const found = (rows || []).find((r) => r.id === id);
-        if (!found) {
-          throw new Error('Exchange rate not found');
-        }
-        return found;
-      })
-    );
+    return this.api.getExchangeRate(id);
   }
 
   protected createItem(payload: ExchangeRateForm): Observable<ExchangeRateDto> {
     return this.api.createExchangeRate(payload);
   }
 
-  protected updateItem(_id: number, _payload: ExchangeRateForm): Observable<ExchangeRateDto> {
-    return of({} as ExchangeRateDto);
+  protected updateItem(id: number, payload: ExchangeRateForm): Observable<ExchangeRateDto> {
+    return this.api.updateExchangeRate(id, payload);
   }
 
-  protected removeItem(_id: number): Observable<void> {
-    return of(undefined);
+  protected removeItem(id: number): Observable<void> {
+    return this.api.deleteExchangeRate(id);
   }
 
   protected defaultFormValues(): Record<string, unknown> {

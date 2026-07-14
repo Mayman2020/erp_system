@@ -11,7 +11,8 @@
     "build:production:ci": "node scripts/write-env.cjs && ng build --configuration production --verbose",
     "build:static": "node scripts/write-env.cjs && ng build --configuration production",
     "serve:static": "serve -s dist/erp-system-frontend/browser -l 4200",
-    "test": "ng test"
+    "test": "ng test",
+    "test:api": "node scripts/api-integration-test.mjs"
   },
   "engines": {
     "node": "^20.19.0 || ^22.12.0 || ^24.0.0",

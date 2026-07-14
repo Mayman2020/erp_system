@@ -366,8 +366,20 @@ export class AccountingApiService {
     return this.http.get<ApiResponse<ExchangeRateDto[]>>(`${this.base}/exchange-rates`).pipe(map((res) => res.data || []));
   }
 
+  getExchangeRate(id: number): Observable<ExchangeRateDto> {
+    return this.http.get<ApiResponse<ExchangeRateDto>>(`${this.base}/exchange-rates/${id}`).pipe(map((res) => res.data));
+  }
+
   createExchangeRate(payload: ExchangeRateForm): Observable<ExchangeRateDto> {
     return this.http.post<ApiResponse<ExchangeRateDto>>(`${this.base}/exchange-rates`, payload).pipe(map((res) => res.data));
+  }
+
+  updateExchangeRate(id: number, payload: ExchangeRateForm): Observable<ExchangeRateDto> {
+    return this.http.put<ApiResponse<ExchangeRateDto>>(`${this.base}/exchange-rates/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deleteExchangeRate(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/exchange-rates/${id}`);
   }
 
   getTransaction(id: number): Observable<AccountingTransactionDto> {

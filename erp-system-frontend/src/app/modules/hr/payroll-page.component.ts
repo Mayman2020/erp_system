@@ -76,6 +76,7 @@ export class PayrollPageComponent extends ErpMasterPageBase<PayrollRunDto, Payro
       ...MASTER_CRUD_ACTIONS.slice(0, 2),
       { id: 'lines', labelKey: 'ERP.PAYROLL_LINES', className: 'erp-action-info' },
       { id: 'approve', labelKey: 'COMMON.APPROVE', className: 'erp-action-success', disabledWhen: (r) => String(r['status']) !== 'DRAFT' },
+      { id: 'cancel', labelKey: 'COMMON.CANCEL', className: 'erp-action-warning', disabledWhen: (r) => String(r['status']) === 'CANCELLED' },
       MASTER_CRUD_ACTIONS[2]
     ];
   }
@@ -97,6 +98,7 @@ export class PayrollPageComponent extends ErpMasterPageBase<PayrollRunDto, Payro
   override onTableAction(event: { actionId: string; row: Record<string, unknown> }): void {
     const id = Number(event.row['id']);
     if (event.actionId === 'approve' && id) { this.api.approvePayrollRun(id, this.actorEmail).subscribe({ next: () => this.load() }); return; }
+    if (event.actionId === 'cancel' && id) { this.api.cancelPayrollRun(id, this.actorEmail).subscribe({ next: () => this.load() }); return; }
     if (event.actionId === 'lines' && id) { this.openLinesPanel(id, Number(event.row['journalEntryId'])); return; }
     super.onTableAction(event);
   }

@@ -752,6 +752,10 @@ export class ErpApiService {
     return this.http.post<ApiResponse<PayrollRunDto>>(`${this.hrBase}/payroll/${id}/approve`, null, { params: { actor } }).pipe(map((res) => res.data));
   }
 
+  cancelPayrollRun(id: number, actor: string, reason?: string): Observable<PayrollRunDto> {
+    return this.http.post<ApiResponse<PayrollRunDto>>(`${this.hrBase}/payroll/${id}/cancel`, null, { params: this.toParams({ actor, reason }) }).pipe(map((res) => res.data));
+  }
+
   // CRM
   getLead(id: number): Observable<CrmLeadDto> {
     return this.http.get<ApiResponse<CrmLeadDto>>(`${this.crmBase}/leads/${id}`).pipe(map((res) => res.data));

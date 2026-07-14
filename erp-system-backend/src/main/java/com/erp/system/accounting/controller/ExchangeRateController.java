@@ -23,9 +23,26 @@ public class ExchangeRateController {
         return ApiResponse.success(currencyConversionService.getAllRates());
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<ExchangeRateDisplayDto> getRate(@PathVariable Long id) {
+        return ApiResponse.success(currencyConversionService.getRateById(id));
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<ExchangeRateDisplayDto> createRate(@Valid @RequestBody ExchangeRateFormDto form) {
         return ApiResponse.success(currencyConversionService.createRate(form));
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<ExchangeRateDisplayDto> updateRate(@PathVariable Long id,
+                                                          @Valid @RequestBody ExchangeRateFormDto form) {
+        return ApiResponse.success(currencyConversionService.updateRate(id, form));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteRate(@PathVariable Long id) {
+        currencyConversionService.deleteRate(id);
+        return ApiResponse.success(null);
     }
 }

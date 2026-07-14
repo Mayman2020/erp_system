@@ -55,11 +55,16 @@ public class CurrencyConversionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public ExchangeRateDisplayDto getRateById(Long id) {
+        return exchangeRateRepository.findById(id)
+                .map(this::toDisplay)
+                .orElseThrow(() -> new BusinessException("Exchange rate not found: " + id));
+    }
+
     @Transactional
     public ExchangeRateDisplayDto createRate(ExchangeRateFormDto form) {
-        if (form.getRate() == null || form.getRate().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Exchange rate must be greater than zero");
-        }
+        validateRateForm(form);
         ExchangeRate rate = ExchangeRate.builder()
                 .sourceCurrency(form.getSourceCurrency().toUpperCase())
                 .targetCurrency(form.getTargetCurrency().toUpperCase())
@@ -68,6 +73,42 @@ public class CurrencyConversionService {
                 .expiryDate(form.getExpiryDate())
                 .build();
         return toDisplay(exchangeRateRepository.save(rate));
+    }
+
+    @Transactional
+    public ExchangeRateDisplayDto updateRate(Long id, ExchangeRateFormDto form) {
+        validateRateForm(form);
+        ExchangeRate rate = exchangeRateRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Exchange rate not found: " + id));
+        rate.setSourceCurrency(form.getSourceCurrency().toUpperCase());
+        rate.setTargetCurrency(form.getTargetCurrency().toUpperCase());
+        rate.setRate(form.getRate());
+        rate.setEffectiveDate(form.getEffectiveDate());
+        rate.setExpiryDate(form.getExpiryDate());
+        return toDisplay(exchangeRateRepository.save(rate));
+    }
+
+    @Transactional
+    public void deleteRate(Long id) {
+        if (!exchangeRateRepository.existsById(id)) {
+            throw new BusinessException("Exchange rate not found: " + id);
+        }
+        exchangeRateRepository.deleteById(id);
+    }
+
+    private void validateRateForm(ExchangeRateFormDto form) {
+        if (form.getRate() == null || form.getRate().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Exchange rate must be greater than zero");
+        }
+        if (form.getSourceCurrency() == null || form.getSourceCurrency().isBlank()) {
+            throw new BusinessException("Source currency is required");
+        }
+        if (form.getTargetCurrency() == null || form.getTargetCurrency().isBlank()) {
+            throw new BusinessException("Target currency is required");
+        }
+        if (form.getSourceCurrency().equalsIgnoreCase(form.getTargetCurrency())) {
+            throw new BusinessException("Source and target currency must differ");
+        }
     }
 
     private ExchangeRateDisplayDto toDisplay(ExchangeRate er) {

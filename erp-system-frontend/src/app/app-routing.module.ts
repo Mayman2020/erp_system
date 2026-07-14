@@ -117,7 +117,8 @@ const routes: Routes = [
       },
       {
         path: 'erp-reports',
-        loadChildren: () => import('./modules/erp-reports/erp-reports.module').then(module => module.ErpReportsModule)
+        redirectTo: 'reports',
+        pathMatch: 'full'
       },
       {
         path: 'banks',
