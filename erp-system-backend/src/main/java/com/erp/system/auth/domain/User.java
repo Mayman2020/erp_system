@@ -50,6 +50,9 @@ public class User extends BaseEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active;
 
+    @Column(name = "must_change_password", nullable = false)
+    private boolean mustChangePassword;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserProfile profile;
 

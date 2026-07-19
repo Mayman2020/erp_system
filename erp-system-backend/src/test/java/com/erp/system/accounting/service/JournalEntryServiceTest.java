@@ -14,6 +14,8 @@ import com.erp.system.common.enums.JournalEntryStatus;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.service.NumberingService;
 import com.erp.system.accounting.service.AccountingAuditService;
+import com.erp.system.notification.domain.NotificationType;
+import com.erp.system.notification.service.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,6 +52,9 @@ class JournalEntryServiceTest {
 
     @Mock
     private AccountingAuditService auditService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private JournalEntryService journalEntryService;
@@ -149,6 +154,13 @@ class JournalEntryServiceTest {
         assertThat(result.getStatus()).isEqualTo(JournalEntryStatus.APPROVED);
         assertThat(draft.getPostedBy()).isEqualTo("admin");
         assertThat(draft.getPostedAt()).isNotNull();
+        verify(notificationService).notifyAdmins(
+                eq(NotificationType.ACCOUNTING),
+                eq("NOTIFICATIONS.JOURNAL_APPROVED_TITLE"),
+                eq("NOTIFICATIONS.JOURNAL_APPROVED_BODY"),
+                eq(java.util.Map.of("referenceNumber", "JE-1", "approvedBy", "admin")),
+                eq("JOURNAL_ENTRY"),
+                eq(1L));
     }
 
     @Test

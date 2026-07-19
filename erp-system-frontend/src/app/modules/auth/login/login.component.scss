@@ -50,6 +50,16 @@ body.rtl .login-shell__grid {
   direction: rtl;
 }
 
+/* Keep the form on the right in both languages; text direction is handled per panel. */
+.login-shell--elevon .login-shell__grid {
+  direction: ltr;
+}
+
+:host-context(body.lang-ar) .login-shell--elevon .login-shell__grid,
+:host-context(body.rtl) .login-shell--elevon .login-shell__grid {
+  direction: ltr;
+}
+
 .login-side {
   position: relative;
   display: flex;
@@ -278,14 +288,14 @@ body.rtl .login-shell__grid {
 }
 
 .forgot {
-  color: var(--brass-600, #8e6a2b);
+  color: var(--brass-500, #2563eb);
   font-weight: 700;
   cursor: pointer;
   transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .forgot:hover {
-  color: var(--brass-500, #b48a40);
+  color: var(--brass-400, #3b82f6);
 }
 
 .login-actions {
@@ -319,7 +329,7 @@ body.rtl .login-shell__grid {
   display: inline-block;
   margin-top: 0.5rem;
   font-weight: 600;
-  color: var(--brass-600, #8e6a2b);
+  color: var(--brass-500, #2563eb);
   cursor: pointer;
   transition: color 0.2s ease;
 }
@@ -494,6 +504,14 @@ body.rtl .login-shell__grid {
   gap: clamp(6px, 1vh, 10px);
 }
 
+:host ::ng-deep .login-shell--elevon .features,
+.login-shell--elevon .features {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  align-items: stretch;
+}
+
 .feature-card {
   display: flex;
   align-items: flex-start;
@@ -504,6 +522,32 @@ body.rtl .login-shell__grid {
   border: 1px solid rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(12px);
   transition: transform 0.22s ease, background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.login-shell--elevon .feature-card {
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: center;
+  gap: 10px !important;
+  min-height: 112px;
+  max-width: none !important;
+  width: 100%;
+  height: 100%;
+  padding: 14px 10px !important;
+  background: rgba(11, 20, 38, 0.35) !important;
+  border: 1px solid rgba(59, 130, 246, 0.22) !important;
+  border-radius: 14px !important;
+}
+
+.login-shell--elevon .feature-card__text span {
+  display: none !important;
+}
+
+.login-shell--elevon .feature-card__text strong {
+  margin: 0 !important;
+  min-height: 2.7em;
+  line-height: 1.35;
 }
 
 .feature-card:hover {
@@ -589,6 +633,16 @@ body.rtl .login-shell__grid {
   font-size: 0.62rem;
 }
 
+:host-context(body.erp-auth-body-lock) .login-shell--elevon .features {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+:host-context(body.erp-auth-body-lock) .login-shell--elevon .feature-card {
+  min-height: 100px;
+  padding: 12px 8px;
+}
+
 :host-context(body.erp-auth-body-lock) .features {
   gap: clamp(4px, 0.55vh, 8px);
 }
@@ -671,8 +725,31 @@ body.rtl .login-shell__grid {
     order: -1;
   }
 
+  .login-shell--elevon .features {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
   .login-form-panel {
     padding: 10px 0 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-shell--elevon .features {
+    grid-template-columns: 1fr !important;
+  }
+
+  .login-shell--elevon .feature-card {
+    min-height: 0 !important;
+    flex-direction: row !important;
+    text-align: start !important;
+    justify-content: flex-start !important;
+    padding: 12px 14px !important;
+  }
+
+  .login-shell--elevon .feature-card__text strong {
+    min-height: 0 !important;
+    text-align: start;
   }
 }
 

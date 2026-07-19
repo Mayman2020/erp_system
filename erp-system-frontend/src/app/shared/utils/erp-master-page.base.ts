@@ -5,6 +5,7 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { DataTableAction, DataTableColumn } from '../components/data-table/data-table.component';
+import { ListLoadController } from './list-load.util';
 
 export const MASTER_CRUD_ACTIONS: DataTableAction[] = [
   { id: 'view', labelKey: 'COMMON.VIEW', className: 'erp-action-secondary' },
@@ -28,8 +29,15 @@ export interface MasterPageConfig {
   statusOptions?: string[];
 }
 
-export abstract class ErpMasterPageBase<TDto extends { id: number }, TForm> {
+export abstract class ErpMasterPageBase<TDto extends {
+  id: number;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}, TForm> {
   readonly actions: DataTableAction[] = MASTER_CRUD_ACTIONS;
+  readonly listLoad = new ListLoadController();
 
   loading = false;
   saving = false;
@@ -39,6 +47,7 @@ export abstract class ErpMasterPageBase<TDto extends { id: number }, TForm> {
   formVisible = false;
   formMode: 'create' | 'edit' | 'view' = 'create';
   selectedId: number | null = null;
+  selectedAuditRecord: TDto | null = null;
   actorEmail = 'system@erp.local';
 
   protected filters: Record<string, string> = {};
@@ -104,6 +113,7 @@ export abstract class ErpMasterPageBase<TDto extends { id: number }, TForm> {
   openCreate(): void {
     this.formMode = 'create';
     this.selectedId = null;
+    this.selectedAuditRecord = null;
     this.form.reset(this.defaultFormValues());
     this.form.enable();
     this.formVisible = true;
@@ -113,6 +123,7 @@ export abstract class ErpMasterPageBase<TDto extends { id: number }, TForm> {
 
   closeForm(): void {
     this.formVisible = false;
+    this.selectedAuditRecord = null;
     this.cdr.markForCheck();
   }
 
@@ -160,12 +171,14 @@ export abstract class ErpMasterPageBase<TDto extends { id: number }, TForm> {
   }
 
   protected load(): void {
-    this.loading = true;
+    this.listLoad.begin();
+    this.loading = this.listLoad.showInitialSpinner;
     this.errorKey = '';
     const params = this.buildListParams();
     this.fetchList(params)
       .pipe(finalize(() => {
-        this.loading = false;
+        this.listLoad.end();
+        this.loading = this.listLoad.showInitialSpinner;
         this.cdr.markForCheck();
       }))
       .subscribe({
@@ -184,6 +197,7 @@ export abstract class ErpMasterPageBase<TDto extends { id: number }, TForm> {
       next: (item) => {
         this.formMode = mode;
         this.selectedId = item.id;
+        this.selectedAuditRecord = item;
         this.patchForm(item);
         if (mode === 'view') {
           this.form.disable();

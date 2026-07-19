@@ -13,20 +13,24 @@
 
       <div class="erp-report-page__summary" *ngIf="!loading && !errorKey">
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">date_range</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.REPORT_FROM' | translate }}</div>
           <div class="erp-report-page__metric-value">{{ summary.fromDate }}</div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">event_available</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.REPORT_TO' | translate }}</div>
           <div class="erp-report-page__metric-value">{{ summary.toDate }}</div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">receipt_long</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.INVOICE_COUNT' | translate }}</div>
-          <div class="erp-report-page__metric-value">{{ summary.invoiceCount }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.invoiceCount" [erpCountUpDecimals]="0"></div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">trending_up</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_SALES' | translate }}</div>
-          <div class="erp-report-page__metric-value">{{ summary.totalSales }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.totalSales" [erpCountUpDecimals]="2"></div>
         </div>
       </div>
 

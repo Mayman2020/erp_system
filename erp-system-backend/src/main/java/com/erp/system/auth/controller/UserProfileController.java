@@ -1,6 +1,7 @@
 package com.erp.system.auth.controller;
 
 import com.erp.system.auth.dto.AuthUserDto;
+import com.erp.system.auth.dto.ChangePasswordRequestDto;
 import com.erp.system.auth.dto.UpdateProfileRequestDto;
 import com.erp.system.auth.service.UserProfileService;
 import com.erp.system.common.dto.ApiResponse;
@@ -27,5 +28,10 @@ public class UserProfileController {
     @PutMapping("/me")
     public ApiResponse<AuthUserDto> updateMyProfile(@Valid @RequestBody UpdateProfileRequestDto request) {
         return ApiResponse.success(userProfileService.updateMyProfile(request));
+    }
+
+    @PutMapping("/me/password")
+    public ApiResponse<AuthUserDto> changeMyPassword(@Valid @RequestBody ChangePasswordRequestDto request) {
+        return ApiResponse.success(userProfileService.changeMyPassword(request));
     }
 }

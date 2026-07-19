@@ -14,6 +14,7 @@ import {
   AdminRolePermission,
   AdminUser,
   AdminUserForm,
+  ScreenSetting,
   UiMenuItemAdmin,
   UiMenuItemAdminForm
 } from '../core/models/admin.models';
@@ -21,6 +22,8 @@ import { TranslationService } from '../core/i18n/translation.service';
 import { AdminApiService } from '../core/services/admin-api.service';
 import { LookupService } from '../core/services/lookup.service';
 import { DataTableAction, DataTableColumn } from '../shared/components/data-table/data-table.component';
+import { ListLoadController } from '../shared/utils/list-load.util';
+import { ExportColumn } from '../shared/components/table-export-toolbar/table-export-toolbar.component';
 
 type PrimaryRole = 'ADMIN' | 'ACCOUNTANT';
 type DialogMode = 'create' | 'edit';
@@ -73,6 +76,10 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
   lookupTypes: AdminLookupType[] = [];
   lookupValues: AdminLookupValue[] = [];
   menuScreens: UiMenuItemAdmin[] = [];
+  screenSettings: ScreenSetting[] = [];
+  newScreenSettingKey = '';
+  screenSettingErrorKey = '';
+  screenSettingSuccessKey = '';
   selectedRoleId: number | null = null;
   selectedLookupTypeId: number | null = null;
   userDialogVisible = false;
@@ -93,6 +100,16 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
   editingScreenId: string | null = null;
   confirmTarget: { kind: DeleteTargetKind; id: number | string; label: string } | null = null;
   rolePermissionDraft: PermissionDraft[] = [];
+  readonly listLoad = new ListLoadController();
+  editingUserAudit: AdminUser | null = null;
+
+  readonly userExportColumns: ExportColumn<AdminUser>[] = [
+    { header: 'Username', value: 'username' },
+    { header: 'Email', value: 'email' },
+    { header: 'Full Name', value: (row) => row.fullNameEn || row.fullName || '' },
+    { header: 'Primary Role', value: 'primaryRole' },
+    { header: 'Active', value: (row) => row.active ? 'Yes' : 'No' }
+  ];
 
   readonly userColumns: DataTableColumn[] = [
     { key: 'fullName', title: 'ACCESS_MANAGEMENT.FULL_NAME', clickable: true, sortable: true },
@@ -164,6 +181,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
     fullNameAr: ['', [Validators.required, Validators.maxLength(150)]],
     primaryRole: ['ACCOUNTANT' as PrimaryRole, Validators.required],
     active: [true, Validators.required],
+    mustChangePassword: [false],
     roleIds: [[] as number[]]
   });
   readonly roleForm = this.fb.group({
@@ -300,6 +318,43 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
       }));
   }
 
+  get rolesList(): AdminRole[] {
+    const query = this.roleQuery.trim().toLowerCase();
+    return this.roles.filter(
+      (role) => !query || [role.code, role.nameEn, role.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query)
+    );
+  }
+
+  get lookupTypeList(): AdminLookupType[] {
+    const query = this.lookupTypeQuery.trim().toLowerCase();
+    return this.lookupTypes.filter(
+      (type) => !query || [type.code, type.nameEn, type.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query)
+    );
+  }
+
+  get filteredLookupValuesRaw(): AdminLookupValue[] {
+    const query = this.lookupValueQuery.trim().toLowerCase();
+    return this.lookupValues.filter(
+      (value) => !query || [value.code, value.nameEn, value.nameAr].filter(Boolean).join(' ').toLowerCase().includes(query)
+    );
+  }
+
+  get editablePermissionModules(): Array<{ key: string; label: string; permissions: PermissionDraft[] }> {
+    const groups = new Map<string, { key: string; label: string; permissions: PermissionDraft[] }>();
+    for (const permission of this.editableRolePermissions) {
+      const key = permission.parentId || '_root';
+      if (!groups.has(key)) {
+        groups.set(key, {
+          key,
+          label: this.permissionPathLabel(permission.parentId) || this.translationService.instant('ACCESS_MANAGEMENT.SCREEN'),
+          permissions: []
+        });
+      }
+      groups.get(key)!.permissions.push(permission);
+    }
+    return Array.from(groups.values());
+  }
+
   get filteredScreens(): Array<Record<string, unknown>> {
     const query = this.screenQuery.trim().toLowerCase();
     return (this.menuScreens || [])
@@ -335,27 +390,31 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
   }
 
   loadPage(): void {
-    this.loading = true;
+    this.listLoad.begin();
+    this.loading = this.listLoad.showInitialSpinner;
     this.lookupTypesLoading = true;
     this.accessErrorKey = '';
     this.lookupErrorKey = '';
     forkJoin({
       access: this.adminApi.getAccessContext(),
       lookupTypes: this.adminApi.getLookupTypes(),
-      menuScreens: this.adminApi.listMenuItems()
+      menuScreens: this.adminApi.listMenuItems(),
+      screenSettings: this.adminApi.getScreenSettings()
     })
       .pipe(
         finalize(() => {
-          this.loading = false;
+          this.listLoad.end();
+          this.loading = this.listLoad.showInitialSpinner;
           this.lookupTypesLoading = false;
           this.cdr.detectChanges();
         })
       )
       .subscribe({
-        next: ({ access, lookupTypes, menuScreens }) => {
+        next: ({ access, lookupTypes, menuScreens, screenSettings }) => {
           this.applyAccessContext(access);
           this.applyLookupTypes(lookupTypes);
           this.menuScreens = menuScreens || [];
+          this.screenSettings = screenSettings || [];
         },
         error: () => {
           this.accessErrorKey = 'ACCESS_MANAGEMENT.LOAD_ERROR';
@@ -364,10 +423,56 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
       });
   }
 
+  toggleScreenSetting(screenKey: string, enabled: boolean): void {
+    this.screenSettingErrorKey = '';
+    this.screenSettingSuccessKey = '';
+    const previous = this.screenSettings.find((s) => s.screenKey === screenKey)?.enabled ?? true;
+    this.patchScreenSetting(screenKey, enabled);
+    this.adminApi.updateScreenSetting(screenKey, enabled).subscribe({
+      next: (updated) => {
+        this.patchScreenSetting(screenKey, updated.enabled);
+        this.screenSettingSuccessKey = 'ACCESS_MANAGEMENT.SCREEN_VISIBILITY_UPDATE_SUCCESS';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.patchScreenSetting(screenKey, previous);
+        this.screenSettingErrorKey = 'ACCESS_MANAGEMENT.SCREEN_VISIBILITY_UPDATE_ERROR';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  addScreenSettingKey(): void {
+    const key = this.newScreenSettingKey.trim();
+    if (!key) {
+      return;
+    }
+    this.screenSettingErrorKey = '';
+    this.screenSettingSuccessKey = '';
+    this.adminApi.updateScreenSetting(key, true).subscribe({
+      next: (created) => {
+        if (!this.screenSettings.some((s) => s.screenKey === created.screenKey)) {
+          this.screenSettings = [...this.screenSettings, created];
+        }
+        this.newScreenSettingKey = '';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.screenSettingErrorKey = 'ACCESS_MANAGEMENT.SCREEN_VISIBILITY_UPDATE_ERROR';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private patchScreenSetting(screenKey: string, enabled: boolean): void {
+    this.screenSettings = this.screenSettings.map((s) => (s.screenKey === screenKey ? { ...s, enabled } : s));
+  }
+
   openCreateUserDialog(): void {
     this.userDialogMode = 'create';
     this.editingUserId = null;
-    this.userForm.reset({ username: '', email: '', phone: '', password: '', fullNameEn: '', fullNameAr: '', primaryRole: 'ACCOUNTANT', active: true, roleIds: [] });
+    this.editingUserAudit = null;
+    this.userForm.reset({ username: '', email: '', phone: '', password: '', fullNameEn: '', fullNameAr: '', primaryRole: 'ACCOUNTANT', active: true, mustChangePassword: true, roleIds: [] });
     this.userDialogVisible = true;
   }
 
@@ -376,6 +481,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
     if (!user) { return; }
     this.userDialogMode = 'edit';
     this.editingUserId = user.id;
+    this.editingUserAudit = user;
     this.userForm.reset({
       username: user.username,
       email: user.email,
@@ -385,6 +491,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
       fullNameAr: user.fullNameAr || '',
       primaryRole: (user.primaryRole || 'ACCOUNTANT') as PrimaryRole,
       active: !!user.active,
+      mustChangePassword: !!user.mustChangePassword,
       roleIds: [...(user.roleIds || [])]
     });
     this.userDialogVisible = true;
@@ -413,6 +520,7 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
       fullNameAr: String(this.userForm.value.fullNameAr || '').trim(),
       primaryRole: (this.userForm.value.primaryRole || 'ACCOUNTANT') as PrimaryRole,
       active: !!this.userForm.value.active,
+      mustChangePassword: !!this.userForm.value.mustChangePassword,
       roleIds: [...(this.userForm.value.roleIds || [])]
     };
     const request$ = this.userDialogMode === 'create' ? this.adminApi.createUser(payload) : this.adminApi.updateUser(this.editingUserId as number, payload);
@@ -571,6 +679,33 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
 
   permissionEnabledCount(role: AdminRole | null): number {
     return (role?.permissions || []).filter((item) => item.canView || item.canCreate || item.canEdit || item.canDelete).length;
+  }
+
+  permissionScreenCount(role: AdminRole | null): number {
+    return (role?.permissions || []).filter((item) => item.canView).length;
+  }
+
+  roleIcon(code?: string | null): string {
+    const key = String(code || '').toUpperCase();
+    if (key.includes('ADMIN')) return 'admin_panel_settings';
+    if (key.includes('ACCOUNT')) return 'payments';
+    if (key.includes('TREASURY') || key.includes('FINANCE')) return 'account_balance';
+    if (key.includes('SALES')) return 'point_of_sale';
+    if (key.includes('PURCHASE')) return 'shopping_cart';
+    if (key.includes('INVENTORY')) return 'inventory_2';
+    if (key.includes('HR')) return 'badge';
+    if (key.includes('REPORT')) return 'bar_chart';
+    if (key.includes('MANAGER')) return 'supervisor_account';
+    return 'security';
+  }
+
+  toggleLookupPanel(type: AdminLookupType): void {
+    if (this.selectedLookupTypeId === type.id) {
+      return;
+    }
+    this.selectedLookupTypeId = type.id;
+    this.lookupValueQuery = '';
+    this.loadLookupValues(type.code);
   }
 
   permissionEnabledCountDraft(): number {
@@ -909,12 +1044,14 @@ export class AccountantsHomeComponent implements OnInit, OnDestroy {
   }
 
   private refreshAccessContext(preferredRoleId: number | null = null): void {
-    this.loading = true;
+    this.listLoad.begin();
+    this.loading = this.listLoad.showInitialSpinner;
     this.adminApi
       .getAccessContext()
       .pipe(
         finalize(() => {
-          this.loading = false;
+          this.listLoad.end();
+          this.loading = this.listLoad.showInitialSpinner;
           this.cdr.detectChanges();
         })
       )

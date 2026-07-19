@@ -91,6 +91,7 @@ public class SecurityConfig {
                                 "/auth/password/otp/send", "/auth/password/otp/reset").permitAll()
                         .requestMatchers("/auth/register").hasRole("ADMIN")
                         .requestMatchers("/profile/**").authenticated()
+                        .requestMatchers("/notifications/**").authenticated()
                         .requestMatchers("/ui/**").authenticated()
                         .requestMatchers("/lookups/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

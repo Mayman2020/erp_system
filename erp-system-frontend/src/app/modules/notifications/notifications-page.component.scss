@@ -1,0 +1,37 @@
+.erp-notifications-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.erp-notification-row {
+  padding: 14px 16px;
+  border: 1px solid var(--border-color, var(--erp-border));
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: var(--bg-surface, var(--erp-bg-elevated));
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.erp-notification-row.is-unread {
+  border-color: color-mix(in srgb, var(--color-primary, var(--erp-info)) 35%, var(--erp-border));
+  box-shadow: var(--shadow-sm, var(--erp-shadow-sm));
+}
+
+.erp-notification-row__title {
+  font-weight: 600;
+  color: var(--text-primary, var(--erp-text));
+  margin-bottom: 4px;
+}
+
+.erp-notification-row__body {
+  color: var(--text-secondary, var(--erp-text-muted));
+  font-size: 0.9rem;
+}
+
+.erp-notification-row__date {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted, var(--erp-text-soft));
+}

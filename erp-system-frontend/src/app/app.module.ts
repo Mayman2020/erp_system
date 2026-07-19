@@ -1,5 +1,6 @@
 import { DATE_PIPE_DEFAULT_OPTIONS } from '@angular/common';
-import { LOCALE_ID } from '@angular/core';
+import { APP_INITIALIZER, LOCALE_ID } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { DateFormatAdapter } from './core/adapters/date-format.adapter';
 import { DD_MM_YYYY_DATE_FORMATS } from './core/constants/date-formats';
@@ -23,6 +24,8 @@ import { NavLeftComponent } from './theme/layout/admin/nav-bar/nav-left/nav-left
 import { NavSearchComponent } from './theme/layout/admin/nav-bar/nav-left/nav-search/nav-search.component';
 import { NavRightComponent } from './theme/layout/admin/nav-bar/nav-right/nav-right.component';
 import { ShellFooterComponent } from './theme/layout/admin/shell-footer/shell-footer.component';
+import { ForcePasswordChangeComponent } from './modules/auth/force-password-change/force-password-change.component';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 
 import { ToggleFullScreenDirective } from './theme/shared/full-screen/toggle-full-screen';
 
@@ -30,6 +33,8 @@ import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { MatDialogModule } from '@angular/material/dialog';
 import { HttpNgZoneInterceptor } from './core/interceptors/http-ng-zone.interceptor';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { PermissionService } from './core/services/permission.service';
+import { AuthService } from './core/auth/auth.service';
 
 @NgModule({
   declarations: [
@@ -44,7 +49,9 @@ import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
     NavSearchComponent,
     NavRightComponent,
     ShellFooterComponent,
-    ToggleFullScreenDirective
+    ToggleFullScreenDirective,
+    ForcePasswordChangeComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -58,6 +65,18 @@ import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
     MatDialogModule
   ],
   providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (permissions: PermissionService) => () => firstValueFrom(permissions.loadMine()),
+      deps: [PermissionService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (auth: AuthService) => () => firstValueFrom(auth.initCurrentUser()),
+      deps: [AuthService],
+      multi: true
+    },
     { provide: DATE_PIPE_DEFAULT_OPTIONS, useValue: { dateFormat: 'dd/MM/yyyy' } },
     { provide: LOCALE_ID, useValue: 'en-US' },
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },

@@ -57,9 +57,9 @@ File: style.css
 @import "themes/plugin/animate";
 
 
-// theme layouts
-@import "themes/layouts/menu-lite";
-@import "themes/layouts/menu-ng";
+// Legacy PCoded menu layouts intentionally removed.
+// The live application shell is owned exclusively by erp-estate-shell.scss
+// and estate-sidebar-nav-sections (the .cursor source of truth).
 
 // Dashboard Widgets
 @import "themes/dashboard/widget";

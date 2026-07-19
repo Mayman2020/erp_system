@@ -1,6 +1,6 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey">
-    <div header-actions>
+    <div header-actions class="erp-toolbar-icons">
       <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
         <mat-icon aria-hidden="true">add</mat-icon>
         <span>{{ 'ERP.CREATE_PRODUCT' | translate }}</span>
@@ -13,7 +13,7 @@
       <app-advanced-search-bar [showDateRange]="false" [showStatus]="false" (search)="onSearch($event)"></app-advanced-search-bar>
       <app-erp-alert *ngIf="errorKey && !formVisible" type="danger" [message]="errorKey" extraClass="mt-3" (dismissed)="errorKey = ''"></app-erp-alert>
       <app-erp-alert *ngIf="successKey && !formVisible" type="success" [message]="successKey" extraClass="mt-3" (dismissed)="successKey = ''"></app-erp-alert>
-      <app-data-table [columns]="columns" [data]="rows" [actions]="actions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
     </div>
   </div>
 </section>
@@ -59,6 +59,13 @@
         </div>
       </div>
     </form>
+    <app-erp-audit-trail
+      *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+      [createdAt]="audit.createdAt"
+      [updatedAt]="audit.updatedAt"
+      [createdBy]="audit.createdBy"
+      [updatedBy]="audit.updatedBy">
+    </app-erp-audit-trail>
   </div>
   <div dialog-footer class="d-flex gap-2 justify-content-end">
     <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>

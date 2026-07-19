@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -29,4 +30,6 @@ public class AccountDisplayDto {
     private BigDecimal openingBalance;
     private Account.BalanceSide openingBalanceSide;
     private String financialStatement;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

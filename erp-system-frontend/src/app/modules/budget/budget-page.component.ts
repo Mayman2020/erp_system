@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable, of } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { AccountDto, BudgetDto, BudgetForm } from '../../core/models/accounting.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -49,6 +49,7 @@ export class BudgetPageComponent extends ErpMasterPageBase<BudgetDto, BudgetForm
   accounts: AccountDto[] = [];
   budgetStatuses = ['DRAFT', 'APPROVED', 'ACTIVE', 'CLOSED'];
   months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  editingRecord: BudgetDto | null = null;
 
   constructor(
     private api: AccountingApiService,
@@ -121,7 +122,7 @@ export class BudgetPageComponent extends ErpMasterPageBase<BudgetDto, BudgetForm
   }
 
   protected removeItem(_id: number): Observable<void> {
-    return of(undefined);
+    return throwError(() => new Error('Budgets cannot be deleted; use Activate/Close instead.'));
   }
 
   protected defaultFormValues(): Record<string, unknown> {
@@ -137,6 +138,7 @@ export class BudgetPageComponent extends ErpMasterPageBase<BudgetDto, BudgetForm
   }
 
   protected patchForm(dto: BudgetDto): void {
+    this.editingRecord = dto;
     this.form.reset({
       accountId: dto.accountId || null,
       budgetName: dto.budgetName || '',

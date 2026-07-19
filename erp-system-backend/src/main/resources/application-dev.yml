@@ -1,7 +1,7 @@
 # Local development: PostgreSQL on localhost (default credentials for docker-less dev)
-# Use port 8081 so we avoid clashing with Oracle TNS / other tools on 8080.
+# Use port 8087 so we avoid clashing with Vzeeta (8081) / Mazaad (8085) / SRS (8080).
 server:
-  port: ${PORT:8081}
+  port: ${PORT:8087}
 
 spring:
   config:

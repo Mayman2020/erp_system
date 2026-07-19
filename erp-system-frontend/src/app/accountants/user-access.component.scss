@@ -1,0 +1,34 @@
+.ua-picker {
+  max-width: 420px;
+
+  &__label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+}
+
+.ua-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--erp-text-muted, #6b7280);
+  }
+
+  &__hint {
+    font-size: 0.85rem;
+    color: var(--erp-text-muted, #6b7280);
+  }
+}

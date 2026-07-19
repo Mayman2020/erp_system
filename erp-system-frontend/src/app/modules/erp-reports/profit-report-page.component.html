@@ -13,24 +13,29 @@
 
       <div class="erp-report-page__summary" *ngIf="!loading && !errorKey">
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">date_range</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.REPORT_FROM' | translate }}</div>
           <div class="erp-report-page__metric-value">{{ summary.fromDate }}</div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">event_available</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.REPORT_TO' | translate }}</div>
           <div class="erp-report-page__metric-value">{{ summary.toDate }}</div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">trending_up</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_SALES' | translate }}</div>
-          <div class="erp-report-page__metric-value">{{ summary.totalSales }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.totalSales" [erpCountUpDecimals]="2"></div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">shopping_cart</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_PURCHASES' | translate }}</div>
-          <div class="erp-report-page__metric-value">{{ summary.totalPurchases }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.totalPurchases" [erpCountUpDecimals]="2"></div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">monitoring</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.NET_PROFIT' | translate }}</div>
-          <div class="erp-report-page__metric-value">{{ summary.netProfit }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.netProfit" [erpCountUpDecimals]="2"></div>
         </div>
       </div>
 

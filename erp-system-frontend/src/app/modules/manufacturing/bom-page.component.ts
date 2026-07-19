@@ -32,6 +32,7 @@ export class BomPageComponent implements OnInit, OnDestroy {
   formVisible = false;
   formMode: 'create' | 'edit' | 'view' = 'create';
   selectedId: number | null = null;
+  selectedAuditRecord: Record<string, unknown> | null = null;
   errorKey = '';
 
   readonly form = this.fb.group({
@@ -96,6 +97,7 @@ export class BomPageComponent implements OnInit, OnDestroy {
     if (!this.parentProductId) return;
     this.formMode = 'create';
     this.selectedId = null;
+    this.selectedAuditRecord = null;
     this.form.reset({ componentProductId: null, quantityPerUnit: 1 });
     this.form.enable();
     this.formVisible = true;
@@ -125,6 +127,7 @@ export class BomPageComponent implements OnInit, OnDestroy {
       next: (dto) => {
         this.formMode = mode;
         this.selectedId = id;
+        this.selectedAuditRecord = dto as unknown as Record<string, unknown>;
         this.form.patchValue({ componentProductId: dto.componentProductId, quantityPerUnit: dto.quantityPerUnit });
         mode === 'view' ? this.form.disable() : this.form.enable();
         this.formVisible = true;

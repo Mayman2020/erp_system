@@ -1,6 +1,6 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey">
-    <div header-actions>
+    <div header-actions class="erp-toolbar-icons">
       <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
         <mat-icon aria-hidden="true">add</mat-icon>
         <span>{{ 'BANKS.CREATE' | translate }}</span>
@@ -29,6 +29,13 @@
         <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.active" labelKey="COMMON.ACTIVE" icon="toggle_on" type="boolean" [readonly]="readOnly"></app-form-field></div>
       </div>
     </form>
+    <app-erp-audit-trail
+      *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+      [createdAt]="audit.createdAt"
+      [updatedAt]="audit.updatedAt"
+      [createdBy]="audit.createdBy"
+      [updatedBy]="audit.updatedBy">
+    </app-erp-audit-trail>
   </div>
   <div dialog-footer class="d-flex gap-2 justify-content-end">
     <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>

@@ -14,6 +14,7 @@ public record AuthUserDto(
         String role,
         List<String> roles,
         boolean active,
+        boolean mustChangePassword,
         Instant createdAt,
         UserProfileDto profile
 ) {

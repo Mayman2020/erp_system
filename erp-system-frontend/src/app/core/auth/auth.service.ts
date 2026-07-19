@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, Injector } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { finalize, map, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api.models';
 import { PermissionService } from '../services/permission.service';
@@ -70,6 +70,7 @@ export interface AuthUser {
   role?: string;
   roles?: string[];
   active?: boolean;
+  mustChangePassword?: boolean;
   createdAt?: string;
   profile?: UserProfile | null;
 }
@@ -179,6 +180,21 @@ export class AuthService {
     this.getMyProfile().subscribe({ error: () => {} });
   }
 
+  /** Resolves once with the current user (or null), used by APP_INITIALIZER so route guards never
+   * evaluate before the profile fetch completes (avoids denying access on a hard refresh). */
+  initCurrentUser(): Observable<AuthUser | null> {
+    if (!this.token) {
+      this.currentUserSubject.next(null);
+      return of(null);
+    }
+    return this.getMyProfile().pipe(
+      catchError(() => {
+        this.currentUserSubject.next(null);
+        return of(null);
+      })
+    );
+  }
+
   getMyProfile(): Observable<AuthUser> {
     this.loadingUserSubject.next(true);
     return this.http.get<ApiResponse<AuthUser>>(`${environment.apiUrl}/profile/me`).pipe(
@@ -190,6 +206,13 @@ export class AuthService {
 
   updateMyProfile(payload: UpdateProfileRequest): Observable<AuthUser> {
     return this.http.put<ApiResponse<AuthUser>>(`${environment.apiUrl}/profile/me`, payload).pipe(
+      map((res) => res.data),
+      tap((user) => this.currentUserSubject.next(user))
+    );
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<AuthUser> {
+    return this.http.put<ApiResponse<AuthUser>>(`${environment.apiUrl}/profile/me/password`, { currentPassword, newPassword }).pipe(
       map((res) => res.data),
       tap((user) => this.currentUserSubject.next(user))
     );

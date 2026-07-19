@@ -156,7 +156,7 @@ export class ReportsPageComponent implements OnInit {
     row += 2;
     boldRows.push(row);
     exportAoAToStyledExcel(data, {
-      sheetName: 'Profit & Loss',
+      sheetName: this.translationService.instant('REPORTS.PROFIT_LOSS.TITLE'),
       fileName: 'profit-loss',
       headerRows: [0],
       rightAlignColumns: [1],
@@ -202,7 +202,7 @@ export class ReportsPageComponent implements OnInit {
     row += 1 + equityRows.length;
     boldRows.push(row);
     exportAoAToStyledExcel(data, {
-      sheetName: 'Balance Sheet',
+      sheetName: this.translationService.instant('REPORTS.BALANCE_SHEET.TITLE'),
       fileName: 'balance-sheet',
       headerRows: [0],
       rightAlignColumns: [1],

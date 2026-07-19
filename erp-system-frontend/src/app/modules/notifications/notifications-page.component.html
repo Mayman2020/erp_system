@@ -1,0 +1,72 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header titleKey="NOTIFICATIONS.TITLE">
+    <div header-actions class="erp-toolbar-icons d-flex gap-2">
+      <button type="button" class="erp-button erp-button--ghost" (click)="markAllRead()"
+        [ngbTooltip]="'NOTIFICATIONS.MARK_ALL_READ' | translate" placement="bottom" container="body"
+        [attr.aria-label]="'NOTIFICATIONS.MARK_ALL_READ' | translate">
+        <mat-icon aria-hidden="true">done_all</mat-icon>
+        <span>{{ 'NOTIFICATIONS.MARK_ALL_READ' | translate }}</span>
+      </button>
+      <button type="button" class="erp-button erp-button--ghost" (click)="load()"
+        [ngbTooltip]="'COMMON.RELOAD' | translate" placement="bottom" container="body"
+        [attr.aria-label]="'COMMON.RELOAD' | translate">
+        <mat-icon aria-hidden="true">refresh</mat-icon>
+        <span>{{ 'COMMON.RELOAD' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="erp-card erp-list-page__card" *ngIf="loading">
+    <app-loading-state></app-loading-state>
+  </div>
+
+  <div class="erp-card erp-list-page__card" *ngIf="!loading">
+    <div class="erp-card__body">
+      <section class="list-stats">
+        <article class="stat-pill stat-pill--purple">
+          <span class="stat-pill__icon"><mat-icon>notifications</mat-icon></span>
+          <span class="stat-label">{{ 'COMMON.ALL' | translate }}</span>
+          <strong [erpCountUp]="total" [erpCountUpDecimals]="0"></strong>
+        </article>
+        <article class="stat-pill stat-pill--amber">
+          <span class="stat-pill__icon"><mat-icon>notifications_active</mat-icon></span>
+          <span class="stat-label">{{ 'NOTIFICATIONS.UNREAD' | translate }}</span>
+          <strong [erpCountUp]="unreadCount" [erpCountUpDecimals]="0"></strong>
+        </article>
+      </section>
+
+      <div class="erp-notify-tabs" role="tablist">
+        <button type="button" class="erp-notify-tabs__btn" role="tab"
+          [class.is-active]="activeTab === 'recent'"
+          (click)="setTab('recent')">
+          {{ 'NOTIFICATIONS.TAB_RECENT' | translate }}
+          <span class="erp-notify-tabs__count">{{ recentRows.length }}</span>
+        </button>
+        <button type="button" class="erp-notify-tabs__btn" role="tab"
+          [class.is-active]="activeTab === 'older'"
+          (click)="setTab('older')">
+          {{ 'NOTIFICATIONS.TAB_OLDER' | translate }}
+          <span class="erp-notify-tabs__count">{{ olderRows.length }}</span>
+        </button>
+      </div>
+
+      <article
+        class="erp-notification-card"
+        *ngFor="let item of visibleRows"
+        [class.is-unread]="!item.read"
+        (click)="onClick(item)"
+      >
+        <div class="erp-notification-row__title">{{ text(item.titleKey, item) }}</div>
+        <div class="erp-notification-row__body">{{ text(item.bodyKey, item) }}</div>
+        <div class="erp-notification-row__date" *ngIf="item.createdAt">{{ item.createdAt | erpDate }}</div>
+      </article>
+
+      <app-empty-state
+        *ngIf="!visibleRows.length"
+        icon="notifications_none"
+        titleKey="NOTIFICATIONS.EMPTY_TITLE"
+        messageKey="NOTIFICATIONS.EMPTY_MESSAGE">
+      </app-empty-state>
+    </div>
+  </div>
+</section>

@@ -45,6 +45,7 @@ export class ManufacturingPageComponent implements OnInit, OnDestroy {
   formVisible = false;
   formMode: 'create' | 'edit' | 'view' = 'create';
   selectedId: number | null = null;
+  selectedAuditRecord: Record<string, unknown> | null = null;
   actorEmail = 'system@erp.local';
 
   products: ProductDto[] = [];
@@ -109,6 +110,7 @@ export class ManufacturingPageComponent implements OnInit, OnDestroy {
   openCreate(): void {
     this.formMode = 'create';
     this.selectedId = null;
+    this.selectedAuditRecord = null;
     this.form.reset({
       orderNumber: '',
       productId: null,
@@ -229,6 +231,7 @@ export class ManufacturingPageComponent implements OnInit, OnDestroy {
       next: (order) => {
         this.formMode = mode;
         this.selectedId = order.id;
+        this.selectedAuditRecord = order as unknown as Record<string, unknown>;
         this.form.reset({
           orderNumber: order.orderNumber,
           productId: order.productId,

@@ -12,8 +12,10 @@ import {
   AdminLookupValueForm,
   AdminRole,
   AdminRoleForm,
+  AdminRolePermission,
   AdminUser,
   AdminUserForm,
+  ScreenSetting,
   UiMenuItemAdmin,
   UiMenuItemAdminForm,
   UiPermission
@@ -47,6 +49,12 @@ export class AdminApiService {
     return this.http
       .patch<ApiResponse<AdminUser>>(`${this.accessBase}/users/${userId}/active`, { active })
       .pipe(map((res) => res.data));
+  }
+
+  getEffectivePermissions(userId: number): Observable<AdminRolePermission[]> {
+    return this.http
+      .get<ApiResponse<AdminRolePermission[]>>(`${this.accessBase}/users/${userId}/effective-permissions`)
+      .pipe(map((res) => res.data || []));
   }
 
   getRoles(): Observable<AdminRole[]> {
@@ -120,5 +128,15 @@ export class AdminApiService {
 
   deleteLookupValue(valueId: number): Observable<boolean> {
     return this.http.delete<ApiResponse<boolean>>(`${this.lookupsBase}/values/${valueId}`).pipe(map((res) => !!res.data));
+  }
+
+  getScreenSettings(): Observable<ScreenSetting[]> {
+    return this.http.get<ApiResponse<ScreenSetting[]>>(`${environment.apiUrl}/admin/screen-settings`).pipe(map((res) => res.data || []));
+  }
+
+  updateScreenSetting(screenKey: string, enabled: boolean): Observable<ScreenSetting> {
+    return this.http
+      .put<ApiResponse<ScreenSetting>>(`${environment.apiUrl}/admin/screen-settings/${encodeURIComponent(screenKey)}`, { enabled })
+      .pipe(map((res) => res.data));
   }
 }

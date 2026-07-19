@@ -488,6 +488,8 @@ export interface EmployeeDto {
   active: boolean;
   createdAt?: string;
   updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
 }
 
 export interface AttendanceRecordDto {

@@ -39,14 +39,14 @@ function Get-PreferredBackendPort {
         return [int]$env:PORT
     }
     if ($ProfileName -eq 'prod') { return 8080 }
-    # application.yml defaults to dev profile; application-dev.yml uses 8081
-    return 8081
+    # application.yml defaults to dev profile; application-dev.yml uses 8087
+    return 8087
 }
 
 function Resolve-BackendPort {
     param([string]$ProfileName)
     $preferred = Get-PreferredBackendPort -ProfileName $ProfileName
-    $fallbacks = @(8081, 8091, 8082, 8090, 8092, 8083)
+    $fallbacks = @(8087, 8091, 8082, 8090, 8092, 8083)
     $candidates = @($preferred) + $fallbacks | Where-Object { $_ -gt 0 } | Select-Object -Unique
 
     foreach ($port in $candidates) {

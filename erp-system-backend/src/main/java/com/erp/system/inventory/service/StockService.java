@@ -19,6 +19,8 @@ import com.erp.system.inventory.repository.ProductRepository;
 import com.erp.system.inventory.repository.StockLevelRepository;
 import com.erp.system.inventory.repository.StockMovementRepository;
 import com.erp.system.inventory.repository.WarehouseRepository;
+import com.erp.system.notification.domain.NotificationType;
+import com.erp.system.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,7 @@ public class StockService {
     private final NumberingService numberingService;
     private final AccountingSettingsService accountingSettingsService;
     private final ActivityLogService activityLogService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<StockLevelDisplayDto> getStockLevels(Long productId, Long warehouseId) {
@@ -153,11 +156,13 @@ public class StockService {
         if (movement.getStatus() == TransactionStatus.CANCELLED) {
             throw new BusinessException("Cancelled movements cannot be approved");
         }
+        BigDecimal totalBefore = stockLevelRepository.sumQuantityByProductId(movement.getProduct().getId());
         applyStockEffect(movement, false);
         movement.setStatus(TransactionStatus.APPROVED);
         movement = stockMovementRepository.save(movement);
         activityLogService.log(MODULE, "APPROVE", "STOCK_MOVEMENT", movement.getId(), movement.getMovementNumber(),
                 "Stock movement approved");
+        notifyIfCrossedLowStock(movement.getProduct(), totalBefore);
         return toMovementDisplay(movement);
     }
 
@@ -243,6 +248,26 @@ public class StockService {
         movement.setReferenceType(request.getReferenceType());
         movement.setReferenceId(request.getReferenceId());
         movement.setNotes(request.getNotes());
+    }
+
+    /** Fires once when a movement drops the product's total quantity below its reorder level. */
+    private void notifyIfCrossedLowStock(Product product, BigDecimal totalBefore) {
+        BigDecimal reorderLevel = product.getReorderLevel();
+        if (reorderLevel == null) {
+            return;
+        }
+        BigDecimal totalAfter = stockLevelRepository.sumQuantityByProductId(product.getId());
+        boolean wasAboveOrAt = totalBefore.compareTo(reorderLevel) >= 0;
+        boolean nowBelow = totalAfter.compareTo(reorderLevel) < 0;
+        if (wasAboveOrAt && nowBelow) {
+            notificationService.notifyAdmins(
+                    NotificationType.INVENTORY,
+                    "NOTIFICATIONS.LOW_STOCK_TITLE",
+                    "NOTIFICATIONS.LOW_STOCK_BODY",
+                    Map.of("productCode", product.getCode(), "quantity", totalAfter.toPlainString(), "reorderLevel", reorderLevel.toPlainString()),
+                    "PRODUCT",
+                    product.getId());
+        }
     }
 
     private void applyStockEffect(StockMovement movement, boolean reverse) {

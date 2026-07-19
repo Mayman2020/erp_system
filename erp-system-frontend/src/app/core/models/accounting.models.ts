@@ -69,6 +69,8 @@ export interface AccountDto {
   active: boolean;
   openingBalance: number;
   openingBalanceSide: BalanceSide | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AccountTreeDto {
@@ -130,6 +132,8 @@ export interface JournalEntry {
   lines: JournalEntryLine[];
   createdBy?: string;
   createdAt?: string;
+  updatedBy?: string;
+  updatedAt?: string;
 }
 
 export interface JournalEntryLineForm {
@@ -178,6 +182,7 @@ export interface VoucherBase {
   createdBy?: string;
   /** Server audit: when the voucher row was created (ISO instant) */
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface PaymentVoucher extends VoucherBase {
@@ -339,6 +344,8 @@ export interface AccountingTransactionDto {
   creditAccountName?: string;
   creditAccountNameEn?: string;
   creditAccountNameAr?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface DocumentLineDto {
@@ -374,6 +381,8 @@ export interface CustomerInvoiceDto {
   revenueAccountName?: string;
   journalEntryId?: number;
   lines?: DocumentLineDto[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CustomerInvoiceLineForm {
@@ -412,6 +421,8 @@ export interface AccountingCheckDto {
   holdingAccountId?: number;
   holdingAccountCode?: string;
   holdingAccountName?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AccountingCheckForm {
@@ -456,6 +467,8 @@ export interface BillDto {
   payableAccountName?: string;
   taxAccountId?: number;
   lines?: DocumentLineDto[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface BillLineForm {
@@ -493,6 +506,8 @@ export interface BudgetDto {
   overBudget?: boolean;
   status: string;
   notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface BudgetForm {

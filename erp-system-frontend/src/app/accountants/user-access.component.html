@@ -1,0 +1,40 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header titleKey="ACCESS_MANAGEMENT.USER_ACCESS_TITLE"></app-page-header>
+
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
+
+      <div class="ua-picker mb-3">
+        <label class="ua-picker__label">{{ 'ACCESS_MANAGEMENT.SELECT_USER' | translate }}</label>
+        <select class="erp-input" [disabled]="loadingUsers" (change)="onSelectUser($any($event.target).value)">
+          <option value="">{{ 'COMMON.SELECT' | translate }}</option>
+          <option *ngFor="let u of users" [value]="u.id">{{ u.fullName || u.username }} ({{ u.username }})</option>
+        </select>
+      </div>
+
+      <div class="ua-summary mb-3" *ngIf="selectedUser as u">
+        <div class="ua-summary__row">
+          <span class="ua-summary__label">{{ 'ACCESS_MANAGEMENT.PRIMARY_ROLE' | translate }}</span>
+          <span class="role-chip">{{ ('ROLE.' + (u.primaryRole || '')) | translate }}</span>
+        </div>
+        <div class="ua-summary__row" *ngIf="u.roleCodes?.length">
+          <span class="ua-summary__label">{{ 'ACCESS_MANAGEMENT.ASSIGNED_ROLES' | translate }}</span>
+          <span class="role-chip" *ngFor="let code of u.roleCodes">{{ code }}</span>
+        </div>
+        <div class="ua-summary__row" *ngIf="!u.roleCodes?.length">
+          <span class="ua-summary__hint">{{ 'ACCESS_MANAGEMENT.NO_CUSTOM_ROLES_HINT' | translate }}</span>
+        </div>
+      </div>
+
+      <app-data-table
+        *ngIf="selectedUserId"
+        [columns]="columns"
+        [data]="rows"
+        [actions]="[]"
+        [loading]="loadingPermissions"
+        [exportable]="false"
+      ></app-data-table>
+    </div>
+  </div>
+</section>

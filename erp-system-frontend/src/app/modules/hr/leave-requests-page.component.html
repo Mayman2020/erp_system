@@ -1,5 +1,5 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
-  <app-page-header [titleKey]="titleKey"><div header-actions><button class="erp-button erp-button--primary" type="button" (click)="openCreate()"><mat-icon>add</mat-icon><span>{{ 'ERP.CREATE_LEAVE' | translate }}</span></button></div></app-page-header>
+  <app-page-header [titleKey]="titleKey"><div header-actions class="erp-toolbar-icons"><button class="erp-button erp-button--primary" type="button" (click)="openCreate()"><mat-icon>add</mat-icon><span>{{ 'ERP.CREATE_LEAVE' | translate }}</span></button></div></app-page-header>
   <div class="erp-card erp-list-page__card"><div class="erp-card__body">
     <app-advanced-search-bar [showStatus]="true" [statusOptions]="statusOptions" (search)="onSearch($event)"></app-advanced-search-bar>
     <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
@@ -12,6 +12,14 @@
     <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.startDate" labelKey="COMMON.FROM_DATE" type="date" [readonly]="readOnly"></app-form-field></div>
     <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.endDate" labelKey="COMMON.TO_DATE" type="date" [readonly]="readOnly"></app-form-field></div>
     <div class="col-12 mb-3"><app-form-field [control]="form.controls.reason" labelKey="INVOICES.NOTES" type="textarea" [rows]="2" [readonly]="readOnly"></app-form-field></div>
-  </div></form></div>
+  </div></form>
+  <app-erp-audit-trail
+    *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+    [createdAt]="audit.createdAt"
+    [updatedAt]="audit.updatedAt"
+    [createdBy]="audit.createdBy"
+    [updatedBy]="audit.updatedBy">
+  </app-erp-audit-trail>
+  </div>
   <div dialog-footer class="d-flex gap-2 justify-content-end"><button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button><button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button></div>
 </app-erp-dialog>

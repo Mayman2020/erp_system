@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,4 +40,6 @@ public class CustomerInvoiceDisplayDto {
     private LocalDateTime cancelledAt;
     private String cancelledBy;
     private List<CustomerInvoiceLineDisplayDto> lines;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

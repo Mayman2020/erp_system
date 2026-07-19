@@ -52,6 +52,7 @@ export interface AdminUser {
   phone: string;
   primaryRole: string;
   active: boolean;
+  mustChangePassword: boolean;
   fullName?: string | null;
   fullNameEn?: string | null;
   fullNameAr?: string | null;
@@ -69,7 +70,15 @@ export interface AdminUserForm {
   fullNameAr: string;
   primaryRole: 'ADMIN' | 'ACCOUNTANT';
   active: boolean;
+  mustChangePassword?: boolean;
   roleIds: number[];
+}
+
+export interface ScreenSetting {
+  screenKey: string;
+  enabled: boolean;
+  updatedBy?: string | null;
+  updatedAt?: string | null;
 }
 
 export interface AdminAccessContext {

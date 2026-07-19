@@ -58,6 +58,11 @@ public class AdminAccessManagementController {
         return ApiResponse.success(adminAccessManagementService.setUserActive(userId, request.getActive()));
     }
 
+    @GetMapping("/users/{userId}/effective-permissions")
+    public ApiResponse<List<com.erp.system.auth.dto.AdminAccessRolePermissionDto>> getEffectivePermissions(@PathVariable Long userId) {
+        return ApiResponse.success(adminAccessManagementService.getEffectivePermissions(userId));
+    }
+
     @GetMapping("/roles")
     public ApiResponse<List<AdminAccessRoleDto>> getRoles() {
         return ApiResponse.success(adminAccessManagementService.getRoles());

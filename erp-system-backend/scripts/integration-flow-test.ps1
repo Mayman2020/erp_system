@@ -1,6 +1,6 @@
 # ERP integration flow test — create → approve → convert chains
 $ErrorActionPreference = 'Stop'
-$base = 'http://localhost:8081/api/v1'
+$base = 'http://localhost:8087/api/v1'
 $actor = 'integration-test'
 $failures = @()
 $passed = 0

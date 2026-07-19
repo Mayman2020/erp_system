@@ -114,6 +114,37 @@ export class DataTableComponent implements OnChanges {
   }
 
   private humanizeExtraKey(key: string): string {
+    const normalized = (key || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    const labels: Record<string, { ar: string; en: string }> = {
+      id: { ar: 'المعرّف', en: 'ID' },
+      createdat: { ar: 'تاريخ الإنشاء', en: 'Created at' },
+      updatedat: { ar: 'تاريخ آخر تحديث', en: 'Updated at' },
+      createdby: { ar: 'أنشئ بواسطة', en: 'Created by' },
+      updatedby: { ar: 'حُدّث بواسطة', en: 'Updated by' },
+      fullnamear: { ar: 'الاسم الكامل بالعربية', en: 'Full name (Arabic)' },
+      fullnameen: { ar: 'الاسم الكامل بالإنجليزية', en: 'Full name (English)' },
+      username: { ar: 'اسم المستخدم', en: 'Username' },
+      email: { ar: 'البريد الإلكتروني', en: 'Email' },
+      phone: { ar: 'رقم الهاتف', en: 'Phone' },
+      active: { ar: 'نشط', en: 'Active' },
+      isactive: { ar: 'نشط', en: 'Active' },
+      primaryrole: { ar: 'الدور الأساسي', en: 'Primary role' },
+      extraroles: { ar: 'الأدوار الإضافية', en: 'Additional roles' },
+      rolecodes: { ar: 'رموز الأدوار', en: 'Role codes' },
+      roleids: { ar: 'معرّفات الأدوار', en: 'Role IDs' },
+      mustchangepassword: { ar: 'يجب تغيير كلمة المرور', en: 'Must change password' },
+      code: { ar: 'الرمز', en: 'Code' },
+      namear: { ar: 'الاسم بالعربية', en: 'Name (Arabic)' },
+      nameen: { ar: 'الاسم بالإنجليزية', en: 'Name (English)' },
+      descriptionar: { ar: 'الوصف بالعربية', en: 'Description (Arabic)' },
+      descriptionen: { ar: 'الوصف بالإنجليزية', en: 'Description (English)' },
+      status: { ar: 'الحالة', en: 'Status' },
+      notes: { ar: 'الملاحظات', en: 'Notes' }
+    };
+    const translated = labels[normalized];
+    if (translated) {
+      return this.translationService.currentLanguage === 'ar' ? translated.ar : translated.en;
+    }
     return (key || '')
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, (s) => s.toUpperCase())
@@ -323,7 +354,7 @@ export class DataTableComponent implements OnChanges {
     );
     const wsData = [headers, ...rows];
     exportAoAToStyledExcel(wsData, {
-      sheetName: 'Export',
+      sheetName: this.translationService.instant('COMMON.EXPORT_SHEET_NAME'),
       fileName: this.exportFileName,
       headerRows: [0],
       rightAlignColumns: []

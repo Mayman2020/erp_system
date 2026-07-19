@@ -30,9 +30,9 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   private particlesAttempts = 0;
 
   readonly form = this.fb.group({
-    email: [localStorage.getItem('erp_login_email') || '', [Validators.required, Validators.email]],
+    email: [localStorage.getItem('erp_login_email') || 'admin', Validators.required],
     rememberMe: [!!localStorage.getItem('erp_login_email')],
-    password: ['', Validators.required]
+    password: ['admin', Validators.required]
   });
 
   readonly forgotForm = this.fb.group({
@@ -78,20 +78,20 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     this.particlesInitialized = true;
     particlesJS('particles-js', {
       particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: '#ffffff' },
+        number: { value: 70, density: { enable: true, value_area: 900 } },
+        color: { value: ['#60a5fa', '#38bdf8', '#93c5fd'] },
         shape: { type: 'circle' },
-        opacity: { value: 0.3, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
-        size: { value: 3, random: true, anim: { enable: true, speed: 2, size_min: 1, sync: false } },
-        line_linked: { enable: true, distance: 150, color: '#ffffff', opacity: 0.2, width: 1 },
-        move: { enable: true, speed: 1, direction: 'none', random: true, straight: false, out_mode: 'out', bounce: false }
+        opacity: { value: 0.45, random: true, anim: { enable: true, speed: 0.8, opacity_min: 0.12, sync: false } },
+        size: { value: 2.6, random: true, anim: { enable: true, speed: 1.4, size_min: 0.8, sync: false } },
+        line_linked: { enable: true, distance: 140, color: '#3b82f6', opacity: 0.28, width: 1 },
+        move: { enable: true, speed: 1.15, direction: 'none', random: true, straight: false, out_mode: 'out', bounce: false }
       },
       interactivity: {
         detect_on: 'canvas',
         events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' }, resize: true },
         modes: {
-          grab: { distance: 140, line_linked: { opacity: 1 } },
-          push: { particles_nb: 4 }
+          grab: { distance: 160, line_linked: { opacity: 0.55 } },
+          push: { particles_nb: 3 }
         }
       },
       retina_detect: true
@@ -214,4 +214,3 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     });
   }
 }
-

@@ -13,16 +13,19 @@
 
       <div class="erp-report-page__summary" *ngIf="!loading && !errorKey">
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">inventory_2</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_SKUS' | translate }}</div>
-          <div class="erp-report-page__metric-value">{{ summary.totalSkus }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.totalSkus" [erpCountUpDecimals]="0"></div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">warning</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.LOW_STOCK_COUNT' | translate }}</div>
-          <div class="erp-report-page__metric-value">{{ summary.lowStockCount }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.lowStockCount" [erpCountUpDecimals]="0"></div>
         </div>
         <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">warehouse</mat-icon>
           <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_QUANTITY' | translate }}</div>
-          <div class="erp-report-page__metric-value">{{ summary.totalQuantity }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.totalQuantity" [erpCountUpDecimals]="2"></div>
         </div>
       </div>
 

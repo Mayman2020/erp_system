@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable, throwError } from 'rxjs';
 import { AccountDto, BillDto, BillForm } from '../../core/models/accounting.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -22,7 +22,7 @@ export class BillsPageComponent extends ErpMasterPageBase<BillDto, BillForm> imp
     editKey: 'COMMON.EDIT',
     viewKey: 'COMMON.VIEW',
     showStatus: true,
-    statusOptions: ['DRAFT', 'APPROVED', 'PAID', 'CANCELLED']
+    statusOptions: ['DRAFT', 'APPROVED', 'POSTED', 'PARTIALLY_PAID', 'PAID', 'CANCELLED']
   };
 
   readonly columns: DataTableColumn[] = [
@@ -49,6 +49,7 @@ export class BillsPageComponent extends ErpMasterPageBase<BillDto, BillForm> imp
 
   liabilityAccounts: AccountDto[] = [];
   expenseAccounts: AccountDto[] = [];
+  editingRecord: BillDto | null = null;
 
   constructor(
     private api: AccountingApiService,
@@ -141,7 +142,7 @@ export class BillsPageComponent extends ErpMasterPageBase<BillDto, BillForm> imp
   }
 
   protected removeItem(_id: number): Observable<void> {
-    return of(undefined);
+    return throwError(() => new Error('Bills cannot be deleted; use Cancel instead.'));
   }
 
   protected defaultFormValues(): Record<string, unknown> {
@@ -161,6 +162,7 @@ export class BillsPageComponent extends ErpMasterPageBase<BillDto, BillForm> imp
   }
 
   protected patchForm(dto: BillDto): void {
+    this.editingRecord = dto;
     while (this.lines.length) {
       this.lines.removeAt(0);
     }

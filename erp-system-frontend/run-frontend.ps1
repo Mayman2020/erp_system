@@ -2,7 +2,7 @@
 param([switch]$SkipInstall)
 
 $ErrorActionPreference = 'Stop'
-$DefaultPort = 4200
+$DefaultPort = 4204
 $DefaultBackendApiUrl = '/api/v1'
 
 $ProjectRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
@@ -52,7 +52,7 @@ window.__ERP_API_URL__ = '$backendApiUrl';
 Write-Step "Backend API: $backendApiUrl" "Cyan"
 
 $servePort = $null
-foreach ($candidatePort in 4200..4210) {
+foreach ($candidatePort in 4204..4214) {
     $portInUse = Get-NetTCPConnection -LocalPort $candidatePort -State Listen -ErrorAction SilentlyContinue
     if (-not $portInUse) {
         $servePort = $candidatePort
@@ -61,12 +61,12 @@ foreach ($candidatePort in 4200..4210) {
 }
 
 if (-not $servePort) {
-    Write-Step "No free port found between 4200 and 4210." "Red"
+    Write-Step "No free port found between 4204 and 4214." "Red"
     exit 1
 }
 
-if ($servePort -ne 4200) {
-    Write-Step "Port 4200 is busy. Switching to port $servePort." "Yellow"
+if ($servePort -ne 4204) {
+    Write-Step "Port 4204 is busy. Switching to port $servePort." "Yellow"
 }
 
 Write-Step "Starting http://localhost:$servePort" "Green"

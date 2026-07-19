@@ -69,13 +69,13 @@
               <div class="col-md-4">
                 <div class="report-card report-card--metric">
                   <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.TOTAL_REVENUE' | translate }}</div>
-                  <div class="h4 mb-0">{{ profitLoss.totalRevenue | number:'1.2-2' }}</div>
+                  <div class="h4 mb-0" [erpCountUp]="profitLoss.totalRevenue" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
               <div class="col-md-4">
                 <div class="report-card report-card--metric">
                   <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.TOTAL_EXPENSES' | translate }}</div>
-                  <div class="h4 mb-0">{{ profitLoss.totalExpenses | number:'1.2-2' }}</div>
+                  <div class="h4 mb-0" [erpCountUp]="profitLoss.totalExpenses" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
               <div class="col-md-4">
@@ -85,7 +85,7 @@
                   [class.report-card--negative]="profitLoss.netProfit < 0"
                 >
                   <div class="text-muted small">{{ 'REPORTS.PROFIT_LOSS.NET_RESULT' | translate }}</div>
-                  <div class="h4 mb-0">{{ profitLoss.netProfit | number:'1.2-2' }}</div>
+                  <div class="h4 mb-0" [erpCountUp]="profitLoss.netProfit" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
             </div>
@@ -131,19 +131,19 @@
               <div class="col-md-4">
                 <div class="report-card report-card--metric">
                   <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_ASSETS' | translate }}</div>
-                  <div class="h4 mb-0">{{ balanceSheet.totalAssets | number:'1.2-2' }}</div>
+                  <div class="h4 mb-0" [erpCountUp]="balanceSheet.totalAssets" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
               <div class="col-md-4">
                 <div class="report-card report-card--metric">
                   <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_LIABILITIES' | translate }}</div>
-                  <div class="h4 mb-0">{{ balanceSheet.totalLiabilities | number:'1.2-2' }}</div>
+                  <div class="h4 mb-0" [erpCountUp]="balanceSheet.totalLiabilities" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
               <div class="col-md-4">
                 <div class="report-card report-card--metric">
                   <div class="text-muted small">{{ 'REPORTS.BALANCE_SHEET.TOTAL_EQUITY' | translate }}</div>
-                  <div class="h4 mb-0">{{ balanceSheet.totalEquity | number:'1.2-2' }}</div>
+                  <div class="h4 mb-0" [erpCountUp]="balanceSheet.totalEquity" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
             </div>
@@ -199,4 +199,3 @@
     </div>
   </div>
 </section>
-

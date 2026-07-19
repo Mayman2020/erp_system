@@ -4,15 +4,16 @@
 .erp-page,
 .erp-list-page {
   width: 100%;
-  max-width: var(--erp-content-max, 1400px);
-  margin-inline: auto;
-  padding: 24px 32px 32px;
+  max-width: var(--content-max-w, none);
+  margin-inline: 0;
+  padding: var(--content-pad-block, 28px) var(--content-pad-inline, 24px) 32px;
+  box-sizing: border-box;
 }
 
 @media (max-width: 991px) {
   .erp-page,
   .erp-list-page {
-    padding: 16px 16px 24px;
+    padding: 22px 18px 24px;
   }
 }
 
@@ -64,6 +65,34 @@
   flex-shrink: 0;
 }
 
+.erp-page-header__actions > [header-actions],
+.page-actions > [header-actions],
+.erp-page-header__actions > div,
+.page-actions > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Shared admin / list section toolbar (Access Mgmt + similar) */
+.erp-admin-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.erp-admin-toolbar__actions,
+.erp-toolbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 /* ── Premium card surface — Property_Managments app-card style ───────────── */
 .erp-list-page__card,
 .erp-card {
@@ -82,12 +111,13 @@
 
 /* Card header — toolbar/title area inside card */
 .erp-card__header {
-  padding: 18px 20px 14px;
+  min-height: 64px;
+  padding: 20px 22px 16px;
   border-bottom: 1px solid var(--line-2, var(--card-border));
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
@@ -99,7 +129,19 @@
 }
 
 .erp-card__body {
+  padding: var(--pad-card, 20px);
+}
+
+/* Tables may opt into edge-to-edge content explicitly; normal cards keep breathing room. */
+.erp-card__body.p-0,
+.erp-card__body.padding-0,
+.erp-card__body--flush {
   padding: 0;
+}
+
+.erp-card__header + .erp-card__body,
+.app-card-header + .app-card-body {
+  border-top: 0;
 }
 
 /* Primary action button — ELEVON navy+gold */
@@ -152,6 +194,9 @@
   font-size: 13.5px;
   vertical-align: middle;
   text-align: center;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 /* Zebra rows */
@@ -343,15 +388,14 @@ html[dir='rtl'] .srs-pager__nav .material-icons {
 }
 
 .directory-search {
+  flex: 0 1 260px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex: 1;
-  min-width: 200px;
-  max-width: 420px;
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: 12px;
+  gap: 6px;
+  min-width: 180px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
   background: var(--paper-2);
   border: 1px solid var(--line);
 }
@@ -379,8 +423,8 @@ html[dir='rtl'] .srs-pager__nav .material-icons {
 .table-list-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-start;
+  gap: 8px;
   flex-wrap: wrap;
   width: 100%;
 }
@@ -419,10 +463,10 @@ html[dir='rtl'] .srs-pager__nav .material-icons {
 
 .tb-action-btn {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--surface);
   color: var(--ink-700);
   display: inline-grid;

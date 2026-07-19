@@ -29,3 +29,6 @@
   margin: 0 14px 12px;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
 }
+.erp-sidebar-logout { margin: 8px 12px 14px; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 11px; background: rgba(239,68,68,.09); color: #ff8a7f; font: inherit; font-weight: 700; cursor: pointer; }
+.erp-sidebar-logout:hover { background: rgba(239,68,68,.17); }
+.brand-name { white-space: nowrap; font-size: .9rem; }

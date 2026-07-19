@@ -15,6 +15,7 @@ import { NextConfig } from '../../../../../app-config';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
+import { NavigationHistoryService } from '../../../../../core/services/navigation-history.service';
 
 @Component({
   standalone: false,
@@ -41,7 +42,8 @@ export class NavContentComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private navigationService: NavigationService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private navHistory: NavigationHistoryService
   ) {
     this.flatConfig = NextConfig.config;
     this.windowWidth = window.innerWidth;
@@ -136,6 +138,7 @@ export class NavContentComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onNavItemClick(): void {
+    this.navHistory.markFromMenu();
     if (this.windowWidth < 992) {
       this.onNavMobCollapse.emit();
     }

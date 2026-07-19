@@ -43,7 +43,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 160px;
+        max-width: 200px;
         line-height: 1.25;
       }
 
@@ -53,7 +53,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 160px;
+        max-width: 200px;
         line-height: 1.25;
       }
     }
@@ -83,7 +83,7 @@
   &__panel {
     position: fixed;
     z-index: 10045;
-    top: calc(var(--erp-header-height, 60px) + 8px);
+    top: calc(var(--erp-header-height, 64px) + 8px);
     inset-inline-end: 12px;
     inset-inline-start: auto;
     min-width: min(280px, calc(100vw - 24px));
@@ -213,56 +213,51 @@
   }
 }
 
+/* Header pill sits flat on the continuous topbar — no translucent card surface */
 :host-context(.erp-header-shell) .erp-sidebar-profile__toggle {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  border-radius: 12px !important;
-  color: var(--erp-shell-bar-text, #f8fafc) !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.14));
+  border-radius: 999px;
+  color: var(--text-main, inherit);
+  box-shadow: none;
 }
 
 :host-context(.erp-header-shell) .erp-sidebar-profile__toggle:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-}
-
-:host-context(.erp-header-shell) .erp-sidebar-profile__toggle--open .erp-sidebar-profile__toggle {
-  background: rgba(255, 255, 255, 0.18) !important;
+  background: var(--icon-btn-hover, rgba(255, 255, 255, 0.08));
+  border-color: var(--line-2, var(--line, rgba(255, 255, 255, 0.22)));
 }
 
 :host-context(.erp-header-shell) .erp-sidebar-profile__info strong {
-  color: rgba(248, 250, 252, 0.98) !important;
+  color: var(--text-main, inherit);
 }
 
-:host-context(.erp-header-shell) .erp-sidebar-profile__info small {
-  color: rgba(248, 250, 252, 0.75) !important;
-}
-
+:host-context(.erp-header-shell) .erp-sidebar-profile__info small,
 :host-context(.erp-header-shell) .erp-sidebar-profile__caret {
-  color: rgba(248, 250, 252, 0.75) !important;
+  color: var(--text-muted, inherit);
 }
 
 .erp-sidebar-profile__toggle--header-pill {
   gap: 10px;
-  min-height: 44px;
-  padding: 4px 14px 4px 5px;
+  min-height: 40px;
+  padding: 4px 12px 4px 5px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.14));
   background: transparent;
 }
 
 .erp-sidebar-profile__toggle--header-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: var(--icon-btn-hover, rgba(255, 255, 255, 0.08));
+  border-color: var(--line-2, var(--line, rgba(255, 255, 255, 0.22)));
 }
 
 .erp-sidebar-profile--header-pill .erp-sidebar-profile__info strong {
   font-size: 0.84rem;
   font-weight: 700;
-  max-width: 160px;
+  max-width: 200px;
 }
 
 .erp-sidebar-profile--header-pill .erp-sidebar-profile__info small {
   font-size: 0.68rem;
   font-weight: 600;
-  max-width: 160px;
+  max-width: 200px;
 }

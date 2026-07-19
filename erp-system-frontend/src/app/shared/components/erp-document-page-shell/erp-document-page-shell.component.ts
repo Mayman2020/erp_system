@@ -23,6 +23,7 @@ export class ErpDocumentPageShellComponent {
   @Input() formVisible = false;
   @Input() formMode: 'create' | 'edit' | 'view' = 'create';
   @Input() selectedId: number | null = null;
+  @Input() auditRecord: Record<string, unknown> | null = null;
   @Input() parties: Array<{ id: number; label: string }> = [];
   @Input() products: ProductDto[] = [];
   @Input() warehouses: WarehouseDto[] = [];
@@ -110,5 +111,10 @@ export class ErpDocumentPageShellComponent {
 
   get partySelectOptions(): Array<{ id: number | null; label: string }> {
     return [{ id: null, label: '—' }, ...(this.parties || [])];
+  }
+
+  statusCount(status: string): number {
+    const needle = (status || '').toUpperCase();
+    return (this.rows || []).filter((row) => String(row['status'] ?? '').toUpperCase() === needle).length;
   }
 }

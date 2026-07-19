@@ -1,6 +1,6 @@
 # ERP API smoke test
 $ErrorActionPreference = 'Continue'
-$base = 'http://localhost:8081/api/v1'
+$base = 'http://localhost:8087/api/v1'
 $failures = @()
 $passed = 0
 

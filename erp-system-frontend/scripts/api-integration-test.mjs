@@ -1,9 +1,9 @@
 /**
  * CoreERP — API ↔ frontend integration smoke test.
  * Usage: node scripts/api-integration-test.mjs [baseUrl]
- * Default: http://localhost:8081/api/v1
+ * Default: http://localhost:8087/api/v1
  */
-const BASE = (process.argv[2] || process.env.ERP_API_BASE || 'http://localhost:8081/api/v1').replace(/\/$/, '');
+const BASE = (process.argv[2] || process.env.ERP_API_BASE || 'http://localhost:8087/api/v1').replace(/\/$/, '');
 const LOGIN = {
   usernameOrEmail: process.env.ERP_LOGIN_USER || 'admin',
   password: process.env.ERP_LOGIN_PASS || 'Admin@123'
@@ -141,12 +141,172 @@ async function main() {
   await check('GET /manufacturing/work-orders', 'GET', '/manufacturing/work-orders');
   await check('GET /manufacturing/bom', 'GET', '/manufacturing/bom?parentProductId=1');
 
+  const today = new Date().toISOString().slice(0, 10);
+
   // Admin / auth
   await check('GET /profile/me', 'GET', '/profile/me');
   await check('GET /ui/menu', 'GET', '/ui/menu');
 
+  // Admin access management
+  await check('GET /admin/access/context', 'GET', '/admin/access/context');
+  await check('GET /admin/access/users', 'GET', '/admin/access/users');
+  await check('GET /admin/access/roles', 'GET', '/admin/access/roles');
+  await check('GET /admin/ui/menu-items', 'GET', '/admin/ui/menu-items');
+  await check('GET /admin/screen-settings', 'GET', '/admin/screen-settings');
+
+  const meForPermissions = await check('GET /profile/me (for effective-permissions)', 'GET', '/profile/me');
+  const meId = meForPermissions?.data?.id;
+  if (meId) {
+    await check('GET /admin/access/users/{id}/effective-permissions', 'GET', `/admin/access/users/${meId}/effective-permissions`);
+  }
+
+  // Role CRUD round-trip (minimal permission on a guaranteed-existing menu item)
+  const roleSuffix = Date.now();
+  const createdRole = await check('POST /admin/access/roles', 'POST', '/admin/access/roles', {
+    body: {
+      code: `SMOKE_TEST_ROLE_${roleSuffix}`,
+      nameEn: 'Smoke Test Role',
+      nameAr: 'دور اختبار',
+      active: true,
+      permissions: [{ menuItemId: 'dashboard', canView: true, canCreate: false, canEdit: false, canDelete: false }]
+    },
+    expect: [200, 201]
+  });
+  const roleId = createdRole?.data?.id;
+  if (roleId) {
+    await check('PUT /admin/access/roles/{id}', 'PUT', `/admin/access/roles/${roleId}`, {
+      body: {
+        code: `SMOKE_TEST_ROLE_${roleSuffix}`,
+        nameEn: 'Smoke Test Role Updated',
+        nameAr: 'دور اختبار محدث',
+        active: true,
+        permissions: [{ menuItemId: 'dashboard', canView: true, canCreate: false, canEdit: false, canDelete: false }]
+      }
+    });
+    await check('DELETE /admin/access/roles/{id}', 'DELETE', `/admin/access/roles/${roleId}`, { expect: [200, 204] });
+  }
+
+  // Screen settings toggle round-trip
+  await check('PUT /admin/screen-settings/{key}', 'PUT', '/admin/screen-settings/smoke-test-screen', {
+    body: { enabled: false }
+  });
+  await check('PUT /admin/screen-settings/{key} (revert)', 'PUT', '/admin/screen-settings/smoke-test-screen', {
+    body: { enabled: true }
+  });
+
+  // Lookups admin CRUD round-trip
+  const lookupSuffix = Date.now();
+  const createdLookupType = await check('POST /admin/lookups/types', 'POST', '/admin/lookups/types', {
+    body: { code: `SMOKE_TYPE_${lookupSuffix}`, nameEn: 'Smoke Type', nameAr: 'نوع اختبار', sortOrder: 999, active: true },
+    expect: [200, 201]
+  });
+  const lookupTypeId = createdLookupType?.data?.id;
+  const lookupTypeCode = createdLookupType?.data?.code;
+  if (lookupTypeId && lookupTypeCode) {
+    const createdLookupValue = await check('POST /admin/lookups/values', 'POST', '/admin/lookups/values', {
+      body: { typeCode: lookupTypeCode, code: 'SMOKE_VALUE', nameEn: 'Smoke Value', nameAr: 'قيمة اختبار', sortOrder: 0, active: true },
+      expect: [200, 201]
+    });
+    const lookupValueId = createdLookupValue?.data?.id;
+    await check('GET /admin/lookups/values?typeCode=...', 'GET', `/admin/lookups/values?typeCode=${encodeURIComponent(lookupTypeCode)}`);
+    if (lookupValueId) {
+      await check('PUT /admin/lookups/values/{id}', 'PUT', `/admin/lookups/values/${lookupValueId}`, {
+        body: { typeCode: lookupTypeCode, code: 'SMOKE_VALUE', nameEn: 'Smoke Value Updated', nameAr: 'قيمة محدثة', sortOrder: 0, active: true }
+      });
+      await check('DELETE /admin/lookups/values/{id}', 'DELETE', `/admin/lookups/values/${lookupValueId}`, { expect: [200, 204] });
+    }
+    await check('DELETE /admin/lookups/types/{id}', 'DELETE', `/admin/lookups/types/${lookupTypeId}`, { expect: [200, 204] });
+  }
+
+  // Notifications inbox
+  await check('GET /notifications/my', 'GET', '/notifications/my?page=0&size=10');
+  await check('GET /notifications/my/unread-count', 'GET', '/notifications/my/unread-count');
+  await check('PATCH /notifications/my/read-all', 'PATCH', '/notifications/my/read-all');
+
+  // Reconciliation read + create smoke
+  await check('GET /accounting/reconciliation', 'GET', '/accounting/reconciliation');
+  await check('GET /accounting/reconciliation/bank-accounts', 'GET', '/accounting/reconciliation/bank-accounts');
+  const bankAccounts = await check('GET /accounting/bank-accounts (for reconciliation)', 'GET', '/accounting/bank-accounts');
+  const bankAccountId = bankAccounts?.data?.[0]?.id;
+  if (bankAccountId) {
+    const createdReconciliation = await check('POST /accounting/reconciliation', 'POST', '/accounting/reconciliation', {
+      body: {
+        bankAccountId,
+        statementStartDate: today,
+        statementEndDate: today,
+        openingBalance: 0,
+        closingBalance: 0
+      },
+      expect: [200, 201]
+    });
+    const reconciliationId = createdReconciliation?.data?.id;
+    if (reconciliationId) {
+      await check('GET /accounting/reconciliation/{id}/summary', 'GET', `/accounting/reconciliation/${reconciliationId}/summary`);
+    }
+  }
+
+  // Ledger + accounting reports
+  const accountsForLedger = await check('GET /accounting/accounts (for ledger)', 'GET', '/accounting/accounts');
+  const ledgerAccountId = accountsForLedger?.data?.[0]?.id;
+  if (ledgerAccountId) {
+    await check('GET /accounting/ledger', 'GET', `/accounting/ledger?accountId=${ledgerAccountId}`);
+  }
+  await check('GET /accounting/reports/profit-loss', 'GET', `/accounting/reports/profit-loss?fromDate=${today}&toDate=${today}`);
+  await check('GET /accounting/reports/balance-sheet', 'GET', `/accounting/reports/balance-sheet?asOfDate=${today}`);
+
+  // Password reset OTP send (dev log mode — no mail server required)
+  await check('POST /auth/password/otp/send', 'POST', '/auth/password/otp/send', {
+    body: { email: 'admin@erp.local' },
+    auth: false
+  });
+
+  // Journal entry approve workflow
+  if (ledgerAccountId && accountsForLedger?.data?.length > 1) {
+    const secondAccountId = accountsForLedger.data.find((a) => a.id !== ledgerAccountId && a.active)?.id;
+    if (secondAccountId) {
+      const createdJournal = await check('POST /accounting/journal-entries', 'POST', '/accounting/journal-entries', {
+        body: {
+          entryDate: today,
+          description: 'Smoke test journal entry',
+          entryType: 'MANUAL',
+          lines: [
+            { accountId: ledgerAccountId, description: 'debit', debit: 1, credit: 0 },
+            { accountId: secondAccountId, description: 'credit', debit: 0, credit: 1 }
+          ]
+        },
+        expect: [200, 201]
+      });
+      const journalId = createdJournal?.data?.id;
+      if (journalId) {
+        await check('POST /accounting/journal-entries/{id}/approve', 'POST', `/accounting/journal-entries/${journalId}/approve?approvedBy=smoke-test`);
+      }
+    }
+  }
+
+  // Stock movement create + submit workflow
+  const productsForMovement = await check('GET /inventory/products (for movement)', 'GET', '/inventory/products');
+  const warehousesForMovement = await check('GET /inventory/warehouses (for movement)', 'GET', '/inventory/warehouses');
+  const movementProductId = productsForMovement?.data?.[0]?.id;
+  const movementWarehouseId = warehousesForMovement?.data?.[0]?.id;
+  if (movementProductId && movementWarehouseId) {
+    const createdMovement = await check('POST /inventory/stock/movements', 'POST', '/inventory/stock/movements', {
+      body: {
+        movementDate: today,
+        movementType: 'IN',
+        productId: movementProductId,
+        warehouseId: movementWarehouseId,
+        quantity: 1,
+        notes: 'Smoke test movement'
+      },
+      expect: [200, 201]
+    });
+    const movementId = createdMovement?.data?.id;
+    if (movementId) {
+      await check('PUT /inventory/stock/movements/{id}/submit', 'PUT', `/inventory/stock/movements/${movementId}/submit`);
+    }
+  }
+
   // Exchange rate CRUD round-trip
-  const today = new Date().toISOString().slice(0, 10);
   const created = await check('POST /accounting/exchange-rates', 'POST', '/accounting/exchange-rates', {
     body: {
       sourceCurrency: 'EUR',

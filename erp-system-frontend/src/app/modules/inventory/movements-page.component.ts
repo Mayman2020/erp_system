@@ -23,7 +23,7 @@ export class MovementsPageComponent extends ErpMasterPageBase<StockMovementDto, 
     editKey: 'COMMON.EDIT',
     viewKey: 'COMMON.VIEW',
     showStatus: true,
-    statusOptions: ['DRAFT', 'APPROVED', 'CANCELLED']
+    statusOptions: ['DRAFT', 'PENDING', 'APPROVED', 'CANCELLED']
   };
 
   readonly columns: DataTableColumn[] = [
@@ -66,7 +66,8 @@ export class MovementsPageComponent extends ErpMasterPageBase<StockMovementDto, 
   get tableActions(): DataTableAction[] {
     return [
       ...MASTER_CRUD_ACTIONS.slice(0, 2),
-      { id: 'approve', labelKey: 'COMMON.APPROVE', className: 'erp-action-success', disabledWhen: (row) => String(row['status']) !== 'DRAFT' },
+      { id: 'submit', labelKey: 'ERP.SUBMIT', className: 'erp-action-info', disabledWhen: (row) => String(row['status']) !== 'DRAFT' },
+      { id: 'approve', labelKey: 'COMMON.APPROVE', className: 'erp-action-success', disabledWhen: (row) => !['DRAFT', 'PENDING'].includes(String(row['status'])) },
       { id: 'cancel', labelKey: 'COMMON.CANCEL', className: 'erp-action-warning', disabledWhen: (row) => ['APPROVED', 'CANCELLED'].includes(String(row['status'])) },
       MASTER_CRUD_ACTIONS[2]
     ];
@@ -98,6 +99,10 @@ export class MovementsPageComponent extends ErpMasterPageBase<StockMovementDto, 
 
   override onTableAction(event: { actionId: string; row: Record<string, unknown> }): void {
     const id = Number(event.row['id']);
+    if (event.actionId === 'submit' && id) {
+      this.api.submitStockMovement(id).subscribe({ next: () => { this.showSuccess('ERP.SUBMIT_SUCCESS'); this.load(); }, error: (e) => this.showError(e?.error?.message || 'COMMON.UNEXPECTED_ERROR') });
+      return;
+    }
     if (event.actionId === 'approve' && id) {
       this.api.approveStockMovement(id).subscribe({ next: () => { this.showSuccess('COMMON.APPROVE_SUCCESS'); this.load(); }, error: (e) => this.showError(e?.error?.message || 'COMMON.UNEXPECTED_ERROR') });
       return;

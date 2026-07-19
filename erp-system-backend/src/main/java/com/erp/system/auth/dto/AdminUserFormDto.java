@@ -47,5 +47,7 @@ public class AdminUserFormDto {
 
     private Boolean active = true;
 
+    private Boolean mustChangePassword = false;
+
     private List<Long> roleIds = new ArrayList<>();
 }

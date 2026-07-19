@@ -8,25 +8,26 @@
   --navy-600: #28476b;
   --navy-500: #3d6290;
 
-  --brass-600: #8e6a2b;
-  --brass-500: #b48a40;
-  --brass-400: #cca55b;
-  --brass-300: #e2c27e;
-  --brass-100: #f4e7c4;
+  /* Accent = Elevon electric blue (legacy --brass-* names kept for CSS compatibility) */
+  --brass-600: #1d4ed8;
+  --brass-500: #2563eb;
+  --brass-400: #3b82f6;
+  --brass-300: #60a5fa;
+  --brass-100: #dbeafe;
 
-  --paper: #f6f2ea;
-  --paper-2: #efeae0;
-  --paper-3: #e8e0d1;
-  --ink-900: #0e1f33;
-  --ink-700: #334a67;
-  --ink-500: #6b7f96;
-  --ink-400: #95a4b8;
-  --ink-300: #b9c3d2;
-  --line: #dfd7c7;
-  --line-2: #e9e2d2;
+  --paper: #f0f4fa;
+  --paper-2: #e6edf7;
+  --paper-3: #d7e2f0;
+  --ink-900: #0b1220;
+  --ink-700: #334155;
+  --ink-500: #64748b;
+  --ink-400: #94a3b8;
+  --ink-300: #cbd5e1;
+  --line: #d5dee9;
+  --line-2: #e2e8f0;
 
-  --surface: #fffdf8;
-  --surface-2: #fbf7ee;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
 
   --ok: #2f6a3a;
   --ok-bg: #e4efd8;
@@ -56,9 +57,12 @@
   --pad-card: calc(20px * var(--density));
   --pad-row: calc(14px * var(--density));
 
-  --sidebar-w: 248px;
+  --sidebar-w: 286px;
   --sidebar-w-collapsed: 76px;
   --topbar-height: 64px;
+  --content-max-w: none;
+  --content-pad-inline: 24px;
+  --content-pad-block: 28px;
 
   --font-display: 'Instrument Serif', 'Playfair Display', Georgia, serif;
   --font-ui: 'Inter', 'IBM Plex Sans Arabic', 'Cairo', -apple-system, system-ui, sans-serif;
@@ -73,11 +77,11 @@
   --header-bg: var(--surface);
   --header-border: var(--line);
 
-  --sidebar-bg: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 100%);
-  --sidebar-text: rgba(233, 223, 200, 0.78);
-  --sidebar-text-active: #f4e7c4;
+  --sidebar-bg: linear-gradient(180deg, #050a14 0%, #0a1628 100%);
+  --sidebar-text: rgba(186, 206, 232, 0.78);
+  --sidebar-text-active: #dbeafe;
   --sidebar-item-hover: rgba(255, 255, 255, 0.06);
-  --sidebar-item-active: rgba(204, 165, 91, 0.22);
+  --sidebar-item-active: rgba(37, 99, 235, 0.28);
   --sidebar-accent: var(--brass-400);
   --sidebar-width: var(--sidebar-w);
   --sidebar-collapsed-width: var(--sidebar-w-collapsed);
@@ -89,8 +93,8 @@
   --shadow-hover: 0 14px 36px rgba(14, 31, 51, 0.1);
   --shadow-card: none;
 
-  --btn-primary-bg: var(--navy-900);
-  --btn-primary-color: var(--brass-100);
+  --btn-primary-bg: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  --btn-primary-color: #ffffff;
   --btn-outline-bg: var(--surface);
   --btn-outline-hover: var(--paper-2);
 
@@ -129,9 +133,9 @@
   --erp-border: var(--line);
   --erp-border-strong: var(--line-2);
   --erp-border-soft: color-mix(in srgb, var(--line) 55%, transparent);
-  --erp-primary: var(--navy-900);
-  --erp-primary-strong: var(--navy-700);
-  --erp-primary-soft: rgba(204, 165, 91, 0.14);
+  --erp-primary: #2563eb;
+  --erp-primary-strong: #1d4ed8;
+  --erp-primary-soft: rgba(37, 99, 235, 0.14);
   --erp-info: var(--info);
   --erp-info-soft: var(--info-bg);
   --erp-success: var(--ok);
@@ -151,21 +155,21 @@
   --border-color: var(--line);
   --text-primary: var(--text-main);
   --text-secondary: var(--text-muted);
-  --primary-color: var(--navy-900);
+  --primary-color: #2563eb;
   --secondary-color: var(--brass-500);
   --bg-color: var(--paper);
   --card-bg: var(--surface);
   --erp-sidebar-width: var(--sidebar-w);
   --erp-sidebar-width-collapsed: var(--sidebar-w-collapsed);
   --erp-header-height: var(--topbar-height);
-  --erp-content-max: 1400px;
+  --erp-content-max: var(--content-max-w, none);
   --erp-radius-card: var(--r);
   --erp-radius-input: var(--r-sm);
   --erp-radius-button: var(--r-sm);
   --erp-radius-dialog: var(--r-lg);
   --erp-transition: var(--t-fast) var(--e-out);
-  --erp-primary-rgb: 14, 31, 51;
-  --erp-info-rgb: 42, 80, 121;
+  --erp-primary-rgb: 37, 99, 235;
+  --erp-info-rgb: 37, 99, 235;
   --erp-success-rgb: 47, 106, 58;
   --erp-warning-rgb: 184, 101, 26;
   --erp-danger-rgb: 168, 51, 43;
@@ -175,12 +179,12 @@
 }
 
 [data-theme='dark'] {
-  /* Deep premium navy — matches ELEVON reference image */
-  --paper: #070e1b;
-  --paper-2: #0a1525;
-  --paper-3: #0e1d30;
-  --surface: #111e30;
-  --surface-2: #162540;
+  /* Deep premium navy — matches ELEVON login */
+  --paper: #050a14;
+  --paper-2: #0a1220;
+  --paper-3: #0e1a2e;
+  --surface: #0b1426;
+  --surface-2: #111e33;
   --ink-900: #eef2f8;
   --ink-700: #b8c5d6;
   --ink-500: #7a8ea7;
@@ -192,31 +196,36 @@
   --ok-bg: rgba(47, 106, 58, 0.2);
   --warn-bg: rgba(184, 101, 26, 0.22);
   --bad-bg: rgba(168, 51, 43, 0.22);
-  --info-bg: rgba(42, 80, 121, 0.3);
+  --info-bg: rgba(37, 99, 235, 0.28);
 
-  --brass-100: rgba(228, 194, 126, 0.12);
-  --brass-300: #c4962a;
-  --accent-soft: rgba(228, 194, 126, 0.12);
+  --brass-100: rgba(37, 99, 235, 0.16);
+  --brass-300: #60a5fa;
+  --accent-soft: rgba(37, 99, 235, 0.16);
+  --accent: #3b82f6;
 
   /* Deeper, more dramatic shadows for premium feel */
   --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.55), 0 4px 16px rgba(0, 0, 0, 0.35);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
 
-  --sidebar-bg: linear-gradient(180deg, #05101e 0%, #070e1b 50%, #060c18 100%);
-  --header-bg: rgba(7, 14, 27, 0.96);
+  --sidebar-bg: linear-gradient(180deg, #040912 0%, #050a14 50%, #060c18 100%);
+  --header-bg: rgba(5, 10, 20, 0.96);
   --header-border: rgba(26, 46, 72, 0.8);
   --card-bg: var(--surface);
   --card-border: var(--line);
 
-  --sidebar-item-active: rgba(204, 165, 91, 0.28);
+  --sidebar-item-active: rgba(37, 99, 235, 0.32);
+  --sidebar-text-active: #dbeafe;
   --sidebar-item-hover: rgba(255, 255, 255, 0.055);
   --icon-btn-hover: var(--surface-2);
   --table-row-hover: var(--paper-2);
   --table-header-bg: rgba(10, 21, 37, 0.85);
+  --btn-primary-bg: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  --btn-primary-color: #ffffff;
   --btn-outline-bg: var(--surface-2);
   --btn-outline-hover: var(--paper-3);
   --input-bg: var(--surface);
+  --input-focus-border: #3b82f6;
 
   /* ERP bridge overrides for dark */
   --erp-bg: var(--paper);

@@ -1,44 +1,20 @@
-<div class="container" *ngIf="this.flatConfig.layout === 'horizontal' && this.flatConfig.subLayout === 'horizontal-2'; else mainHeader">
-  <ng-container *ngTemplateOutlet="mainHeader"></ng-container>
-</div>
-
-<ng-template #mainHeader>
-  <div class="erp-header-shell topbar">
-    <div class="erp-header-shell__brand topbar-start">
-      <button
-        type="button"
-        class="erp-header-toggle"
-        id="mobile-collapse"
-        (click)="navCollapse()"
-        [attr.aria-label]="'NAV.TOGGLE_MENU' | translate"
-        [attr.title]="'NAV.TOGGLE_MENU' | translate"
-      >
-        <mat-icon aria-hidden="true">menu</mat-icon>
-      </button>
-
-      <h1 class="erp-header-shell__title">{{ 'DASHBOARD.ERP_TITLE' | translate }}</h1>
-
-      <a
-        [routerLink]="['/dashboard']"
-        class="erp-header-brand-pill erp-header-brand-pill--mark-only erp-header-brand-pill--mobile-only"
-        [attr.title]="'APP.BRAND' | translate"
-        [attr.aria-label]="'APP.BRAND' | translate"
-      >
-        <span class="erp-header-brand-pill__icon-wrap erp-header-brand-pill__icon-wrap--hero">
-          <img [src]="logoMarkSrc" [alt]="'APP.BRAND' | translate" class="erp-header-brand-pill__mark" />
-        </span>
-      </a>
-    </div>
-
-    <div class="erp-header-shell__center">
-      <button type="button" class="erp-header-search" (click)="openSearch()">
-        <mat-icon aria-hidden="true">search</mat-icon>
-        <span class="erp-header-search__placeholder">{{ 'NAV.SEARCH_PLACEHOLDER' | translate }}</span>
-      </button>
-    </div>
-
-    <div class="erp-header-shell__actions topbar-end">
-      <app-nav-right></app-nav-right>
-    </div>
+<header class="topbar">
+  <div class="topbar-start">
+    <button
+      type="button"
+      class="tb-action-btn topbar-toggle"
+      id="mobile-collapse"
+      (click)="navCollapse()"
+      [ngbTooltip]="'TOPBAR.TOGGLE_MENU' | translate"
+      placement="bottom"
+      container="body"
+      [attr.aria-label]="'TOPBAR.TOGGLE_MENU' | translate"
+    >
+      <mat-icon aria-hidden="true">menu</mat-icon>
+    </button>
   </div>
-</ng-template>
+
+  <div class="topbar-end">
+    <app-nav-right></app-nav-right>
+  </div>
+</header>

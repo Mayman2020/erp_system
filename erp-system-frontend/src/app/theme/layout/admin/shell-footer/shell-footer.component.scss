@@ -18,7 +18,7 @@
   justify-content: space-between;
   gap: 28px 24px;
   padding: clamp(24px, 3.5vw, 40px) clamp(18px, 5%, 56px);
-  max-width: var(--erp-content-max);
+  max-width: var(--content-max-w, none);
   margin: 0 auto;
 }
 
@@ -161,10 +161,20 @@
 }
 
 :host(.erp-shell-footer--integrated) .erp-shell-footer {
+  width: 100%;
+  margin: 0;
   background: #111827;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   border-top-left-radius: 0;
   box-shadow: none;
+}
+
+:host(.erp-shell-footer--integrated) {
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: 0;
 }
 
 :host(.erp-shell-footer--integrated) .erp-shell-footer__grid--rich,

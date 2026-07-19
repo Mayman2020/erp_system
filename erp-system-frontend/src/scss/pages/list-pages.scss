@@ -1,14 +1,16 @@
 /* List & detail pages — Property_Managments-style cards (app-page + app-card aliases) */
 
 .page-shell {
-  padding: 28px 32px 48px;
+  padding: var(--content-pad-block, 28px) var(--content-pad-inline, 24px) 48px;
   min-height: calc(100vh - var(--topbar-height, 64px));
-  max-width: 1400px;
-  margin-inline: auto;
+  max-width: var(--content-max-w, none);
+  margin-inline: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
   text-align: start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .page-shell app-page-header {
@@ -21,6 +23,18 @@
   border-radius: var(--r, 12px);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
+}
+
+.estate-card > .app-card-header,
+.estate-card > .erp-card__header {
+  min-height: 64px;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--line-2, var(--line));
+}
+
+.estate-card > .app-card-body,
+.estate-card > .erp-card__body {
+  padding: var(--pad-card, 20px);
 }
 
 .estate-card.app-list-surface {

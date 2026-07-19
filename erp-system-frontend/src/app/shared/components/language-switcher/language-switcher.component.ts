@@ -19,7 +19,9 @@ interface LanguageOption {
         [class.erp-language-switcher__trigger--header]="headerStyle"
         ngbDropdownToggle
         [attr.aria-label]="ariaLabelKey | translate"
-        [attr.title]="ariaLabelKey | translate"
+        [ngbTooltip]="ariaLabelKey | translate"
+        placement="bottom"
+        container="body"
       >
         <img
           [src]="currentLanguageOption.flagSrc"

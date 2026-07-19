@@ -5,7 +5,9 @@ import { EmployeeDto, EmployeeForm, DepartmentDto } from '../../core/models/erp.
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { ErpApiService } from '../../core/services/erp-api.service';
+import { TranslationService } from '../../core/i18n/translation.service';
 import { DataTableColumn } from '../../shared/components/data-table/data-table.component';
+import { ExportColumn } from '../../shared/components/table-export-toolbar/table-export-toolbar.component';
 import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-master-page.base';
 
 @Component({
@@ -35,19 +37,38 @@ export class EmployeesPageComponent extends ErpMasterPageBase<EmployeeDto, Emplo
   
   get tableActions() { return this.actions; }
 
+  get activeCount(): number {
+    return this.rows.filter((row) => !!row['active']).length;
+  }
+
+  get inactiveCount(): number {
+    return Math.max(0, this.rows.length - this.activeCount);
+  }
+
   constructor(
     private api: ErpApiService,
     private fb: FormBuilder,
     authService: AuthService,
     confirmDialog: ConfirmDialogService,
+    public translationService: TranslationService,
     cdr: ChangeDetectorRef
   ) {
     super(authService, confirmDialog, cdr);
   }
   
   departments: DepartmentDto[] = [];
-  get departmentOptions(): Array<{ id: number | null; label: string }> {
-    return [{ id: null, label: '—' }, ...(this.departments || []).map((d) => ({ id: d.id, label: d.nameEn }))];
+  selectedEmployee: EmployeeDto | null = null;
+
+  readonly exportColumns: ExportColumn<EmployeeDto>[] = [
+    { header: 'Code', value: 'employeeCode' },
+    { header: 'Name', value: 'fullNameEn' },
+    { header: 'Job Title', value: 'jobTitle' },
+    { header: 'Salary', value: (row) => row.basicSalary ?? '' },
+    { header: 'Active', value: (row) => row.active ? 'Yes' : 'No' }
+  ];
+
+  get departmentLovItems(): Array<{ id: number | null; label: string }> {
+    return (this.departments || []).map((d) => ({ id: d.id, label: d.nameEn }));
   }
   ngOnInit(): void {
     this.initMasterPage();
@@ -82,7 +103,28 @@ export class EmployeesPageComponent extends ErpMasterPageBase<EmployeeDto, Emplo
     return this.form.getRawValue();
   }
 
+  openCreate(): void {
+    this.selectedEmployee = null;
+    super.openCreate();
+  }
+
+  onTableAction(event: { actionId: string; row: Record<string, unknown> }): void {
+    const id = Number(event.row['id']);
+    if (id && (event.actionId === 'view' || event.actionId === 'edit')) {
+      this.api.getEmployee(id).subscribe({
+        next: (employee) => {
+          this.selectedEmployee = employee;
+          super.onTableAction(event);
+        },
+        error: () => super.onTableAction(event)
+      });
+      return;
+    }
+    super.onTableAction(event);
+  }
+
   protected patchForm(dto: EmployeeDto): void {
+    this.selectedEmployee = dto;
     this.form.patchValue({ employeeCode: dto.employeeCode, fullNameEn: dto.fullNameEn, fullNameAr: dto.fullNameAr || '', email: dto.email || '', phone: dto.phone || '', departmentId: dto.departmentId || null, jobTitle: dto.jobTitle || '', hireDate: dto.hireDate || '', basicSalary: dto.basicSalary || 0, active: dto.active !== false });
   }
 

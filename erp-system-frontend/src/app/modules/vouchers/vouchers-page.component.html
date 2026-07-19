@@ -146,6 +146,12 @@
       ></app-form-field>
     </div>
   </form>
+  <app-erp-audit-trail
+    *ngIf="selectedId && selectedAuditRecord as audit"
+    [createdAt]="audit.createdAt"
+    [updatedAt]="audit.updatedAt"
+    [createdBy]="audit.createdBy">
+  </app-erp-audit-trail>
   </div>
   <div dialog-footer class="erp-dialog-actions">
     <button type="button" class="erp-button erp-button--primary" (click)="save()" [disabled]="readOnlyMode || saving">
@@ -156,4 +162,3 @@
     </button>
   </div>
 </app-erp-dialog>
-

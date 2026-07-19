@@ -161,7 +161,10 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
         map.put("/inventory/categories", "erp-inventory-categories");
         map.put("/inventory/warehouses", "erp-inventory-warehouses");
         map.put("/inventory/units", "erp-inventory-units");
-        map.put("/inventory/movements", "erp-inventory-movements");
+        map.put("/inventory/stock/movements", "erp-inventory-movements");
+        map.put("/inventory/stock/in", "erp-inventory-movements");
+        map.put("/inventory/stock/out", "erp-inventory-movements");
+        map.put("/inventory/stock/transfer", "erp-inventory-movements");
         map.put("/sales/customers", "erp-sales-customers");
         map.put("/sales/quotations", "erp-sales-quotations");
         map.put("/sales/orders", "erp-sales-orders");

@@ -1,6 +1,6 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header titleKey="JOURNAL.TITLE">
-    <div header-actions>
+    <div header-actions class="erp-toolbar-icons">
       <button
         class="erp-button erp-button--primary"
         type="button"
@@ -141,6 +141,12 @@
       </div>
     </div>
   </form>
+  <app-erp-audit-trail
+    *ngIf="formMode !== 'create' && selectedEntry as audit"
+    [createdAt]="audit.createdAt"
+    [updatedAt]="audit.updatedAt"
+    [createdBy]="audit.createdBy">
+  </app-erp-audit-trail>
   </div>
   <div dialog-footer class="erp-dialog-actions">
     <button type="button" class="erp-button erp-button--primary" (click)="save()" [disabled]="saving || formMode === 'view'">

@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin, Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { AuthService, AuthUser, UpdateProfileRequest } from '../../core/auth/auth.service';
+import { ChangePasswordPayload } from './components/profile-settings.component';
 import { TranslationService } from '../../core/i18n/translation.service';
 import {
   AccountingSettingsDto,
@@ -13,7 +15,9 @@ import {
   FiscalYearFormDto
 } from '../../core/models/accounting.models';
 import { LookupItem } from '../../core/models/lookup.models';
+import { CompanySettings } from '../../core/models/company-settings.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
+import { CompanySettingsApiService } from '../../core/services/company-settings-api.service';
 import { LookupService } from '../../core/services/lookup.service';
 import { ThemeMode, ThemeService } from '../../core/services/theme.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
@@ -37,6 +41,9 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
   successKey = '';
   accountingErrorKey = '';
   accountingSuccessKey = '';
+  passwordSaving = false;
+  passwordErrorKey = '';
+  passwordSuccessKey = '';
 
   actorEmail = 'frontend.user';
   public themeMode: ThemeMode = 'light';
@@ -50,21 +57,38 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
   accountingSettings: AccountingSettingsDto | null = null;
   canViewAccounting = false;
 
+  companySettings: CompanySettings | null = null;
+  companySaving = false;
+  companyErrorKey = '';
+  companySuccessKey = '';
+
   constructor(
     private authService: AuthService,
     private accountingApi: AccountingApiService,
+    private companySettingsApi: CompanySettingsApiService,
     private lookupService: LookupService,
     private themeService: ThemeService,
     public translationService: TranslationService,
     private confirmDialog: ConfirmDialogService,
     private permissionService: PermissionService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {}
 
+  get isAdmin(): boolean {
+    const user = this.authService.currentUser;
+    const roles = user?.roles || (user?.role ? [user.role] : []);
+    return roles.includes('ADMIN');
+  }
+
   ngOnInit(): void {
+    const tab = this.route.snapshot.data['tab'];
+    if (tab) {
+      this.activeTabId = tab;
+    }
     this.themeMode = this.themeService.mode;
     this.currentLanguage = this.translationService.currentLanguage;
-    
+
     this.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       if (user) {
         this.actorEmail = user.email || user.username || 'frontend.user';
@@ -84,6 +108,14 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
         this.accountingLoading = false;
       }
       this.cdr.markForCheck();
+    });
+
+    this.companySettingsApi.getSettings().subscribe({
+      next: (settings) => {
+        this.companySettings = settings;
+        this.cdr.markForCheck();
+      },
+      error: () => this.cdr.markForCheck()
     });
   }
 
@@ -105,6 +137,22 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: () => this.successKey = 'PROFILE.SAVE_SUCCESS',
       error: () => this.errorKey = 'PROFILE.SAVE_ERROR'
+    });
+  }
+
+  onChangePassword(payload: ChangePasswordPayload): void {
+    this.passwordSaving = true;
+    this.passwordErrorKey = '';
+    this.passwordSuccessKey = '';
+
+    this.authService.changePassword(payload.currentPassword, payload.newPassword).pipe(
+      finalize(() => {
+        this.passwordSaving = false;
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: () => this.passwordSuccessKey = 'PROFILE.CHANGE_PASSWORD_SUCCESS',
+      error: (err) => this.passwordErrorKey = err?.error?.message || 'PROFILE.CHANGE_PASSWORD_ERROR'
     });
   }
 
@@ -197,6 +245,25 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
         this.refreshAccountingSettings();
       },
       error: () => this.accountingErrorKey = 'SETTINGS.ACTION_ERROR'
+    });
+  }
+
+  onSaveCompany(payload: CompanySettings): void {
+    this.companySaving = true;
+    this.companyErrorKey = '';
+    this.companySuccessKey = '';
+
+    this.companySettingsApi.updateSettings(payload).pipe(
+      finalize(() => {
+        this.companySaving = false;
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: (settings) => {
+        this.companySettings = settings;
+        this.companySuccessKey = 'SETTINGS.COMPANY_SAVE_SUCCESS';
+      },
+      error: (err) => this.companyErrorKey = err?.error?.message || 'SETTINGS.COMPANY_SAVE_ERROR'
     });
   }
 

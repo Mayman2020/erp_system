@@ -47,6 +47,7 @@ public class AdminAccessManagementService {
     private final RoleMenuPermissionRepository roleMenuPermissionRepository;
     private final UiMenuItemRepository uiMenuItemRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccessControlService accessControlService;
 
     @Transactional(readOnly = true)
     public AdminAccessContextDto getContext() {
@@ -102,6 +103,7 @@ public class AdminAccessManagementService {
                 .password(passwordEncoder.encode(normalizePassword(request.getPassword(), true)))
                 .role(request.getPrimaryRole())
                 .active(Boolean.TRUE.equals(request.getActive()))
+                .mustChangePassword(Boolean.TRUE.equals(request.getMustChangePassword()))
                 .build();
 
         String fullNameEn = normalize(request.getFullNameEn());
@@ -123,6 +125,35 @@ public class AdminAccessManagementService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
         user.setActive(active);
         return toUserDto(userRepository.save(user));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminAccessRolePermissionDto> getEffectivePermissions(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+        List<String> legacyRoles = user.getRole() == null ? List.of() : List.of(user.getRole().name());
+        Map<String, com.erp.system.ui.dto.MenuActionPermissionDto> effective = accessControlService
+                .menuPermissionsForUser(userId, legacyRoles).stream()
+                .collect(Collectors.toMap(com.erp.system.ui.dto.MenuActionPermissionDto::menuItemId, p -> p));
+
+        return indexMenuItems().values().stream()
+                .sorted(Comparator.comparing(UiMenuItem::getSortOrder).thenComparing(UiMenuItem::getId))
+                .map(menu -> {
+                    com.erp.system.ui.dto.MenuActionPermissionDto permission = effective.get(menu.getId());
+                    return AdminAccessRolePermissionDto.builder()
+                            .menuItemId(menu.getId())
+                            .titleKey(menu.getTitleKey())
+                            .url(menu.getUrl())
+                            .itemType(menu.getItemType())
+                            .parentId(menu.getParentId())
+                            .sortOrder(menu.getSortOrder())
+                            .canView(permission != null && permission.canView())
+                            .canCreate(permission != null && permission.canCreate())
+                            .canEdit(permission != null && permission.canEdit())
+                            .canDelete(permission != null && permission.canDelete())
+                            .build();
+                })
+                .toList();
     }
 
     @Transactional
@@ -149,6 +180,7 @@ public class AdminAccessManagementService {
         user.setPhone(normalize(request.getPhone()));
         user.setRole(request.getPrimaryRole());
         user.setActive(Boolean.TRUE.equals(request.getActive()));
+        user.setMustChangePassword(Boolean.TRUE.equals(request.getMustChangePassword()));
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(normalizePassword(request.getPassword(), false)));
         }
@@ -205,6 +237,9 @@ public class AdminAccessManagementService {
 
     private void syncAssignments(User user, List<Long> roleIds) {
         userAccessRoleRepository.deleteByUserId(user.getId());
+        // See syncPermissions(): force the delete to flush before re-inserting, otherwise
+        // re-assigning the same role(s) on an edit violates the (user_id, role_id) unique constraint.
+        userAccessRoleRepository.flush();
         if (roleIds == null || roleIds.isEmpty()) {
             return;
         }
@@ -224,6 +259,10 @@ public class AdminAccessManagementService {
 
     private void syncPermissions(AccessRole role, List<AdminAccessRolePermissionFormDto> permissions) {
         roleMenuPermissionRepository.deleteByRoleId(role.getId());
+        // Force the delete to hit the DB before the inserts below are queued — Hibernate's default
+        // flush order runs insertions before deletions, which would otherwise violate the
+        // (role_id, menu_item_id) unique constraint when re-saving the same menu item.
+        roleMenuPermissionRepository.flush();
         if (permissions == null || permissions.isEmpty()) {
             throw new BusinessException("Role must contain at least one permission row");
         }
@@ -270,6 +309,7 @@ public class AdminAccessManagementService {
                 .phone(user.getPhone())
                 .primaryRole(user.getRole() == null ? null : user.getRole().name())
                 .active(user.isActive())
+                .mustChangePassword(user.isMustChangePassword())
                 .fullName(resolvedFullName)
                 .fullNameEn(prof == null ? null : prof.getFullNameEn())
                 .fullNameAr(prof == null ? null : prof.getFullNameAr())

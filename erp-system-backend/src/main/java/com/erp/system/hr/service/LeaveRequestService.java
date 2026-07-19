@@ -8,11 +8,14 @@ import com.erp.system.hr.domain.LeaveRequest;
 import com.erp.system.hr.dto.display.LeaveRequestDisplayDto;
 import com.erp.system.hr.dto.form.LeaveRequestFormDto;
 import com.erp.system.hr.repository.LeaveRequestRepository;
+import com.erp.system.notification.domain.NotificationType;
+import com.erp.system.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class LeaveRequestService {
 
     private final LeaveRequestRepository leaveRequestRepository;
     private final ActivityLogService activityLogService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<LeaveRequestDisplayDto> getAll() {
@@ -41,6 +45,13 @@ public class LeaveRequestService {
         leaveRequest = leaveRequestRepository.save(leaveRequest);
         activityLogService.log(MODULE, "CREATE", "LeaveRequest", leaveRequest.getId(), String.valueOf(leaveRequest.getId()),
                 "Created leave request " + leaveRequest.getId());
+        notificationService.notifyAdmins(
+                NotificationType.HR,
+                "NOTIFICATIONS.LEAVE_SUBMITTED_TITLE",
+                "NOTIFICATIONS.LEAVE_SUBMITTED_BODY",
+                Map.of("leaveType", leaveRequest.getLeaveType()),
+                "LEAVE_REQUEST",
+                leaveRequest.getId());
         return toDisplay(leaveRequest);
     }
 
@@ -67,6 +78,13 @@ public class LeaveRequestService {
         leaveRequest = leaveRequestRepository.save(leaveRequest);
         activityLogService.log(MODULE, "APPROVE", "LeaveRequest", leaveRequest.getId(), String.valueOf(leaveRequest.getId()),
                 "Approved leave request " + leaveRequest.getId());
+        notificationService.notifyAdmins(
+                NotificationType.HR,
+                "NOTIFICATIONS.LEAVE_APPROVED_TITLE",
+                "NOTIFICATIONS.LEAVE_APPROVED_BODY",
+                Map.of("leaveType", leaveRequest.getLeaveType()),
+                "LEAVE_REQUEST",
+                leaveRequest.getId());
         return toDisplay(leaveRequest);
     }
 

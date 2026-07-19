@@ -63,9 +63,9 @@
 /* Cards & panels                                                             */
 /* -------------------------------------------------------------------------- */
 
-.erp-card:not(.no-motion):not(.erp-card--static),
-.erp-table-card:not(.no-motion),
-.erp-search-panel:not(.no-motion) {
+.erp-card:not(.no-motion):not(.erp-card--static):not(:has(app-data-table)),
+.stat-pill:not(.no-motion),
+.erp-admin-kpi:not(.no-motion) {
   transition:
     transform var(--transition-normal),
     box-shadow var(--transition-normal),
@@ -73,11 +73,42 @@
   will-change: transform;
 }
 
-.erp-card:not(.no-motion):not(.erp-card--static):hover,
-.erp-table-card:not(.no-motion):hover,
-.erp-search-panel:not(.no-motion):hover {
+.erp-card:not(.no-motion):not(.erp-card--static):not(:has(app-data-table)):hover,
+.stat-pill:not(.no-motion):hover,
+.erp-admin-kpi:not(.no-motion):hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
+}
+
+.erp-table-card,
+.table-card,
+.directory-table-card,
+.erp-card:has(app-data-table),
+.app-card:has(app-data-table),
+.erp-integrated-table {
+  transform: none !important;
+  will-change: auto !important;
+}
+
+.erp-table-card:hover,
+.table-card:hover,
+.directory-table-card:hover,
+.erp-card:has(app-data-table):hover,
+.app-card:has(app-data-table):hover,
+.erp-integrated-table:hover {
+  transform: none !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+/* Toolbar stays flat on the list card — no lift */
+.erp-search-panel:not(.no-motion) {
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  will-change: auto;
+}
+
+.erp-search-panel:not(.no-motion):hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* -------------------------------------------------------------------------- */

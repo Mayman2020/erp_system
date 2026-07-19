@@ -12,12 +12,15 @@
         <div class="col-md-2"><app-form-field [control]="taskForm.controls.status" labelKey="COMMON.STATUS"></app-form-field></div>
         <div class="col-md-2 d-flex align-items-end"><button type="button" class="erp-button erp-button--primary mb-3" (click)="addTask()">{{ (editingTaskId ? 'COMMON.SAVE' : 'COMMON.CREATE') | translate }}</button></div>
       </form>
-      <div *ngFor="let t of tasks" class="border-bottom py-2 d-flex justify-content-between align-items-center">
-        <span>{{ t.title }} — {{ t.status }} — {{ t.dueDate }}</span>
-        <span>
-          <button type="button" class="btn btn-sm btn-link" (click)="editTask(t)">{{ 'COMMON.EDIT' | translate }}</button>
-          <button type="button" class="btn btn-sm btn-link text-danger" (click)="deleteTask(t.id)">{{ 'COMMON.DELETE' | translate }}</button>
-        </span>
+      <div *ngFor="let t of tasks" class="border-bottom py-2 d-flex justify-content-between align-items-center">
+        <div class="flex-grow-1">
+          <span>{{ t.title }} — {{ t.status }} — {{ t.dueDate }}</span>
+          <app-erp-audit-trail [createdAt]="t.createdAt" [updatedAt]="t.updatedAt"></app-erp-audit-trail>
+        </div>
+        <span>
+          <button type="button" class="btn btn-sm btn-link" (click)="editTask(t)">{{ 'COMMON.EDIT' | translate }}</button>
+          <button type="button" class="btn btn-sm btn-link text-danger" (click)="deleteTask(t.id)">{{ 'COMMON.DELETE' | translate }}</button>
+        </span>
       </div>
     </div>
     <div *ngIf="activeTab === 'members'">
@@ -31,9 +34,12 @@
         <div class="col-md-3"><app-form-field [control]="memberForm.controls.role" labelKey="ERP.ROLE"></app-form-field></div>
         <div class="col-md-2 d-flex align-items-end"><button type="button" class="erp-button erp-button--primary mb-3" (click)="addMember()">{{ 'COMMON.ADD' | translate }}</button></div>
       </form>
-      <div *ngFor="let m of members" class="border-bottom py-2 d-flex justify-content-between">
-        <span>{{ employeeLabel(m.employeeId) }} — {{ m.role }}</span>
-        <button type="button" class="btn btn-sm btn-link text-danger" (click)="removeMember(m.id)">{{ 'COMMON.DELETE' | translate }}</button>
+      <div *ngFor="let m of members" class="border-bottom py-2 d-flex justify-content-between">
+        <div class="flex-grow-1">
+          <span>{{ employeeLabel(m.employeeId) }} — {{ m.role }}</span>
+          <app-erp-audit-trail [createdAt]="m.createdAt" [updatedAt]="m.updatedAt"></app-erp-audit-trail>
+        </div>
+        <button type="button" class="btn btn-sm btn-link text-danger" (click)="removeMember(m.id)">{{ 'COMMON.DELETE' | translate }}</button>
       </div>
     </div>
     <div *ngIf="activeTab === 'expenses'">
@@ -51,9 +57,10 @@
             <button *ngIf="e.status === 'APPROVED'" type="button" class="btn btn-sm btn-link" (click)="cancelExpense(e.id)">{{ 'COMMON.CANCEL' | translate }}</button>
             <button *ngIf="e.status === 'DRAFT'" type="button" class="btn btn-sm btn-link text-danger" (click)="deleteExpense(e.id)">{{ 'COMMON.DELETE' | translate }}</button>
           </span>
-        </div>
-        <app-journal-link [journalEntryId]="e.journalEntryId"></app-journal-link>
-      </div>
+        </div>
+        <app-journal-link [journalEntryId]="e.journalEntryId"></app-journal-link>
+        <app-erp-audit-trail [createdAt]="e.createdAt" [updatedAt]="e.updatedAt"></app-erp-audit-trail>
+      </div>
     </div>
   </div>
 </app-erp-dialog>

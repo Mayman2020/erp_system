@@ -5,6 +5,10 @@
     "STATUS": "حالة",
     "SEARCH": "البحث",
     "ALL": "الجميع",
+    "ACTIVE": "نشط",
+    "REFRESH": "تحديث",
+    "REQUIRED": "مطلوب",
+    "VIEW_ALL": "عرض الجميع",
     "APPLY": "تطبيق",
     "CLEAR": "مسح",
     "TREE_FILTER_ACCOUNTS": "تصفية بالرمز أو الاسم أو الوصف…",
@@ -14,6 +18,9 @@
     "NO_DATA": "لا توجد بيانات متاحة",
     "NO_RESULTS_HINT": "حاول تعديل معايير البحث أو عوامل التصفية.",
     "RETRY": "إعادة المحاولة",
+    "NOT_FOUND_TITLE": "الصفحة غير موجودة",
+    "NOT_FOUND_HINT": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "BACK_TO_DASHBOARD": "العودة إلى لوحة التحكم",
     "ACTIONS": "الإجراءات",
     "VIEW": "عرض",
     "CREATE": "إنشاء",
@@ -36,6 +43,8 @@
     "DELETE_CONFIRM": "هل أنت متأكد من حذف هذا السجل؟",
     "APPROVE_SUCCESS": "تم الاعتماد بنجاح",
     "CANCEL_SUCCESS": "تم الإلغاء بنجاح",
+    "ACTIVATE_SUCCESS": "تم التفعيل بنجاح",
+    "DEACTIVATE_SUCCESS": "تم إلغاء التنشيط بنجاح",
     "SORT_BY": "فرز حسب",
     "SORT_DIRECTION": "اتجاه",
     "ASC": "تصاعدي",
@@ -59,9 +68,11 @@
     "EXPAND": "توسيع",
     "COLLAPSE": "طي",
     "RELOAD": "إعادة تحميل",
+    "BACK": "رجوع",
     "REMOVE": "إزالة",
     "FULL_DETAILS": "كل الحقول",
     "EXPORT_EXCEL": "تصدير إلى Excel",
+    "EXPORT_SHEET_NAME": "تصدير",
     "EXPORT_PDF": "تصدير إلى PDF",
     "ADD": "إضافة",
     "PAGE": "صفحة",
@@ -95,6 +106,7 @@
     "ROLES": "الصلاحيات",
     "LOOKUPS": "البيانات المرجعية",
     "SCREENS": "الشاشات (القائمة)",
+    "USER_ACCESS": "صلاحيات المستخدم",
     "TOGGLE_THEME": "التبديل للوضع الداكن / التبديل للوضع الفاتح",
     "TOGGLE_MENU": "تبديل الشريط الجانبي",
     "SIDEBAR_WELCOME": "مرحبا بكم",
@@ -103,11 +115,19 @@
     "NOTIFICATIONS": "الإشعارات",
     "MESSAGES": "الرسائل"
   },
+  "TOPBAR": {
+    "TOGGLE_MENU": "إظهار/إخفاء القائمة",
+    "LANGUAGE": "اللغة",
+    "LIGHT_MODE": "الوضع الفاتح",
+    "DARK_MODE": "الوضع الداكن"
+  },
   "COMMAND_PALETTE": {
     "TITLE": "بحث سريع (Ctrl+K)",
     "PLACEHOLDER": "ابحث في الصفحات والمسارات…",
     "EMPTY": "لا توجد نتائج",
     "GROUP_NAV": "التنقل",
+    "GROUP_MODULES": "الوحدات",
+    "GROUP_ADMIN": "إدارة النظام",
     "HINT_ARROWS": "أسهم للتحريك",
     "HINT_ENTER": "Enter للفتح"
   },
@@ -164,9 +184,13 @@
     "INVALID_DATE": "يجب أن يكون التاريخ بصيغة DD/MM/YYYY"
   },
   "AUTH": {
+    "FORCE_PASSWORD_CHANGE": {
+      "TITLE": "غيّر كلمة المرور الخاصة بك",
+      "HINT": "يطلب منك المسؤول تعيين كلمة مرور جديدة قبل المتابعة."
+    },
     "SIGN_IN": "تسجيل الدخول",
     "EMAIL": "بريد إلكتروني",
-    "EMAIL_PLACEHOLDER": "name@example.com",
+    "EMAIL_PLACEHOLDER": "admin@erp.local",
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD": "كلمة المرور",
     "LOGIN": "تسجيل الدخول",
@@ -174,13 +198,16 @@
     "SUBTITLE": "الوصول بشكل آمن إلى مساحة عمل ERP الخاصة بك",
     "BRAND_SUBTITLE": "حلول محاسبية متقدمة",
     "SECURE_LOGIN": "دخول آمن ومحمي",
+    "SECURE_LOGIN_ENHANCED": "دخول آمن محسّن",
+    "OR": "أو",
+    "USERNAME": "اسم المستخدم",
     "NEW_EXPERIENCE": "تجربة تسجيل دخول جديدة",
     "HERO_TITLE": "التحكم في العمليات المحاسبية من مكان واحد موثوق به",
     "HERO_SUBTITLE": "تسجيل دخول حديث يتماشى مع جودة حساباتي من حيث السرعة والوضوح والأمان.",
     "FEATURE_1": "المصادقة الآمنة والجلسات المحمية",
     "FEATURE_2": "الوصول الموحد عبر سير العمل المحاسبي",
     "FEATURE_3": "الرؤية في الوقت الحقيقي للأداء المالي",
-    "REMEMBER_ME": "تذكر بريدي الإلكتروني",
+    "REMEMBER_ME": "تذكرني",
     "FORGOT": "هل نسيت كلمة السر",
     "FORGOT_SUBTITLE": "أرسل OTP ثم قم بتعيين كلمة مرور جديدة",
     "SEND_OTP": "أرسل كلمة مرور لمرة واحدة",
@@ -199,18 +226,21 @@
     "logoAlt": "شعار النظام",
     "heroTitle": "التحكم في العمليات المحاسبية من مكان واحد موثوق به",
     "heroLead": "تسجيل دخول حديث يتماشى مع جودة حساباتي من حيث السرعة والوضوح والأمان.",
-    "visionBadge": "تخطيط موارد المؤسسات",
-    "feat1Title": "جلسات محمية",
+    "visionBadge": "نظام تخطيط موارد المؤسسات",
+    "feat1Title": "أمان متقدم",
     "feat1Desc": "المصادقة الآمنة والجلسات المحمية",
-    "feat2Title": "سير عمل موحد",
+    "feat2Title": "أداء عالي",
     "feat2Desc": "الوصول الموحد عبر سير العمل المحاسبي",
-    "feat3Title": "أداء لحظي",
+    "feat3Title": "تقارير ذكية",
     "feat3Desc": "الرؤية في الوقت الحقيقي للأداء المالي",
     "footerBlurb": "مساحة عمل محاسبية موثوقة للفرق التي تحتاج إلى الوضوح والسرعة والتحكم.",
     "footerLinksTitle": "روابط سريعة",
     "footerOfficeTitle": "الثقة",
     "footerOfficeLine": "تسجيل دخول مشفّر · صلاحيات حسب الدور · سير عمل جاهز للتدقيق",
-    "footerCopyright": "© {{year}} ELEVON ERP"
+    "footerCopyright": "© {{year}} ELEVON ERP",
+    "footerSupport": "دعم فني 24/7",
+    "footerSecure": "اتصال آمن",
+    "footerEncrypted": "جلسات مشفّرة"
   },
   "LANG": {
     "EN": "EN",
@@ -236,6 +266,8 @@
     "QUICK_ACTIONS": "إجراءات سريعة",
     "RECENT_ACTIVITIES": "الأنشطة الأخيرة",
     "LOW_STOCK": "مخزون منخفض",
+    "STOCK_HIGH": "مرتفع",
+    "STOCK_NORMAL": "طبيعي",
     "EMPLOYEE_PERFORMANCE": "أداء الموظفين",
     "PRODUCT": "المنتج",
     "QUANTITY": "الكمية",
@@ -340,6 +372,7 @@
     "TITLE": "سندات اليومية"
   },
   "JOURNAL": {
+    "ACCOUNT_NAME": "اسم الحساب",
     "TITLE": "سندات اليومية",
     "CREATE": "إنشاء سند يومية",
     "FORM_TITLE_CREATE": "إنشاء سند يومية",
@@ -752,6 +785,17 @@
     "LOAD_ERROR": "فشل تحميل إعدادات المحاسبة",
     "SAVE_SUCCESS": "تم حفظ إعدادات المحاسبة بنجاح",
     "SAVE_ERROR": "فشل حفظ إعدادات المحاسبة",
+    "COMPANY_TAB": "الشركة",
+    "COMPANY_TITLE": "هوية الشركة",
+    "COMPANY_NAME_EN": "الاسم القانوني للشركة (إنجليزي)",
+    "COMPANY_NAME_AR": "الاسم القانوني للشركة (عربي)",
+    "COMPANY_TAX_ID": "الرقم الضريبي",
+    "COMPANY_LOGO": "شعار الشركة",
+    "COMPANY_UPLOAD_LOGO": "رفع الشعار",
+    "COMPANY_FISCAL_START_MONTH": "شهر بداية السنة المالية",
+    "COMPANY_READONLY_HINT": "يمكن للمسؤولين فقط تغيير إعدادات هوية الشركة.",
+    "COMPANY_SAVE_SUCCESS": "تم حفظ إعدادات الشركة بنجاح",
+    "COMPANY_SAVE_ERROR": "فشل حفظ إعدادات الشركة",
     "CREATE_SUCCESS": "تم إنشاء السجل المالي بنجاح",
     "ACTION_SUCCESS": "تم تحديث الحالة المحاسبية بنجاح",
     "ACTION_ERROR": "فشل تحديث الحالة المحاسبية",
@@ -787,7 +831,22 @@
     "SAVE_SUCCESS": "تم تحديث الملف الشخصي بنجاح",
     "SAVE_ERROR": "فشل في تحديث الملف الشخصي",
     "LOAD_ERROR": "فشل تحميل بيانات الملف الشخصي",
-    "AVATAR_ALT": "صورة الملف الشخصي"
+    "AVATAR_ALT": "صورة الملف الشخصي",
+    "YOUR_DETAILS": "بياناتك",
+    "EMAIL_READONLY_HINT": "البريد الإلكتروني للقراءة فقط — تواصل مع المسؤول لتغييره.",
+    "CURRENT_PASSWORD": "كلمة المرور الحالية",
+    "NEW_PASSWORD": "كلمة المرور الجديدة",
+    "CONFIRM_PASSWORD": "تأكيد كلمة المرور الجديدة",
+    "PASSWORD_MISMATCH": "كلمة المرور الجديدة والتأكيد غير متطابقين.",
+    "CHANGE_PASSWORD_SUCCESS": "تم تغيير كلمة المرور بنجاح",
+    "CHANGE_PASSWORD_ERROR": "فشل تغيير كلمة المرور",
+    "ERRORS": {
+      "CURRENT_PASSWORD_INVALID": "كلمة المرور الحالية غير صحيحة.",
+      "USERNAME_IN_USE": "اسم المستخدم هذا مستخدم بالفعل.",
+      "EMAIL_IN_USE": "هذا البريد الإلكتروني مستخدم بالفعل."
+    },
+    "CHANGE_PASSWORD": "تغيير كلمة المرور",
+    "PASSWORD_ADMIN_HINT": "لتغيير كلمة المرور، استخدم تدفق إعادة التعيين من مسؤول النظام أو صفحة تسجيل الدخول."
   },
   "ACCESS_MANAGEMENT": {
     "TITLE": "إدارة الصلاحيات",
@@ -818,6 +877,7 @@
     "PASSWORD_OPTIONAL": "اتركها فارغة إذا كنت لا تريد تغيير كلمة المرور الحالية.",
     "PASSWORD_OPTIONAL_ADMIN": "أدخل كلمة مرور جديدة للتغيير، أو اتركها فارغة للإبقاء على الحالية.",
     "PASSWORD_MASKED": "••••••••",
+    "MUST_CHANGE_PASSWORD": "طلب تغيير كلمة المرور عند تسجيل الدخول التالي",
     "ACTIVE_USER": "نشط",
     "USER_ACTIVE_UPDATED": "تم تحديث حالة تفعيل المستخدم.",
     "USER_ACTIVE_ERROR": "تعذر تحديث حالة التفعيل.",
@@ -917,7 +977,22 @@
     "SCREEN_DELETE_ERROR": "تعذر حذف عنصر القائمة.",
     "DELETE_CONFIRM_TITLE": "تأكيد الحذف",
     "DELETE_CONFIRM_COPY": "سيتم حذف السجل المحدد نهائياً إذا سمح الخادم بذلك.",
-    "LOAD_ERROR": "فشل تحميل بيانات إدارة الصلاحيات."
+    "LOAD_ERROR": "فشل تحميل بيانات إدارة الصلاحيات.",
+    "USER_ACCESS_TITLE": "صلاحيات المستخدم الفعلية",
+    "SELECT_USER": "اختر مستخدماً",
+    "SCREEN": "الشاشة",
+    "CAN_VIEW": "عرض",
+    "CAN_CREATE": "إنشاء",
+    "CAN_EDIT": "تعديل",
+    "CAN_DELETE": "حذف",
+    "NO_CUSTOM_ROLES_HINT": "لا توجد أدوار مخصصة لهذا المستخدم؛ يتم استخدام صلاحيات دوره الأساسي.",
+    "SCREEN_VISIBILITY_TITLE": "إظهار الشاشات",
+    "SCREEN_VISIBILITY_HINT": "إخفاء شاشة بشكل عام لجميع المستخدمين، بغض النظر عن صلاحيات الدور. يختلف عن محرر كتالوج القوائم أدناه.",
+    "ADD_SCREEN_KEY": "إضافة مفتاح شاشة",
+    "SCREEN_KEY_PLACEHOLDER": "مثال: inventory",
+    "SCREEN_VISIBILITY_UPDATE_SUCCESS": "تم تحديث إظهار الشاشة.",
+    "SCREEN_VISIBILITY_UPDATE_ERROR": "تعذر تحديث إظهار الشاشة.",
+    "MENU_CATALOG_TITLE": "كتالوج القوائم (محرر حسب الدور)"
   },
   "APP": {
     "BRAND": "ELEVON ERP",
@@ -1022,6 +1097,8 @@
     "INVOICE_ID": "رقم الفاتورة المرتبطة"
   },
   "ERP": {
+    "SUBMIT": "إرسال",
+    "SUBMIT_SUCCESS": "تم الإرسال بنجاح",
     "CODE": "الرمز",
     "NUMBER": "الرقم",
     "DATE": "التاريخ",
@@ -1121,8 +1198,56 @@
     "MEMBERS": "الأعضاء",
     "EXPENSES": "المصروفات",
     "MEMBER": "عضو"
+  },
+  "AUDIT": {
+    "INFO_TITLE": "معلومات التدقيق",
+    "CREATED_BY": "أنشئ بواسطة",
+    "CREATED_AT": "تاريخ الإنشاء",
+    "MODIFIED_BY": "عدّل بواسطة",
+    "UPDATED_AT": "تاريخ التعديل",
+    "APPROVED_BY": "اعتمد بواسطة",
+    "UNKNOWN": "غير معروف"
+  },
+  "LOV": {
+    "SELECT_PLACEHOLDER": "اختر…",
+    "SEARCH_PLACEHOLDER": "بحث…",
+    "OPEN": "فتح القائمة",
+    "CLEAR": "مسح الاختيار"
+  },
+  "EXPORT": {
+    "EXCEL": "تصدير Excel"
+  },
+  "NOTIFICATIONS": {
+    "TITLE": "الإشعارات",
+    "MARK_ALL_READ": "تعليم الكل كمقروء",
+    "EMPTY_TITLE": "لا توجد إشعارات",
+    "EMPTY_MESSAGE": "لا توجد إشعارات جديدة.",
+    "UNREAD": "غير مقروء",
+    "TAB_RECENT": "حديثة (14 يوم)",
+    "TAB_OLDER": "أقدم",
+    "JOURNAL_APPROVED_TITLE": "تم اعتماد القيد المحاسبي",
+    "JOURNAL_APPROVED_BODY": "تم اعتماد القيد {{referenceNumber}} بواسطة {{approvedBy}}.",
+    "LOW_STOCK_TITLE": "تنبيه انخفاض المخزون",
+    "LOW_STOCK_BODY": "انخفض المنتج {{productCode}} إلى {{quantity}} وحدة، أقل من حد إعادة الطلب {{reorderLevel}}.",
+    "LEAVE_SUBMITTED_TITLE": "تم تقديم طلب إجازة",
+    "LEAVE_SUBMITTED_BODY": "تم تقديم طلب إجازة {{leaveType}} جديد وهو بانتظار الاعتماد.",
+    "LEAVE_APPROVED_TITLE": "تم اعتماد طلب الإجازة",
+    "LEAVE_APPROVED_BODY": "تم اعتماد طلب إجازة {{leaveType}}."
+  },
+  "MONTH": {
+    "JANUARY": "يناير",
+    "FEBRUARY": "فبراير",
+    "MARCH": "مارس",
+    "APRIL": "أبريل",
+    "MAY": "مايو",
+    "JUNE": "يونيو",
+    "JULY": "يوليو",
+    "AUGUST": "أغسطس",
+    "SEPTEMBER": "سبتمبر",
+    "OCTOBER": "أكتوبر",
+    "NOVEMBER": "نوفمبر",
+    "DECEMBER": "ديسمبر"
   }
 }
-
 
 

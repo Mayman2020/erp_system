@@ -16,8 +16,10 @@
       type="button"
       class="collapse-btn"
       (click)="navCollapse()"
+      [ngbTooltip]="'NAV.TOGGLE_MENU' | translate"
+      placement="bottom"
+      container="body"
       [attr.aria-label]="'NAV.TOGGLE_MENU' | translate"
-      [attr.title]="'NAV.TOGGLE_MENU' | translate"
     >
       <mat-icon>{{ sidebarCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
     </button>
@@ -26,9 +28,21 @@
   <div class="erp-sidebar-chrome erp-sidebar-chrome__nav">
     <app-nav-content [menuIconsOnly]="sidebarCollapsed" (onNavMobCollapse)="navMobCollapse()"></app-nav-content>
 
-    <div class="erp-sidebar-footer" *ngIf="!sidebarCollapsed">
-      <div class="erp-sidebar-divider"></div>
-      <app-sidebar-calendar></app-sidebar-calendar>
+  </div>
+
+  <div class="erp-sidebar-user" [class.erp-sidebar-user--collapsed]="sidebarCollapsed">
+    <img
+      *ngIf="avatarUrl as photo"
+      class="erp-sidebar-user__avatar erp-sidebar-user__avatar--img"
+      [src]="photo"
+      [attr.alt]="'PROFILE.AVATAR_ALT' | translate">
+    <div class="erp-sidebar-user__avatar" *ngIf="!avatarUrl">{{ userInitials }}</div>
+    <div class="erp-sidebar-user__info" *ngIf="!sidebarCollapsed">
+      <span class="erp-sidebar-user__name">{{ displayName }}</span>
+      <span class="erp-sidebar-user__role" *ngIf="roleLabel">{{ roleLabel | translate }}</span>
     </div>
   </div>
+  <button type="button" class="erp-sidebar-logout" (click)="logout()" [ngbTooltip]="'AUTH.LOGOUT' | translate" container="body">
+    <mat-icon>logout</mat-icon><span *ngIf="!sidebarCollapsed">{{ 'AUTH.LOGOUT' | translate }}</span>
+  </button>
 </div>

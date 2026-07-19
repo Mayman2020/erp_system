@@ -1,10 +1,10 @@
 <form [formGroup]="form" class="erp-search-panel">
   <div class="erp-search-panel__fields">
-    <app-form-field *ngIf="showDateRange" class="erp-search-panel__field" [control]="form.controls.fromDate" labelKey="COMMON.FROM_DATE" icon="calendar_month" type="date"></app-form-field>
-    <app-form-field *ngIf="showDateRange" class="erp-search-panel__field" [control]="form.controls.toDate" labelKey="COMMON.TO_DATE" icon="event" type="date"></app-form-field>
+    <app-form-field *ngIf="showDateRange" class="erp-search-panel__field erp-search-panel__field--date" [control]="form.controls.fromDate" labelKey="COMMON.FROM_DATE" icon="calendar_month" type="date"></app-form-field>
+    <app-form-field *ngIf="showDateRange" class="erp-search-panel__field erp-search-panel__field--date" [control]="form.controls.toDate" labelKey="COMMON.TO_DATE" icon="event" type="date"></app-form-field>
     <app-form-field
       *ngIf="showStatus"
-      class="erp-search-panel__field"
+      class="erp-search-panel__field erp-search-panel__field--status"
       [control]="form.controls.status"
       labelKey="COMMON.STATUS"
       icon="filter_alt"
@@ -15,8 +15,8 @@
       [optionLabelPrefix]="statusLabelPrefix"
     ></app-form-field>
     <div *ngIf="showAmountRange" class="erp-search-panel__amount-group">
-      <app-form-field class="erp-search-panel__field" [control]="form.controls.minAmount" labelKey="COMMON.MIN_AMOUNT" icon="payments" type="number" step="0.01"></app-form-field>
-      <app-form-field class="erp-search-panel__field" [control]="form.controls.maxAmount" labelKey="COMMON.MAX_AMOUNT" icon="monitoring" type="number" step="0.01"></app-form-field>
+      <app-form-field class="erp-search-panel__field erp-search-panel__field--amount" [control]="form.controls.minAmount" labelKey="COMMON.MIN_AMOUNT" icon="payments" type="number" step="0.01"></app-form-field>
+      <app-form-field class="erp-search-panel__field erp-search-panel__field--amount" [control]="form.controls.maxAmount" labelKey="COMMON.MAX_AMOUNT" icon="monitoring" type="number" step="0.01"></app-form-field>
     </div>
     <app-form-field class="erp-search-panel__field erp-search-panel__field--query" [control]="form.controls.query" labelKey="COMMON.SEARCH" icon="search"></app-form-field>
   </div>

@@ -24,6 +24,15 @@
         <mat-icon>account_balance</mat-icon>
         <span>{{ 'SETTINGS.ACCOUNTING_TAB' | translate }}</span>
       </button>
+      <button
+        type="button"
+        class="nav-pill"
+        [class.is-active]="activeTabId === 'company'"
+        (click)="activeTabId = 'company'"
+      >
+        <mat-icon>domain</mat-icon>
+        <span>{{ 'SETTINGS.COMPANY_TAB' | translate }}</span>
+      </button>
     </div>
 
     <div class="settings-content-wrapper" [ngSwitch]="activeTabId">
@@ -35,9 +44,13 @@
           [saving]="saving"
           [errorKey]="errorKey"
           [successKey]="successKey"
+          [passwordSaving]="passwordSaving"
+          [passwordErrorKey]="passwordErrorKey"
+          [passwordSuccessKey]="passwordSuccessKey"
           (saveProfile)="onSaveProfile($event)"
           (changeTheme)="setTheme($event)"
           (changeLanguage)="setLanguage($event)"
+          (changePassword)="onChangePassword($event)"
         ></app-profile-settings>
       </div>
 
@@ -56,6 +69,17 @@
           (toggleYear)="onToggleYear($event)"
           (togglePeriod)="onTogglePeriod($event)"
         ></app-accounting-settings>
+      </div>
+
+      <div *ngSwitchCase="'company'" class="animate__animated animate__fadeIn">
+        <app-company-settings
+          [settings]="companySettings"
+          [canEdit]="isAdmin"
+          [saving]="companySaving"
+          [errorKey]="companyErrorKey"
+          [successKey]="companySuccessKey"
+          (saveSettings)="onSaveCompany($event)"
+        ></app-company-settings>
       </div>
     </div>
   </div>

@@ -1,6 +1,14 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey">
-    <div header-actions>
+    <div header-actions class="erp-toolbar-icons">
+      <app-table-export-toolbar
+        [inline]="true"
+        [title]="translationService.instant('MENU.EMPLOYEES')"
+        fileName="employees"
+        [columns]="exportColumns"
+        [rows]="rows"
+        [disabled]="listLoad.refreshing">
+      </app-table-export-toolbar>
       <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
         <mat-icon aria-hidden="true">add</mat-icon>
         <span>{{ 'ERP.CREATE_EMPLOYEE' | translate }}</span>
@@ -8,8 +16,30 @@
     </div>
   </app-page-header>
 
-  <div class="erp-card erp-list-page__card">
+  <div class="erp-card erp-list-page__card" *ngIf="listLoad.showInitialSpinner">
+    <app-loading-state></app-loading-state>
+  </div>
+
+  <div class="erp-card erp-list-page__card" *ngIf="listLoad.showSurface" [class.is-refreshing]="listLoad.refreshing">
     <div class="erp-card__body">
+      <section class="list-stats" *ngIf="rows.length || !listLoad.refreshing">
+        <article class="stat-pill stat-pill--purple">
+          <span class="stat-pill__icon"><mat-icon>groups</mat-icon></span>
+          <span class="stat-label">{{ 'COMMON.ALL' | translate }}</span>
+          <strong [erpCountUp]="rows.length" [erpCountUpDecimals]="0"></strong>
+        </article>
+        <article class="stat-pill stat-pill--green">
+          <span class="stat-pill__icon"><mat-icon>person_check</mat-icon></span>
+          <span class="stat-label">{{ 'STATUS.ACTIVE' | translate }}</span>
+          <strong [erpCountUp]="activeCount" [erpCountUpDecimals]="0"></strong>
+        </article>
+        <article class="stat-pill stat-pill--amber">
+          <span class="stat-pill__icon"><mat-icon>person_off</mat-icon></span>
+          <span class="stat-label">{{ 'STATUS.INACTIVE' | translate }}</span>
+          <strong [erpCountUp]="inactiveCount" [erpCountUpDecimals]="0"></strong>
+        </article>
+      </section>
+
       <app-advanced-search-bar
         *ngIf="showSearch"
         [showDateRange]="showDateRange"
@@ -21,7 +51,7 @@
       <app-erp-alert *ngIf="errorKey && !formVisible" type="danger" [message]="errorKey" extraClass="mt-3" (dismissed)="errorKey = ''"></app-erp-alert>
       <app-erp-alert *ngIf="successKey && !formVisible" type="success" [message]="successKey" extraClass="mt-3" (dismissed)="successKey = ''"></app-erp-alert>
 
-      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="listLoad.refreshing" [exportable]="false" (actionClick)="onTableAction($event)"></app-data-table>
     </div>
   </div>
 </section>
@@ -51,7 +81,16 @@
           <app-form-field [control]="form.controls.phone" labelKey="ERP.PHONE" icon="edit" type="text" [readonly]="readOnly" ></app-form-field>
         </div>
         <div class="col-md-6 mb-3">
-          <app-form-field [control]="form.controls.departmentId" labelKey="MENU.DEPARTMENTS" icon="list" type="select" [options]="departmentOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field>
+          <app-searchable-select
+            formControlName="departmentId"
+            label="MENU.DEPARTMENTS"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="departmentLovItems"
+            [clearable]="true"
+            [disabled]="readOnly">
+          </app-searchable-select>
         </div>
         <div class="col-md-6 mb-3">
           <app-form-field [control]="form.controls.jobTitle" labelKey="ERP.JOB_TITLE" icon="edit" type="text" [readonly]="readOnly" ></app-form-field>
@@ -63,6 +102,13 @@
           <app-form-field [control]="form.controls.basicSalary" labelKey="ERP.SALARY" icon="edit" type="number" [readonly]="readOnly" step="0.01" min="0"></app-form-field>
         </div>
       </div>
+      <app-erp-audit-trail
+        *ngIf="selectedEmployee && formMode !== 'create'"
+        [createdAt]="selectedEmployee.createdAt"
+        [updatedAt]="selectedEmployee.updatedAt"
+        [createdByName]="selectedEmployee.createdBy"
+        [modifiedByName]="selectedEmployee.updatedBy">
+      </app-erp-audit-trail>
     </form>
   </div>
   <div dialog-footer class="d-flex gap-2 justify-content-end">

@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { JournalEntry } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
+import { NavigationHistoryService } from '../../core/services/navigation-history.service';
 
 @Component({
   standalone: false,
@@ -24,6 +26,8 @@ export class GeneralLedgerDetailComponent implements OnInit {
     private api: AccountingApiService,
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
+    private navHistory: NavigationHistoryService,
     private i18n: TranslationService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -38,6 +42,10 @@ export class GeneralLedgerDetailComponent implements OnInit {
   }
 
   goBack(): void {
+    if (this.navHistory.canGoBack()) {
+      this.navHistory.goBack(this.location);
+      return;
+    }
     this.router.navigate(['/general-ledger']);
   }
 

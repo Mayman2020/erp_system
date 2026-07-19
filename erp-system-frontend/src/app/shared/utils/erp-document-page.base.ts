@@ -48,6 +48,7 @@ export abstract class ErpDocumentPageBase<TDto, TForm> {
   formVisible = false;
   formMode: 'create' | 'edit' | 'view' = 'create';
   selectedId: number | null = null;
+  selectedAuditRecord: Record<string, unknown> | null = null;
   actorEmail = 'system@erp.local';
 
   parties: Array<{ id: number; label: string }> = [];
@@ -104,6 +105,7 @@ export abstract class ErpDocumentPageBase<TDto, TForm> {
   openCreate(): void {
     this.formMode = 'create';
     this.selectedId = null;
+    this.selectedAuditRecord = null;
     this.resetForm();
     this.form.enable();
     this.formVisible = true;
@@ -113,6 +115,7 @@ export abstract class ErpDocumentPageBase<TDto, TForm> {
 
   closeForm(): void {
     this.formVisible = false;
+    this.selectedAuditRecord = null;
     this.cdr.markForCheck();
   }
 
@@ -270,7 +273,8 @@ export abstract class ErpDocumentPageBase<TDto, TForm> {
       next: (doc) => {
         this.formMode = mode;
         this.selectedId = id;
-        this.patchDocument(doc as unknown as Record<string, unknown>);
+        this.selectedAuditRecord = doc as unknown as Record<string, unknown>;
+        this.patchDocument(this.selectedAuditRecord);
         mode === 'view' ? this.form.disable() : this.form.enable();
         this.formVisible = true;
         this.cdr.markForCheck();

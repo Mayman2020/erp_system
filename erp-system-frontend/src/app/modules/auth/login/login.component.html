@@ -1,24 +1,76 @@
-<section class="login-shell login-shell--estate">
+<section class="login-shell login-shell--elevon">
+  <!-- Full-bleed background + particles (one continuous stage) -->
+  <div class="login-bg-fx" aria-hidden="true">
+    <div class="login-brand-visual">
+      <div class="login-brand-visual__orb login-brand-visual__orb--a"></div>
+      <div class="login-brand-visual__orb login-brand-visual__orb--b"></div>
+      <div class="login-brand-visual__orb login-brand-visual__orb--c"></div>
+      <div class="login-brand-visual__glow"></div>
+    </div>
+    <div id="particles-js"></div>
+  </div>
+
   <div class="login-shell__grid">
+    <aside class="login-side login-side--brand" aria-hidden="false">
+      <div #brandPanel class="login-side__content">
+        <div class="login-brand-mark login-gsap-stagger">
+          <span class="login-brand-mark__icon" aria-hidden="true">
+            <mat-icon>hexagon</mat-icon>
+          </span>
+          <div class="login-brand-mark__text">
+            <strong>ELEVON ERP</strong>
+            <span>{{ 'login.visionBadge' | t }}</span>
+          </div>
+        </div>
+
+        <h2 class="login-hero-title login-gsap-stagger">{{ 'login.heroTitle' | t }}</h2>
+        <p class="login-side__lead login-gsap-stagger">{{ 'login.heroLead' | t }}</p>
+
+        <div class="features login-gsap-stagger">
+          <article class="feature-card">
+            <span class="feature-icon" aria-hidden="true"><mat-icon>shield</mat-icon></span>
+            <div class="feature-card__text">
+              <strong>{{ 'login.feat1Title' | t }}</strong>
+              <span>{{ 'login.feat1Desc' | t }}</span>
+            </div>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon" aria-hidden="true"><mat-icon>speed</mat-icon></span>
+            <div class="feature-card__text">
+              <strong>{{ 'login.feat2Title' | t }}</strong>
+              <span>{{ 'login.feat2Desc' | t }}</span>
+            </div>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon" aria-hidden="true"><mat-icon>bar_chart</mat-icon></span>
+            <div class="feature-card__text">
+              <strong>{{ 'login.feat3Title' | t }}</strong>
+              <span>{{ 'login.feat3Desc' | t }}</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </aside>
+
     <main class="login-side login-side--form">
       <div class="login-form-panel">
-        <div #loginCard class="login-card login-anim-target erp-card erp-card--soft">
-          <div class="login-brand login-gsap-stagger">
-            <div class="login-brand__meta">
-              <p class="login-brand__tag">{{ 'login.heroLead' | t }}</p>
-            </div>
+        <div #loginCard class="login-card login-anim-target">
+          <div class="login-card__badge login-gsap-stagger" aria-hidden="true">
+            <mat-icon>person</mat-icon>
+            <mat-icon class="login-card__badge-lock">lock</mat-icon>
           </div>
 
           <div class="login-head login-gsap-stagger">
             <h3>{{ mode === 'login' ? ('AUTH.SIGN_IN' | translate) : ('AUTH.FORGOT' | translate) }}</h3>
             <p class="sub">{{ mode === 'login' ? ('AUTH.SUBTITLE' | translate) : ('AUTH.FORGOT_SUBTITLE' | translate) }}</p>
+            <span class="login-head__line" aria-hidden="true"></span>
           </div>
 
           <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="mode === 'login'" class="login-form login-gsap-stagger">
             <app-form-field
               [control]="form.controls.email"
-              labelKey="AUTH.EMAIL"
-              icon="mail"
+              labelKey="AUTH.USERNAME"
+              icon="person"
               type="email"
               placeholderKey="AUTH.EMAIL_PLACEHOLDER"
               controlClass="login-input"
@@ -41,17 +93,24 @@
                 <input type="checkbox" formControlName="rememberMe" />
                 <span>{{ 'AUTH.REMEMBER_ME' | translate }}</span>
               </label>
-              <a class="forgot" (click)="mode = 'forgot'">{{ 'AUTH.FORGOT' | translate }}</a>
+              <a class="forgot" (click)="mode = 'forgot'">{{ 'AUTH.FORGOT' | translate }}؟</a>
             </div>
 
             <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" [dismissible]="false"></app-erp-alert>
 
             <div class="login-actions">
-              <button class="erp-button erp-button--primary login-submit" type="submit" [disabled]="loading">
+              <button class="login-submit" type="submit" [disabled]="loading">
                 <span *ngIf="!loading">{{ 'AUTH.LOGIN' | translate }}</span>
                 <div class="button-spinner" *ngIf="loading"></div>
               </button>
             </div>
+
+            <div class="login-or" aria-hidden="true"><span>{{ 'AUTH.OR' | translate }}</span></div>
+
+            <button type="button" class="login-secure-btn" disabled>
+              <mat-icon>verified_user</mat-icon>
+              <span>{{ 'AUTH.SECURE_LOGIN_ENHANCED' | translate }}</span>
+            </button>
           </form>
 
           <div *ngIf="mode === 'forgot'" class="login-form login-form--forgot login-gsap-stagger">
@@ -67,7 +126,7 @@
 
               <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" [dismissible]="false"></app-erp-alert>
 
-              <button class="erp-button erp-button--primary login-submit" type="submit" [disabled]="otpLoading">
+              <button class="login-submit" type="submit" [disabled]="otpLoading">
                 <span *ngIf="!otpLoading">{{ 'AUTH.SEND_OTP' | translate }}</span>
                 <div class="button-spinner" *ngIf="otpLoading"></div>
               </button>
@@ -95,65 +154,20 @@
 
               <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" [dismissible]="false"></app-erp-alert>
 
-              <button class="erp-button erp-button--primary login-submit" type="submit" [disabled]="otpLoading">
+              <button class="login-submit" type="submit" [disabled]="otpLoading">
                 <span *ngIf="!otpLoading">{{ 'AUTH.RESET_PASSWORD' | translate }}</span>
                 <div class="button-spinner" *ngIf="otpLoading"></div>
               </button>
             </form>
           </div>
 
-          <div class="security-badge login-gsap-stagger">
-            <mat-icon>verified_user</mat-icon>
-            <span>{{ 'AUTH.SECURE_LOGIN' | translate }}</span>
+          <div class="login-card__footer login-gsap-stagger">
+            <span><mat-icon>support_agent</mat-icon>{{ 'login.footerSupport' | t }}</span>
+            <span><mat-icon>https</mat-icon>{{ 'login.footerSecure' | t }}</span>
+            <span><mat-icon>encrypted</mat-icon>{{ 'login.footerEncrypted' | t }}</span>
           </div>
         </div>
       </div>
     </main>
-
-    <aside class="login-side login-side--brand" aria-hidden="false">
-      <div class="login-bg-fx" aria-hidden="true">
-        <div class="login-brand-visual">
-          <div class="login-brand-visual__orb login-brand-visual__orb--a"></div>
-          <div class="login-brand-visual__orb login-brand-visual__orb--b"></div>
-          <div class="login-brand-visual__wave"></div>
-        </div>
-        <div id="particles-js"></div>
-      </div>
-      <div #brandPanel class="login-side__content">
-        <span class="vision-badge">{{ 'login.visionBadge' | t }}</span>
-        <h2 class="login-hero-title">{{ 'login.heroTitle' | t }}</h2>
-        <p class="login-side__lead">{{ 'login.heroLead' | t }}</p>
-
-        <div class="features">
-          <article class="feature-card">
-            <span class="feature-icon" aria-hidden="true">
-              <mat-icon>smart_toy</mat-icon>
-            </span>
-            <div class="feature-card__text">
-              <strong>{{ 'login.feat1Title' | t }}</strong>
-              <span>{{ 'login.feat1Desc' | t }}</span>
-            </div>
-          </article>
-          <article class="feature-card">
-            <span class="feature-icon" aria-hidden="true">
-              <mat-icon>gavel</mat-icon>
-            </span>
-            <div class="feature-card__text">
-              <strong>{{ 'login.feat2Title' | t }}</strong>
-              <span>{{ 'login.feat2Desc' | t }}</span>
-            </div>
-          </article>
-          <article class="feature-card">
-            <span class="feature-icon" aria-hidden="true">
-              <mat-icon>insights</mat-icon>
-            </span>
-            <div class="feature-card__text">
-              <strong>{{ 'login.feat3Title' | t }}</strong>
-              <span>{{ 'login.feat3Desc' | t }}</span>
-            </div>
-          </article>
-        </div>
-      </div>
-    </aside>
   </div>
 </section>

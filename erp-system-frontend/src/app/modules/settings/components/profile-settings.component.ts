@@ -1,7 +1,18 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { AuthUser, resolveProfileFullName, UpdateProfileRequest } from '../../../core/auth/auth.service';
 import { ThemeMode } from '../../../core/services/theme.service';
+
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
+function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
+  const newPassword = control.get('newPassword')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+  return newPassword && confirmPassword && newPassword !== confirmPassword ? { passwordMismatch: true } : null;
+}
 
 @Component({
   standalone: false,
@@ -17,12 +28,17 @@ export class ProfileSettingsComponent {
   @Input() saving = false;
   @Input() errorKey = '';
   @Input() successKey = '';
+  @Input() passwordSaving = false;
+  @Input() passwordErrorKey = '';
+  @Input() passwordSuccessKey = '';
 
   @Output() saveProfile = new EventEmitter<UpdateProfileRequest>();
   @Output() changeTheme = new EventEmitter<ThemeMode>();
   @Output() changeLanguage = new EventEmitter<string>();
+  @Output() changePassword = new EventEmitter<ChangePasswordPayload>();
 
   form: FormGroup;
+  passwordForm: FormGroup;
   imagePreview = '';
 
   constructor(private fb: FormBuilder) {
@@ -37,6 +53,24 @@ export class ProfileSettingsComponent {
       companyNameAr: ['', [Validators.maxLength(180)]],
       profileImage: ['']
     });
+    this.passwordForm = this.fb.group({
+      currentPassword: ['', Validators.required],
+      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required]
+    }, { validators: passwordsMatchValidator });
+  }
+
+  onChangePassword(): void {
+    if (this.passwordForm.invalid || this.passwordSaving) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+    const { currentPassword, newPassword } = this.passwordForm.getRawValue();
+    this.changePassword.emit({ currentPassword, newPassword });
+  }
+
+  resetPasswordForm(): void {
+    this.passwordForm.reset();
   }
 
   headerDisplayName(): string {

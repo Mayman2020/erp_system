@@ -62,27 +62,31 @@
 }
 
 .erp-data-table-detail {
-  max-height: min(70vh, 560px);
-  overflow-y: auto;
-  padding-inline-end: 4px;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
 }
 
 .erp-data-table-detail__list {
   display: grid;
-  grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1fr);
-  gap: 0.5rem 16px;
+  grid-template-columns: minmax(120px, .32fr) minmax(0, 1fr) minmax(120px, .32fr) minmax(0, 1fr);
+  gap: 12px 18px;
   margin: 0;
 }
 
 .erp-data-table-detail__list > dt {
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--erp-border, rgba(148, 163, 184, 0.22));
+  padding: 12px 14px;
+  border: 1px solid var(--line-2, var(--erp-border));
+  border-radius: 10px;
+  background: var(--paper-2, var(--erp-bg-muted));
 }
 
 .erp-data-table-detail__list > dd {
   margin: 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--erp-border, rgba(148, 163, 184, 0.22));
+  padding: 12px 14px;
+  border: 1px solid var(--line-2, var(--erp-border));
+  border-radius: 10px;
+  background: var(--surface, var(--erp-bg-elevated));
 }
 
 .erp-data-table-detail__label {
@@ -101,4 +105,10 @@
 
 .erp-data-table-detail__label--extra {
   font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .erp-data-table-detail__list {
+    grid-template-columns: minmax(110px, .38fr) minmax(0, 1fr);
+  }
 }

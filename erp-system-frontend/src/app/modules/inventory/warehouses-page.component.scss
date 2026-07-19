@@ -1,11 +1,1 @@
-.erp-list-page__card {
-  margin-top: 0.5rem;
-}
-
-.erp-list-page__card .erp-card__body {
-  padding: 1rem 1.25rem 1.25rem;
-}
-
-[data-theme='dark'] .erp-list-page__card {
-  border-color: rgba(255, 255, 255, 0.08);
-}
+:host { display: block; }

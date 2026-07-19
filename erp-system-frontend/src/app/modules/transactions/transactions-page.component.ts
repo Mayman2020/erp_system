@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable, throwError } from 'rxjs';
 import { AccountDto, AccountingTransactionDto, AccountingTransactionForm } from '../../core/models/accounting.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -50,6 +50,7 @@ export class TransactionsPageComponent extends ErpMasterPageBase<AccountingTrans
 
   accounts: AccountDto[] = [];
   transactionTypes: string[] = [];
+  editingRecord: AccountingTransactionDto | null = null;
 
   constructor(
     private api: AccountingApiService,
@@ -126,7 +127,7 @@ export class TransactionsPageComponent extends ErpMasterPageBase<AccountingTrans
   }
 
   protected removeItem(_id: number): Observable<void> {
-    return of(undefined);
+    return throwError(() => new Error('Transactions cannot be deleted; use Cancel instead.'));
   }
 
   protected defaultFormValues(): Record<string, unknown> {
@@ -143,6 +144,7 @@ export class TransactionsPageComponent extends ErpMasterPageBase<AccountingTrans
   }
 
   protected patchForm(dto: AccountingTransactionDto): void {
+    this.editingRecord = dto;
     this.form.reset({
       transactionDate: dto.transactionDate || '',
       reference: dto.reference || '',

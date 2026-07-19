@@ -2,6 +2,6 @@
     "/api/v1":  {
                     "secure":  false,
                     "changeOrigin":  true,
-                    "target":  "http://127.0.0.1:8081"
+                    "target":  "http://127.0.0.1:8087"
                 }
 }

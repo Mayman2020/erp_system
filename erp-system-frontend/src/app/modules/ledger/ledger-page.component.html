@@ -41,20 +41,20 @@
         <div class="col-lg-2 col-md-6">
           <div class="report-card">
             <div class="text-muted small">{{ 'LEDGER.OPENING_BALANCE' | translate }}</div>
-            <div class="h5 mb-0">{{ ledger.openingBalance | number:'1.2-2' }}</div>
+            <div class="h5 mb-0" [erpCountUp]="ledger.openingBalance" [erpCountUpDecimals]="2"></div>
             <div class="text-muted small mt-1 ledger-opening-hint">{{ 'LEDGER.OPENING_BALANCE_HINT' | translate }}</div>
           </div>
         </div>
         <div class="col-lg-2 col-md-6">
           <div class="report-card">
             <div class="text-muted small">{{ 'LEDGER.CLOSING_BALANCE' | translate }}</div>
-            <div class="h5 mb-0">{{ ledger.closingBalance | number:'1.2-2' }}</div>
+            <div class="h5 mb-0" [erpCountUp]="ledger.closingBalance" [erpCountUpDecimals]="2"></div>
           </div>
         </div>
         <div class="col-lg-2 col-md-6">
           <div class="report-card">
             <div class="text-muted small">{{ 'LEDGER.ENTRY_COUNT' | translate }}</div>
-            <div class="h5 mb-0">{{ ledger.lines?.length || 0 }}</div>
+            <div class="h5 mb-0" [erpCountUp]="ledger.lines?.length || 0" [erpCountUpDecimals]="0"></div>
           </div>
         </div>
         <div class="col-lg-2 col-md-6">

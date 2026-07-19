@@ -5,6 +5,10 @@
     "STATUS": "Status",
     "SEARCH": "Search",
     "ALL": "All",
+    "ACTIVE": "Active",
+    "REFRESH": "Refresh",
+    "REQUIRED": "Required",
+    "VIEW_ALL": "View all",
     "APPLY": "Apply",
     "CLEAR": "Clear",
     "TREE_FILTER_ACCOUNTS": "Filter by code, name, or description…",
@@ -14,6 +18,9 @@
     "NO_DATA": "No data available",
     "NO_RESULTS_HINT": "Try adjusting the search criteria or filters.",
     "RETRY": "Retry",
+    "NOT_FOUND_TITLE": "Page not found",
+    "NOT_FOUND_HINT": "The page you're looking for doesn't exist or has moved.",
+    "BACK_TO_DASHBOARD": "Back to dashboard",
     "ACTIONS": "Actions",
     "VIEW": "View",
     "CREATE": "Create",
@@ -36,6 +43,8 @@
     "DELETE_CONFIRM": "Are you sure you want to delete this record?",
     "APPROVE_SUCCESS": "Approved successfully",
     "CANCEL_SUCCESS": "Cancelled successfully",
+    "ACTIVATE_SUCCESS": "Activated successfully",
+    "DEACTIVATE_SUCCESS": "Deactivated successfully",
     "SORT_BY": "Sort By",
     "SORT_DIRECTION": "Direction",
     "ASC": "Ascending",
@@ -59,9 +68,11 @@
     "EXPAND": "Expand",
     "COLLAPSE": "Collapse",
     "RELOAD": "Reload",
+    "BACK": "Back",
     "REMOVE": "Remove",
     "FULL_DETAILS": "All fields",
     "EXPORT_EXCEL": "Export to Excel",
+    "EXPORT_SHEET_NAME": "Export",
     "EXPORT_PDF": "Export to PDF",
     "ADD": "Add",
     "PAGE": "Page",
@@ -95,6 +106,7 @@
     "ROLES": "Roles & Permissions",
     "LOOKUPS": "Lookups",
     "SCREENS": "Screens (menu)",
+    "USER_ACCESS": "User Access",
     "TOGGLE_THEME": "Toggle light / dark mode",
     "TOGGLE_MENU": "Toggle sidebar",
     "SIDEBAR_WELCOME": "Welcome",
@@ -103,11 +115,19 @@
     "NOTIFICATIONS": "Notifications",
     "MESSAGES": "Messages"
   },
+  "TOPBAR": {
+    "TOGGLE_MENU": "Toggle sidebar",
+    "LANGUAGE": "Language",
+    "LIGHT_MODE": "Light mode",
+    "DARK_MODE": "Dark mode"
+  },
   "COMMAND_PALETTE": {
     "TITLE": "Quick find (Ctrl+K)",
     "PLACEHOLDER": "Search pages and routes…",
     "EMPTY": "No matches",
     "GROUP_NAV": "Navigation",
+    "GROUP_MODULES": "Modules",
+    "GROUP_ADMIN": "System Management",
     "HINT_ARROWS": "Arrow keys to move",
     "HINT_ENTER": "Enter to open"
   },
@@ -164,21 +184,26 @@
     "CURRENCY_CODE_LENGTH": "Currency must be 3 characters"
   },
   "AUTH": {
+    "FORCE_PASSWORD_CHANGE": {
+      "TITLE": "Change your password",
+      "HINT": "Your administrator requires you to set a new password before continuing."
+    },
     "SIGN_IN": "Sign in",
     "EMAIL": "Email",
-    "EMAIL_PLACEHOLDER": "email@example.com",
+    "EMAIL_PLACEHOLDER": "admin@erp.local",
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD": "Password",
     "LOGIN": "Login",
     "INVALID_CREDENTIALS": "Invalid credentials",
     "SUBTITLE": "Securely access your ERP workspace",
+    "BRAND_SUBTITLE": "Advanced accounting solutions",
     "NEW_EXPERIENCE": "New Login Experience",
     "HERO_TITLE": "Control accounting operations from one trusted place",
     "HERO_SUBTITLE": "A modern sign-in aligned with Hesabaty quality for speed, clarity, and security.",
     "FEATURE_1": "Secure authentication and protected sessions",
     "FEATURE_2": "Unified access across accounting workflows",
     "FEATURE_3": "Real-time visibility into financial performance",
-    "REMEMBER_ME": "Remember my email",
+    "REMEMBER_ME": "Remember me",
     "FORGOT": "Forgot password",
     "FORGOT_SUBTITLE": "Send OTP then set a new password",
     "SEND_OTP": "Send OTP",
@@ -191,6 +216,9 @@
     "ROLE_ACCOUNTANT": "Accountant",
     "LOGOUT": "Sign out",
     "SECURE_LOGIN": "Secure, encrypted sign-in",
+    "SECURE_LOGIN_ENHANCED": "Enhanced secure login",
+    "OR": "or",
+    "USERNAME": "Username",
     "SHOW_PASSWORD": "Show password",
     "HIDE_PASSWORD": "Hide password"
   },
@@ -198,18 +226,21 @@
     "logoAlt": "ERP logo",
     "heroTitle": "Control accounting operations from one trusted place",
     "heroLead": "A modern sign-in aligned with Hesabaty quality for speed, clarity, and security.",
-    "visionBadge": "Enterprise ERP",
-    "feat1Title": "Protected sessions",
+    "visionBadge": "Enterprise Resource Planning",
+    "feat1Title": "Advanced security",
     "feat1Desc": "Secure authentication and protected sessions",
-    "feat2Title": "Unified workflows",
+    "feat2Title": "High performance",
     "feat2Desc": "Unified access across accounting workflows",
-    "feat3Title": "Live performance",
+    "feat3Title": "Smart reports",
     "feat3Desc": "Real-time visibility into financial performance",
     "footerBlurb": "A reliable accounting workspace for teams that need clarity, speed, and control.",
     "footerLinksTitle": "Quick links",
     "footerOfficeTitle": "Trust",
     "footerOfficeLine": "Encrypted sign-in · role-based access · audit-ready workflows",
-    "footerCopyright": "© {{year}} ELEVON ERP"
+    "footerCopyright": "© {{year}} ELEVON ERP",
+    "footerSupport": "24/7 support",
+    "footerSecure": "Secure connection",
+    "footerEncrypted": "Encrypted sessions"
   },
   "LANG": {
     "EN": "EN",
@@ -235,6 +266,8 @@
     "QUICK_ACTIONS": "Quick Actions",
     "RECENT_ACTIVITIES": "Recent Activities",
     "LOW_STOCK": "Low Stock Inventory",
+    "STOCK_HIGH": "High",
+    "STOCK_NORMAL": "Normal",
     "EMPLOYEE_PERFORMANCE": "Employee Performance",
     "PRODUCT": "Product",
     "QUANTITY": "Quantity",
@@ -339,6 +372,7 @@
     "TITLE": "Journal Vouchers"
   },
   "JOURNAL": {
+    "ACCOUNT_NAME": "Account name",
     "TITLE": "Journal Vouchers",
     "CREATE": "Create Journal Voucher",
     "FORM_TITLE_CREATE": "Create Journal Voucher",
@@ -751,6 +785,17 @@
     "LOAD_ERROR": "Failed to load accounting settings",
     "SAVE_SUCCESS": "Accounting settings saved successfully",
     "SAVE_ERROR": "Failed to save accounting settings",
+    "COMPANY_TAB": "Company",
+    "COMPANY_TITLE": "Company Identity",
+    "COMPANY_NAME_EN": "Company legal name (English)",
+    "COMPANY_NAME_AR": "Company legal name (Arabic)",
+    "COMPANY_TAX_ID": "Tax identification number",
+    "COMPANY_LOGO": "Company logo",
+    "COMPANY_UPLOAD_LOGO": "Upload logo",
+    "COMPANY_FISCAL_START_MONTH": "Fiscal year start month",
+    "COMPANY_READONLY_HINT": "Only administrators can change company identity settings.",
+    "COMPANY_SAVE_SUCCESS": "Company settings saved successfully",
+    "COMPANY_SAVE_ERROR": "Failed to save company settings",
     "CREATE_SUCCESS": "New fiscal record created successfully",
     "ACTION_SUCCESS": "Accounting status updated successfully",
     "ACTION_ERROR": "Failed to update accounting status",
@@ -786,7 +831,22 @@
     "SAVE_SUCCESS": "Profile updated successfully",
     "SAVE_ERROR": "Failed to update profile",
     "LOAD_ERROR": "Failed to load profile data",
-    "AVATAR_ALT": "Profile image"
+    "AVATAR_ALT": "Profile image",
+    "YOUR_DETAILS": "Your details",
+    "EMAIL_READONLY_HINT": "Email is read-only — contact an administrator to change it.",
+    "CHANGE_PASSWORD": "Change password",
+    "PASSWORD_ADMIN_HINT": "To change your password, use the reset flow from your administrator or the sign-in page.",
+    "CURRENT_PASSWORD": "Current password",
+    "NEW_PASSWORD": "New password",
+    "CONFIRM_PASSWORD": "Confirm new password",
+    "PASSWORD_MISMATCH": "New password and confirmation do not match.",
+    "CHANGE_PASSWORD_SUCCESS": "Password changed successfully",
+    "CHANGE_PASSWORD_ERROR": "Failed to change password",
+    "ERRORS": {
+      "CURRENT_PASSWORD_INVALID": "Current password is incorrect.",
+      "USERNAME_IN_USE": "This username is already in use.",
+      "EMAIL_IN_USE": "This email is already in use."
+    }
   },
   "ACCESS_MANAGEMENT": {
     "TITLE": "Access Management",
@@ -817,6 +877,7 @@
     "PASSWORD_OPTIONAL": "Leave blank to keep the current password unchanged.",
     "PASSWORD_OPTIONAL_ADMIN": "Enter a new password to change it, or leave blank to keep the current one.",
     "PASSWORD_MASKED": "••••••••",
+    "MUST_CHANGE_PASSWORD": "Require password change on next login",
     "ACTIVE_USER": "Active",
     "USER_ACTIVE_UPDATED": "User active status updated.",
     "USER_ACTIVE_ERROR": "Could not update active status.",
@@ -916,7 +977,22 @@
     "SCREEN_DELETE_ERROR": "Could not delete this menu screen.",
     "DELETE_CONFIRM_TITLE": "Confirm deletion",
     "DELETE_CONFIRM_COPY": "This will permanently remove the selected record if the server allows it.",
-    "LOAD_ERROR": "Failed to load access management data."
+    "LOAD_ERROR": "Failed to load access management data.",
+    "USER_ACCESS_TITLE": "User Access & Effective Permissions",
+    "SELECT_USER": "Select a user",
+    "SCREEN": "Screen",
+    "CAN_VIEW": "View",
+    "CAN_CREATE": "Create",
+    "CAN_EDIT": "Edit",
+    "CAN_DELETE": "Delete",
+    "NO_CUSTOM_ROLES_HINT": "This user has no custom role assignments; permissions fall back to their primary account role.",
+    "SCREEN_VISIBILITY_TITLE": "Screen visibility",
+    "SCREEN_VISIBILITY_HINT": "Globally hide a screen for every user, regardless of role permissions. Distinct from the menu catalog editor below.",
+    "ADD_SCREEN_KEY": "Add screen key",
+    "SCREEN_KEY_PLACEHOLDER": "e.g. inventory",
+    "SCREEN_VISIBILITY_UPDATE_SUCCESS": "Screen visibility updated.",
+    "SCREEN_VISIBILITY_UPDATE_ERROR": "Could not update screen visibility.",
+    "MENU_CATALOG_TITLE": "Menu catalog (per-role editor)"
   },
   "APP": {
     "BRAND": "ELEVON ERP",
@@ -1021,6 +1097,8 @@
     "INVOICE_ID": "Linked Invoice ID"
   },
   "ERP": {
+    "SUBMIT": "Submit",
+    "SUBMIT_SUCCESS": "Submitted successfully",
     "CODE": "Code",
     "NUMBER": "Number",
     "DATE": "Date",
@@ -1121,8 +1199,55 @@
     "MEMBERS": "Members",
     "EXPENSES": "Expenses",
     "MEMBER": "Member"
+  },
+  "AUDIT": {
+    "INFO_TITLE": "Audit information",
+    "CREATED_BY": "Created by",
+    "CREATED_AT": "Created at",
+    "MODIFIED_BY": "Modified by",
+    "UPDATED_AT": "Updated at",
+    "APPROVED_BY": "Approved by",
+    "UNKNOWN": "Unknown"
+  },
+  "LOV": {
+    "SELECT_PLACEHOLDER": "Select…",
+    "SEARCH_PLACEHOLDER": "Search…",
+    "OPEN": "Open picker",
+    "CLEAR": "Clear selection"
+  },
+  "EXPORT": {
+    "EXCEL": "Export Excel"
+  },
+  "NOTIFICATIONS": {
+    "TITLE": "Notifications",
+    "MARK_ALL_READ": "Mark all read",
+    "EMPTY_TITLE": "No notifications",
+    "EMPTY_MESSAGE": "You are all caught up.",
+    "UNREAD": "Unread",
+    "TAB_RECENT": "Recent (14 days)",
+    "TAB_OLDER": "Older",
+    "JOURNAL_APPROVED_TITLE": "Journal entry approved",
+    "JOURNAL_APPROVED_BODY": "Journal entry {{referenceNumber}} was approved by {{approvedBy}}.",
+    "LOW_STOCK_TITLE": "Low stock alert",
+    "LOW_STOCK_BODY": "Product {{productCode}} dropped to {{quantity}} units, below its reorder level of {{reorderLevel}}.",
+    "LEAVE_SUBMITTED_TITLE": "Leave request submitted",
+    "LEAVE_SUBMITTED_BODY": "A new {{leaveType}} leave request was submitted and is awaiting approval.",
+    "LEAVE_APPROVED_TITLE": "Leave request approved",
+    "LEAVE_APPROVED_BODY": "A {{leaveType}} leave request was approved."
+  },
+  "MONTH": {
+    "JANUARY": "January",
+    "FEBRUARY": "February",
+    "MARCH": "March",
+    "APRIL": "April",
+    "MAY": "May",
+    "JUNE": "June",
+    "JULY": "July",
+    "AUGUST": "August",
+    "SEPTEMBER": "September",
+    "OCTOBER": "October",
+    "NOVEMBER": "November",
+    "DECEMBER": "December"
   }
 }
-
-
 

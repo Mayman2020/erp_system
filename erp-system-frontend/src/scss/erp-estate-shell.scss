@@ -31,11 +31,18 @@
   background: transparent;
   display: flex;
   flex-direction: column;
+  padding: 0;
 }
 
 .erp-app-shell .erp-route-shell {
   flex: 1 1 auto;
   min-height: 0;
+  padding: 0;
+}
+
+.erp-app-shell .erp-breadcrumb-host {
+  display: block;
+  padding: 12px var(--content-pad-inline, 24px) 0;
 }
 
 /* ── Sidebar host (app-navigation) ──────────────────────────────────────── */
@@ -61,7 +68,7 @@ app-navigation.erp-estate-sidebar::before,
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(600px 300px at 20% 0%, rgba(204, 165, 91, 0.08), transparent 60%);
+  background: radial-gradient(600px 300px at 20% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%);
   z-index: 0;
 }
 
@@ -78,16 +85,19 @@ app-navigation.erp-estate-sidebar::before,
 .erp-estate-sidebar .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 20px 18px 16px;
-  border-bottom: 1px solid rgba(204, 165, 91, 0.12);
+  gap: 12px;
+  height: var(--topbar-height, 64px);
+  min-height: var(--topbar-height, 64px);
+  padding: 0 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
   flex-shrink: 0;
-  background: linear-gradient(135deg, rgba(204, 165, 91, 0.04) 0%, transparent 60%);
+  box-sizing: border-box;
+  background: transparent;
 }
 
 .erp-estate-sidebar .sidebar-brand--collapsed {
   justify-content: center;
-  padding: 18px 0 12px;
+  padding: 0;
   gap: 0;
 }
 
@@ -96,14 +106,14 @@ app-navigation.erp-estate-sidebar::before,
   height: 40px;
   border-radius: 10px;
   background: linear-gradient(135deg, #0e1f33 0%, #1b3553 100%);
-  border: 1px solid rgba(204, 165, 91, 0.35);
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(204, 165, 91, 0.15),
+    0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
   overflow: hidden;
   position: relative;
@@ -113,7 +123,7 @@ app-navigation.erp-estate-sidebar::before,
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 20%, rgba(204, 165, 91, 0.22), transparent 60%);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 60%);
   pointer-events: none;
 }
 
@@ -123,7 +133,7 @@ app-navigation.erp-estate-sidebar::before,
   object-fit: contain;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 2px 6px rgba(204, 165, 91, 0.5));
+  filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--accent) 55%, transparent));
 }
 
 .erp-estate-sidebar .brand-text {
@@ -138,11 +148,10 @@ app-navigation.erp-estate-sidebar::before,
   font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: #dbeafe;
   line-height: 1.15;
 
-  /* ELEVON: gold gradient on brand name */
-  background: linear-gradient(135deg, #f0d87a 0%, #e8c97a 40%, #cca55b 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #bfdbfe 48%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -150,7 +159,7 @@ app-navigation.erp-estate-sidebar::before,
 
 .erp-estate-sidebar .brand-tagline {
   font-size: 10px;
-  color: rgba(204, 165, 91, 0.75);
+  color: color-mix(in srgb, #ffffff 62%, var(--accent));
   margin-top: 3px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -197,6 +206,74 @@ app-navigation.erp-estate-sidebar::before,
 .app-shell.sidebar-collapsed .erp-estate-sidebar .sidebar-brand {
   justify-content: center;
   padding: 20px 0 14px;
+  gap: 0;
+}
+
+.app-shell.sidebar-collapsed .erp-estate-sidebar .brand-icon {
+  margin-inline: auto;
+}
+
+.erp-estate-sidebar .erp-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 12px 14px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  flex-shrink: 0;
+}
+
+.erp-estate-sidebar .erp-sidebar-user--collapsed {
+  justify-content: center;
+  margin-inline: 8px;
+  padding-inline: 8px;
+}
+
+.erp-estate-sidebar .erp-sidebar-user__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #0e1f33, #1b3553);
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  flex-shrink: 0;
+}
+
+.erp-estate-sidebar .erp-sidebar-user__avatar--img {
+  object-fit: cover;
+}
+
+.erp-estate-sidebar .erp-sidebar-user__info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.erp-estate-sidebar .erp-sidebar-user__name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.erp-estate-sidebar .erp-sidebar-user__role {
+  font-size: 0.66rem;
+  color: color-mix(in srgb, #ffffff 68%, var(--accent));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.app-shell.sidebar-collapsed .erp-estate-sidebar .erp-sidebar-user__info {
+  display: none;
 }
 
 /* Estate sidebar nav (Property pattern) */
@@ -205,7 +282,7 @@ app-navigation.erp-estate-sidebar::before,
   min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(204, 165, 91, 0.42) transparent;
+  scrollbar-color: color-mix(in srgb, var(--accent) 48%, transparent) transparent;
 }
 
 .erp-estate-sidebar .sidebar-nav {
@@ -219,7 +296,7 @@ app-navigation.erp-estate-sidebar::before,
 
 .erp-estate-sidebar .nav-section-label {
   font-size: 13px;
-  color: rgba(232, 201, 122, 0.9);
+  color: color-mix(in srgb, #ffffff 72%, var(--accent));
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -232,12 +309,12 @@ app-navigation.erp-estate-sidebar::before,
   width: 14px;
   height: 2px;
   border-radius: 2px;
-  background: linear-gradient(90deg, #e8c97a, rgba(232, 201, 122, 0.3));
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 25%, transparent));
   flex-shrink: 0;
 }
 
 [dir='rtl'] .erp-estate-sidebar .nav-section-label::before {
-  background: linear-gradient(270deg, #e8c97a, rgba(232, 201, 122, 0.3));
+  background: linear-gradient(270deg, var(--accent), color-mix(in srgb, var(--accent) 25%, transparent));
 }
 
 .erp-estate-sidebar .nav-section-toggle {
@@ -255,7 +332,7 @@ app-navigation.erp-estate-sidebar::before,
   font-size: 18px;
   width: 18px;
   height: 18px;
-  color: rgba(232, 201, 122, 0.55);
+  color: color-mix(in srgb, #ffffff 48%, var(--accent));
 }
 
 .erp-estate-sidebar .nav-section-items {
@@ -286,16 +363,16 @@ app-navigation.erp-estate-sidebar::before,
 
 .erp-estate-sidebar .nav-item:hover {
   background: var(--sidebar-item-hover);
-  color: #f4e7c4;
+  color: #dbeafe;
 }
 
 .erp-estate-sidebar .nav-item.active {
-  background: linear-gradient(135deg, rgba(204, 165, 91, 0.22) 0%, rgba(196, 152, 42, 0.14) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--navy-700) 72%, transparent));
   color: #fff;
   font-weight: 700;
   box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.3),
-    inset 0 0 0 1px rgba(232, 201, 122, 0.55),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 58%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -312,8 +389,8 @@ app-navigation.erp-estate-sidebar::before,
   bottom: 4px;
   width: 5px;
   border-radius: 0 5px 5px 0;
-  background: linear-gradient(180deg, #f0d87a, #c4982a);
-  box-shadow: 0 0 14px rgba(204, 165, 91, 0.9);
+  background: linear-gradient(180deg, #60a5fa, var(--accent));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 80%, transparent);
 }
 
 [dir='rtl'] .erp-estate-sidebar .nav-item.active::before {
@@ -325,7 +402,7 @@ app-navigation.erp-estate-sidebar::before,
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: rgba(232, 201, 122, 0.72);
+  color: color-mix(in srgb, #ffffff 60%, var(--accent));
 }
 
 .app-shell.sidebar-collapsed .erp-estate-sidebar .nav-label,
@@ -346,7 +423,7 @@ app-navigation.erp-estate-sidebar::before,
   padding-inline-start: 0;
 }
 
-/* ── Topbar host (app-nav-bar) ──────────────────────────────────────────── */
+/* ── Topbar host (Property flat bar) ────────────────────────────────────── */
 app-nav-bar.erp-estate-topbar,
 .erp-estate-topbar {
   display: block;
@@ -354,8 +431,7 @@ app-nav-bar.erp-estate-topbar,
   width: 100%;
 }
 
-.erp-estate-topbar .topbar,
-.erp-estate-topbar .erp-header-shell {
+.erp-estate-topbar .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -373,24 +449,14 @@ app-nav-bar.erp-estate-topbar,
   margin: 0 !important;
 }
 
-.erp-estate-topbar .erp-header-shell__brand,
 .erp-estate-topbar .topbar-start {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 0 0 auto;
+  flex: 1;
   min-width: 0;
 }
 
-.erp-estate-topbar .erp-header-shell__center {
-  flex: 1 1 auto;
-  display: flex;
-  justify-content: center;
-  min-width: 0;
-  padding: 0 12px;
-}
-
-.erp-estate-topbar .erp-header-shell__actions,
 .erp-estate-topbar .topbar-end {
   display: flex;
   align-items: center;
@@ -398,28 +464,25 @@ app-nav-bar.erp-estate-topbar,
   flex-shrink: 0;
 }
 
-.erp-estate-topbar .erp-header-toggle,
-.erp-estate-topbar .tb-action-btn {
+.erp-estate-topbar .tb-action-btn.topbar-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
+  min-width: 36px;
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
   color: var(--text-main);
-  cursor: pointer;
-  transition: background 0.18s, border-color 0.18s;
+  box-shadow: none;
 }
 
-.erp-estate-topbar .erp-header-toggle:hover,
-.erp-estate-topbar .tb-action-btn:hover {
+.erp-estate-topbar .tb-action-btn.topbar-toggle:hover {
   background: var(--icon-btn-hover);
   border-color: var(--line);
 }
 
-/* Mobile drawer */
 @media (max-width: 991px) {
   .app-shell,
   .erp-app-shell {
@@ -450,8 +513,7 @@ app-nav-bar.erp-estate-topbar,
     transform: translateX(0);
   }
 
-  .erp-estate-topbar .topbar,
-  .erp-estate-topbar .erp-header-shell {
+  .erp-estate-topbar .topbar {
     padding: 0 14px;
   }
 }

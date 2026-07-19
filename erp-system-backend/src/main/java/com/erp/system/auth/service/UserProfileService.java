@@ -3,6 +3,7 @@ package com.erp.system.auth.service;
 import com.erp.system.auth.domain.User;
 import com.erp.system.auth.domain.UserProfile;
 import com.erp.system.auth.dto.AuthUserDto;
+import com.erp.system.auth.dto.ChangePasswordRequestDto;
 import com.erp.system.auth.dto.UpdateProfileRequestDto;
 import com.erp.system.auth.dto.UserProfileDtoMapper;
 import com.erp.system.auth.repository.UserProfileRepository;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ public class UserProfileService {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final AccessControlService accessControlService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public AuthUserDto getMyProfile() {
@@ -70,6 +73,17 @@ public class UserProfileService {
         return toDto(userRepository.save(user));
     }
 
+    @Transactional
+    public AuthUserDto changeMyPassword(ChangePasswordRequestDto request) {
+        User user = getCurrentUser();
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BusinessException("PROFILE.ERRORS.CURRENT_PASSWORD_INVALID");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setMustChangePassword(false);
+        return toDto(userRepository.save(user));
+    }
+
     private AuthUserDto toDto(User user) {
         UserProfile profile = user.getProfile();
         return AuthUserDto.builder()
@@ -80,6 +94,7 @@ public class UserProfileService {
                 .role(user.getRole().name())
                 .roles(accessControlService.authorityCodesFor(user))
                 .active(user.isActive())
+                .mustChangePassword(user.isMustChangePassword())
                 .createdAt(user.getCreatedAt())
                 .profile(UserProfileDtoMapper.from(profile, user.getId(), LocaleContextHolder.getLocale()))
                 .build();

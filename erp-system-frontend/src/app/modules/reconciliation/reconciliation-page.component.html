@@ -73,7 +73,7 @@
               <div class="erp-card erp-summary-card text-center h-100">
                 <div class="erp-card__body py-2">
                   <small class="text-muted">{{ 'RECONCILIATION.FORM.OPENING_BALANCE' | translate }}</small>
-                  <div class="fw-bold">{{ summary.openingBalance || 0 | number:'1.2-2' }}</div>
+                  <div class="fw-bold" [erpCountUp]="summary.openingBalance || 0" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
             </div>
@@ -81,7 +81,7 @@
               <div class="erp-card erp-summary-card text-center h-100">
                 <div class="erp-card__body py-2">
                   <small class="text-muted">{{ 'RECONCILIATION.FORM.CLOSING_BALANCE' | translate }}</small>
-                  <div class="fw-bold">{{ summary.closingBalance || 0 | number:'1.2-2' }}</div>
+                  <div class="fw-bold" [erpCountUp]="summary.closingBalance || 0" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
             </div>
@@ -89,7 +89,7 @@
               <div class="erp-card erp-summary-card text-center h-100">
                 <div class="erp-card__body py-2">
                   <small class="text-muted">{{ 'RECONCILIATION.SUMMARY.MATCHED' | translate }}</small>
-                  <div class="fw-bold text-success">{{ summary.matchedCount || 0 }}</div>
+                  <div class="fw-bold text-success" [erpCountUp]="summary.matchedCount || 0" [erpCountUpDecimals]="0"></div>
                 </div>
               </div>
             </div>
@@ -97,7 +97,7 @@
               <div class="erp-card erp-summary-card text-center h-100" [class.erp-summary-card--danger]="(summary.difference || 0) !== 0">
                 <div class="erp-card__body py-2">
                   <small class="text-muted">{{ 'RECONCILIATION.SUMMARY.DIFFERENCE' | translate }}</small>
-                  <div class="fw-bold" [ngClass]="(summary.difference || 0) === 0 ? 'text-success' : 'text-danger'">{{ summary.difference || 0 | number:'1.2-2' }}</div>
+                  <div class="fw-bold" [ngClass]="(summary.difference || 0) === 0 ? 'text-success' : 'text-danger'" [erpCountUp]="summary.difference || 0" [erpCountUpDecimals]="2"></div>
                 </div>
               </div>
             </div>

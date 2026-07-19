@@ -14,6 +14,8 @@ import com.erp.system.accounting.service.PostingPeriodService;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.common.service.NumberingService;
+import com.erp.system.notification.domain.NotificationType;
+import com.erp.system.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +42,7 @@ public class JournalEntryService {
     private final NumberingService numberingService;
     private final PostingPeriodService postingPeriodService;
     private final AccountingAuditService auditService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<JournalEntryDisplayDto> getJournalEntries() {
@@ -215,6 +219,13 @@ public class JournalEntryService {
 
         JournalEntry saved = journalEntryRepository.save(journalEntry);
         auditService.log("JournalEntry", saved.getId(), "APPROVE", approvedBy, "Approved journal " + saved.getReferenceNumber());
+        notificationService.notifyAdmins(
+                NotificationType.ACCOUNTING,
+                "NOTIFICATIONS.JOURNAL_APPROVED_TITLE",
+                "NOTIFICATIONS.JOURNAL_APPROVED_BODY",
+                Map.of("referenceNumber", saved.getReferenceNumber(), "approvedBy", approvedBy),
+                "JOURNAL_ENTRY",
+                saved.getId());
         return toDisplay(saved);
     }
 

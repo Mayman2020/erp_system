@@ -1,12 +1,5 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
-  <app-page-header titleKey="GENERAL_LEDGER.DETAIL_TITLE">
-    <div header-actions>
-      <button type="button" class="erp-button erp-button--ghost" (click)="goBack()">
-        <mat-icon aria-hidden="true">arrow_back</mat-icon>
-        <span>{{ 'GENERAL_LEDGER.BACK_TO_LIST' | translate }}</span>
-      </button>
-    </div>
-  </app-page-header>
+  <app-page-header titleKey="GENERAL_LEDGER.DETAIL_TITLE"></app-page-header>
 
   <div class="erp-card erp-list-page__card" *ngIf="loading"><app-loading-state></app-loading-state></div>
 
@@ -130,6 +123,18 @@
             <strong class="gl-detail__value">{{ entry.reversedBy }}</strong>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="erp-card erp-list-page__card">
+      <div class="erp-card__body">
+        <app-erp-audit-trail
+          [createdAt]="entry.createdAt"
+          [updatedAt]="entry.updatedAt"
+          [createdByName]="entry.createdBy"
+          [modifiedByName]="entry.updatedBy"
+          [approvedByName]="entry.postedBy">
+        </app-erp-audit-trail>
       </div>
     </div>
   </div>

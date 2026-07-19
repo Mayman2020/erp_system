@@ -36,6 +36,13 @@ import { DocumentLinesTableComponent } from './components/document-lines-table/d
 import { CommandPaletteComponent } from './components/command-palette/command-palette.component';
 import { HasPermissionDirective } from './directives/has-permission.directive';
 import { JournalLinkComponent } from './components/journal-link/journal-link.component';
+import { ErpAuditTrailComponent } from './components/erp-audit-trail/erp-audit-trail.component';
+import { LovSelectDialogComponent } from './components/lov-select-dialog/lov-select-dialog.component';
+import { SearchableSelectComponent } from './components/searchable-select/searchable-select.component';
+import { TableExportToolbarComponent } from './components/table-export-toolbar/table-export-toolbar.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -66,7 +73,11 @@ import { JournalLinkComponent } from './components/journal-link/journal-link.com
     ErpDocumentPageShellComponent,
     ErpAlertComponent,
     HasPermissionDirective,
-    JournalLinkComponent
+    JournalLinkComponent,
+    ErpAuditTrailComponent,
+    LovSelectDialogComponent,
+    SearchableSelectComponent,
+    TableExportToolbarComponent
   ],
   imports: [
     CommonModule,
@@ -81,6 +92,9 @@ import { JournalLinkComponent } from './components/journal-link/journal-link.com
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatProgressSpinnerModule,
     DateFieldComponent
   ],
   exports: [
@@ -124,7 +138,10 @@ import { JournalLinkComponent } from './components/journal-link/journal-link.com
     ErpDocumentPageShellComponent,
     ErpAlertComponent,
     HasPermissionDirective,
-    JournalLinkComponent
+    JournalLinkComponent,
+    ErpAuditTrailComponent,
+    SearchableSelectComponent,
+    TableExportToolbarComponent
   ]
 })
 export class SharedModule {}

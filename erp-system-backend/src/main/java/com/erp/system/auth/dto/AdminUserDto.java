@@ -13,6 +13,7 @@ public record AdminUserDto(
         String phone,
         String primaryRole,
         boolean active,
+        boolean mustChangePassword,
         String fullName,
         String fullNameEn,
         String fullNameAr,

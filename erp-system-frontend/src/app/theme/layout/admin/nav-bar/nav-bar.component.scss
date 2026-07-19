@@ -1,286 +1,74 @@
+/* Property topbar — single continuous flat bar (no floating cards) */
 :host {
   display: block;
   width: 100%;
-  overflow: visible;
+  flex-shrink: 0;
   position: relative;
   z-index: 1000;
-  isolation: isolate;
 }
 
-.erp-header-shell {
+.topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  min-width: 0;
-  min-height: var(--erp-header-height, 64px);
-  padding: 0 24px;
-  color: var(--erp-shell-bar-text, #f8fafc);
-  background: var(--erp-shell-bar-gradient);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(204, 165, 91, 0.1);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04),
-    0 4px 24px rgba(0, 0, 0, 0.18);
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  overflow: visible;
+  gap: 16px;
+  height: 64px;
+  padding: 0 28px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 99;
+  flex-shrink: 0;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
-/* Light mode topbar: warm paper */
-.erp-integrated-shell .erp-header-shell {
-  background: var(--header-bg, var(--surface)) !important;
-  border-bottom: 1px solid var(--header-border, var(--line)) !important;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 4px 16px rgba(14, 31, 51, 0.06) !important;
-  color: var(--text-main) !important;
-}
-
-/* ── Brand area ─────────────────────────────────────────────────────────── */
-.erp-header-shell__brand,
-.erp-header-shell__actions {
+.topbar-start,
+.topbar-end {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.erp-header-shell__brand {
+.topbar-start {
+  flex: 1;
   min-width: 0;
-  flex: 0 1 auto;
 }
 
-.erp-header-shell__title {
-  margin: 0;
-  font-size: clamp(14px, 1.5vw, 17px);
-  font-weight: 800;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  color: inherit;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: min(240px, 28vw);
-}
-
-/* Integrated (light) topbar title color */
-.erp-integrated-shell .erp-header-shell__title {
-  color: var(--text-main);
-}
-
-/* ── Search bar ─────────────────────────────────────────────────────────── */
-.erp-header-shell__center {
-  flex: 1 1 auto;
-  min-width: 0;
+.tb-action-btn {
   display: flex;
-  justify-content: center;
-  padding: 0 16px;
-}
-
-.erp-header-search {
-  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  width: min(480px, 100%);
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(248, 250, 252, 0.85);
+  gap: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 6px 10px;
+  height: 36px;
+  min-width: 36px;
   cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background 0.18s, border-color 0.18s;
+  text-decoration: none;
 }
 
-.erp-header-search:hover,
-.erp-header-search:focus-within {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 0 3px rgba(204, 165, 91, 0.12);
-}
-
-/* Integrated light mode search */
-.erp-integrated-shell .erp-header-search {
-  background: var(--paper-2, rgba(0, 0, 0, 0.04)) !important;
-  border: 1px solid var(--line, rgba(0, 0, 0, 0.1)) !important;
-  color: var(--text-main) !important;
-}
-
-.erp-integrated-shell .erp-header-search:hover,
-.erp-integrated-shell .erp-header-search:focus-within {
-  background: var(--surface) !important;
-  border-color: rgba(204, 165, 91, 0.4) !important;
-  box-shadow: 0 0 0 3px rgba(204, 165, 91, 0.1) !important;
-}
-
-.erp-header-search mat-icon {
+.tb-action-btn mat-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
-  opacity: 0.75;
-  flex-shrink: 0;
+  opacity: 0.85;
+  line-height: 1;
 }
 
-.erp-header-search__placeholder {
-  flex: 1 1 auto;
-  text-align: start;
-  font-size: 13px;
-  opacity: 0.72;
+.tb-action-btn:hover {
+  background: var(--icon-btn-hover);
+  border-color: var(--line);
 }
 
-.erp-header-search__kbd {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 48px;
-  padding: 2px 8px;
-  border-radius: 7px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(0, 0, 0, 0.2);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  opacity: 0.72;
-}
-
-/* ── Toggle / hamburger ─────────────────────────────────────────────────── */
-.erp-header-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
-  cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-  flex-shrink: 0;
-}
-
-.erp-header-toggle:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.24);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.erp-integrated-shell .erp-header-toggle {
-  background: var(--icon-btn-hover) !important;
-  border-color: var(--line) !important;
-  color: var(--text-main) !important;
-}
-
-.erp-header-toggle mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-/* ── Brand pill (mobile logo) ───────────────────────────────────────────── */
-.erp-header-brand-pill--mobile-only {
-  display: none;
-}
-
-.erp-header-brand-pill {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 14px 6px 6px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.erp-header-brand-pill--mark-only {
-  padding: 6px;
-}
-
-.erp-header-brand-pill:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-}
-
-.erp-header-brand-pill__icon-wrap {
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: rgba(204, 165, 91, 0.18);
-  border: 1px solid rgba(204, 165, 91, 0.3);
-}
-
-.erp-header-brand-pill__icon-wrap--hero {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-}
-
-.erp-header-brand-pill__mark {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
-.erp-header-brand-pill__logo {
-  height: 20px;
-  width: auto;
-  max-width: 130px;
-  object-fit: contain;
-}
-
-/* ── Actions area ───────────────────────────────────────────────────────── */
-.erp-header-shell__actions {
-  justify-content: flex-end;
-  flex-shrink: 0;
-}
-
-/* ── Responsive ─────────────────────────────────────────────────────────── */
-@media (max-width: 1199px) {
-  .erp-header-shell {
-    padding: 0 16px;
-  }
-}
-
-@media (max-width: 991px) {
-  .erp-header-shell__title {
-    display: none;
-  }
-
-  .erp-header-brand-pill--mobile-only {
-    display: flex;
-  }
-}
-
-@media (max-width: 767px) {
-  .erp-header-shell {
-    padding: 0 12px;
-    flex-wrap: wrap;
-    gap: 6px;
-    min-height: auto;
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-
-  .erp-header-shell__center {
-    order: 3;
-    width: 100%;
-    padding: 0;
-  }
-
-  .erp-header-search__kbd {
-    display: none;
-  }
-
-  .erp-header-search {
-    width: 100%;
+@media (max-width: 900px) {
+  .topbar {
+    padding: 0 14px;
   }
 }

@@ -1,38 +1,96 @@
-<div class="erp-header-actions">
-  <div class="erp-header-actions__rail">
-    <app-language-switcher [headerStyle]="true" placement="bottom-end" align="end"></app-language-switcher>
-    <button
-      type="button"
-      class="erp-nav-theme-btn erp-nav-notify-btn"
-      [attr.title]="'NAV.MESSAGES' | translate"
-      [attr.aria-label]="'NAV.MESSAGES' | translate"
-    >
-      <mat-icon aria-hidden="true">chat_bubble_outline</mat-icon>
+<!-- Property topbar-end chrome: lang → theme → notify → user pill -->
+<div class="tb-clock" aria-live="off"><mat-icon>schedule</mat-icon><span>{{ clockText }}</span></div>
+<div class="tb-lang" ngbDropdown placement="bottom-end" container="body">
+  <button
+    type="button"
+    class="tb-action-btn"
+    ngbDropdownToggle
+    [ngbTooltip]="'TOPBAR.LANGUAGE' | translate"
+    placement="bottom"
+    container="body"
+    [attr.aria-label]="'TOPBAR.LANGUAGE' | translate"
+  >
+    <img class="flag" [src]="activeFlagSrc" alt="" />
+  </button>
+  <div class="dropdown-menu tb-dropdown-menu" ngbDropdownMenu>
+    <button type="button" class="dropdown-item tb-dropdown-item" ngbDropdownItem (click)="switchLang('ar')">
+      <img class="flag" src="assets/images/flags/uae.svg" alt="" />
+      <span>{{ 'LANG.ARABIC' | translate }}</span>
+      <mat-icon *ngIf="currentLang === 'ar'" class="tb-check">check</mat-icon>
     </button>
-    <a
-      routerLink="/erp/activity-log"
-      class="erp-nav-theme-btn erp-nav-notify-btn"
-      [attr.title]="'NAV.NOTIFICATIONS' | translate"
-      [attr.aria-label]="'NAV.NOTIFICATIONS' | translate"
-    >
-      <mat-icon aria-hidden="true">notifications_none</mat-icon>
-    </a>
+    <button type="button" class="dropdown-item tb-dropdown-item" ngbDropdownItem (click)="switchLang('en')">
+      <img class="flag" src="assets/images/flags/uk.svg" alt="" />
+      <span>{{ 'LANG.ENGLISH' | translate }}</span>
+      <mat-icon *ngIf="currentLang === 'en'" class="tb-check">check</mat-icon>
+    </button>
   </div>
-
-  <ng-container *ngIf="authenticated$ | async">
-    <ng-container *ngIf="{ user: user$ | async, loading: loadingProfile$ | async } as profile">
-      <app-profile-card
-        [headerPill]="true"
-        [displayName]="resolveDisplayName(profile.user)"
-        [roleKey]="resolveRoleKey(profile.user)"
-        [avatarUrl]="resolveAvatarUrl(profile.user)"
-        [loading]="profile.loading"
-        [menuOpen]="profileMenuOpen"
-        (toggleMenu)="toggleProfileMenu()"
-        (closeMenu)="closeProfileMenu()"
-        (profileClick)="closeProfileMenu()"
-        (logoutClick)="logout()"
-      ></app-profile-card>
-    </ng-container>
-  </ng-container>
 </div>
+
+<button
+  type="button"
+  class="tb-action-btn tb-theme-btn"
+  (click)="toggleTheme()"
+  [ngbTooltip]="(darkMode ? 'TOPBAR.LIGHT_MODE' : 'TOPBAR.DARK_MODE') | translate"
+  placement="bottom"
+  container="body"
+  [attr.aria-label]="(darkMode ? 'TOPBAR.LIGHT_MODE' : 'TOPBAR.DARK_MODE') | translate"
+>
+  <mat-icon aria-hidden="true">{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+</button>
+
+<a
+  routerLink="/notifications"
+  class="tb-action-btn tb-notify-btn"
+  [ngbTooltip]="'NOTIFICATIONS.TITLE' | translate"
+  placement="bottom"
+  container="body"
+  [attr.aria-label]="'NOTIFICATIONS.TITLE' | translate"
+>
+  <mat-icon aria-hidden="true">notifications</mat-icon>
+  <span *ngIf="unreadCount > 0" class="tb-notify-count">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+</a>
+
+<ng-container *ngIf="authenticated$ | async">
+  <ng-container *ngIf="user$ | async as user">
+    <div class="tb-user-wrap" ngbDropdown placement="bottom-end" container="body">
+      <button type="button" class="tb-user-btn" ngbDropdownToggle [attr.aria-label]="resolveDisplayName(user)">
+        <img
+          *ngIf="resolveAvatarUrl(user) as photo"
+          class="tb-avatar tb-avatar-img"
+          [src]="photo"
+          [attr.alt]="'PROFILE.AVATAR_ALT' | translate"
+        />
+        <div *ngIf="!resolveAvatarUrl(user)" class="tb-avatar">{{ resolveInitials(user) }}</div>
+        <span class="tb-user-copy">
+          <span class="tb-user-name">{{ resolveDisplayName(user) || '—' }}</span>
+          <span class="tb-user-role">{{ resolveRoleKey(user) | translate }}</span>
+        </span>
+      </button>
+      <div class="dropdown-menu tb-user-menu" ngbDropdownMenu>
+        <div class="user-menu-header">
+          <img
+            *ngIf="resolveAvatarUrl(user) as photo"
+            class="user-menu-avatar user-menu-avatar-img"
+            [src]="photo"
+            alt=""
+          />
+          <div *ngIf="!resolveAvatarUrl(user)" class="user-menu-avatar">{{ resolveInitials(user) }}</div>
+          <div class="user-menu-copy">
+            <strong>{{ resolveDisplayName(user) || '—' }}</strong>
+            <span class="user-menu-role">{{ resolveRoleKey(user) | translate }}</span>
+            <span class="user-menu-email" *ngIf="user.email">{{ user.email }}</span>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item tb-dropdown-item" routerLink="/settings" ngbDropdownItem>
+          <mat-icon>person</mat-icon>
+          <span>{{ 'PROFILE.TITLE' | translate }}</span>
+        </a>
+        <button type="button" class="dropdown-item tb-dropdown-item tb-dropdown-item--danger" (click)="logout()" ngbDropdownItem>
+          <mat-icon>logout</mat-icon>
+          <span>{{ 'AUTH.LOGOUT' | translate }}</span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

@@ -20,6 +20,7 @@ import com.erp.system.common.security.AppUserPrincipal;
 import com.erp.system.common.security.JwtProperties;
 import com.erp.system.auth.util.UserProfileI18n;
 import com.erp.system.common.security.JwtTokenProvider;
+import com.erp.system.common.mail.PasswordResetOtpDeliveryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,6 +49,7 @@ public class AuthService {
     private final PasswordResetOtpRepository passwordResetOtpRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccessControlService accessControlService;
+    private final PasswordResetOtpDeliveryService passwordResetOtpDeliveryService;
 
     @Transactional(readOnly = true)
     public AuthResponseDto login(AuthLoginRequestDto request) {
@@ -90,6 +92,7 @@ public class AuthService {
                 .expiresAt(Instant.now().plus(10, ChronoUnit.MINUTES))
                 .used(false)
                 .build());
+        passwordResetOtpDeliveryService.deliver(email, code);
         return true;
     }
 
@@ -179,6 +182,7 @@ public class AuthService {
                 .role(user.getRole().name())
                 .roles(accessControlService.authorityCodesFor(user))
                 .active(user.isActive())
+                .mustChangePassword(user.isMustChangePassword())
                 .createdAt(user.getCreatedAt())
                 .profile(UserProfileDtoMapper.from(profile, user.getId(), LocaleContextHolder.getLocale()))
                 .build();

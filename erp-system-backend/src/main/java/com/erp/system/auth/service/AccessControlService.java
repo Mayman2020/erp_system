@@ -77,6 +77,21 @@ public class AccessControlService {
         return fallbackPermissions(authorityCodes(authentication));
     }
 
+    /** Effective permissions for an arbitrary user (used by the admin "effective permissions" inspector). */
+    @Transactional(readOnly = true)
+    public List<MenuActionPermissionDto> menuPermissionsForUser(Long userId, List<String> legacyRoleCodes) {
+        if (userId == null) {
+            return List.of();
+        }
+        if (hasCustomAssignments(userId)) {
+            List<String> roleCodes = assignedRoles(userId).stream()
+                    .map(AccessRole::getCode)
+                    .toList();
+            return mergePermissions(roleMenuPermissionRepository.findByRoleCodeIn(roleCodes));
+        }
+        return fallbackPermissions(legacyRoleCodes == null ? List.of() : legacyRoleCodes);
+    }
+
     @Transactional(readOnly = true)
     public boolean hasMenuAction(Authentication authentication, String menuItemId, String action) {
         if (menuItemId == null || menuItemId.isBlank()) {

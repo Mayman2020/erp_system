@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable, throwError } from 'rxjs';
 import { AccountDto, CustomerInvoiceDto, CustomerInvoiceForm } from '../../core/models/accounting.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -24,7 +24,7 @@ export class InvoicesPageComponent extends ErpMasterPageBase<CustomerInvoiceDto,
     saveSuccessKey: 'INVOICES.SAVE_SUCCESS',
     showStatus: true,
     showDateRange: true,
-    statusOptions: ['DRAFT', 'APPROVED', 'PAID', 'CANCELLED']
+    statusOptions: ['DRAFT', 'POSTED', 'PARTIAL', 'PAID', 'CANCELLED']
   };
 
   readonly columns: DataTableColumn[] = [
@@ -51,6 +51,7 @@ export class InvoicesPageComponent extends ErpMasterPageBase<CustomerInvoiceDto,
 
   assetAccounts: AccountDto[] = [];
   revenueAccounts: AccountDto[] = [];
+  editingRecord: CustomerInvoiceDto | null = null;
 
   constructor(
     private api: AccountingApiService,
@@ -147,7 +148,7 @@ export class InvoicesPageComponent extends ErpMasterPageBase<CustomerInvoiceDto,
   }
 
   protected removeItem(_id: number): Observable<void> {
-    return of(undefined);
+    return throwError(() => new Error('Invoices cannot be deleted; use Cancel instead.'));
   }
 
   protected defaultFormValues(): Record<string, unknown> {
@@ -167,6 +168,7 @@ export class InvoicesPageComponent extends ErpMasterPageBase<CustomerInvoiceDto,
   }
 
   protected patchForm(dto: CustomerInvoiceDto): void {
+    this.editingRecord = dto;
     while (this.lines.length) {
       this.lines.removeAt(0);
     }

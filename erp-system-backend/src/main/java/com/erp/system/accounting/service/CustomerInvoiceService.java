@@ -331,6 +331,8 @@ public class CustomerInvoiceService {
                         .unitPrice(line.getUnitPrice())
                         .lineTotal(line.getLineTotal())
                         .build()).toList())
+                .createdAt(invoice.getCreatedAt())
+                .updatedAt(invoice.getUpdatedAt())
                 .build();
     }
 }

@@ -1,12 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    ERP Integrated Shell — Estate OS (Property_Managments pattern)
-   Warm paper workspace · navy sidebar · brass accents · smooth motion
+   Elevon workspace · deep navy shell · electric-blue accents · smooth motion
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root,
 [data-theme='light'],
 [data-theme='dark'] {
-  --erp-sidebar-width: var(--sidebar-w, 248px);
+  --erp-sidebar-width: var(--sidebar-w, 286px);
   --erp-sidebar-width-collapsed: var(--sidebar-w-collapsed, 76px);
   --erp-header-height: var(--topbar-height, 64px);
 }
@@ -24,7 +24,7 @@
 }
 
 .erp-integrated-shell .pcoded-content.erp-content {
-  padding: 24px 32px 0;
+  padding: 0;
   background: transparent !important;
 }
 
@@ -48,7 +48,7 @@
   color: var(--text-main);
 }
 
-/* ── Topbar (Property topbar — light surface) ───────────────────────────── */
+/* ── Topbar (Property flat bar) ─────────────────────────────────────────── */
 .erp-integrated-shell .pcoded-header.navbar-light,
 .erp-integrated-shell .erp-admin-shell__header.navbar {
   background: var(--header-bg) !important;
@@ -58,120 +58,11 @@
   -webkit-backdrop-filter: none !important;
 }
 
-.erp-integrated-shell .erp-header-shell {
-  min-height: var(--erp-header-height);
-  height: var(--erp-header-height);
-  padding: 0 28px;
+.erp-integrated-shell app-nav-bar .topbar {
   background: var(--header-bg) !important;
   border-bottom: 1px solid var(--header-border) !important;
   box-shadow: none !important;
-  backdrop-filter: none !important;
   color: var(--text-main);
-  transition: background var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
-}
-
-.erp-integrated-shell .erp-header-shell__title {
-  font-size: clamp(15px, 1.8vw, 17px);
-  font-weight: 800;
-  color: var(--text-main);
-  letter-spacing: -0.01em;
-}
-
-.erp-integrated-shell .erp-header-shell__center {
-  padding: 0 16px;
-}
-
-.erp-integrated-shell .erp-header-search {
-  width: min(420px, 100%);
-  min-height: 40px;
-  border-radius: 12px;
-  background: var(--paper-2) !important;
-  border: 1px solid transparent !important;
-  padding: 0 14px;
-  color: var(--text-main);
-  transition:
-    background var(--t-fast) var(--e-out),
-    border-color var(--t-fast) var(--e-out),
-    transform var(--t-fast) var(--e-out);
-}
-
-.erp-integrated-shell .erp-header-search:hover,
-.erp-integrated-shell .erp-header-search:focus-within {
-  background: var(--surface) !important;
-  border-color: var(--brass-500) !important;
-  transform: none;
-}
-
-.erp-integrated-shell .erp-header-search__placeholder {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.erp-integrated-shell .erp-header-shell .erp-header-toggle {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-main);
-  transition: background var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
-}
-
-.erp-integrated-shell .erp-header-shell .erp-header-toggle:hover {
-  background: var(--icon-btn-hover);
-  border-color: var(--line);
-}
-
-.erp-integrated-shell .erp-header-actions {
-  gap: 8px;
-}
-
-.erp-integrated-shell .erp-language-switcher__trigger--header,
-.erp-integrated-shell .erp-nav-theme-btn {
-  min-height: 36px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-main);
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: background var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
-}
-
-.erp-integrated-shell .erp-language-switcher__trigger--header:hover,
-.erp-integrated-shell .erp-nav-theme-btn:hover {
-  background: var(--icon-btn-hover);
-  border-color: var(--line);
-}
-
-.erp-integrated-shell .erp-nav-notify-badge--count {
-  top: 2px;
-  inset-inline-end: 2px;
-  border: 2px solid var(--surface);
-  background: var(--bad);
-}
-
-/* Profile pill — Property tb-user-btn */
-.erp-integrated-shell .erp-header-shell .erp-sidebar-profile__toggle {
-  border: 1px solid var(--line) !important;
-  border-radius: 999px !important;
-  background: transparent !important;
-  color: var(--text-main) !important;
-  transition: background var(--t-fast) var(--e-out), border-color var(--t-fast) var(--e-out);
-}
-
-.erp-integrated-shell .erp-header-shell .erp-sidebar-profile__toggle:hover {
-  background: var(--icon-btn-hover) !important;
-  border-color: var(--line-2) !important;
-}
-
-.erp-integrated-shell .erp-header-shell .erp-sidebar-profile__info strong {
-  color: var(--text-main) !important;
-}
-
-.erp-integrated-shell .erp-header-shell .erp-sidebar-profile__info small {
-  color: var(--text-muted) !important;
 }
 
 /* ── Sidebar (Property sidebar) ─────────────────────────────────────────── */
@@ -233,12 +124,15 @@
 
 /* ── Dashboard (estate-stat-card pattern) ───────────────────────────────── */
 .erp-integrated-shell .erp-integrated-dashboard {
-  padding-bottom: 12px;
+  display: block;
+  min-height: 100%;
+  padding-bottom: 32px;
 }
 
 .erp-integrated-shell .dashboard-grid {
   --bs-gutter-x: 20px;
   --bs-gutter-y: 20px;
+  margin-bottom: 0;
 }
 
 .erp-integrated-shell .dash-kpi-card,
@@ -303,11 +197,14 @@
 }
 
 .erp-integrated-shell .dash-kpi-card__value {
-  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
-  font-weight: 400;
+  font-size: clamp(16px, 1.6vw, 24px);
+  font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-main);
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .erp-integrated-shell .dash-kpi-card__growth-hint {
@@ -341,7 +238,7 @@
 .erp-integrated-shell .dash-quick-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  padding: 0 20px 20px;
+  padding: 20px 20px 22px;
 }
 
 .erp-integrated-shell .dash-quick-action {
@@ -367,6 +264,12 @@
 .erp-integrated-shell .dash-quick-action__label {
   color: var(--text-muted);
   font-weight: 600;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .erp-integrated-shell .dash-quick-action__icon {
@@ -385,6 +288,9 @@
 
 .erp-integrated-shell .dash-activity-item__content p {
   color: var(--text-main);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
 }
 
 .erp-integrated-shell .dash-activity-item__content small {
@@ -426,6 +332,9 @@
   border-color: var(--line-2);
   color: var(--text-main);
   transition: background var(--t-fast) var(--e-out);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .erp-integrated-shell .erp-table tbody tr:hover td {
@@ -500,22 +409,9 @@ body.rtl .erp-integrated-shell .erp-estate-sidebar .nav-label {
   }
 }
 
-@media (max-width: 991px) {
-  .erp-integrated-shell .erp-header-shell {
-    height: auto;
-    min-height: var(--erp-header-height);
-    padding: 10px 14px;
-    flex-wrap: wrap;
-  }
-
-  .erp-integrated-shell .erp-header-shell__center {
-    order: 3;
-    width: 100%;
-    padding: 0;
-  }
-
+@media (max-width: 767px) {
   .erp-integrated-shell .pcoded-content.erp-content {
-    padding: 16px 16px 0;
+    padding: 0;
   }
 }
 

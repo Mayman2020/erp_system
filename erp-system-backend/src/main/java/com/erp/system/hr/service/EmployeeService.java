@@ -99,6 +99,8 @@ public class EmployeeService {
 
                 .createdAt(employee.getCreatedAt())
                 .updatedAt(employee.getUpdatedAt())
+                .createdBy(employee.getCreatedBy())
+                .updatedBy(employee.getUpdatedBy())
                 .build();
     }
 

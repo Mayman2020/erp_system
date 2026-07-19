@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable, throwError } from 'rxjs';
 import { AccountDto, AccountingCheckDto, AccountingCheckForm, BankAccountDto } from '../../core/models/accounting.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -53,6 +53,7 @@ export class ChecksPageComponent extends ErpMasterPageBase<AccountingCheckDto, A
   bankAccounts: BankAccountDto[] = [];
   assetAccounts: AccountDto[] = [];
   checkTypes = ['ISSUED', 'RECEIVED'];
+  editingRecord: AccountingCheckDto | null = null;
 
   constructor(
     private api: AccountingApiService,
@@ -139,7 +140,7 @@ export class ChecksPageComponent extends ErpMasterPageBase<AccountingCheckDto, A
   }
 
   protected removeItem(_id: number): Observable<void> {
-    return of(undefined);
+    return throwError(() => new Error('Checks cannot be deleted; use Cancel instead.'));
   }
 
   protected defaultFormValues(): Record<string, unknown> {
@@ -159,6 +160,7 @@ export class ChecksPageComponent extends ErpMasterPageBase<AccountingCheckDto, A
   }
 
   protected patchForm(dto: AccountingCheckDto): void {
+    this.editingRecord = dto;
     this.form.reset({
       checkNumber: dto.checkNumber || '',
       checkType: dto.checkType || 'RECEIVED',

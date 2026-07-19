@@ -45,12 +45,22 @@ export class NavigationService {
       this.menu$ = this.http.get<ApiResponse<Navigation[]>>(this.endpoint).pipe(
         map((response) => this.normalize(response.data || [])),
         tap((items) => this.writeCache(items)),
-        catchError(() => of(cached)),
+        catchError(() => of(cached.length ? cached : this.fallbackMenu())),
         shareReplay(1)
       );
     }
 
     return this.menu$;
+  }
+
+  /** Minimal safe menu shown when `/ui/menu` fails and no prior successful fetch was cached
+   * (first login on a fresh browser/profile, or right after a cache-clearing deploy). */
+  private fallbackMenu(): Navigation[] {
+    return [
+      { id: 'dashboard', title: 'NAV.DASHBOARD', translate: 'NAV.DASHBOARD', type: 'item', icon: 'dashboard', url: '/dashboard', classes: 'nav-item' },
+      { id: 'settings', title: 'NAV.SETTINGS', translate: 'NAV.SETTINGS', type: 'item', icon: 'tune', url: '/settings', classes: 'nav-item' },
+      { id: 'admin', title: 'NAV.SYSTEM_MANAGEMENT', translate: 'NAV.SYSTEM_MANAGEMENT', type: 'item', icon: 'admin_panel_settings', url: '/admin', classes: 'nav-item' }
+    ];
   }
 
   public refresh(): Observable<Navigation[]> {

@@ -1,6 +1,7 @@
 package com.erp.system.auth.repository;
 
 import com.erp.system.auth.domain.User;
+import com.erp.system.auth.domain.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -8,6 +9,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     java.util.List<User> findAllByOrderByUsernameAsc();
+
+    java.util.List<User> findByRoleAndActiveTrue(UserRole role);
 
     Optional<User> findByUsernameIgnoreCase(String username);
 

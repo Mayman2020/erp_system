@@ -1,6 +1,6 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey">
-    <div header-actions>
+    <div header-actions class="erp-toolbar-icons">
       <button class="erp-button erp-button--primary" type="button" (click)="create.emit()">
         <mat-icon aria-hidden="true">add</mat-icon>
         <span>{{ 'INVOICES.CREATE' | translate }}</span>
@@ -10,6 +10,29 @@
 
   <div class="erp-card erp-list-page__card">
     <div class="erp-card__body">
+      <section class="list-stats" *ngIf="rows?.length">
+        <article class="stat-pill stat-pill--purple">
+          <span class="stat-pill__icon"><mat-icon>description</mat-icon></span>
+          <span class="stat-label">{{ 'COMMON.ALL' | translate }}</span>
+          <strong [erpCountUp]="rows.length" [erpCountUpDecimals]="0"></strong>
+        </article>
+        <article class="stat-pill stat-pill--amber">
+          <span class="stat-pill__icon"><mat-icon>edit_note</mat-icon></span>
+          <span class="stat-label">{{ 'STATUS.DRAFT' | translate }}</span>
+          <strong [erpCountUp]="statusCount('DRAFT')" [erpCountUpDecimals]="0"></strong>
+        </article>
+        <article class="stat-pill stat-pill--green">
+          <span class="stat-pill__icon"><mat-icon>verified</mat-icon></span>
+          <span class="stat-label">{{ 'STATUS.APPROVED' | translate }}</span>
+          <strong [erpCountUp]="statusCount('APPROVED') + statusCount('POSTED')" [erpCountUpDecimals]="0"></strong>
+        </article>
+        <article class="stat-pill stat-pill--red">
+          <span class="stat-pill__icon"><mat-icon>cancel</mat-icon></span>
+          <span class="stat-label">{{ 'STATUS.CANCELLED' | translate }}</span>
+          <strong [erpCountUp]="statusCount('CANCELLED')" [erpCountUpDecimals]="0"></strong>
+        </article>
+      </section>
+
       <app-advanced-search-bar [showDateRange]="true" [showStatus]="true" [statusOptions]="statusOptions" (search)="search.emit($event)"></app-advanced-search-bar>
 
       <app-erp-alert *ngIf="errorKey && !formVisible" type="danger" [message]="errorKey" extraClass="mt-3" (dismissed)="clearError.emit()"></app-erp-alert>
@@ -27,6 +50,22 @@
   (close)="closeForm.emit()"
 >
   <div dialog-body>
+    <div class="erp-detail-hero" *ngIf="formMode !== 'create'">
+      <h2 class="erp-detail-hero__title">{{ titleKey | translate }}</h2>
+      <div class="erp-detail-hero__chips">
+        <span class="erp-detail-hero__chip" *ngIf="numberControl?.value">
+          <mat-icon style="font-size:16px;width:16px;height:16px">tag</mat-icon>
+          {{ numberControl?.value }}
+        </span>
+        <span class="erp-detail-hero__chip" *ngIf="form.get('status')?.value">
+          {{ ('STATUS.' + form.get('status')?.value) | translate }}
+        </span>
+        <span class="erp-detail-hero__chip" *ngIf="totals?.total != null">
+          {{ totals.total | number:'1.2-2' }}
+        </span>
+      </div>
+    </div>
+
     <form [formGroup]="form" class="erp-dialog-form">
       <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-2" (dismissed)="clearError.emit()"></app-erp-alert>
 
@@ -145,6 +184,14 @@
         <div><strong>{{ 'INVOICES.TAX' | translate }}:</strong> {{ totals.tax | number:'1.2-2' }}</div>
         <div><strong>{{ 'INVOICES.TOTAL' | translate }}:</strong> {{ totals.total | number:'1.2-2' }}</div>
       </div>
+
+      <app-erp-audit-trail
+        *ngIf="formMode !== 'create' && auditRecord as audit"
+        [createdAt]="$any(audit['createdAt'])"
+        [updatedAt]="$any(audit['updatedAt'])"
+        [createdBy]="$any(audit['createdBy'])"
+        [updatedBy]="$any(audit['updatedBy'])">
+      </app-erp-audit-trail>
     </form>
   </div>
 

@@ -523,6 +523,14 @@ export class ErpApiService {
     return this.http.delete<void>(`${this.inventoryBase}/products/${id}`);
   }
 
+  activateProduct(id: number): Observable<void> {
+    return this.http.put<void>(`${this.inventoryBase}/products/${id}/activate`, {});
+  }
+
+  deactivateProduct(id: number): Observable<void> {
+    return this.http.put<void>(`${this.inventoryBase}/products/${id}/deactivate`, {});
+  }
+
   getCategory(id: number): Observable<ProductCategoryDto> {
     return this.http.get<ApiResponse<ProductCategoryDto>>(`${this.inventoryBase}/categories/${id}`).pipe(map((res) => res.data));
   }
@@ -539,6 +547,14 @@ export class ErpApiService {
     return this.http.delete<void>(`${this.inventoryBase}/categories/${id}`);
   }
 
+  activateCategory(id: number): Observable<void> {
+    return this.http.put<void>(`${this.inventoryBase}/categories/${id}/activate`, {});
+  }
+
+  deactivateCategory(id: number): Observable<void> {
+    return this.http.put<void>(`${this.inventoryBase}/categories/${id}/deactivate`, {});
+  }
+
   getWarehouse(id: number): Observable<WarehouseDto> {
     return this.http.get<ApiResponse<WarehouseDto>>(`${this.inventoryBase}/warehouses/${id}`).pipe(map((res) => res.data));
   }
@@ -553,6 +569,14 @@ export class ErpApiService {
 
   deleteWarehouse(id: number): Observable<void> {
     return this.http.delete<void>(`${this.inventoryBase}/warehouses/${id}`);
+  }
+
+  activateWarehouse(id: number): Observable<void> {
+    return this.http.put<void>(`${this.inventoryBase}/warehouses/${id}/activate`, {});
+  }
+
+  deactivateWarehouse(id: number): Observable<void> {
+    return this.http.put<void>(`${this.inventoryBase}/warehouses/${id}/deactivate`, {});
   }
 
   getUnits(filters: Record<string, string | number | boolean> = {}): Observable<UnitOfMeasureDto[]> {
@@ -577,6 +601,14 @@ export class ErpApiService {
     return this.http.delete<void>(`${this.inventoryBase}/units/${id}`);
   }
 
+  activateUnit(id: number): Observable<void> {
+    return this.http.put<void>(`${this.inventoryBase}/units/${id}/activate`, {});
+  }
+
+  deactivateUnit(id: number): Observable<void> {
+    return this.http.put<void>(`${this.inventoryBase}/units/${id}/deactivate`, {});
+  }
+
   getStockMovement(id: number): Observable<StockMovementDto> {
     return this.http.get<ApiResponse<StockMovementDto>>(`${this.inventoryBase}/stock/movements/${id}`).pipe(map((res) => res.data));
   }
@@ -587,6 +619,10 @@ export class ErpApiService {
 
   updateStockMovement(id: number, payload: StockMovementForm): Observable<StockMovementDto> {
     return this.http.put<ApiResponse<StockMovementDto>>(`${this.inventoryBase}/stock/movements/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  submitStockMovement(id: number): Observable<StockMovementDto> {
+    return this.http.put<ApiResponse<StockMovementDto>>(`${this.inventoryBase}/stock/movements/${id}/submit`, {}).pipe(map((res) => res.data));
   }
 
   approveStockMovement(id: number): Observable<StockMovementDto> {

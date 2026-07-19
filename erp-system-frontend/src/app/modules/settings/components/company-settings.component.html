@@ -1,0 +1,57 @@
+<div class="erp-company-settings">
+  <section class="app-card company-card">
+    <div class="card-head">
+      <div class="card-head-icon-wrap">
+        <mat-icon>domain</mat-icon>
+      </div>
+      <div>
+        <div class="card-eyebrow">{{ 'SETTINGS.COMPANY_TAB' | translate }}</div>
+        <h3 class="card-title">{{ 'SETTINGS.COMPANY_TITLE' | translate }}</h3>
+      </div>
+    </div>
+
+    <app-erp-alert *ngIf="!canEdit" type="info" message="SETTINGS.COMPANY_READONLY_HINT" extraClass="mb-3" [dismissible]="false"></app-erp-alert>
+
+    <form [formGroup]="form" class="pf-form profile-form-grid">
+      <div class="col-md-3 mb-3 company-logo-field">
+        <label class="company-logo-field__label">{{ 'SETTINGS.COMPANY_LOGO' | translate }}</label>
+        <div class="company-logo-field__preview">
+          <img *ngIf="logoPreview" [src]="logoPreview" [attr.alt]="'SETTINGS.COMPANY_LOGO' | translate" />
+          <mat-icon *ngIf="!logoPreview">domain</mat-icon>
+        </div>
+        <label *ngIf="canEdit" class="erp-button erp-button--secondary btn-sm company-logo-field__upload">
+          <mat-icon>upload</mat-icon>
+          <span>{{ 'SETTINGS.COMPANY_UPLOAD_LOGO' | translate }}</span>
+          <input type="file" hidden accept="image/*" (change)="onSelectLogo($event)" />
+        </label>
+      </div>
+      <div class="col-md-9">
+        <div class="row">
+          <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.companyNameEn" labelKey="SETTINGS.COMPANY_NAME_EN" icon="business"></app-form-field></div>
+          <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.companyNameAr" labelKey="SETTINGS.COMPANY_NAME_AR" icon="business"></app-form-field></div>
+          <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.taxId" labelKey="SETTINGS.COMPANY_TAX_ID" icon="badge"></app-form-field></div>
+          <div class="col-md-6 mb-3">
+            <app-form-field
+              [control]="form.controls.fiscalYearStartMonth"
+              labelKey="SETTINGS.COMPANY_FISCAL_START_MONTH"
+              icon="event"
+              type="select"
+              [options]="monthOptions"
+              optionValueField="value"
+              optionLabelField="labelKey"
+            ></app-form-field>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="company-footer">
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-0" [dismissible]="false"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-0" [dismissible]="false"></app-erp-alert>
+      <button *ngIf="canEdit" type="button" class="erp-button erp-button--primary" [disabled]="saving || form.invalid" (click)="onSave()">
+        <mat-icon>save</mat-icon>
+        <span>{{ 'COMMON.SAVE' | translate }}</span>
+      </button>
+    </div>
+  </section>
+</div>

@@ -3,7 +3,7 @@
 
     <!-- ── KPI Row (5 cards matching reference image) ───────────────────── -->
     <div class="col-xl-col-kpi col-lg-4 col-md-6">
-      <div class="dash-kpi-card dash-kpi-card--revenue">
+      <a routerLink="/sales" class="dash-kpi-card dash-kpi-card--revenue dash-kpi-card--link">
         <div class="dash-kpi-card__icon-wrap">
           <div class="dash-kpi-card__icon"><mat-icon>trending_up</mat-icon></div>
         </div>
@@ -18,11 +18,11 @@
             <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
           </span>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-xl-col-kpi col-lg-4 col-md-6">
-      <div class="dash-kpi-card dash-kpi-card--customers">
+      <a routerLink="/crm" class="dash-kpi-card dash-kpi-card--customers dash-kpi-card--link">
         <div class="dash-kpi-card__icon-wrap">
           <div class="dash-kpi-card__icon"><mat-icon>people</mat-icon></div>
         </div>
@@ -37,11 +37,11 @@
             <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
           </span>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-xl-col-kpi col-lg-4 col-md-6">
-      <div class="dash-kpi-card dash-kpi-card--profit">
+      <a routerLink="/reports" class="dash-kpi-card dash-kpi-card--profit dash-kpi-card--link">
         <div class="dash-kpi-card__icon-wrap">
           <div class="dash-kpi-card__icon"><mat-icon>monitoring</mat-icon></div>
         </div>
@@ -56,30 +56,30 @@
             <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
           </span>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-xl-col-kpi col-lg-4 col-md-6">
-      <div class="dash-kpi-card dash-kpi-card--expense">
+      <a routerLink="/inventory" class="dash-kpi-card dash-kpi-card--expense dash-kpi-card--link">
         <div class="dash-kpi-card__icon-wrap">
           <div class="dash-kpi-card__icon"><mat-icon>inventory_2</mat-icon></div>
         </div>
         <div class="dash-kpi-card__body">
           <span class="dash-kpi-card__label">{{ 'DASHBOARD.LOW_STOCK' | translate }}</span>
-          <span class="dash-kpi-card__value">{{ summary.lowStockCount }}</span>
+          <span class="dash-kpi-card__value" [erpCountUp]="summary.lowStockCount" [erpCountUpDecimals]="0"></span>
           <span class="dash-kpi-card__growth-row">
             <span class="dash-kpi-card__growth dash-kpi-card__growth--chip" [ngClass]="summary.lowStockCount > 10 ? 'dash-kpi-card__growth--down' : 'dash-kpi-card__growth--up'">
               <mat-icon>{{ summary.lowStockCount > 10 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-              {{ summary.lowStockCount > 10 ? 'مرتفع' : 'طبيعي' }}
+              {{ (summary.lowStockCount > 10 ? 'DASHBOARD.STOCK_HIGH' : 'DASHBOARD.STOCK_NORMAL') | translate }}
             </span>
             <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.CURRENT_STOCK' | translate }}</span>
           </span>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-xl-col-kpi col-lg-4 col-md-6">
-      <div class="dash-kpi-card dash-kpi-card--orders">
+      <a routerLink="/purchases" class="dash-kpi-card dash-kpi-card--orders dash-kpi-card--link">
         <div class="dash-kpi-card__icon-wrap">
           <div class="dash-kpi-card__icon"><mat-icon>shopping_cart</mat-icon></div>
         </div>
@@ -94,7 +94,7 @@
             <span class="dash-kpi-card__growth-hint">{{ 'DASHBOARD.VS_LAST_MONTH' | translate }}</span>
           </span>
         </div>
-      </div>
+      </a>
     </div>
 
     <!-- ── Charts Row 1 ─────────────────────────────────────────────────── -->
@@ -208,7 +208,9 @@
     <div class="erp-card erp-list-page__card" *ngIf="!loading && errorKey">
       <div class="card-body text-center text-danger">
         {{ errorKey | translate }}
-        <button class="erp-icon-button" type="button" (click)="fetchDashboard()"><mat-icon>refresh</mat-icon></button>
+        <button class="erp-icon-button" type="button" (click)="fetchDashboard()"
+          [ngbTooltip]="'COMMON.REFRESH' | translate" placement="top" container="body"
+          [attr.aria-label]="'COMMON.REFRESH' | translate"><mat-icon>refresh</mat-icon></button>
       </div>
     </div>
   </ng-template>

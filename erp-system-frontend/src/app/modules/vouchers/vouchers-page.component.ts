@@ -79,6 +79,7 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   assetAccountTree: AccountTreeDto[] = [];
 
   selectedId: number | null = null;
+  selectedAuditRecord: PaymentVoucher | ReceiptVoucher | null = null;
   dialogVisible = false;
   dialogTitle = 'VOUCHERS.PAYMENT.CREATE';
   readOnlyMode = false;
@@ -439,6 +440,7 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   }
 
   private patchDialogForm(voucher: PaymentVoucher | ReceiptVoucher, targetId: number, linkedReference?: string, readOnly = false): void {
+    this.selectedAuditRecord = voucher;
     this.form.reset({
       voucherDate: voucher.voucherDate,
       reference: voucher.reference,
@@ -463,6 +465,7 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   closeDialog(): void {
     this.dialogVisible = false;
     this.selectedId = null;
+    this.selectedAuditRecord = null;
     this.readOnlyMode = false;
     this.errorKey = '';
     this.successKey = '';

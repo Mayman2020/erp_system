@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import '@angular/material/prebuilt-themes/azure-blue.css';
 @import "scss/style";
 
 
@@ -569,52 +570,8 @@ input[type='date'].erp-input {
   color: var(--erp-danger);
 }
 
-.erp-search-panel {
-  display: grid;
-  gap: 16px;
-  padding: 20px;
-  border: 1px solid var(--erp-border);
-  border-radius: 16px;
-  background: var(--erp-bg-accent), var(--erp-bg-elevated);
-  box-shadow: var(--erp-shadow-sm);
-}
-
-.erp-search-panel__fields {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.erp-search-panel__field {
-  flex: 1 1 148px;
-  min-width: 148px;
-}
-
-.erp-search-panel__field--query {
-  flex: 1.2 1 220px;
-  min-width: 220px;
-}
-
-.erp-search-panel__amount-group {
-  flex: 1.35 1 480px;
-  min-width: 480px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.erp-search-panel__actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-body.rtl .erp-search-panel__actions {
-  justify-content: flex-start;
-}
+/* Search/filter layout is owned by erp-estate-utilities.scss.
+   Keep this legacy layer free of competing geometry. */
 
 .erp-badge {
   display: inline-flex;
@@ -692,7 +649,7 @@ body.rtl .erp-search-panel__actions {
   justify-content: space-between;
   gap: var(--erp-space-2);
   flex-shrink: 0;
-  padding: var(--erp-space-4) var(--erp-space-4) var(--erp-space-3);
+  padding: 20px 20px 16px;
   border-bottom: 1px solid var(--erp-border);
 }
 
@@ -720,7 +677,7 @@ body.rtl .erp-search-panel__actions {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: var(--erp-space-3) var(--erp-space-4) var(--erp-space-4);
+  padding: 16px 20px 20px;
 }
 
 .erp-integrated-table__body--empty {
@@ -822,9 +779,17 @@ body.rtl .erp-search-panel__actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 8px 16px;
+  min-height: 72px;
+  padding: 16px 20px;
   gap: 16px;
   flex-wrap: wrap;
+  background: var(--paper-2, var(--erp-bg-muted));
+  border-block: 1px solid var(--line-2, var(--erp-border));
+}
+
+/* Keep the table visually separated from its filter/export toolbar. */
+.erp-table-toolbar + .erp-table-scroll {
+  margin-top: 12px;
 }
 
 /* Excel export: Office-green glow + spreadsheet icon (all tables / reports) */
@@ -832,13 +797,13 @@ body.rtl .erp-search-panel__actions {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 0 18px;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: #ffffff !important;
   background: linear-gradient(135deg, #0f6b3a 0%, #217346 38%, #21a366 100%);
@@ -1660,8 +1625,8 @@ body.rtl .erp-admin-shell .erp-main-container {
 
 .erp-route-shell {
   width: 100%;
-  max-width: var(--erp-content-max);
-  margin: 0 auto;
+  max-width: var(--content-max-w, none);
+  margin-inline: 0;
 }
 
 .erp-breadcrumb-host .page-header {
@@ -1700,10 +1665,10 @@ body.rtl .erp-admin-shell .erp-main-container {
 }
 
 .erp-lang-flag-btn {
-  min-width: 48px;
-  height: 44px;
+  min-width: 44px;
+  height: 36px;
   padding: 0 10px;
-  border-radius: 12px;
+  border-radius: 10px;
   /* Consistent with other header buttons */
   border: 1px solid var(--erp-border);
   background: var(--erp-bg-elevated);
@@ -1772,31 +1737,30 @@ body.rtl .erp-admin-shell .erp-main-container {
   color: var(--erp-text);
 }
 
-.erp-header-toggle,
 .mob-toggler {
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
   padding: 0;
-  border: 1px solid var(--erp-border);
-  border-radius: 12px;
-  background: var(--erp-bg-elevated);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
   color: var(--erp-text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.erp-header-toggle:hover,
 .mob-toggler:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--erp-shadow-sm);
+  background: var(--icon-btn-hover, rgba(0, 0, 0, 0.06));
+  border-color: var(--line, var(--erp-border));
+  transform: none;
+  box-shadow: none;
 }
 
-.erp-header-toggle mat-icon,
 .mob-toggler mat-icon {
-  font-size: 22px;
+  font-size: 18px;
   width: 22px;
   height: 22px;
 }
@@ -2053,8 +2017,15 @@ body.rtl app-navigation.pcoded-navbar.navbar-collapsed:not(.theme-horizontal)~.p
   }
 
   .erp-page-header {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .erp-page-header__actions,
+  .app-page-header .page-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .erp-search-panel__field,

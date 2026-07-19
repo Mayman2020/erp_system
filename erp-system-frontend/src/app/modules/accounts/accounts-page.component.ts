@@ -46,6 +46,7 @@ export class AccountsPageComponent implements OnInit {
   dialogVisible = false;
   dialogMode: 'create' | 'edit' | 'view' = 'create';
   selectedAccountId: number | null = null;
+  selectedAccountAudit: AccountDto | null = null;
 
   readonly form = this.fb.group({
     code: [''],
@@ -123,6 +124,7 @@ export class AccountsPageComponent implements OnInit {
   openCreateDialog(): void {
     this.dialogMode = 'create';
     this.selectedAccountId = null;
+    this.selectedAccountAudit = null;
     this.form.reset({
       code: '',
       nameEn: '',
@@ -140,6 +142,7 @@ export class AccountsPageComponent implements OnInit {
   openViewDialog(account: AccountDto): void {
     this.dialogMode = 'view';
     this.selectedAccountId = account.id;
+    this.selectedAccountAudit = account;
     this.setFormFromAccount(account);
     this.form.disable();
     this.dialogVisible = true;
@@ -148,6 +151,7 @@ export class AccountsPageComponent implements OnInit {
   openEditDialog(account: AccountDto): void {
     this.dialogMode = 'edit';
     this.selectedAccountId = account.id;
+    this.selectedAccountAudit = account;
     this.setFormFromAccount(account);
     this.form.enable();
     this.dialogVisible = true;
