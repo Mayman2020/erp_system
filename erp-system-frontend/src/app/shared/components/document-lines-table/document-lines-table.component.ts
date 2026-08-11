@@ -23,6 +23,13 @@ export class DocumentLinesTableComponent {
     return this.parentForm.get('lines') as FormArray;
   }
 
+  get productLovItems(): Array<{ id: number; label: string }> {
+    return (this.products || []).map((p) => ({
+      id: p.id,
+      label: `${p.code} - ${p.name || p.nameEn || ''}`
+    }));
+  }
+
   addLine(): void {
     this.lines.push(this.simple ? createSimpleLineGroup(this.fb) : createFullLineGroup(this.fb));
     this.linesChanged.emit();

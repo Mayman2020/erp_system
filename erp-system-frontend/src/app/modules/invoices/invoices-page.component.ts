@@ -75,16 +75,28 @@ export class InvoicesPageComponent extends ErpMasterPageBase<CustomerInvoiceDto,
     ];
   }
 
+  get receivableLovItems() {
+    return (this.assetAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }));
+  }
+
+  get revenueLovItems() {
+    return (this.revenueAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }));
+  }
+
+  get lineAccountLovItems() {
+    return this.revenueLovItems;
+  }
+
   get receivableOptions() {
-    return [{ id: null, label: '—' }, ...(this.assetAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.receivableLovItems];
   }
 
   get revenueOptions() {
-    return [{ id: null, label: '—' }, ...(this.revenueAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.revenueLovItems];
   }
 
   get lineAccountOptions() {
-    return [{ id: null, label: '—' }, ...(this.revenueAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.lineAccountLovItems];
   }
 
   ngOnInit(): void {

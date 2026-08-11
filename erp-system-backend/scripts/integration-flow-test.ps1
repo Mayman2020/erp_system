@@ -1,6 +1,9 @@
 # ERP integration flow test — create → approve → convert chains
 $ErrorActionPreference = 'Stop'
-$base = 'http://localhost:8087/api/v1'
+$base = if ($env:ERP_API_BASE_URL) { $env:ERP_API_BASE_URL.TrimEnd('/') } else { 'http://localhost:10080/api/v1' }
+$username = if ($env:ERP_TEST_USERNAME) { $env:ERP_TEST_USERNAME } else { 'admin' }
+$password = if ($env:ERP_TEST_PASSWORD) { $env:ERP_TEST_PASSWORD } else { 'admin' }
+$replacementPassword = if ($env:ERP_TEST_NEW_PASSWORD) { $env:ERP_TEST_NEW_PASSWORD } else { 'Admin@Test2026!' }
 $actor = 'integration-test'
 $failures = @()
 $passed = 0
@@ -40,11 +43,24 @@ function Invoke-Api {
 Write-Host "=== ERP Integration Flow Test ===" -ForegroundColor Cyan
 
 $login = Invoke-Api -Method POST -Url "$base/auth/login" -Body @{
-    usernameOrEmail = 'admin'
-    password        = 'Admin@123'
+    usernameOrEmail = $username
+    password        = $password
 }
 if (-not (Assert-Ok 'Login' $login)) { exit 1 }
 $h = @{ Authorization = "Bearer $($login.data.token)" }
+if ($login.data.user.mustChangePassword) {
+    Invoke-Api -Method PUT -Url "$base/profile/me/password" -Headers $h -Body @{
+        currentPassword = $password
+        newPassword     = $replacementPassword
+    } | Out-Null
+    $password = $replacementPassword
+    $login = Invoke-Api -Method POST -Url "$base/auth/login" -Body @{
+        usernameOrEmail = $username
+        password        = $password
+    }
+    $h = @{ Authorization = "Bearer $($login.data.token)" }
+    Assert-Ok 'Forced password change' $login | Out-Null
+}
 
 $customers = Invoke-Api -Url "$base/sales/customers" -Headers $h
 $products = Invoke-Api -Url "$base/inventory/products" -Headers $h
@@ -152,11 +168,18 @@ if ($src -and $dst -and $src.id -ne $dst.id) {
     Write-Host '[FAIL] Transfer — insufficient accounts' -ForegroundColor Red
 }
 
-# --- BOM save ---
-$bom = Invoke-Api -Method POST -Url "$base/manufacturing/bom" -Headers $h -Body @{
+# --- BOM save (idempotent: update the component line when it already exists) ---
+$bomBody = @{
     parentProductId     = $productId
     componentProductId  = $componentProductId
     quantityPerUnit     = 1
+}
+$existingBom = Invoke-Api -Url "$base/manufacturing/bom?parentProductId=$productId" -Headers $h
+$existingBomLine = $existingBom.data | Where-Object { $_.componentProductId -eq $componentProductId } | Select-Object -First 1
+$bom = if ($existingBomLine) {
+    Invoke-Api -Method PUT -Url "$base/manufacturing/bom/$($existingBomLine.id)" -Headers $h -Body $bomBody
+} else {
+    Invoke-Api -Method POST -Url "$base/manufacturing/bom" -Headers $h -Body $bomBody
 }
 Assert-Ok 'Save product BOM' $bom | Out-Null
 

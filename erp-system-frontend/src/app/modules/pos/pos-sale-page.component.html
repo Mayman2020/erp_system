@@ -1,0 +1,56 @@
+<section class="pos-screen" dir="rtl">
+  <header class="pos-topbar">
+    <h1>{{ 'POS.TITLE' | translate }}</h1>
+    <div class="pos-meta">
+      <span [class.online]="online" [class.offline]="!online">
+        {{ (online ? 'POS.ONLINE' : 'POS.OFFLINE') | translate }}
+      </span>
+      <span *ngIf="shift">{{ shift.shiftNo }}</span>
+      <button class="erp-button erp-button--danger" type="button" (click)="closeShift()">
+        {{ 'POS.CLOSE_SHIFT' | translate }}
+      </button>
+    </div>
+  </header>
+
+  <div class="pos-grid">
+    <div class="pos-catalog app-card">
+      <input class="form-control" [(ngModel)]="query" [placeholder]="'COMMON.SEARCH' | translate" />
+      <div class="product-grid">
+        <button type="button" class="product-card" *ngFor="let p of filteredProducts" (click)="addProduct(p)">
+          <strong>{{ p.nameAr || p.nameEn }}</strong>
+          <small>{{ p.code }}</small>
+          <span>{{ p.salePrice | number:'1.2-2' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="pos-cart app-card">
+      <h3>{{ 'POS.TITLE' | translate }}</h3>
+      <div *ngIf="!cart.length" class="empty">{{ 'POS.CART_EMPTY' | translate }}</div>
+      <div class="cart-line" *ngFor="let line of cart; let i = index">
+        <div>
+          <strong>{{ line.name }}</strong>
+          <small>{{ line.sku }} × {{ line.quantity }}</small>
+        </div>
+        <div>
+          <span>{{ line.unitPrice * line.quantity | number:'1.2-2' }}</span>
+          <button type="button" class="erp-action-danger" (click)="removeLine(i)">×</button>
+        </div>
+      </div>
+      <div class="totals">
+        <label>{{ 'COMMON.DESCRIPTION' | translate }} / Discount</label>
+        <input type="number" class="form-control" [(ngModel)]="discount" />
+        <div class="total-box">{{ total | number:'1.2-2' }}</div>
+      </div>
+      <div class="pay-methods">
+        <button type="button" [class.active]="paymentMethod==='CASH'" (click)="paymentMethod='CASH'">{{ 'POS.PAY_CASH' | translate }}</button>
+        <button type="button" [class.active]="paymentMethod==='CARD'" (click)="paymentMethod='CARD'">{{ 'POS.PAY_CARD' | translate }}</button>
+        <button type="button" [class.active]="paymentMethod==='CREDIT'" (click)="paymentMethod='CREDIT'">{{ 'POS.PAY_CREDIT' | translate }}</button>
+      </div>
+      <button class="erp-button erp-button--primary confirm" type="button" [disabled]="saving || !cart.length" (click)="confirmSale()">
+        {{ 'POS.CONFIRM_SALE' | translate }}
+      </button>
+      <div *ngIf="errorKey" class="error">{{ errorKey | translate }}</div>
+    </div>
+  </div>
+</section>

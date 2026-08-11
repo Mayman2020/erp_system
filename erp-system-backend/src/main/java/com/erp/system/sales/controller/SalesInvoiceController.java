@@ -1,6 +1,7 @@
 package com.erp.system.sales.controller;
 
 import com.erp.system.common.dto.ApiResponse;
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.sales.dto.display.SalesInvoiceDisplayDto;
 import com.erp.system.sales.dto.form.SalesInvoiceFormDto;
@@ -8,6 +9,8 @@ import com.erp.system.sales.service.SalesInvoiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +31,19 @@ public class SalesInvoiceController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         return ApiResponse.success(invoiceService.getInvoices(status, search, fromDate, toDate));
+    }
+
+    @GetMapping("/paged")
+    public ApiResponse<PageResponse<SalesInvoiceDisplayDto>> getInvoicesPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) TransactionStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+        PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 200),
+                Sort.by(Sort.Order.desc("invoiceDate"), Sort.Order.desc("id")));
+        return ApiResponse.success(invoiceService.getInvoicesPaged(status, q, fromDate, toDate, pageable));
     }
 
     @GetMapping("/{id}")

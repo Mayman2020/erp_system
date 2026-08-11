@@ -1,17 +1,10 @@
+/**
+ * Production: injected by scripts/write-env.cjs from NG_API_BASE_URL at build time.
+ */
 import type { AppEnvironment } from './environment.types';
-
-function resolveApiUrl(): string {
-  if (typeof window !== 'undefined') {
-    const runtime = (window as Window & { __ERP_API_URL__?: string }).__ERP_API_URL__?.trim();
-    if (runtime) {
-      return runtime;
-    }
-  }
-  return '/api/v1';
-}
 
 export const environment: AppEnvironment = {
   production: true,
-  apiUrl: resolveApiUrl(),
+  apiUrl: '/api/v1',
   appVersion: '21.0.0'
 };

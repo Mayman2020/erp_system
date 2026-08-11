@@ -61,4 +61,10 @@ public class Product extends BaseEntity {
 
     @Column(name = "description", length = 500)
     private String description;
+
+    @Column(name = "qr_payload", length = 512)
+    private String qrPayload;
+
+    @Column(name = "manufacturer", length = 200)
+    private String manufacturer;
 }

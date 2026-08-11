@@ -13,7 +13,16 @@
 
       <div *ngIf="showCreateForm" class="row erp-reconciliation-form" [formGroup]="createForm">
         <div class="col-md-4">
-          <app-form-field [control]="createForm.controls.bankAccountId" labelKey="RECONCILIATION.FORM.BANK_ACCOUNT" icon="account_balance" type="select" [options]="bankAccountOptions" optionValueField="id" optionLabelField="label"></app-form-field>
+          <app-searchable-select
+            formControlName="bankAccountId"
+            label="RECONCILIATION.FORM.BANK_ACCOUNT"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="bankAccountOptions"
+            [clearable]="false"
+            [required]="true">
+          </app-searchable-select>
         </div>
         <div class="col-md-2">
           <app-form-field [control]="createForm.controls.statementStartDate" labelKey="RECONCILIATION.FORM.START_DATE" icon="event" type="date"></app-form-field>
@@ -146,7 +155,7 @@
                           <button type="button" class="erp-action-btn erp-action-btn--neutral" [ngbTooltip]="'COMMON.FULL_DETAILS' | translate" placement="top" container="body" [attr.aria-label]="'COMMON.FULL_DETAILS' | translate" (click)="openLineDetail(line, $event)">
                             <mat-icon aria-hidden="true">list_alt</mat-icon>
                           </button>
-                          <button *ngIf="line.status === 'MATCHED' || line.status === 'PARTIALLY_MATCHED'" type="button" class="erp-action-btn erp-action-btn--danger" [ngbTooltip]="'RECONCILIATION.UNMATCH' | translate" placement="top" container="body" [disabled]="!isEditable" (click)="unmatchLine(line); $event.stopPropagation()">
+                          <button *ngIf="line.status === 'MATCHED' || line.status === 'PARTIALLY_MATCHED'" type="button" class="erp-action-btn erp-action-btn--danger" [ngbTooltip]="'RECONCILIATION.UNMATCH' | translate" placement="top" container="body" [attr.aria-label]="'RECONCILIATION.UNMATCH' | translate" [disabled]="!isEditable" (click)="unmatchLine(line); $event.stopPropagation()">
                             <mat-icon aria-hidden="true">link_off</mat-icon>
                           </button>
                         </td>
@@ -183,7 +192,7 @@
                           <button type="button" class="erp-action-btn erp-action-btn--neutral" [ngbTooltip]="'COMMON.FULL_DETAILS' | translate" placement="top" container="body" [attr.aria-label]="'COMMON.FULL_DETAILS' | translate" (click)="openLineDetail(line, $event)">
                             <mat-icon aria-hidden="true">list_alt</mat-icon>
                           </button>
-                          <button *ngIf="line.status === 'MATCHED' || line.status === 'PARTIALLY_MATCHED'" type="button" class="erp-action-btn erp-action-btn--danger" [ngbTooltip]="'RECONCILIATION.UNMATCH' | translate" placement="top" container="body" [disabled]="!isEditable" (click)="unmatchLine(line); $event.stopPropagation()">
+                          <button *ngIf="line.status === 'MATCHED' || line.status === 'PARTIALLY_MATCHED'" type="button" class="erp-action-btn erp-action-btn--danger" [ngbTooltip]="'RECONCILIATION.UNMATCH' | translate" placement="top" container="body" [attr.aria-label]="'RECONCILIATION.UNMATCH' | translate" [disabled]="!isEditable" (click)="unmatchLine(line); $event.stopPropagation()">
                             <mat-icon aria-hidden="true">link_off</mat-icon>
                           </button>
                         </td>

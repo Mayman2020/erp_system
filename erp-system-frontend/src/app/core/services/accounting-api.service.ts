@@ -24,6 +24,7 @@ import {
   RecentActivityItem,
   RecentActivityKind,
   ProfitLossReportDto,
+  TrialBalanceReportDto,
   ReceiptVoucher,
   ReceiptVoucherForm,
   SortDirection,
@@ -473,6 +474,11 @@ export class AccountingApiService {
   getBalanceSheet(asOfDate: string): Observable<BalanceSheetReportDto> {
     const params = new HttpParams().set('asOfDate', asOfDate);
     return this.http.get<ApiResponse<BalanceSheetReportDto>>(`${this.base}/reports/balance-sheet`, { params }).pipe(map((res) => res.data));
+  }
+
+  getTrialBalance(fromDate: string, toDate: string): Observable<TrialBalanceReportDto> {
+    const params = new HttpParams().set('fromDate', fromDate).set('toDate', toDate);
+    return this.http.get<ApiResponse<TrialBalanceReportDto>>(`${this.base}/reports/trial-balance`, { params }).pipe(map((res) => res.data));
   }
 
   getSettings(): Observable<AccountingSettingsDto> {

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { CardComponent } from './card.component';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 /*import { AnimationService, AnimatorModule } from 'css-animator';*/
 
 @NgModule({
@@ -10,6 +10,7 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
     CommonModule,
     MatIconModule,
     NgbDropdownModule,
+    NgbTooltipModule,
     /*AnimatorModule*/
   ],
   declarations: [CardComponent],

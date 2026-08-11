@@ -1,12 +1,15 @@
 package com.erp.system.sales.controller;
 
 import com.erp.system.common.dto.ApiResponse;
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.sales.dto.display.CustomerDisplayDto;
 import com.erp.system.sales.dto.form.CustomerFormDto;
 import com.erp.system.sales.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +26,17 @@ public class CustomerController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) String search) {
         return ApiResponse.success(customerService.getCustomers(active, search));
+    }
+
+    @GetMapping("/paged")
+    public ApiResponse<PageResponse<CustomerDisplayDto>> getCustomersPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Boolean active) {
+        PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 200),
+                Sort.by("code").ascending());
+        return ApiResponse.success(customerService.getCustomersPaged(active, q, pageable));
     }
 
     @GetMapping("/{id}")

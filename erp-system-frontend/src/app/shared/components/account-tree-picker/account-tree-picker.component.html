@@ -14,10 +14,16 @@
       type="button"
       class="account-tree-picker__clear"
       (click)="clearSelection($event)"
+      [ngbTooltip]="'COMMON.CLEAR' | translate"
+      placement="top"
+      container="body"
+      [attr.aria-label]="'COMMON.CLEAR' | translate"
     >
       <mat-icon aria-hidden="true">close</mat-icon>
     </button>
-    <button type="button" class="account-tree-picker__browse" [disabled]="disabled">
+    <button type="button" class="account-tree-picker__browse" [disabled]="disabled"
+      [ngbTooltip]="'COMMON.SEARCH' | translate" placement="top" container="body"
+      [attr.aria-label]="'COMMON.SEARCH' | translate">
       <mat-icon aria-hidden="true">search</mat-icon>
     </button>
   </div>

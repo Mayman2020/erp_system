@@ -1,5 +1,6 @@
 package com.erp.system.hr.service;
 
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.erp.service.ActivityLogService;
 import com.erp.system.hr.domain.Employee;
@@ -7,6 +8,8 @@ import com.erp.system.hr.dto.display.EmployeeDisplayDto;
 import com.erp.system.hr.dto.form.EmployeeFormDto;
 import com.erp.system.hr.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,14 @@ public class EmployeeService {
         return employeeRepository.findAllByOrderByIdDesc().stream()
                 .map(this::toDisplay)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<EmployeeDisplayDto> getPaged(Boolean active, String q, Pageable pageable) {
+        Page<Employee> employees = q == null || q.isBlank()
+                ? employeeRepository.findPaged(active, pageable)
+                : employeeRepository.searchPaged(active, q.trim(), pageable);
+        return PageResponse.from(employees.map(this::toDisplay));
     }
 
     @Transactional(readOnly = true)

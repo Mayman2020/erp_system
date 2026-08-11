@@ -1,0 +1,60 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
+  </app-page-header>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
+</section>
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'INCIDENTS.CREATE' : 'COMMON.EDIT'" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.incidentNo" labelKey="ERP.NUMBER" icon="tag" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.incidentType" labelKey="ERP.TYPE" icon="report" type="select" [options]="incidentTypeOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.reasonCode" labelKey="ERP.REASON" icon="info" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.productId" labelKey="ERP.PRODUCT" icon="inventory_2" type="select" [options]="productOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.warehouseId" labelKey="INVOICES.WAREHOUSE" icon="warehouse" type="select" [options]="warehouseOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.quantity" labelKey="ERP.QUANTITY" icon="pin" type="number" step="0.0001" min="0.0001" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.unitCost" labelKey="ERP.COST_PRICE" icon="payments" type="number" step="0.01" min="0" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-12 mb-3"><app-form-field [control]="form.controls.notes" labelKey="INVOICES.NOTES" icon="notes" type="textarea" [rows]="2" [readonly]="readOnly"></app-form-field></div>
+      </div>
+    </form>
+    <app-erp-audit-trail *ngIf="formMode !== 'create' && selectedAuditRecord as audit" [createdAt]="audit.createdAt" [updatedAt]="audit.updatedAt" [createdBy]="audit.createdBy" [updatedBy]="audit.updatedBy"></app-erp-audit-trail>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

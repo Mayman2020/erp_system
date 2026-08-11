@@ -69,12 +69,20 @@ export class BudgetPageComponent extends ErpMasterPageBase<BudgetDto, BudgetForm
     ];
   }
 
+  get accountLovItems() {
+    return (this.accounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }));
+  }
+
+  get monthLovItems() {
+    return this.months.map((m) => ({ id: m, label: String(m) }));
+  }
+
   get accountOptions() {
-    return [{ id: null, label: '—' }, ...(this.accounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.accountLovItems];
   }
 
   get monthOptions() {
-    return [{ id: null, label: '—' }, ...this.months.map((m) => ({ id: m, label: String(m) }))];
+    return [{ id: null, label: '—' }, ...this.monthLovItems];
   }
 
   ngOnInit(): void {

@@ -1,12 +1,15 @@
 package com.erp.system.hr.controller;
 
 import com.erp.system.common.dto.ApiResponse;
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.hr.dto.display.EmployeeDisplayDto;
 import com.erp.system.hr.dto.form.EmployeeFormDto;
 import com.erp.system.hr.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +24,17 @@ public class EmployeeController {
     @GetMapping
     public ApiResponse<List<EmployeeDisplayDto>> getAll() {
         return ApiResponse.success(employeeService.getAll());
+    }
+
+    @GetMapping("/paged")
+    public ApiResponse<PageResponse<EmployeeDisplayDto>> getPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Boolean active) {
+        PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 200),
+                Sort.by("id").descending());
+        return ApiResponse.success(employeeService.getPaged(active, q, pageable));
     }
 
     @GetMapping("/{id}")

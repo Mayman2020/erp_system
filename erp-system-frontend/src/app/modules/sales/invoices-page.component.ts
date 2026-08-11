@@ -74,15 +74,21 @@ export class InvoicesPageComponent extends ErpDocumentPageBase<SalesInvoiceDto, 
 
   protected reloadList(): void {
     this.loading = true;
-    const params: Record<string, string> = { search: this.filters.query || '' };
+    const params: Record<string, string | number> = {
+      page: 0,
+      size: 200,
+      q: this.filters.query || ''
+    };
     if (this.filters.status) params.status = this.filters.status;
     if (this.filters.fromDate) params.fromDate = this.filters.fromDate;
     if (this.filters.toDate) params.toDate = this.filters.toDate;
-    this.api.getSalesInvoices(params).pipe(finalize(() => {
+    this.api.getSalesInvoicesPaged(params).pipe(finalize(() => {
       this.loading = false;
       this.cdr.markForCheck();
     })).subscribe({
-      next: (rows) => { this.rows = (rows || []).map((r) => mapAmountRow(r as unknown as Record<string, unknown>)); },
+      next: (page) => {
+        this.rows = (page?.content || []).map((r) => mapAmountRow(r as unknown as Record<string, unknown>));
+      },
       error: () => { this.errorKey = 'COMMON.ERROR_LOADING'; this.rows = []; }
     });
   }

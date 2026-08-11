@@ -31,15 +31,16 @@
           <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.companyNameAr" labelKey="SETTINGS.COMPANY_NAME_AR" icon="business"></app-form-field></div>
           <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.taxId" labelKey="SETTINGS.COMPANY_TAX_ID" icon="badge"></app-form-field></div>
           <div class="col-md-6 mb-3">
-            <app-form-field
-              [control]="form.controls.fiscalYearStartMonth"
-              labelKey="SETTINGS.COMPANY_FISCAL_START_MONTH"
-              icon="event"
-              type="select"
-              [options]="monthOptions"
-              optionValueField="value"
-              optionLabelField="labelKey"
-            ></app-form-field>
+            <app-searchable-select
+              formControlName="fiscalYearStartMonth"
+              label="SETTINGS.COMPANY_FISCAL_START_MONTH"
+              placeholder="LOV.SELECT_PLACEHOLDER"
+              bindLabel="label"
+              bindValue="id"
+              [items]="monthLovItems"
+              [clearable]="false"
+              [required]="true">
+            </app-searchable-select>
           </div>
         </div>
       </div>

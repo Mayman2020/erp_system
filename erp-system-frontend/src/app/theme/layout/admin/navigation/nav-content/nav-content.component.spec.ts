@@ -1,14 +1,25 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { NavContentComponent } from './nav-content.component';
+
+@Pipe({ name: 'translate' })
+class StubTranslatePipe implements PipeTransform {
+  transform(value: string): string {
+    return value;
+  }
+}
 
 describe('NavContentComponent', () => {
   let component: NavContentComponent;
   let fixture: ComponentFixture<NavContentComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ NavContentComponent ]
+      imports: [RouterTestingModule, StubTranslatePipe],
+      declarations: [NavContentComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
   }));

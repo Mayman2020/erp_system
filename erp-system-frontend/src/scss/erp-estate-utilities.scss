@@ -160,6 +160,22 @@ body.lang-ar:has(.erp-integrated-shell) {
   margin-top: 0;
 }
 
+.erp-list-page__card.is-refreshing,
+.app-list-surface.is-refreshing {
+  position: relative;
+  pointer-events: none;
+}
+
+.erp-list-page__card.is-refreshing::after,
+.app-list-surface.is-refreshing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--surface, #fff) 55%, transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .erp-card__body,
 .erp-unified-card .card-body,
 .app-card-body {

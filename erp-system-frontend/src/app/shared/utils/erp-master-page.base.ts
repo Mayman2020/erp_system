@@ -1,10 +1,19 @@
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Optional } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
+import { PermissionService } from '../../core/services/permission.service';
+import { PagedResult } from '../../core/services/erp-api.service';
+import {
+  clampTablePageIndex,
+  DEFAULT_TABLE_PAGE_SIZE,
+  paginatedSlice,
+  withPageParams
+} from '../../core/utils/pagination.util';
 import { DataTableAction, DataTableColumn } from '../components/data-table/data-table.component';
+import { ExportColumn } from '../components/table-export-toolbar/table-export-toolbar.component';
 import { ListLoadController } from './list-load.util';
 
 export const MASTER_CRUD_ACTIONS: DataTableAction[] = [
@@ -36,7 +45,7 @@ export abstract class ErpMasterPageBase<TDto extends {
   createdBy?: string;
   updatedBy?: string;
 }, TForm> {
-  readonly actions: DataTableAction[] = MASTER_CRUD_ACTIONS;
+  actions: DataTableAction[] = [...MASTER_CRUD_ACTIONS];
   readonly listLoad = new ListLoadController();
 
   loading = false;
@@ -44,11 +53,18 @@ export abstract class ErpMasterPageBase<TDto extends {
   errorKey = '';
   successKey = '';
   rows: Array<Record<string, unknown>> = [];
+  pageIndex = 0;
+  pageSize = DEFAULT_TABLE_PAGE_SIZE;
+  totalElements = 0;
   formVisible = false;
   formMode: 'create' | 'edit' | 'view' = 'create';
   selectedId: number | null = null;
   selectedAuditRecord: TDto | null = null;
   actorEmail = 'system@erp.local';
+  canCreate = true;
+  canEdit = true;
+  canDelete = true;
+  canExport = true;
 
   protected filters: Record<string, string> = {};
   protected readonly destroy$ = new Subject<void>();
@@ -61,7 +77,8 @@ export abstract class ErpMasterPageBase<TDto extends {
   constructor(
     protected authService: AuthService,
     protected confirmDialog: ConfirmDialogService,
-    public cdr: ChangeDetectorRef
+    public cdr: ChangeDetectorRef,
+    @Optional() protected permissionService?: PermissionService
   ) {}
 
   get titleKey(): string {
@@ -88,12 +105,34 @@ export abstract class ErpMasterPageBase<TDto extends {
     return this.formMode === 'view';
   }
 
+  /** Opt-in: list uses `/paged` APIs instead of client slicing. */
+  protected readonly serverPaging: boolean = false;
+
+  get pagedRows(): Array<Record<string, unknown>> {
+    if (this.serverPaging) {
+      return this.rows;
+    }
+    return paginatedSlice(this.rows, this.pageIndex, this.pageSize);
+  }
+
+  get exportFileName(): string {
+    return (this.config.titleKey || 'export').replace(/[^a-zA-Z0-9_-]+/g, '-').toLowerCase();
+  }
+
+  get exportColumns(): ExportColumn[] {
+    return this.columns.map((column) => ({
+      header: column.title,
+      value: column.key
+    }));
+  }
+
   initMasterPage(): void {
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       this.actorEmail = user?.email || user?.username || 'system@erp.local';
       this.cdr.markForCheck();
     });
     this.authService.refreshCurrentUser();
+    this.loadPermissions();
     this.load();
   }
 
@@ -107,10 +146,27 @@ export abstract class ErpMasterPageBase<TDto extends {
 
   onSearch(filters: Record<string, string>): void {
     this.filters = filters || {};
+    this.pageIndex = 0;
     this.load();
   }
 
+  onPageChange(pageIndex: number): void {
+    if (this.pageIndex === pageIndex) {
+      return;
+    }
+    this.pageIndex = pageIndex;
+    if (this.serverPaging) {
+      this.load(false);
+      return;
+    }
+    this.cdr.markForCheck();
+  }
+
   openCreate(): void {
+    if (!this.canCreate) {
+      this.showError('COMMON.FORBIDDEN');
+      return;
+    }
     this.formMode = 'create';
     this.selectedId = null;
     this.selectedAuditRecord = null;
@@ -137,10 +193,18 @@ export abstract class ErpMasterPageBase<TDto extends {
       return;
     }
     if (event.actionId === 'edit') {
+      if (!this.canEdit) {
+        this.showError('COMMON.FORBIDDEN');
+        return;
+      }
       this.openDocument(id, 'edit');
       return;
     }
     if (event.actionId === 'delete') {
+      if (!this.canDelete) {
+        this.showError('COMMON.FORBIDDEN');
+        return;
+      }
       this.confirmDelete(id);
     }
   }
@@ -148,6 +212,14 @@ export abstract class ErpMasterPageBase<TDto extends {
   save(): void {
     if (this.readOnly || this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+    if (this.formMode === 'create' && !this.canCreate) {
+      this.showError('COMMON.FORBIDDEN');
+      return;
+    }
+    if (this.formMode === 'edit' && !this.canEdit) {
+      this.showError('COMMON.FORBIDDEN');
       return;
     }
     this.saving = true;
@@ -170,10 +242,53 @@ export abstract class ErpMasterPageBase<TDto extends {
       });
   }
 
-  protected load(): void {
+  protected loadPermissions(): void {
+    const menuItemId = this.config.menuItemId;
+    if (!menuItemId || !this.permissionService) {
+      return;
+    }
+    this.permissionService.can(menuItemId, 'canCreate').pipe(takeUntil(this.destroy$)).subscribe((ok) => {
+      this.canCreate = ok;
+      this.refreshActions();
+    });
+    this.permissionService.can(menuItemId, 'canEdit').pipe(takeUntil(this.destroy$)).subscribe((ok) => {
+      this.canEdit = ok;
+      this.refreshActions();
+    });
+    this.permissionService.can(menuItemId, 'canDelete').pipe(takeUntil(this.destroy$)).subscribe((ok) => {
+      this.canDelete = ok;
+      this.refreshActions();
+    });
+    this.permissionService.can(menuItemId, 'canView').pipe(takeUntil(this.destroy$)).subscribe((ok) => {
+      this.canExport = ok;
+      this.cdr.markForCheck();
+    });
+  }
+
+  protected refreshActions(): void {
+    this.actions = MASTER_CRUD_ACTIONS.filter((action) => {
+      if (action.id === 'edit') {
+        return this.canEdit;
+      }
+      if (action.id === 'delete') {
+        return this.canDelete;
+      }
+      return true;
+    });
+    this.cdr.markForCheck();
+  }
+
+  protected load(resetPage = true): void {
+    if (resetPage) {
+      this.pageIndex = 0;
+    }
     this.listLoad.begin();
     this.loading = this.listLoad.showInitialSpinner;
     this.errorKey = '';
+    if (this.serverPaging) {
+      this.loadServerPage();
+      return;
+    }
     const params = this.buildListParams();
     this.fetchList(params)
       .pipe(finalize(() => {
@@ -184,10 +299,42 @@ export abstract class ErpMasterPageBase<TDto extends {
       .subscribe({
         next: (rows) => {
           this.rows = (rows || []).map((row) => this.mapRow(row));
+          this.totalElements = this.rows.length;
+          this.pageIndex = clampTablePageIndex(this.pageIndex, this.totalElements, this.pageSize);
         },
         error: () => {
           this.errorKey = 'COMMON.ERROR_LOADING';
           this.rows = [];
+          this.totalElements = 0;
+          this.pageIndex = 0;
+        }
+      });
+  }
+
+  private loadServerPage(): void {
+    const params = withPageParams(this.pageIndex, this.pageSize, this.buildListParams());
+    this.fetchPagedList(params)
+      .pipe(finalize(() => {
+        this.listLoad.end();
+        this.loading = this.listLoad.showInitialSpinner;
+        this.cdr.markForCheck();
+      }))
+      .subscribe({
+        next: (page) => {
+          const content = page?.content || [];
+          this.rows = content.map((row) => this.mapRow(row));
+          this.totalElements = page?.totalElements ?? content.length;
+          this.pageIndex = clampTablePageIndex(
+            page?.page ?? this.pageIndex,
+            this.totalElements,
+            this.pageSize
+          );
+        },
+        error: () => {
+          this.errorKey = 'COMMON.ERROR_LOADING';
+          this.rows = [];
+          this.totalElements = 0;
+          this.pageIndex = 0;
         }
       });
   }
@@ -230,7 +377,10 @@ export abstract class ErpMasterPageBase<TDto extends {
   }
 
   protected buildListParams(): Record<string, string> {
-    const params: Record<string, string> = { search: this.filters.query || '' };
+    const query = this.filters.query || '';
+    const params: Record<string, string> = this.serverPaging
+      ? (query ? { q: query } : {})
+      : { search: query };
     if (this.showStatus && this.filters.status) {
       params.status = this.filters.status;
     }
@@ -265,6 +415,9 @@ export abstract class ErpMasterPageBase<TDto extends {
   }
 
   protected abstract fetchList(filters: Record<string, string>): Observable<TDto[]>;
+  protected fetchPagedList(_filters: Record<string, string | number | boolean>): Observable<PagedResult<TDto>> {
+    throw new Error(`${this.constructor.name} must implement fetchPagedList when serverPaging is enabled`);
+  }
   protected abstract fetchOne(id: number): Observable<TDto>;
   protected abstract createItem(payload: TForm): Observable<TDto>;
   protected abstract updateItem(id: number, payload: TForm): Observable<TDto>;

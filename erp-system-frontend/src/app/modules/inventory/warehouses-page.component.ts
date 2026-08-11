@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { WarehouseDto, WarehouseForm } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { ErpApiService } from '../../core/services/erp-api.service';
+import { ErpApiService, PagedResult } from '../../core/services/erp-api.service';
 import { DataTableAction, DataTableColumn } from '../../shared/components/data-table/data-table.component';
 import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../shared/utils/erp-master-page.base';
 
@@ -16,6 +16,8 @@ import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WarehousesPageComponent extends ErpMasterPageBase<WarehouseDto, WarehouseForm> implements OnInit, OnDestroy {
+  protected override readonly serverPaging = true;
+
   readonly config: MasterPageConfig = {
     titleKey: 'MENU.WAREHOUSES',
     createKey: 'ERP.CREATE_WAREHOUSE',
@@ -56,6 +58,10 @@ export class WarehousesPageComponent extends ErpMasterPageBase<WarehouseDto, War
 
   protected fetchList(filters: Record<string, string>): Observable<WarehouseDto[]> {
     return this.api.getWarehouses(filters);
+  }
+
+  protected override fetchPagedList(filters: Record<string, string | number | boolean>): Observable<PagedResult<WarehouseDto>> {
+    return this.api.getWarehousesPaged(filters);
   }
 
   protected fetchOne(id: number): Observable<WarehouseDto> {

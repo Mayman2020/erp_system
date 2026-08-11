@@ -9,6 +9,7 @@
 
 .tb-lang,
 .tb-theme-btn,
+.tb-role,
 .tb-notify-btn {
   flex: 0 0 auto;
 }
@@ -68,6 +69,7 @@
 }
 
 :host ::ng-deep .tb-lang.dropdown .dropdown-toggle::after,
+:host ::ng-deep .tb-role.dropdown .dropdown-toggle::after,
 :host ::ng-deep .tb-user-wrap.dropdown .dropdown-toggle::after {
   display: none;
 }

@@ -1,16 +1,19 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Optional } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { PermissionService } from '../../../core/services/permission.service';
 
 export interface ExportColumn<T = unknown> {
   header: string;
-  value: keyof T | ((row: T, index: number) => unknown);
+  value: string | keyof T | ((row: T, index: number) => unknown);
 }
 
 @Component({
   standalone: false,
   selector: 'app-table-export-toolbar',
   template: `
-    <div class="erp-export-toolbar" *ngIf="showExport" [class.erp-export-toolbar--inline]="inline">
+    <div class="erp-export-toolbar" *ngIf="showExport && permissionAllowed" [class.erp-export-toolbar--inline]="inline">
       <button
         type="button"
         class="erp-excel-export-btn"
@@ -55,17 +58,42 @@ export interface ExportColumn<T = unknown> {
     }
   `]
 })
-export class TableExportToolbarComponent<T = unknown> {
+export class TableExportToolbarComponent<T = unknown> implements OnInit, OnDestroy {
   @Input() inline = false;
   @Input() title = 'Export';
   @Input() fileName = 'export';
   @Input() showExport = true;
+  /** When set, export is shown only if the user can view this menu item. */
+  @Input() permissionKey = '';
   @Input() columns: ExportColumn<T>[] = [];
   @Input() rows: T[] = [];
   @Input() loadRows?: () => Promise<T[]>;
   @Input() disabled = false;
 
-  constructor(private readonly translationService: TranslationService) {}
+  permissionAllowed = true;
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(
+    private readonly translationService: TranslationService,
+    @Optional() private readonly permissionService?: PermissionService
+  ) {}
+
+  ngOnInit(): void {
+    if (!this.permissionKey?.trim() || !this.permissionService) {
+      this.permissionAllowed = true;
+      return;
+    }
+    this.permissionService.can(this.permissionKey, 'canView')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((ok) => {
+        this.permissionAllowed = ok;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   get hasRows(): boolean {
     return !!this.loadRows || this.rows.length > 0;

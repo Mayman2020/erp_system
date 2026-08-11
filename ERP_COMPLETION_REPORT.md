@@ -228,7 +228,7 @@ npm run build
 
 | Username | Role | Password |
 |----------|------|----------|
-| `admin` | ADMIN (full access) | `Admin@123` |
+| `admin` | ADMIN (full access) | `admin` |
 | `chief.accountant` | ACCOUNTANT_STANDARD | `Admin@123` |
 | `treasury.user` | TREASURY_OPERATOR | `Admin@123` |
 | `report.viewer` | REPORT_VIEWER | `Admin@123` |

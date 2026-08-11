@@ -21,10 +21,10 @@
         </div>
 
         <form [formGroup]="form" class="row mb-3">
-          <div class="col-md-3" *ngIf="activeReport === 'profitLoss'">
+          <div class="col-md-3" *ngIf="activeReport === 'profitLoss' || activeReport === 'trialBalance'">
             <app-form-field [control]="form.controls.fromDate" labelKey="REPORTS.FILTER.FROM_DATE" icon="calendar_month" type="date"></app-form-field>
           </div>
-          <div class="col-md-3" *ngIf="activeReport === 'profitLoss'">
+          <div class="col-md-3" *ngIf="activeReport === 'profitLoss' || activeReport === 'trialBalance'">
             <app-form-field [control]="form.controls.toDate" labelKey="REPORTS.FILTER.TO_DATE" icon="event" type="date"></app-form-field>
           </div>
           <div class="col-md-3" *ngIf="activeReport === 'profitLoss'">
@@ -194,6 +194,61 @@
               {{ balanceSheet.totalAssets | number:'1.2-2' }} =
               {{ balanceSheet.liabilitiesAndEquity | number:'1.2-2' }}
             </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="activeReport === 'trialBalance'">
+          <div *ngIf="trialBalance$ | async as trialBalance" class="report-table">
+            <div class="d-flex justify-content-end mb-3 erp-report-excel-actions">
+              <button type="button" class="erp-excel-export-btn" (click)="exportTrialBalance()">
+                <mat-icon aria-hidden="true" class="erp-excel-export-btn__icon">table_chart</mat-icon>
+                <span>{{ 'COMMON.EXPORT_EXCEL' | translate }}</span>
+              </button>
+            </div>
+            <div class="row report-summary">
+              <div class="col-md-4">
+                <div class="report-card report-card--metric">
+                  <div class="text-muted small">{{ 'REPORTS.TRIAL_BALANCE.TOTAL_DEBIT' | translate }}</div>
+                  <div class="h4 mb-0" [erpCountUp]="trialBalance.totalDebit" [erpCountUpDecimals]="2"></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="report-card report-card--metric">
+                  <div class="text-muted small">{{ 'REPORTS.TRIAL_BALANCE.TOTAL_CREDIT' | translate }}</div>
+                  <div class="h4 mb-0" [erpCountUp]="trialBalance.totalCredit" [erpCountUpDecimals]="2"></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="report-card report-card--metric" [class.report-card--positive]="trialBalance.balanced">
+                  <div class="text-muted small">{{ 'REPORTS.TRIAL_BALANCE.BALANCED' | translate }}</div>
+                  <div class="h4 mb-0">{{ (trialBalance.balanced ? 'COMMON.BOOL.YES' : 'COMMON.BOOL.NO') | translate }}</div>
+                </div>
+              </div>
+            </div>
+            <table class="erp-table">
+              <thead>
+                <tr>
+                  <th>{{ 'ACCOUNTS.CODE' | translate }} - {{ 'COMMON.NAME' | translate }}</th>
+                  <th class="text-right">{{ 'REPORTS.TRIAL_BALANCE.DEBIT' | translate }}</th>
+                  <th class="text-right">{{ 'REPORTS.TRIAL_BALANCE.CREDIT' | translate }}</th>
+                  <th class="text-right">{{ 'REPORTS.TRIAL_BALANCE.BALANCE' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let line of trialBalance.lines">
+                  <td>{{ formatReportAccountCell(line) }}</td>
+                  <td class="text-right">{{ line.debit | number:'1.2-2' }}</td>
+                  <td class="text-right">{{ line.credit | number:'1.2-2' }}</td>
+                  <td class="text-right">{{ line.balance | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="font-weight-bold">
+                  <td>{{ 'REPORTS.TRIAL_BALANCE.TOTAL_ROW' | translate }}</td>
+                  <td class="text-right">{{ trialBalance.totalDebit | number:'1.2-2' }}</td>
+                  <td class="text-right">{{ trialBalance.totalCredit | number:'1.2-2' }}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </ng-container>
     </div>

@@ -1,5 +1,6 @@
 package com.erp.system.erp.service;
 
+import com.erp.system.accounting.service.AccountingReportService;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.inventory.dto.display.LowStockAlertDisplayDto;
 import com.erp.system.inventory.dto.display.StockLevelDisplayDto;
@@ -28,6 +29,7 @@ public class ErpReportService {
     private final PurchaseInvoiceRepository purchaseInvoiceRepository;
     private final SupplierRepository supplierRepository;
     private final StockService stockService;
+    private final AccountingReportService accountingReportService;
 
     @Transactional(readOnly = true)
     public Map<String, Object> salesReport(LocalDate fromDate, LocalDate toDate) {
@@ -86,13 +88,19 @@ public class ErpReportService {
     public Map<String, Object> inventoryReport() {
         List<StockLevelDisplayDto> levels = stockService.getStockLevels(null, null);
         List<LowStockAlertDisplayDto> lowStock = stockService.getLowStockAlerts();
-        BigDecimal valuation = levels.stream()
-                .map(l -> l.getQuantity())
+        BigDecimal totalQuantity = levels.stream()
+                .map(StockLevelDisplayDto::getQuantity)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalValuation = levels.stream()
+                .map(l -> l.getQuantity().multiply(
+                        l.getCostPrice() != null ? l.getCostPrice() : BigDecimal.ZERO))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
         Map<String, Object> result = new HashMap<>();
         result.put("totalSkus", levels.size());
         result.put("lowStockCount", lowStock.size());
-        result.put("totalQuantity", valuation);
+        result.put("totalQuantity", totalQuantity);
+        result.put("totalValuation", totalValuation);
         result.put("stockLevels", levels);
         result.put("lowStockAlerts", lowStock);
         return result;
@@ -104,12 +112,20 @@ public class ErpReportService {
         Map<String, Object> purchases = purchasesReport(fromDate, toDate);
         BigDecimal totalSales = (BigDecimal) sales.get("totalSales");
         BigDecimal totalPurchases = (BigDecimal) purchases.get("totalPurchases");
+        BigDecimal netProfit;
+        try {
+            netProfit = accountingReportService.getProfitLoss(
+                    (LocalDate) sales.get("fromDate"),
+                    (LocalDate) sales.get("toDate")).getNetProfit();
+        } catch (Exception e) {
+            netProfit = totalSales.subtract(totalPurchases);
+        }
         Map<String, Object> result = new HashMap<>();
         result.put("fromDate", sales.get("fromDate"));
         result.put("toDate", sales.get("toDate"));
         result.put("totalSales", totalSales);
         result.put("totalPurchases", totalPurchases);
-        result.put("netProfit", totalSales.subtract(totalPurchases));
+        result.put("netProfit", netProfit);
         return result;
     }
 }

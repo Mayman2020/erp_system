@@ -33,7 +33,6 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         default_schema: erp_system
   flyway:
@@ -61,3 +60,10 @@ logging:
   level:
     root: INFO
     com.erp.system: INFO
+
+management:
+  health:
+    # SMTP is optional unless explicitly enabled. A disabled integration must
+    # not make the whole ERP report DOWN to an orchestrator/load balancer.
+    mail:
+      enabled: ${MAIL_ENABLED:false}

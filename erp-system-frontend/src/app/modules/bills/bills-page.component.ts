@@ -73,12 +73,20 @@ export class BillsPageComponent extends ErpMasterPageBase<BillDto, BillForm> imp
     ];
   }
 
+  get payableLovItems() {
+    return (this.liabilityAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }));
+  }
+
+  get lineAccountLovItems() {
+    return (this.expenseAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }));
+  }
+
   get payableOptions() {
-    return [{ id: null, label: '—' }, ...(this.liabilityAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.payableLovItems];
   }
 
   get lineAccountOptions() {
-    return [{ id: null, label: '—' }, ...(this.expenseAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.lineAccountLovItems];
   }
 
   ngOnInit(): void {

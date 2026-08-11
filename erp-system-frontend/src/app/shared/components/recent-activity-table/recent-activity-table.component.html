@@ -8,7 +8,9 @@
         type="button"
         class="erp-icon-button erp-integrated-table__icon-btn"
         [attr.aria-label]="'COMMON.SORT_DIRECTION' | translate"
-        [attr.title]="'COMMON.SORT_DIRECTION' | translate"
+        [ngbTooltip]="'COMMON.SORT_DIRECTION' | translate"
+        placement="top"
+        container="body"
         (click)="toggleSortDirection()"
       >
         <mat-icon aria-hidden="true">{{ sortDirection === 'desc' ? 'south' : 'north' }}</mat-icon>

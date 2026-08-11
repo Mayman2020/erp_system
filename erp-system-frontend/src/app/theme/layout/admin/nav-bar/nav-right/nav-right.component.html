@@ -38,6 +38,65 @@
   <mat-icon aria-hidden="true">{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
 </button>
 
+<div *ngIf="companies.length" class="tb-role" ngbDropdown placement="bottom-end" container="body">
+  <button
+    type="button"
+    class="tb-action-btn tb-role-btn"
+    ngbDropdownToggle
+    [ngbTooltip]="'TOPBAR.ACTIVE_COMPANY' | translate"
+    placement="bottom"
+    container="body"
+    [attr.aria-label]="'TOPBAR.ACTIVE_COMPANY' | translate"
+  >
+    <mat-icon>corporate_fare</mat-icon>
+    <span class="lang-name">
+      {{ companyLabel(companyContext.activeCompany || companies[0]) }}
+    </span>
+  </button>
+  <div class="dropdown-menu tb-dropdown-menu" ngbDropdownMenu>
+    <button
+      *ngFor="let company of companies"
+      type="button"
+      class="dropdown-item tb-dropdown-item"
+      ngbDropdownItem
+      (click)="switchCompany(company.id)"
+    >
+      <mat-icon>{{ company.entityType === 'BRANCH' ? 'account_tree' : 'business' }}</mat-icon>
+      <span>{{ companyLabel(company) }}</span>
+      <small>{{ company.code }}</small>
+      <mat-icon *ngIf="company.id === activeCompanyId" class="tb-check">check</mat-icon>
+    </button>
+  </div>
+</div>
+
+<div *ngIf="effectiveRoles.length > 1" class="tb-role" ngbDropdown placement="bottom-end" container="body">
+  <button
+    type="button"
+    class="tb-action-btn tb-role-btn"
+    ngbDropdownToggle
+    [ngbTooltip]="'TOPBAR.ACTIVE_ROLE' | translate"
+    placement="bottom"
+    container="body"
+    [attr.aria-label]="'TOPBAR.ACTIVE_ROLE' | translate"
+  >
+    <mat-icon>badge</mat-icon>
+    <span class="lang-name">{{ roleLabel(activeRole || '') }}</span>
+  </button>
+  <div class="dropdown-menu tb-dropdown-menu" ngbDropdownMenu>
+    <button
+      *ngFor="let role of effectiveRoles"
+      type="button"
+      class="dropdown-item tb-dropdown-item"
+      ngbDropdownItem
+      (click)="switchRole(role)"
+    >
+      <mat-icon>admin_panel_settings</mat-icon>
+      <span>{{ roleLabel(role) }}</span>
+      <mat-icon *ngIf="role === activeRole" class="tb-check">check</mat-icon>
+    </button>
+  </div>
+</div>
+
 <a
   routerLink="/notifications"
   class="tb-action-btn tb-notify-btn"

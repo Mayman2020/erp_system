@@ -5,7 +5,7 @@ import { finalize } from 'rxjs/operators';
 import { ProductCategoryDto, ProductDto, ProductForm, UnitOfMeasureDto } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { ErpApiService } from '../../core/services/erp-api.service';
+import { ErpApiService, PagedResult } from '../../core/services/erp-api.service';
 import { DataTableAction, DataTableColumn } from '../../shared/components/data-table/data-table.component';
 import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../shared/utils/erp-master-page.base';
 
@@ -17,6 +17,8 @@ import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductsPageComponent extends ErpMasterPageBase<ProductDto, ProductForm> implements OnInit, OnDestroy {
+  protected override readonly serverPaging = true;
+
   readonly config: MasterPageConfig = {
     titleKey: 'MENU.PRODUCTS',
     createKey: 'ERP.CREATE_PRODUCT',
@@ -68,12 +70,20 @@ export class ProductsPageComponent extends ErpMasterPageBase<ProductDto, Product
     super(authService, confirmDialog, cdr);
   }
 
+  get categoryLovItems(): Array<{ id: number; label: string }> {
+    return (this.categories || []).map((c) => ({ id: c.id, label: `${c.code} - ${c.name || c.nameEn}` }));
+  }
+
+  get unitLovItems(): Array<{ id: number; label: string }> {
+    return (this.units || []).map((u) => ({ id: u.id, label: `${u.code} - ${u.nameEn}` }));
+  }
+
   get categoryOptions(): Array<{ id: number | null; label: string }> {
-    return [{ id: null, label: '—' }, ...(this.categories || []).map((c) => ({ id: c.id, label: `${c.code} - ${c.name || c.nameEn}` }))];
+    return [{ id: null, label: '—' }, ...this.categoryLovItems];
   }
 
   get unitOptions(): Array<{ id: number | null; label: string }> {
-    return [{ id: null, label: '—' }, ...(this.units || []).map((u) => ({ id: u.id, label: `${u.code} - ${u.nameEn}` }))];
+    return [{ id: null, label: '—' }, ...this.unitLovItems];
   }
 
   ngOnInit(): void {
@@ -93,6 +103,10 @@ export class ProductsPageComponent extends ErpMasterPageBase<ProductDto, Product
 
   protected fetchList(filters: Record<string, string>): Observable<ProductDto[]> {
     return this.api.getProducts(filters);
+  }
+
+  protected override fetchPagedList(filters: Record<string, string | number | boolean>): Observable<PagedResult<ProductDto>> {
+    return this.api.getProductsPaged(filters);
   }
 
   protected fetchOne(id: number): Observable<ProductDto> {

@@ -15,6 +15,9 @@
     type="button"
     class="erp-alert__close"
     (click)="onDismiss()"
+    [ngbTooltip]="'COMMON.CLOSE' | translate"
+    placement="top"
+    container="body"
     [attr.aria-label]="'COMMON.CLOSE' | translate"
   >
     <mat-icon aria-hidden="true">close</mat-icon>

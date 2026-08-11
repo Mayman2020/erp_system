@@ -1,5 +1,6 @@
 package com.erp.system.hr.service;
 
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.erp.service.ActivityLogService;
 import com.erp.system.hr.domain.AttendanceRecord;
@@ -7,10 +8,13 @@ import com.erp.system.hr.dto.display.AttendanceRecordDisplayDto;
 import com.erp.system.hr.dto.form.AttendanceRecordFormDto;
 import com.erp.system.hr.repository.AttendanceRecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.time.LocalDate;
 
 
 @Service
@@ -27,6 +31,18 @@ public class AttendanceRecordService {
         return attendanceRecordRepository.findAllByOrderByIdDesc().stream()
                 .map(this::toDisplay)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AttendanceRecordDisplayDto> getPaged(
+            Long employeeId, String status, String q, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
+        String normalizedStatus = status == null || status.isBlank() ? null : status.trim().toUpperCase();
+        Page<AttendanceRecord> records = q == null || q.isBlank()
+                ? attendanceRecordRepository.findPaged(
+                        employeeId, normalizedStatus, fromDate, toDate, pageable)
+                : attendanceRecordRepository.searchPaged(
+                        employeeId, normalizedStatus, fromDate, toDate, q.trim(), pageable);
+        return PageResponse.from(records.map(this::toDisplay));
     }
 
     @Transactional(readOnly = true)

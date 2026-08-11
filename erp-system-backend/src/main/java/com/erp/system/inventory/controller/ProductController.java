@@ -1,12 +1,15 @@
 package com.erp.system.inventory.controller;
 
 import com.erp.system.common.dto.ApiResponse;
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.inventory.dto.display.ProductDisplayDto;
 import com.erp.system.inventory.dto.form.ProductFormDto;
 import com.erp.system.inventory.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +28,18 @@ public class ProductController {
             @RequestParam(required = false) String search
     ) {
         return ApiResponse.success(productService.getProducts(active, categoryId, search));
+    }
+
+    @GetMapping("/paged")
+    public ApiResponse<PageResponse<ProductDisplayDto>> getProductsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) Long categoryId) {
+        PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 200),
+                Sort.by("code").ascending());
+        return ApiResponse.success(productService.getProductsPaged(active, categoryId, q, pageable));
     }
 
     @GetMapping("/{id}")

@@ -58,6 +58,10 @@ export class JournalEntryPageComponent implements OnInit, OnDestroy {
   currencyLookups: LookupItem[] = [];
   entryTypeLookups: LookupItem[] = [];
 
+  get currencyLovItems() {
+    return (this.currencyLookups || []).map((c) => ({ id: c.code, label: c.code }));
+  }
+
   formVisible = false;
   accountPickerVisible = false;
   formMode: 'create' | 'edit' | 'view' = 'create';

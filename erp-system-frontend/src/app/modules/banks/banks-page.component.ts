@@ -57,8 +57,12 @@ export class BanksPageComponent extends ErpMasterPageBase<BankAccountDto, BankAc
     super(authService, confirmDialog, cdr);
   }
 
+  get accountLovItems() {
+    return (this.assetAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }));
+  }
+
   get accountOptions() {
-    return [{ id: null, label: '—' }, ...(this.assetAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.accountLovItems];
   }
 
   ngOnInit(): void {

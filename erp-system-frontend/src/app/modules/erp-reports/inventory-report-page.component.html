@@ -27,6 +27,11 @@
           <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_QUANTITY' | translate }}</div>
           <div class="erp-report-page__metric-value" [erpCountUp]="summary.totalQuantity" [erpCountUpDecimals]="2"></div>
         </div>
+        <div class="erp-report-page__metric">
+          <mat-icon class="erp-report-page__metric-icon">payments</mat-icon>
+          <div class="erp-report-page__metric-label">{{ 'ERP.TOTAL_VALUATION' | translate }}</div>
+          <div class="erp-report-page__metric-value" [erpCountUp]="summary.totalValuation" [erpCountUpDecimals]="2"></div>
+        </div>
       </div>
 
       <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>

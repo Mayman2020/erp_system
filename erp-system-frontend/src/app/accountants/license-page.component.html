@@ -1,0 +1,22 @@
+<section class="erp-page erp-estate-fade-up">
+  <app-page-header [titleKey]="'LICENSE.TITLE'"></app-page-header>
+  <div class="erp-card mb-3" *ngIf="current"><div class="erp-card__body">
+    <p><strong>{{ 'LICENSE.CUSTOMER' | translate }}:</strong> {{ current.customerName }}</p>
+    <p><strong>{{ 'LICENSE.VALID_TO' | translate }}:</strong> {{ current.validTo | erpDate }}</p>
+    <p><strong>{{ 'LICENSE.MAX_USERS' | translate }}:</strong> {{ current.maxUsers }}</p>
+    <p><strong>{{ 'COMMON.STATUS' | translate }}:</strong> {{ current.valid ? ('LICENSE.VALID' | translate) : ('LICENSE.EXPIRED' | translate) }}</p>
+  </div></div>
+  <div class="erp-card"><div class="erp-card__body">
+    <h3>{{ 'LICENSE.ACTIVATE' | translate }}</h3>
+    <form [formGroup]="form"><div class="row">
+      <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.licenseKey" labelKey="LICENSE.KEY"></app-form-field></div>
+      <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.customerName" labelKey="LICENSE.CUSTOMER"></app-form-field></div>
+      <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.validFrom" labelKey="COMMON.FROM_DATE" type="date"></app-form-field></div>
+      <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.validTo" labelKey="LICENSE.VALID_TO" type="date"></app-form-field></div>
+      <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.maxUsers" labelKey="LICENSE.MAX_USERS" type="number"></app-form-field></div>
+      <div class="col-12 mb-3"><app-form-field [control]="form.controls.modulesCsv" labelKey="LICENSE.MODULES"></app-form-field></div>
+      <div class="col-12 mb-3"><app-form-field [control]="form.controls.signature" labelKey="LICENSE.SIGNATURE" type="textarea" [rows]="2"></app-form-field></div>
+    </div></form>
+    <button type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="activate()">{{ 'LICENSE.ACTIVATE' | translate }}</button>
+  </div></div>
+</section>

@@ -5,9 +5,12 @@ import com.erp.system.accounting.dto.display.BalanceSheetLineDto;
 import com.erp.system.accounting.dto.display.BalanceSheetReportDto;
 import com.erp.system.accounting.dto.display.ProfitLossLineDto;
 import com.erp.system.accounting.dto.display.ProfitLossReportDto;
+import com.erp.system.accounting.dto.display.TrialBalanceLineDto;
+import com.erp.system.accounting.dto.display.TrialBalanceReportDto;
 import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.repository.JournalEntryLineRepository;
 import com.erp.system.common.enums.AccountingType;
+import com.erp.system.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +66,41 @@ public class AccountingReportService {
                 .totalRevenue(totalRevenue)
                 .totalExpenses(totalExpenses)
                 .netProfit(totalRevenue.subtract(totalExpenses).setScale(2, RoundingMode.HALF_UP))
+                .build();
+    }
+
+    // ===================== TRIAL BALANCE =====================
+
+    @Transactional(readOnly = true)
+    public TrialBalanceReportDto getTrialBalance(LocalDate fromDate, LocalDate toDate) {
+        List<TrialBalanceLineDto> lines = journalEntryLineRepository.aggregateTrialBalance(fromDate, toDate).stream()
+                .map(line -> TrialBalanceLineDto.builder()
+                        .accountId(line.getAccountId())
+                        .accountCode(line.getAccountCode())
+                        .accountNameEn(line.getAccountNameEn())
+                        .accountNameAr(line.getAccountNameAr())
+                        .debit(line.getDebit().setScale(2, RoundingMode.HALF_UP))
+                        .credit(line.getCredit().setScale(2, RoundingMode.HALF_UP))
+                        .balance(line.getBalance().setScale(2, RoundingMode.HALF_UP))
+                        .build())
+                .toList();
+
+        BigDecimal totalDebit = lines.stream()
+                .map(TrialBalanceLineDto::getDebit)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalCredit = lines.stream()
+                .map(TrialBalanceLineDto::getCredit)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        return TrialBalanceReportDto.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .lines(lines)
+                .totalDebit(totalDebit)
+                .totalCredit(totalCredit)
+                .balanced(totalDebit.compareTo(totalCredit) == 0)
                 .build();
     }
 
@@ -280,8 +318,12 @@ public class AccountingReportService {
         }
         try {
             return currencyConversionService.getRate(fromCurrency, toCurrency, date);
-        } catch (Exception e) {
-            return BigDecimal.ONE;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new BusinessException(
+                    "No exchange rate found for " + fromCurrency + " → " + toCurrency
+                            + (date != null ? " on " + date : ""));
         }
     }
 

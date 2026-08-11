@@ -2,6 +2,10 @@ package com.erp.system.common.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+
     public ResourceNotFoundException(String resourceName, Object id) {
         super(resourceName + " not found for id " + id);
     }

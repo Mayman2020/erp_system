@@ -65,8 +65,12 @@ export class TransfersPageComponent extends ErpMasterPageBase<TransferDto, Trans
     ];
   }
 
+  get accountLovItems() {
+    return (this.accounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }));
+  }
+
   get accountOptions() {
-    return [{ id: null, label: '—' }, ...(this.accounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.accountLovItems];
   }
 
   ngOnInit(): void {

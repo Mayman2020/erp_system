@@ -1,29 +1,41 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey">
-    <div header-actions class="erp-toolbar-icons">
-      <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
-        <mat-icon aria-hidden="true">add</mat-icon>
-        <span>{{ 'ERP.CREATE_CATEGORY' | translate }}</span>
-      </button>
-    </div>
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
   </app-page-header>
 
-  <div class="erp-card erp-list-page__card">
-    <div class="erp-card__body">
-      <app-advanced-search-bar
-        *ngIf="showSearch"
-        [showDateRange]="showDateRange"
-        [showStatus]="showStatus"
-        [statusOptions]="statusOptions"
-        (search)="onSearch($event)"
-      ></app-advanced-search-bar>
-
-      <app-erp-alert *ngIf="errorKey && !formVisible" type="danger" [message]="errorKey" extraClass="mt-3" (dismissed)="errorKey = ''"></app-erp-alert>
-      <app-erp-alert *ngIf="successKey && !formVisible" type="success" [message]="successKey" extraClass="mt-3" (dismissed)="successKey = ''"></app-erp-alert>
-
-      <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
-    </div>
-  </div>
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
 </section>
 
 <app-erp-dialog

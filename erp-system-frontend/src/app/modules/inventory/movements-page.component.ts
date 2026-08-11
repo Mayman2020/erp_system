@@ -5,7 +5,7 @@ import { finalize } from 'rxjs/operators';
 import { ProductDto, StockMovementDto, StockMovementForm, WarehouseDto } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { ErpApiService } from '../../core/services/erp-api.service';
+import { ErpApiService, PagedResult } from '../../core/services/erp-api.service';
 import { DataTableAction, DataTableColumn } from '../../shared/components/data-table/data-table.component';
 import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../shared/utils/erp-master-page.base';
 
@@ -17,6 +17,8 @@ import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MovementsPageComponent extends ErpMasterPageBase<StockMovementDto, StockMovementForm> implements OnInit, OnDestroy {
+  protected override readonly serverPaging = true;
+
   readonly config: MasterPageConfig = {
     titleKey: 'MENU.STOCK_MOVEMENTS',
     createKey: 'ERP.CREATE_MOVEMENT',
@@ -73,12 +75,20 @@ export class MovementsPageComponent extends ErpMasterPageBase<StockMovementDto, 
     ];
   }
 
+  get productLovItems() {
+    return (this.products || []).map((p) => ({ id: p.id, label: `${p.code} - ${p.name || p.nameEn}` }));
+  }
+
+  get warehouseLovItems() {
+    return (this.warehouses || []).map((w) => ({ id: w.id, label: `${w.code} - ${w.nameEn || w.name}` }));
+  }
+
   get productOptions() {
-    return [{ id: null, label: '—' }, ...(this.products || []).map((p) => ({ id: p.id, label: `${p.code} - ${p.name || p.nameEn}` }))];
+    return [{ id: null, label: '—' }, ...this.productLovItems];
   }
 
   get warehouseOptions() {
-    return [{ id: null, label: '—' }, ...(this.warehouses || []).map((w) => ({ id: w.id, label: `${w.code} - ${w.nameEn || w.name}` }))];
+    return [{ id: null, label: '—' }, ...this.warehouseLovItems];
   }
 
   get movementTypeOptions() {
@@ -116,6 +126,10 @@ export class MovementsPageComponent extends ErpMasterPageBase<StockMovementDto, 
 
   protected fetchList(filters: Record<string, string>): Observable<StockMovementDto[]> {
     return this.api.getStockMovements(filters);
+  }
+
+  protected override fetchPagedList(filters: Record<string, string | number | boolean>): Observable<PagedResult<StockMovementDto>> {
+    return this.api.getStockMovementsPaged(filters);
   }
 
   protected fetchOne(id: number): Observable<StockMovementDto> {

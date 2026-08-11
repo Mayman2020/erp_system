@@ -6,7 +6,9 @@
           <div class="col-md-12">
             <ul class="breadcrumb">
               <li class="breadcrumb-item">
-                <a [routerLink]="['/dashboard']" *ngIf="type === 'theme2'"><mat-icon aria-hidden="true">home</mat-icon></a>
+                <a [routerLink]="['/dashboard']" *ngIf="type === 'theme2'"
+                  [ngbTooltip]="'NAV.DASHBOARD' | translate" placement="top" container="body"
+                  [attr.aria-label]="'NAV.DASHBOARD' | translate"><mat-icon aria-hidden="true">home</mat-icon></a>
                 <a [routerLink]="['/dashboard']" *ngIf="type === 'theme1'">{{ 'NAV.DASHBOARD' | translate }}</a>
               </li>
               <ng-container *ngFor="let breadcrumb of navigationList">

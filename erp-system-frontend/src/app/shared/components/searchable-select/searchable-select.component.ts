@@ -50,6 +50,9 @@ import { LovSelectDialogComponent } from '../lov-select-dialog/lov-select-dialog
           tabindex="-1"
           (mousedown)="$event.preventDefault()"
           (click)="clearSelection($event)"
+          [ngbTooltip]="'LOV.CLEAR' | translate"
+          placement="top"
+          container="body"
           [attr.aria-label]="'LOV.CLEAR' | translate">
           <mat-icon aria-hidden="true">close</mat-icon>
         </button>
@@ -61,6 +64,9 @@ import { LovSelectDialogComponent } from '../lov-select-dialog/lov-select-dialog
           [disabled]="disabled"
           (mousedown)="$event.preventDefault()"
           (click)="openPicker($event)"
+          [ngbTooltip]="'LOV.OPEN' | translate"
+          placement="top"
+          container="body"
           [attr.aria-label]="'LOV.OPEN' | translate">
           <mat-icon aria-hidden="true">search</mat-icon>
         </button>
@@ -109,6 +115,7 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnChange
   @Input() clearable = true;
   @Input() serverSide = false;
   @Output() searchTextChange = new EventEmitter<string>();
+  @Output() selectionChange = new EventEmitter<unknown>();
 
   displayText = '';
   touched = false;
@@ -161,6 +168,7 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnChange
     this.touched = true;
     this.onChange(null);
     this.onTouched();
+    this.selectionChange.emit(null);
   }
 
   getItemLabel(item: any): string {
@@ -200,6 +208,7 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnChange
     this._value = item ? this.itemValue(item) : null;
     this.displayText = item ? this.getItemLabel(item) : '';
     this.onChange(this._value);
+    this.selectionChange.emit(this._value);
   }
 
   private syncDisplayFromValue(): void {

@@ -125,7 +125,7 @@
       </table>
     </div>
 
-    <nav class="erp-table-pagination" *ngIf="totalItemsCount > 0" [attr.aria-label]="'COMMON.PAGINATION' | translate">
+    <nav class="erp-table-pagination" *ngIf="showPager && totalItemsCount > 0" [attr.aria-label]="'COMMON.PAGINATION' | translate">
       <div class="erp-table-pagination__info">
         {{ 'COMMON.TABLE_SHOWING' | translate:{ start: rangeStart, end: rangeEnd, total: totalItemsCount } }}
       </div>

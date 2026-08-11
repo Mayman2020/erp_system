@@ -1,0 +1,112 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
+  </app-page-header>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
+</section>
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'PURCHASES.CREATE_RECEIPT' : 'COMMON.EDIT'" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.receiptNo" labelKey="ERP.NUMBER" icon="tag" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3">
+          <app-searchable-select
+            formControlName="supplierId"
+            label="MENU.SUPPLIERS"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="supplierLovItems"
+            [clearable]="true">
+          </app-searchable-select>
+        </div>
+        <div class="col-md-4 mb-3">
+          <app-searchable-select
+            formControlName="warehouseId"
+            label="INVOICES.WAREHOUSE"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="warehouseLovItems"
+            [clearable]="false"
+            [required]="true">
+          </app-searchable-select>
+        </div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.purchaseOrderId" labelKey="MENU.PURCHASE_ORDERS" icon="shopping_cart" type="number" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-12 mb-3"><app-form-field [control]="form.controls.notes" labelKey="INVOICES.NOTES" icon="notes" type="textarea" [rows]="2" [readonly]="readOnly"></app-form-field></div>
+      </div>
+      <div formArrayName="lines">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">{{ 'ERP.LINES' | translate }}</h5>
+          <button *ngIf="!readOnly" type="button" class="erp-button erp-button--secondary btn-sm" (click)="addLine()">{{ 'COMMON.ADD' | translate }}</button>
+        </div>
+        <div *ngFor="let line of lines.controls; let i = index" [formGroupName]="i" class="row border rounded p-2 mb-2 align-items-end">
+          <div class="col-md-5 mb-2">
+            <app-searchable-select
+              formControlName="productId"
+              label="ERP.PRODUCT"
+              placeholder="LOV.SELECT_PLACEHOLDER"
+              bindLabel="label"
+              bindValue="id"
+              [items]="productLovItems"
+              [clearable]="false"
+              [required]="true">
+            </app-searchable-select>
+          </div>
+          <div class="col-md-3 mb-2"><app-form-field [control]="$any(line).controls.quantity" labelKey="ERP.QUANTITY" icon="pin" type="number" step="0.0001" min="0.0001" [readonly]="readOnly"></app-form-field></div>
+          <div class="col-md-3 mb-2"><app-form-field [control]="$any(line).controls.unitCost" labelKey="ERP.COST_PRICE" icon="payments" type="number" step="0.01" min="0" [readonly]="readOnly"></app-form-field></div>
+          <div class="col-md-1 mb-2" *ngIf="!readOnly && lines.length > 1">
+            <button
+              type="button"
+              class="erp-button erp-button--danger btn-sm w-100"
+              (click)="removeLine(i)"
+              [ngbTooltip]="'COMMON.DELETE' | translate"
+              placement="top"
+              container="body"
+              [attr.aria-label]="'COMMON.DELETE' | translate">
+              <mat-icon aria-hidden="true">delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+    <app-erp-audit-trail *ngIf="formMode !== 'create' && selectedAuditRecord as audit" [createdAt]="audit.createdAt" [updatedAt]="audit.updatedAt" [createdBy]="audit.createdBy" [updatedBy]="audit.updatedBy"></app-erp-audit-trail>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

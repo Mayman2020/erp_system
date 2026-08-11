@@ -1,0 +1,35 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions class="erp-toolbar-icons d-flex gap-2 flex-wrap">
+      <button class="erp-button erp-button--primary" type="button" [disabled]="generating" (click)="generate()">
+        <mat-icon aria-hidden="true">autorenew</mat-icon>
+        <span>{{ 'INVENTORY.GENERATE_REPLENISHMENT' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+  <div class="erp-card erp-list-page__card mb-3">
+    <div class="erp-card__body">
+      <h4 class="mb-3">{{ 'INVENTORY.CONVERT_TO_PO' | translate }}</h4>
+      <form [formGroup]="convertForm" class="row align-items-end g-3">
+        <div class="col-md-5">
+          <app-form-field [control]="convertForm.controls.supplierId" labelKey="MENU.SUPPLIERS" icon="local_shipping" type="select" [options]="supplierOptions" optionValueField="id" optionLabelField="label"></app-form-field>
+        </div>
+        <div class="col-md-5">
+          <app-form-field [control]="convertForm.controls.warehouseId" labelKey="INVOICES.WAREHOUSE" icon="warehouse" type="select" [options]="warehouseOptions" optionValueField="id" optionLabelField="label"></app-form-field>
+        </div>
+        <div class="col-md-2">
+          <button type="button" class="erp-button erp-button--secondary w-100" [disabled]="converting || convertForm.invalid" (click)="convertToPo()">
+            {{ 'INVENTORY.CONVERT_TO_PO' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-3" (dismissed)="successKey = ''"></app-erp-alert>
+      <app-data-table [columns]="columns" [data]="rows" [loading]="loading"></app-data-table>
+    </div>
+  </div>
+</section>

@@ -1,18 +1,56 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
-  <app-page-header [titleKey]="titleKey"><div header-actions class="erp-toolbar-icons"><button class="erp-button erp-button--primary" type="button" (click)="openCreate()"><mat-icon>add</mat-icon><span>{{ 'ERP.CREATE_NOTE' | translate }}</span></button></div></app-page-header>
-  <div class="erp-card erp-list-page__card"><div class="erp-card__body">
-    <app-advanced-search-bar (search)="onSearch($event)"></app-advanced-search-bar>
-    <app-data-table [columns]="columns" [data]="rows" [actions]="actions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
-  </div></div>
+  <app-page-header [titleKey]="titleKey">
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
+  </app-page-header>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
 </section>
 <app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'ERP.CREATE_NOTE' : 'COMMON.EDIT'" size="lg" (close)="closeForm()">
   <div dialog-body><form [formGroup]="form"><div class="row">
     <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.entityType" labelKey="ERP.ENTITY_TYPE" [readonly]="readOnly"></app-form-field></div>
     <div class="col-md-4 mb-3" *ngIf="form.controls.entityType.value === 'LEAD'; else manualEntityId">
-      <label class="form-label">{{ 'MENU.LEADS' | translate }}</label>
-      <select class="form-control" formControlName="entityId" [disabled]="readOnly">
-        <option *ngFor="let l of leadOptions" [ngValue]="l.id">{{ l.label }}</option>
-      </select>
+      <app-searchable-select
+        formControlName="entityId"
+        label="MENU.LEADS"
+        placeholder="LOV.SELECT_PLACEHOLDER"
+        bindLabel="label"
+        bindValue="id"
+        [items]="leadLovItems"
+        [clearable]="false"
+        [required]="true">
+      </app-searchable-select>
     </div>
     <ng-template #manualEntityId>
       <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.entityId" labelKey="COMMON.ID" type="number" [readonly]="readOnly"></app-form-field></div>

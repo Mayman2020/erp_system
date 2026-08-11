@@ -75,12 +75,20 @@ export class ChecksPageComponent extends ErpMasterPageBase<AccountingCheckDto, A
     ];
   }
 
+  get bankAccountLovItems() {
+    return (this.bankAccounts || []).map((b) => ({ id: b.id, label: `${b.bankName} (${b.accountNumber})` }));
+  }
+
+  get accountLovItems() {
+    return (this.assetAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }));
+  }
+
   get bankAccountOptions() {
-    return [{ id: null, label: '—' }, ...(this.bankAccounts || []).map((b) => ({ id: b.id, label: `${b.bankName} (${b.accountNumber})` }))];
+    return [{ id: null, label: '—' }, ...this.bankAccountLovItems];
   }
 
   get accountOptions() {
-    return [{ id: null, label: '—' }, ...(this.assetAccounts || []).map((a) => ({ id: a.id, label: `${a.code} - ${a.nameEn || a.name}` }))];
+    return [{ id: null, label: '—' }, ...this.accountLovItems];
   }
 
   ngOnInit(): void {

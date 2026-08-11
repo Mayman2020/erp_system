@@ -1,20 +1,42 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
   <app-page-header [titleKey]="titleKey">
-    <div header-actions class="erp-toolbar-icons">
-      <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
-        <mat-icon aria-hidden="true">add</mat-icon>
-        <span>{{ 'BANKS.CREATE' | translate }}</span>
-      </button>
-    </div>
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
   </app-page-header>
-  <div class="erp-card erp-list-page__card">
-    <div class="erp-card__body">
-      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
-      <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-3" (dismissed)="successKey = ''"></app-erp-alert>
-      <app-advanced-search-bar [showStatus]="showStatus" [showDateRange]="false" [statusOptions]="statusOptions" statusLabelPrefix="COMMON.BOOL." (search)="onSearch($event)"></app-advanced-search-bar>
-      <app-data-table [columns]="columns" [data]="rows" [actions]="actions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
-    </div>
-  </div>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    statusLabelPrefix="COMMON.BOOL."
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
 </section>
 <app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'BANKS.CREATE' : (formMode === 'view' ? 'COMMON.VIEW' : 'COMMON.EDIT')" size="lg" (close)="closeForm()">
   <div dialog-body>
@@ -25,7 +47,18 @@
         <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.iban" labelKey="BANKS.IBAN" icon="credit_card" [readonly]="readOnly"></app-form-field></div>
         <div class="col-md-3 mb-3"><app-form-field [control]="form.controls.currency" labelKey="BANKS.CURRENCY" icon="paid" [readonly]="readOnly"></app-form-field></div>
         <div class="col-md-3 mb-3"><app-form-field [control]="form.controls.openingBalance" labelKey="BANKS.OPENING_BALANCE" icon="account_balance_wallet" type="number" step="0.01" [readonly]="readOnly"></app-form-field></div>
-        <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.linkedAccountId" labelKey="BANKS.LINKED_ACCOUNT" icon="savings" type="select" [options]="accountOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+        <div class="col-md-6 mb-3">
+          <app-searchable-select
+            formControlName="linkedAccountId"
+            label="BANKS.LINKED_ACCOUNT"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="accountLovItems"
+            [clearable]="false"
+            [required]="true">
+          </app-searchable-select>
+        </div>
         <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.active" labelKey="COMMON.ACTIVE" icon="toggle_on" type="boolean" [readonly]="readOnly"></app-form-field></div>
       </div>
     </form>

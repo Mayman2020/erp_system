@@ -20,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import com.erp.system.organization.CompanyContextFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -55,6 +56,12 @@ public class SecurityConfig {
     private static final String[] MANUFACTURING_ROLES = {
             "ADMIN", "MANAGER", "INVENTORY", "ACCOUNTANT_STANDARD"
     };
+    private static final String[] MAINTENANCE_ROLES = {
+            "ADMIN", "MANAGER", "TECHNICIAN", "ACCOUNTANT_STANDARD"
+    };
+    private static final String[] POS_ROLES = {
+            "ADMIN", "MANAGER", "CASHIER", "SALES", "ACCOUNTANT", "ACCOUNTANT_STANDARD"
+    };
     private static final String[] ERP_READ_ROLES = {
             "ADMIN", "MANAGER", "REPORT_VIEWER", "ACCOUNTANT", "ACCOUNTANT_STANDARD"
     };
@@ -64,6 +71,9 @@ public class SecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final MustChangePasswordFilter mustChangePasswordFilter;
+    private final CompanyContextFilter companyContextFilter;
+    private final ActiveRoleFilter activeRoleFilter;
     private final MenuActionAuthorizationFilter menuActionAuthorizationFilter;
     private final AuthenticationEntryPoint apiAuthenticationEntryPoint;
     private final AccessDeniedHandler apiAccessDeniedHandler;
@@ -94,6 +104,8 @@ public class SecurityConfig {
                         .requestMatchers("/notifications/**").authenticated()
                         .requestMatchers("/ui/**").authenticated()
                         .requestMatchers("/lookups/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/organizations/companies/accessible").authenticated()
+                        .requestMatchers("/organizations/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/accounting/**").hasAnyRole(ACCOUNTING_READ_ROLES)
@@ -120,6 +132,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/manufacturing/**").hasAnyRole(MANUFACTURING_ROLES)
                         .requestMatchers("/manufacturing/**").hasAnyRole(MANUFACTURING_ROLES)
 
+                        .requestMatchers(HttpMethod.GET, "/maintenance/**").hasAnyRole(MAINTENANCE_ROLES)
+                        .requestMatchers("/maintenance/**").hasAnyRole(MAINTENANCE_ROLES)
+
+                        .requestMatchers(HttpMethod.GET, "/pos/**").hasAnyRole(POS_ROLES)
+                        .requestMatchers("/pos/**").hasAnyRole(POS_ROLES)
+
                         .requestMatchers(HttpMethod.GET, "/erp/reports/**").hasAnyRole(ERP_READ_ROLES)
                         .requestMatchers(HttpMethod.GET, "/erp/**").hasAnyRole(ERP_READ_ROLES)
                         .requestMatchers("/erp/**").hasAnyRole(ERP_WRITE_ROLES)
@@ -127,7 +145,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(menuActionAuthorizationFilter, JwtAuthenticationFilter.class);
+                .addFilterAfter(mustChangePasswordFilter, JwtAuthenticationFilter.class)
+                .addFilterAfter(companyContextFilter, MustChangePasswordFilter.class)
+                .addFilterAfter(activeRoleFilter, CompanyContextFilter.class)
+                .addFilterAfter(menuActionAuthorizationFilter, ActiveRoleFilter.class);
         return http.build();
     }
 

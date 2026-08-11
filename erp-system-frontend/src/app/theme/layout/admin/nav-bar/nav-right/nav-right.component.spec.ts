@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Pipe, PipeTransform, NO_ERRORS_SCHEMA } from '@angular/core';
-import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgbDropdownConfig, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { BehaviorSubject, of } from 'rxjs';
@@ -22,14 +21,13 @@ describe('NavRightComponent', () => {
   let component: NavRightComponent;
   let fixture: ComponentFixture<NavRightComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, NgbDropdownModule],
-      declarations: [NavRightComponent, StubTranslatePipe],
+      imports: [RouterTestingModule, NgbDropdownModule, StubTranslatePipe],
+      declarations: [NavRightComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         NgbDropdownConfig,
-        { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } },
         {
           provide: AuthService,
           useValue: {
@@ -37,6 +35,10 @@ describe('NavRightComponent', () => {
             refreshCurrentUser: jasmine.createSpy('refreshCurrentUser'),
             isAuthenticated$: of(false),
             currentUser$: of(null),
+            activeRoleChanged: of(null),
+            activeRole: null,
+            getEffectiveRoles: jasmine.createSpy('getEffectiveRoles').and.returnValue([]),
+            setActiveRole: jasmine.createSpy('setActiveRole').and.returnValue(true),
             logout: jasmine.createSpy('logout')
           }
         },

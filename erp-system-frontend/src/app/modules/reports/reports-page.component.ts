@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { exportAoAToStyledExcel } from '../../core/utils/styled-excel-export';
-import { BalanceSheetReportDto, ProfitLossReportDto } from '../../core/models/accounting.models';
+import { BalanceSheetReportDto, ProfitLossReportDto, TrialBalanceReportDto } from '../../core/models/accounting.models';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { LookupItem } from '../../core/models/lookup.models';
 import { AccountingApiService } from '../../core/services/accounting-api.service';
@@ -18,7 +18,7 @@ import { LookupService } from '../../core/services/lookup.service';
 export class ReportsPageComponent implements OnInit {
   readonly titleKey = 'REPORTS.TITLE';
   loading = false;
-  activeReport: 'profitLoss' | 'balanceSheet' = 'profitLoss';
+  activeReport: 'profitLoss' | 'balanceSheet' | 'trialBalance' = 'profitLoss';
   periodOptions: LookupItem[] = [];
   
   private readonly profitLossSubject = new BehaviorSubject<ProfitLossReportDto | null>(null);
@@ -26,6 +26,9 @@ export class ReportsPageComponent implements OnInit {
   
   private readonly balanceSheetSubject = new BehaviorSubject<BalanceSheetReportDto | null>(null);
   public readonly balanceSheet$: Observable<BalanceSheetReportDto | null> = this.balanceSheetSubject.asObservable();
+
+  private readonly trialBalanceSubject = new BehaviorSubject<TrialBalanceReportDto | null>(null);
+  public readonly trialBalance$: Observable<TrialBalanceReportDto | null> = this.trialBalanceSubject.asObservable();
 
   errorKey = '';
 
@@ -38,7 +41,8 @@ export class ReportsPageComponent implements OnInit {
 
   reportCards = [
     { id: 'profitLoss', title: 'REPORTS.PROFIT_LOSS.TITLE', description: 'REPORTS.PROFIT_LOSS.DESCRIPTION' },
-    { id: 'balanceSheet', title: 'REPORTS.BALANCE_SHEET.TITLE', description: 'REPORTS.BALANCE_SHEET.DESCRIPTION' }
+    { id: 'balanceSheet', title: 'REPORTS.BALANCE_SHEET.TITLE', description: 'REPORTS.BALANCE_SHEET.DESCRIPTION' },
+    { id: 'trialBalance', title: 'REPORTS.TRIAL_BALANCE.TITLE', description: 'REPORTS.TRIAL_BALANCE.DESCRIPTION' }
   ];
 
   constructor(
@@ -58,7 +62,7 @@ export class ReportsPageComponent implements OnInit {
     this.runReport('profitLoss');
   }
 
-  runReport(report: 'profitLoss' | 'balanceSheet'): void {
+  runReport(report: 'profitLoss' | 'balanceSheet' | 'trialBalance'): void {
     this.activeReport = report;
     if (!this.isRangeValid()) {
       this.errorKey = 'REPORTS.INVALID_RANGE';
@@ -84,6 +88,22 @@ export class ReportsPageComponent implements OnInit {
       return;
     }
 
+    if (report === 'trialBalance') {
+      this.api
+        .getTrialBalance(String(raw.fromDate || ''), String(raw.toDate || ''))
+        .pipe(
+          finalize(() => {
+            this.loading = false;
+            this.cdr.markForCheck();
+          })
+        )
+        .subscribe({
+          next: (result) => this.trialBalanceSubject.next(result),
+          error: () => (this.errorKey = 'COMMON.ERROR_LOADING')
+        });
+      return;
+    }
+
     this.api
       .getBalanceSheet(String(raw.asOfDate || ''))
       .pipe(
@@ -101,6 +121,10 @@ export class ReportsPageComponent implements OnInit {
   runReportCard(reportId: string): void {
     if (reportId === 'balanceSheet') {
       this.runReport('balanceSheet');
+      return;
+    }
+    if (reportId === 'trialBalance') {
+      this.runReport('trialBalance');
       return;
     }
     this.runReport('profitLoss');
@@ -144,23 +168,46 @@ export class ReportsPageComponent implements OnInit {
       ['', ''],
       [this.translationService.instant('REPORTS.PROFIT_LOSS.NET_RESULT'), profitLoss.netProfit]
     ];
-    const boldRows: number[] = [];
-    let row = 1;
-    boldRows.push(row);
-    row += 1 + revenueRows.length;
-    boldRows.push(row);
-    row += 2;
-    boldRows.push(row);
-    row += 1 + expenseRows.length;
-    boldRows.push(row);
-    row += 2;
-    boldRows.push(row);
     exportAoAToStyledExcel(data, {
       sheetName: this.translationService.instant('REPORTS.PROFIT_LOSS.TITLE'),
       fileName: 'profit-loss',
       headerRows: [0],
       rightAlignColumns: [1],
-      boldRows
+      boldRows: [0, 1 + revenueRows.length, 3 + revenueRows.length + expenseRows.length]
+    });
+  }
+
+  exportTrialBalance(): void {
+    const trialBalance = this.trialBalanceSubject.value;
+    if (!trialBalance) return;
+    const headers = [
+      this.translationService.instant('ACCOUNTS.CODE') + ' - ' + this.translationService.instant('COMMON.NAME'),
+      this.translationService.instant('REPORTS.TRIAL_BALANCE.DEBIT'),
+      this.translationService.instant('REPORTS.TRIAL_BALANCE.CREDIT'),
+      this.translationService.instant('REPORTS.TRIAL_BALANCE.BALANCE')
+    ];
+    const rows = trialBalance.lines.map((l) => [
+      this.formatReportAccountCell(l),
+      l.debit,
+      l.credit,
+      l.balance
+    ]);
+    const data: unknown[][] = [
+      headers,
+      ...rows,
+      [
+        this.translationService.instant('REPORTS.TRIAL_BALANCE.TOTAL_ROW'),
+        trialBalance.totalDebit,
+        trialBalance.totalCredit,
+        ''
+      ]
+    ];
+    exportAoAToStyledExcel(data, {
+      sheetName: this.translationService.instant('REPORTS.TRIAL_BALANCE.TITLE'),
+      fileName: 'trial-balance',
+      headerRows: [0],
+      rightAlignColumns: [1, 2, 3],
+      boldRows: [0, data.length - 1]
     });
   }
 

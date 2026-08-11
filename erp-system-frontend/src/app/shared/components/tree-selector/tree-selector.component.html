@@ -18,7 +18,10 @@
           class="erp-tree__toggle"
           *ngIf="node.children?.length"
           (click)="toggle(node.id)"
-          [attr.aria-label]="isExpanded(node.id) ? 'Collapse' : 'Expand'"
+          [ngbTooltip]="(isExpanded(node.id) ? 'COMMON.COLLAPSE' : 'COMMON.EXPAND') | translate"
+          placement="top"
+          container="body"
+          [attr.aria-label]="(isExpanded(node.id) ? 'COMMON.COLLAPSE' : 'COMMON.EXPAND') | translate"
         >
           <mat-icon aria-hidden="true">{{ isExpanded(node.id) ? 'expand_more' : 'chevron_right' }}</mat-icon>
         </button>
@@ -35,7 +38,10 @@
           <button
             type="button"
             class="erp-tree__pick-name"
-            [attr.title]="'ACCOUNTS.VIEW_DETAIL_HINT' | translate"
+            [ngbTooltip]="'ACCOUNTS.VIEW_DETAIL_HINT' | translate"
+            placement="top"
+            container="body"
+            [attr.aria-label]="'ACCOUNTS.VIEW_DETAIL_HINT' | translate"
             (click)="onAccountNameClick($event, node)"
           >
             {{ label(node) }}

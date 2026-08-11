@@ -63,6 +63,9 @@ import { TranslationService } from '../../../core/i18n/translation.service';
               type="button"
               class="erp-form-field__password-toggle"
               (click)="passwordHidden = !passwordHidden"
+              [ngbTooltip]="(passwordHidden ? 'AUTH.SHOW_PASSWORD' : 'AUTH.HIDE_PASSWORD') | translate"
+              placement="top"
+              container="body"
               [attr.aria-label]="(passwordHidden ? 'AUTH.SHOW_PASSWORD' : 'AUTH.HIDE_PASSWORD') | translate"
             >
               <mat-icon aria-hidden="true">{{ passwordHidden ? 'visibility' : 'visibility_off' }}</mat-icon>

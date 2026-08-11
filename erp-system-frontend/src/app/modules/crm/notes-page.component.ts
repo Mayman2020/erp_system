@@ -42,8 +42,8 @@ export class NotesPageComponent extends ErpMasterPageBase<CrmNoteDto, CrmNoteFor
   }
   ngOnDestroy(): void { this.destroyMasterPage(); }
 
-  get leadOptions() {
-    return [{ id: null, label: '—' }, ...this.leads.map((l) => ({ id: l.id, label: `${l.leadNumber} - ${l.name}` }))];
+  get leadLovItems(): Array<{ id: number; label: string }> {
+    return this.leads.map((l) => ({ id: l.id, label: `${l.leadNumber} - ${l.name}` }));
   }
 
   protected fetchList(f: Record<string, string>): Observable<CrmNoteDto[]> { return this.api.getCrmNotes(f); }

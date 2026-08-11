@@ -11,11 +11,15 @@ import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.common.service.NumberingService;
 import com.erp.system.erp.service.ActivityLogService;
+import com.erp.system.hr.domain.Employee;
 import com.erp.system.hr.domain.PayrollLine;
 import com.erp.system.hr.domain.PayrollRun;
 import com.erp.system.hr.dto.display.PayrollLineDisplayDto;
 import com.erp.system.hr.dto.display.PayrollRunDisplayDto;
 import com.erp.system.hr.dto.form.PayrollRunFormDto;
+import com.erp.system.hr.domain.Employee;
+import com.erp.system.hr.repository.AttendanceRecordRepository;
+import com.erp.system.hr.repository.EmployeeRepository;
 import com.erp.system.hr.repository.PayrollLineRepository;
 import com.erp.system.hr.repository.PayrollRunRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -34,6 +40,8 @@ public class PayrollRunService {
 
     private final PayrollRunRepository payrollRunRepository;
     private final PayrollLineRepository payrollLineRepository;
+    private final EmployeeRepository employeeRepository;
+    private final AttendanceRecordRepository attendanceRecordRepository;
     private final NumberingService numberingService;
     private final ActivityLogService activityLogService;
     private final AccountRepository accountRepository;
@@ -159,6 +167,57 @@ public class PayrollRunService {
         payrollRunRepository.delete(payrollRun);
         activityLogService.log(MODULE, "DELETE", "PayrollRun", id, payrollRun.getPayrollNumber(),
                 "Deleted payroll run " + payrollRun.getPayrollNumber());
+    }
+
+    @Transactional
+    public PayrollRunDisplayDto generateFromAttendance(Long payrollRunId) {
+        PayrollRun payrollRun = loadPayrollRun(payrollRunId);
+        if (payrollRun.getStatus() == TransactionStatus.APPROVED) {
+            throw new BusinessException("Approved payroll run cannot be regenerated from attendance");
+        }
+        if (payrollRun.getStatus() == TransactionStatus.CANCELLED) {
+            throw new BusinessException("Cancelled payroll run cannot be regenerated from attendance");
+        }
+
+        LocalDate periodStart = payrollRun.getPeriodStart();
+        LocalDate periodEnd = payrollRun.getPeriodEnd();
+        long periodDays = ChronoUnit.DAYS.between(periodStart, periodEnd) + 1;
+        if (periodDays <= 0) {
+            throw new BusinessException("Payroll period must contain at least one day");
+        }
+
+        List<PayrollLine> existingLines = payrollLineRepository.findByPayrollIdOrderByIdAsc(payrollRun.getId());
+        if (!existingLines.isEmpty()) {
+            payrollLineRepository.deleteAll(existingLines);
+        }
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (Employee employee : employeeRepository.findByActiveTrueOrderByIdAsc()) {
+            long attendanceDays = attendanceRecordRepository.countByEmployeeIdAndAttendanceDateBetween(
+                    employee.getId(), periodStart, periodEnd);
+            if (attendanceDays <= 0) {
+                continue;
+            }
+            BigDecimal basicSalary = employee.getBasicSalary() == null ? BigDecimal.ZERO : employee.getBasicSalary();
+            BigDecimal earnedBasic = basicSalary
+                    .multiply(BigDecimal.valueOf(attendanceDays))
+                    .divide(BigDecimal.valueOf(periodDays), 2, RoundingMode.HALF_UP);
+            PayrollLine line = new PayrollLine();
+            line.setPayrollId(payrollRun.getId());
+            line.setEmployeeId(employee.getId());
+            line.setBasicSalary(earnedBasic);
+            line.setAllowances(BigDecimal.ZERO);
+            line.setDeductions(BigDecimal.ZERO);
+            line.setNetSalary(earnedBasic);
+            payrollLineRepository.save(line);
+            totalAmount = totalAmount.add(earnedBasic);
+        }
+
+        payrollRun.setTotalAmount(totalAmount);
+        payrollRun = payrollRunRepository.save(payrollRun);
+        activityLogService.log(MODULE, "UPDATE", "PayrollRun", payrollRun.getId(), payrollRun.getPayrollNumber(),
+                "Generated payroll lines from attendance for " + payrollRun.getPayrollNumber());
+        return toDisplay(payrollRun);
     }
 
     private String resolveNumber(String requested) {

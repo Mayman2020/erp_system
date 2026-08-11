@@ -1,0 +1,91 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
+  </app-page-header>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
+</section>
+
+<app-erp-dialog
+  [visible]="formVisible"
+  [titleKey]="formMode === 'create' ? 'MAINTENANCE.CREATE_ASSET' : (formMode === 'edit' ? 'COMMON.EDIT' : 'COMMON.VIEW')"
+  size="lg"
+  (close)="closeForm()"
+>
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <app-form-field [control]="form.controls.assetCode" labelKey="ERP.CODE" icon="tag" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-md-6 mb-3">
+          <app-form-field [control]="form.controls.name" labelKey="COMMON.NAME" icon="devices" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-md-6 mb-3">
+          <app-form-field [control]="form.controls.serialNo" labelKey="MAINTENANCE.SERIAL_NO" icon="qr_code_2" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-md-6 mb-3">
+          <app-form-field [control]="form.controls.customerId" labelKey="ERP.CUSTOMER" icon="person" type="number" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-md-6 mb-3">
+          <app-form-field
+            [control]="form.controls.status"
+            labelKey="COMMON.STATUS"
+            icon="flag"
+            type="select"
+            [options]="[{ id: 'ACTIVE', label: 'ACTIVE' }, { id: 'INACTIVE', label: 'INACTIVE' }]"
+            optionValueField="id"
+            optionLabelField="label"
+            [disabled]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-12 mb-3">
+          <app-form-field [control]="form.controls.notes" labelKey="INVOICES.NOTES" icon="notes" type="textarea" [rows]="2" [readonly]="readOnly"></app-form-field>
+        </div>
+      </div>
+    </form>
+    <app-erp-audit-trail
+      *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+      [createdAt]="audit.createdAt"
+      [updatedAt]="audit.updatedAt"
+      [createdBy]="audit.createdBy"
+      [updatedBy]="audit.updatedBy">
+    </app-erp-audit-trail>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

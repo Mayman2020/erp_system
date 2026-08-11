@@ -149,6 +149,10 @@ export class CardComponent implements OnInit {
     return this.translationService.instant(this.cardClass === 'full-card' ? 'COMMON.RESTORE' : 'COMMON.MAXIMIZE');
   }
 
+  get actionsLabel(): string {
+    return this.translationService.instant('COMMON.ACTIONS');
+  }
+
   get collapsedCardLabel(): string {
     return this.translationService.instant(this.collapsedCard === 'collapsed' ? 'COMMON.EXPAND' : 'COMMON.COLLAPSE');
   }

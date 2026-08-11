@@ -1,0 +1,81 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
+  </app-page-header>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
+</section>
+
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'PARTNERS.CREATE' : (formMode === 'edit' ? 'COMMON.EDIT' : 'COMMON.VIEW')" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.code" labelKey="PARTNERS.CODE" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-8 mb-3"><app-form-field [control]="form.controls.name" labelKey="COMMON.NAME" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.sharePercent" labelKey="PARTNERS.SHARE" type="number" step="0.0001" min="0" max="100" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">{{ 'PARTNERS.CAPITAL' | translate }}</label>
+          <select class="form-control" formControlName="capitalAccountId" [disabled]="readOnly">
+            <option *ngFor="let a of accountOptions" [ngValue]="a.id">{{ a.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">{{ 'PARTNERS.DRAWING' | translate }}</label>
+          <select class="form-control" formControlName="drawingAccountId" [disabled]="readOnly">
+            <option *ngFor="let a of accountOptions" [ngValue]="a.id">{{ a.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3" *ngIf="formMode !== 'create'">
+          <label class="form-label">{{ 'COMMON.STATUS' | translate }}</label>
+          <select class="form-control" formControlName="active" [disabled]="readOnly">
+            <option [ngValue]="true">{{ 'COMMON.ACTIVE' | translate }}</option>
+            <option [ngValue]="false">{{ 'STATUS.INACTIVE' | translate }}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+    <app-erp-audit-trail
+      *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+      [createdAt]="audit.createdAt"
+      [updatedAt]="audit.updatedAt"
+      [createdBy]="audit.createdBy"
+      [updatedBy]="audit.updatedBy">
+    </app-erp-audit-trail>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

@@ -4,7 +4,9 @@
     <p *ngIf="!customHeader && cardCaption" [ngClass]="captionClass">{{cardCaption}}</p>
     <div class="card-header-right" *ngIf="this.options && !customHeader">
       <div class="btn-group card-option dropdown" ngbDropdown placement="auto">
-        <button type="button" class="btn dropdown-toggle btn-icon" ngbDropdownToggle>
+        <button type="button" class="btn dropdown-toggle btn-icon" ngbDropdownToggle
+          [ngbTooltip]="actionsLabel" placement="top" container="body"
+          [attr.aria-label]="actionsLabel">
           <mat-icon aria-hidden="true">more_horiz</mat-icon>
         </button>
         <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right" ngbDropdownMenu>

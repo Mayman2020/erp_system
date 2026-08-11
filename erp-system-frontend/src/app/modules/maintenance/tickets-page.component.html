@@ -1,0 +1,234 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <div header-actions class="erp-toolbar-icons">
+      <button class="erp-button erp-button--primary" type="button" (click)="openCreate()">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        <span>{{ 'MAINTENANCE.CREATE_TICKET' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <app-erp-alert *ngIf="errorKey && !formVisible && !assignVisible" type="danger" [message]="errorKey" (dismissed)="errorKey = ''"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey && !formVisible && !assignVisible" type="success" [message]="successKey" (dismissed)="successKey = ''"></app-erp-alert>
+
+      <app-data-table
+        [columns]="columns"
+        [data]="rows"
+        [actions]="actions"
+        [loading]="loading"
+        (actionClick)="onTableAction($event)"
+      ></app-data-table>
+    </div>
+  </div>
+</section>
+
+<app-erp-dialog
+  [visible]="formVisible"
+  [titleKey]="formMode === 'create' ? 'MAINTENANCE.CREATE_TICKET' : (formMode === 'edit' ? 'MAINTENANCE.EDIT_TICKET' : 'MAINTENANCE.VIEW_TICKET')"
+  size="xl"
+  (close)="closeForm()"
+>
+  <div dialog-body>
+    <div *ngIf="selectedTicket as ticket" class="mb-3 d-flex flex-wrap gap-2">
+      <app-status-badge [status]="ticket.status" labelPrefix="MAINTENANCE_STATUS."></app-status-badge>
+      <app-status-badge [status]="ticket.priority" labelPrefix="MAINTENANCE_PRIORITY."></app-status-badge>
+    </div>
+
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <app-form-field [control]="form.controls.ticketNo" labelKey="ERP.NUMBER" icon="tag" [readonly]="readOnly || formMode !== 'create'"></app-form-field>
+        </div>
+        <div class="col-md-4 mb-3">
+          <app-form-field
+            [control]="form.controls.assetId"
+            labelKey="MAINTENANCE.ASSETS"
+            icon="devices"
+            type="select"
+            [options]="assetOptions"
+            optionValueField="id"
+            optionLabelField="label"
+            [disabled]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-4 mb-3">
+          <app-form-field [control]="form.controls.customerId" labelKey="ERP.CUSTOMER" icon="person" type="number" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-md-8 mb-3">
+          <app-form-field [control]="form.controls.title" labelKey="COMMON.TITLE" icon="title" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-md-4 mb-3">
+          <app-form-field
+            [control]="form.controls.priority"
+            labelKey="COMMON.PRIORITY"
+            icon="priority_high"
+            type="select"
+            [options]="priorityOptions.map(v => ({ id: v, label: v }))"
+            optionValueField="id"
+            optionLabelField="label"
+            [disabled]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-4 mb-3">
+          <app-form-field
+            [control]="form.controls.ticketType"
+            labelKey="MAINTENANCE.TICKET_TYPE"
+            icon="build"
+            type="select"
+            [options]="typeOptions.map(v => ({ id: v, label: v }))"
+            optionValueField="id"
+            optionLabelField="label"
+            [disabled]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-4 mb-3">
+          <app-form-field
+            [control]="form.controls.technicianId"
+            labelKey="MAINTENANCE.TECHNICIAN"
+            icon="engineering"
+            type="select"
+            [options]="technicianOptions"
+            optionValueField="id"
+            optionLabelField="label"
+            [disabled]="readOnly"
+          ></app-form-field>
+        </div>
+        <div class="col-md-4 mb-3">
+          <app-form-field [control]="form.controls.slaHours" labelKey="MAINTENANCE.SLA_HOURS" icon="schedule" type="number" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-12 mb-3">
+          <app-form-field [control]="form.controls.description" labelKey="COMMON.DESCRIPTION" icon="description" type="textarea" [rows]="3" [readonly]="readOnly"></app-form-field>
+        </div>
+      </div>
+    </form>
+
+    <div *ngIf="selectedId" class="maintenance-detail-section mt-3">
+      <h6>{{ 'MAINTENANCE.CHECKLIST' | translate }}</h6>
+      <ul class="list-group mb-3" *ngIf="checklists.length; else emptyChecklist">
+        <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let item of checklists">
+          <span>{{ item.itemText }}</span>
+          <app-status-badge [status]="item.done ? 'COMPLETED' : 'PENDING'" labelPrefix="STATUS."></app-status-badge>
+        </li>
+      </ul>
+      <ng-template #emptyChecklist>
+        <p class="text-muted small">{{ 'COMMON.NO_DATA' | translate }}</p>
+      </ng-template>
+      <form *ngIf="!readOnly" [formGroup]="checklistForm" class="d-flex gap-2 align-items-start">
+        <div class="flex-grow-1">
+          <app-form-field [control]="checklistForm.controls.itemText" labelKey="MAINTENANCE.CHECKLIST_ITEM" icon="checklist" [readonly]="readOnly"></app-form-field>
+        </div>
+        <button type="button" class="erp-button erp-button--secondary mt-4" (click)="addChecklistItem()">{{ 'COMMON.ADD' | translate }}</button>
+      </form>
+    </div>
+
+    <div *ngIf="selectedId" class="maintenance-detail-section mt-4">
+      <h6>{{ 'MAINTENANCE.SPARES' | translate }}</h6>
+      <div class="table-responsive mb-3" *ngIf="spareParts.length; else emptySpares">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>{{ 'ERP.PRODUCT' | translate }}</th>
+              <th>{{ 'INVOICES.WAREHOUSE' | translate }}</th>
+              <th>{{ 'ERP.QUANTITY' | translate }}</th>
+              <th>{{ 'COMMON.STATUS' | translate }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let part of spareParts">
+              <td>{{ part.productCode }} - {{ part.productName }}</td>
+              <td>{{ part.warehouseName }}</td>
+              <td>{{ part.quantity }}</td>
+              <td>
+                <app-status-badge [status]="part.issued ? 'POSTED' : 'DRAFT'" labelPrefix="STATUS."></app-status-badge>
+              </td>
+              <td>
+                <button *ngIf="!readOnly && !part.issued" type="button" class="erp-button erp-button--secondary btn-sm" (click)="issueSparePart(part.id)">
+                  {{ 'MAINTENANCE.ISSUE_SPARE' | translate }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #emptySpares>
+        <p class="text-muted small">{{ 'COMMON.NO_DATA' | translate }}</p>
+      </ng-template>
+      <form *ngIf="!readOnly" [formGroup]="spareForm" class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <app-form-field
+            [control]="spareForm.controls.productId"
+            labelKey="ERP.PRODUCT"
+            icon="inventory_2"
+            type="select"
+            [options]="productOptions"
+            optionValueField="id"
+            optionLabelField="label"
+          ></app-form-field>
+        </div>
+        <div class="col-md-3">
+          <app-form-field
+            [control]="spareForm.controls.warehouseId"
+            labelKey="INVOICES.WAREHOUSE"
+            icon="warehouse"
+            type="select"
+            [options]="warehouseOptions"
+            optionValueField="id"
+            optionLabelField="label"
+          ></app-form-field>
+        </div>
+        <div class="col-md-2">
+          <app-form-field [control]="spareForm.controls.quantity" labelKey="ERP.QUANTITY" icon="pin" type="number" step="0.0001" min="0.0001"></app-form-field>
+        </div>
+        <div class="col-md-2">
+          <app-form-field [control]="spareForm.controls.unitCost" labelKey="ERP.UNIT_COST" icon="payments" type="number" step="0.01"></app-form-field>
+        </div>
+        <div class="col-md-1">
+          <button type="button" class="erp-button erp-button--secondary w-100" (click)="addSparePart()">{{ 'COMMON.ADD' | translate }}</button>
+        </div>
+      </form>
+    </div>
+
+    <app-erp-audit-trail
+      *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+      [createdAt]="$any(audit['createdAt'])"
+      [updatedAt]="$any(audit['updatedAt'])"
+      [createdBy]="$any(audit['createdBy'])"
+      [updatedBy]="$any(audit['updatedBy'])">
+    </app-erp-audit-trail>
+  </div>
+
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">
+      {{ 'COMMON.SAVE' | translate }}
+    </button>
+  </div>
+</app-erp-dialog>
+
+<app-erp-dialog
+  [visible]="assignVisible"
+  titleKey="MAINTENANCE.ASSIGN"
+  size="md"
+  (close)="closeAssign()"
+>
+  <div dialog-body>
+    <form [formGroup]="assignForm" class="erp-dialog-form">
+      <app-form-field
+        [control]="assignForm.controls.technicianId"
+        labelKey="MAINTENANCE.TECHNICIAN"
+        icon="engineering"
+        type="select"
+        [options]="technicianOptions"
+        optionValueField="id"
+        optionLabelField="label"
+      ></app-form-field>
+    </form>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeAssign()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="saveAssign()">{{ 'MAINTENANCE.ASSIGN' | translate }}</button>
+  </div>
+</app-erp-dialog>

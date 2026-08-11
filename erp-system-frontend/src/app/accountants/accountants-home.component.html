@@ -153,7 +153,9 @@
                       </td>
                       <td>
                         <div class="app-row-actions" (click)="$event.stopPropagation()">
-                          <button type="button" class="app-icon-btn" (click)="openEditRoleDialog(role.id)" [attr.title]="'COMMON.EDIT' | translate">
+                          <button type="button" class="app-icon-btn" (click)="openEditRoleDialog(role.id)"
+                            [ngbTooltip]="'COMMON.EDIT' | translate" placement="top" container="body"
+                            [attr.aria-label]="'COMMON.EDIT' | translate">
                             <mat-icon>tune</mat-icon>
                           </button>
                           <button
@@ -161,7 +163,10 @@
                             class="app-icon-btn danger"
                             *ngIf="!role.systemRole"
                             (click)="onRoleAction({ actionId: 'delete', row: { id: role.id, systemRole: role.systemRole } })"
-                            [attr.title]="'COMMON.DELETE' | translate"
+                            [ngbTooltip]="'COMMON.DELETE' | translate"
+                            placement="top"
+                            container="body"
+                            [attr.aria-label]="'COMMON.DELETE' | translate"
                           >
                             <mat-icon>delete</mat-icon>
                           </button>
@@ -343,10 +348,14 @@
                           </td>
                           <td>
                             <div class="app-row-actions">
-                              <button type="button" class="app-icon-btn" (click)="openEditLookupValueDialog(value.id)" [attr.title]="'COMMON.EDIT' | translate">
+                              <button type="button" class="app-icon-btn" (click)="openEditLookupValueDialog(value.id)"
+                                [ngbTooltip]="'COMMON.EDIT' | translate" placement="top" container="body"
+                                [attr.aria-label]="'COMMON.EDIT' | translate">
                                 <mat-icon>edit</mat-icon>
                               </button>
-                              <button type="button" class="app-icon-btn danger" (click)="confirmDeleteLookupValue(value.id)" [attr.title]="'COMMON.DELETE' | translate">
+                              <button type="button" class="app-icon-btn danger" (click)="confirmDeleteLookupValue(value.id)"
+                                [ngbTooltip]="'COMMON.DELETE' | translate" placement="top" container="body"
+                                [attr.aria-label]="'COMMON.DELETE' | translate">
                                 <mat-icon>delete</mat-icon>
                               </button>
                             </div>

@@ -42,15 +42,16 @@
         <app-form-field [control]="form.controls.entryDate" labelKey="JOURNAL.DATE" icon="calendar_month" type="date"></app-form-field>
       </div>
       <div class="col-md-3 mb-3">
-        <app-form-field
-          [control]="form.controls.currencyCode"
-          labelKey="JOURNAL.CURRENCY"
-          icon="currency_exchange"
-          type="select"
-          [options]="currencyLookups"
-          optionValueField="code"
-          optionLabelField="code"
-        ></app-form-field>
+        <app-searchable-select
+          formControlName="currencyCode"
+          label="JOURNAL.CURRENCY"
+          placeholder="LOV.SELECT_PLACEHOLDER"
+          bindLabel="label"
+          bindValue="id"
+          [items]="currencyLovItems"
+          [clearable]="false"
+          [required]="true">
+        </app-searchable-select>
       </div>
       <div class="col-md-3 mb-3">
         <app-form-field
@@ -79,6 +80,10 @@
           class="erp-icon-button"
           (click)="addLine()"
           [disabled]="formMode === 'view'"
+          [ngbTooltip]="'COMMON.ADD' | translate"
+          placement="top"
+          container="body"
+          [attr.aria-label]="'COMMON.ADD' | translate"
         >
           <mat-icon aria-hidden="true">add</mat-icon>
         </button>
@@ -105,6 +110,10 @@
                       class="erp-icon-button ml-1"
                       (click)="openAccountSelector(i)"
                       [disabled]="formMode === 'view'"
+                      [ngbTooltip]="'COMMON.SEARCH' | translate"
+                      placement="top"
+                      container="body"
+                      [attr.aria-label]="'COMMON.SEARCH' | translate"
                     >
                       <mat-icon aria-hidden="true">search</mat-icon>
                     </button>
@@ -119,6 +128,10 @@
                     class="erp-icon-button erp-action-btn erp-action-btn--danger"
                     (click)="removeLine(i)"
                     [disabled]="formMode === 'view'"
+                    [ngbTooltip]="'COMMON.DELETE' | translate"
+                    placement="top"
+                    container="body"
+                    [attr.aria-label]="'COMMON.DELETE' | translate"
                   >
                     <mat-icon aria-hidden="true">delete</mat-icon>
                   </button>

@@ -24,6 +24,7 @@ public class StockLevelDisplayDto {
     private BigDecimal quantity;
     private BigDecimal reservedQuantity;
     private BigDecimal availableQuantity;
+    private BigDecimal costPrice;
     private Instant createdAt;
     private Instant updatedAt;
 }

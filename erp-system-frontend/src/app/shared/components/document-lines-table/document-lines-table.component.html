@@ -23,10 +23,15 @@
       <tbody formArrayName="lines">
         <tr *ngFor="let line of lines.controls; let i = index" [formGroupName]="i">
           <td>
-            <select class="erp-input erp-input--sm" formControlName="productId" (change)="onProductChange(i)">
-              <option [ngValue]="null">—</option>
-              <option *ngFor="let p of products" [ngValue]="p.id">{{ p.code }} - {{ p.name || p.nameEn }}</option>
-            </select>
+            <app-searchable-select
+              formControlName="productId"
+              placeholder="LOV.SELECT_PLACEHOLDER"
+              bindLabel="label"
+              bindValue="id"
+              [items]="productLovItems"
+              [clearable]="true"
+              (selectionChange)="onProductChange(i)">
+            </app-searchable-select>
           </td>
           <td *ngIf="!simple">
             <input class="erp-input erp-input--sm" formControlName="description" [readonly]="readOnly" />
@@ -45,7 +50,15 @@
           </td>
           <td class="text-end">{{ lineTotal(i) | number:'1.2-2' }}</td>
           <td *ngIf="!readOnly">
-            <button type="button" class="erp-action-btn erp-action-btn--danger" (click)="removeLine(i)" [disabled]="lines.length <= 1">
+            <button
+              type="button"
+              class="erp-action-btn erp-action-btn--danger"
+              (click)="removeLine(i)"
+              [disabled]="lines.length <= 1"
+              [ngbTooltip]="'COMMON.DELETE' | translate"
+              placement="top"
+              container="body"
+              [attr.aria-label]="'COMMON.DELETE' | translate">
               <mat-icon aria-hidden="true">delete</mat-icon>
             </button>
           </td>

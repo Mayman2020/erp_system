@@ -49,6 +49,8 @@ export class DataTableComponent implements OnChanges {
   @Input() exportable = true;
   @Input() filterable = false;
   @Input() exportFileName = 'export';
+  /** When false, hide built-in pager (use external app-table-pager). */
+  @Input() showPager = true;
 
   @Output() actionClick = new EventEmitter<{ actionId: string; row: Record<string, unknown> }>();
   @Output() cellClick = new EventEmitter<{ key: string; row: Record<string, unknown> }>();

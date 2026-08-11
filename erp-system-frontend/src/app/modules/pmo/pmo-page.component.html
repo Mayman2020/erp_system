@@ -1,0 +1,70 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="'PMO.TITLE'">
+    <div header-actions class="erp-toolbar-icons" *ngIf="selectedProjectId">
+      <button
+        class="erp-button erp-button--primary"
+        type="button"
+        (click)="openCreate()"
+        [ngbTooltip]="'COMMON.ADD' | translate"
+        placement="top"
+        container="body"
+        [attr.aria-label]="'COMMON.ADD' | translate">
+        <mat-icon aria-hidden="true">add</mat-icon><span>{{ 'COMMON.ADD' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+  <div class="erp-card erp-list-page__card"><div class="erp-card__body">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <app-searchable-select
+          [ngModel]="selectedProjectId"
+          (ngModelChange)="onProjectChange($event)"
+          label="MENU.PROJECTS"
+          placeholder="LOV.SELECT_PLACEHOLDER"
+          bindLabel="label"
+          bindValue="id"
+          [items]="projectLovItems"
+          [clearable]="true">
+        </app-searchable-select>
+      </div>
+    </div>
+    <div class="pmo-tabs mb-3" *ngIf="selectedProjectId">
+      <button type="button" class="erp-button" [class.erp-button--primary]="activeTab === 'milestones'" (click)="setTab('milestones')">{{ 'PMO.MILESTONES' | translate }}</button>
+      <button type="button" class="erp-button" [class.erp-button--primary]="activeTab === 'risks'" (click)="setTab('risks')">{{ 'PMO.RISKS' | translate }}</button>
+      <button type="button" class="erp-button" [class.erp-button--primary]="activeTab === 'issues'" (click)="setTab('issues')">{{ 'PMO.ISSUES' | translate }}</button>
+    </div>
+    <app-data-table *ngIf="selectedProjectId" [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+  </div></div>
+</section>
+<app-erp-dialog [visible]="formVisible" [titleKey]="'COMMON.EDIT'" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form *ngIf="activeTab === 'milestones'" [formGroup]="milestoneForm"><div class="row">
+      <div class="col-md-8 mb-3"><app-form-field [control]="milestoneForm.controls.title" labelKey="COMMON.TITLE"></app-form-field></div>
+      <div class="col-md-4 mb-3"><app-form-field [control]="milestoneForm.controls.status" labelKey="COMMON.STATUS"></app-form-field></div>
+      <div class="col-md-4 mb-3"><app-form-field [control]="milestoneForm.controls.dueDate" labelKey="COMMON.DUE_DATE" type="date"></app-form-field></div>
+    </div></form>
+    <form *ngIf="activeTab === 'risks'" [formGroup]="riskForm"><div class="row">
+      <div class="col-md-8 mb-3"><app-form-field [control]="riskForm.controls.title" labelKey="COMMON.TITLE"></app-form-field></div>
+      <div class="col-md-4 mb-3"><app-form-field [control]="riskForm.controls.severity" labelKey="PMO.SEVERITY"></app-form-field></div>
+      <div class="col-md-4 mb-3"><app-form-field [control]="riskForm.controls.status" labelKey="COMMON.STATUS"></app-form-field></div>
+      <div class="col-12 mb-3"><app-form-field [control]="riskForm.controls.mitigation" labelKey="PMO.MITIGATION" type="textarea" [rows]="2"></app-form-field></div>
+    </div></form>
+    <form *ngIf="activeTab === 'issues'" [formGroup]="issueForm"><div class="row">
+      <div class="col-md-8 mb-3"><app-form-field [control]="issueForm.controls.title" labelKey="COMMON.TITLE"></app-form-field></div>
+      <div class="col-md-4 mb-3"><app-form-field [control]="issueForm.controls.status" labelKey="COMMON.STATUS"></app-form-field></div>
+      <div class="col-md-6 mb-3"><app-form-field [control]="issueForm.controls.ownerName" labelKey="PMO.OWNER"></app-form-field></div>
+      <div class="col-12 mb-3"><app-form-field [control]="issueForm.controls.notes" labelKey="INVOICES.NOTES" type="textarea" [rows]="2"></app-form-field></div>
+    </div></form>
+    <app-erp-audit-trail
+      *ngIf="editingId && selectedAuditRecord as audit"
+      [createdAt]="audit.createdAt"
+      [updatedAt]="audit.updatedAt"
+      [createdBy]="audit.createdBy"
+      [updatedBy]="audit.updatedBy">
+    </app-erp-audit-trail>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button type="button" class="erp-button erp-button--primary" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

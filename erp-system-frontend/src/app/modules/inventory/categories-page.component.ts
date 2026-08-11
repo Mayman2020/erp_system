@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { ProductCategoryDto, ProductCategoryForm } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { ErpApiService } from '../../core/services/erp-api.service';
+import { ErpApiService, PagedResult } from '../../core/services/erp-api.service';
 import { DataTableAction, DataTableColumn } from '../../shared/components/data-table/data-table.component';
 import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../shared/utils/erp-master-page.base';
 
@@ -16,6 +16,8 @@ import { ErpMasterPageBase, MasterPageConfig, MASTER_CRUD_ACTIONS } from '../../
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoriesPageComponent extends ErpMasterPageBase<ProductCategoryDto, ProductCategoryForm> implements OnInit, OnDestroy {
+  protected override readonly serverPaging = true;
+
   readonly config: MasterPageConfig = {
     titleKey: 'MENU.CATEGORIES',
     createKey: 'ERP.CREATE_CATEGORY',
@@ -56,6 +58,10 @@ export class CategoriesPageComponent extends ErpMasterPageBase<ProductCategoryDt
 
   protected fetchList(filters: Record<string, string>): Observable<ProductCategoryDto[]> {
     return this.api.getCategories(filters);
+  }
+
+  protected override fetchPagedList(filters: Record<string, string | number | boolean>): Observable<PagedResult<ProductCategoryDto>> {
+    return this.api.getCategoriesPaged(filters);
   }
 
   protected fetchOne(id: number): Observable<ProductCategoryDto> {

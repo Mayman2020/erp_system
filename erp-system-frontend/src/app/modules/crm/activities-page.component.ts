@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { CrmActivityDto, CrmActivityForm } from '../../core/models/erp.models';
+import { CrmActivityDto, CrmActivityForm, CrmLeadDto } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { ErpApiService } from '../../core/services/erp-api.service';
@@ -35,11 +35,20 @@ export class ActivitiesPageComponent extends ErpMasterPageBase<CrmActivityDto, C
     notes: ['']
   });
 
+  leads: CrmLeadDto[] = [];
+
   constructor(private api: ErpApiService, private fb: FormBuilder, authService: AuthService, confirmDialog: ConfirmDialogService, cdr: ChangeDetectorRef) {
     super(authService, confirmDialog, cdr);
   }
 
-  ngOnInit(): void { this.initMasterPage(); }
+  get leadLovItems(): Array<{ id: number; label: string }> {
+    return (this.leads || []).map((l) => ({ id: l.id, label: `${l.leadNumber} - ${l.name}` }));
+  }
+
+  ngOnInit(): void {
+    this.api.getLeads().subscribe({ next: (leads) => { this.leads = leads || []; this.cdr.markForCheck(); } });
+    this.initMasterPage();
+  }
   ngOnDestroy(): void { this.destroyMasterPage(); }
 
   protected fetchList(f: Record<string, string>): Observable<CrmActivityDto[]> { return this.api.getCrmActivities(f); }

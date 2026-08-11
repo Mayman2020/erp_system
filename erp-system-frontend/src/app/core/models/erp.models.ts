@@ -63,6 +63,7 @@ export interface StockLevelDto {
   quantity: number;
   reservedQuantity?: number;
   availableQuantity?: number;
+  costPrice?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -417,6 +418,132 @@ export interface WorkOrderForm {
   notes?: string;
 }
 
+export type MaintenanceAssetStatus = 'ACTIVE' | 'INACTIVE';
+export type MaintenanceTicketStatus = 'OPEN' | 'ASSIGNED' | 'IN_PROGRESS' | 'CLOSED' | 'CANCELLED';
+export type MaintenanceTicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type MaintenanceTicketType = 'CORRECTIVE' | 'PREVENTIVE' | 'INSPECTION';
+
+export interface MaintenanceAssetDto {
+  id: number;
+  assetCode: string;
+  name: string;
+  serialNo?: string;
+  customerId?: number;
+  customerName?: string;
+  status: MaintenanceAssetStatus | string;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface MaintenanceAssetForm {
+  assetCode: string;
+  name: string;
+  serialNo?: string;
+  customerId?: number;
+  status?: string;
+  notes?: string;
+}
+
+export interface MaintenanceTechnicianDto {
+  id: number;
+  employeeId?: number;
+  employeeName?: string;
+  displayName: string;
+  skillsCsv?: string;
+  active: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface MaintenanceTechnicianForm {
+  employeeId?: number;
+  displayName: string;
+  skillsCsv?: string;
+  active?: boolean;
+}
+
+export interface MaintenanceChecklistDto {
+  id?: number;
+  ticketId?: number;
+  itemText: string;
+  done?: boolean;
+  sortOrder?: number;
+}
+
+export interface MaintenanceChecklistForm {
+  id?: number;
+  itemText: string;
+  done?: boolean;
+  sortOrder?: number;
+}
+
+export interface MaintenanceSparePartDto {
+  id: number;
+  ticketId: number;
+  productId: number;
+  productCode?: string;
+  productName?: string;
+  warehouseId: number;
+  warehouseName?: string;
+  quantity: number;
+  unitCost?: number;
+  movementId?: number;
+  issued?: boolean;
+}
+
+export interface MaintenanceSparePartForm {
+  productId: number;
+  warehouseId: number;
+  quantity: number;
+  unitCost?: number;
+}
+
+export interface MaintenanceTicketDto {
+  id: number;
+  ticketNo: string;
+  assetId?: number;
+  assetCode?: string;
+  assetName?: string;
+  customerId?: number;
+  customerName?: string;
+  title: string;
+  description?: string;
+  priority: MaintenanceTicketPriority | string;
+  status: MaintenanceTicketStatus | string;
+  ticketType: MaintenanceTicketType | string;
+  technicianId?: number;
+  technicianName?: string;
+  slaHours?: number;
+  openedAt?: string;
+  closedAt?: string;
+  checklists?: MaintenanceChecklistDto[];
+  spareParts?: MaintenanceSparePartDto[];
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface MaintenanceTicketForm {
+  ticketNo?: string;
+  assetId?: number;
+  customerId?: number;
+  title: string;
+  description?: string;
+  priority?: string;
+  ticketType?: string;
+  technicianId?: number;
+  slaHours?: number;
+  checklists?: MaintenanceChecklistForm[];
+}
+
+export interface AssignTechnicianForm {
+  technicianId: number;
+}
+
 export interface PurchaseReturnDto {
   id: number;
   returnNumber: string;
@@ -669,6 +796,7 @@ export interface ErpInventoryReportDto {
   totalSkus: number;
   lowStockCount: number;
   totalQuantity: number;
+  totalValuation?: number;
   stockLevels: StockLevelDto[];
   lowStockAlerts: Array<{ productId: number; productCode: string; productName: string; quantity: number; reorderLevel: number }>;
 }
@@ -957,4 +1085,506 @@ export interface ProjectExpenseForm {
   expenseDate: string;
   description?: string;
   amount: number;
+}
+
+export interface PosTerminalDto {
+  id: number;
+  code: string;
+  name: string;
+  warehouseId: number;
+  warehouseCode?: string;
+  warehouseName?: string;
+  active?: boolean;
+}
+
+export interface PosShiftDto {
+  id: number;
+  shiftNo: string;
+  terminalId: number;
+  terminalCode?: string;
+  terminalName?: string;
+  cashierUserId: number;
+  cashierUsername?: string;
+  warehouseId: number;
+  warehouseCode?: string;
+  warehouseName?: string;
+  status: string;
+  openingCash: number;
+  closingCash?: number;
+  expectedCash?: number;
+  cashSales?: number;
+  cardSales?: number;
+  creditSales?: number;
+  discrepancy?: number;
+  notes?: string;
+  openedAt?: string;
+  closedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface PosShiftOpenForm {
+  terminalId: number;
+  warehouseId: number;
+  openingCash: number;
+  cashierUserId: number;
+  notes?: string;
+}
+
+export interface PosShiftCloseForm {
+  closingCash: number;
+  notes?: string;
+}
+
+export interface PosSaleLineDto {
+  id?: number;
+  productId: number;
+  productCode?: string;
+  productName?: string;
+  quantity: number;
+  unitPrice: number;
+  discountAmount?: number;
+  taxRate?: number;
+  lineTotal?: number;
+}
+
+export interface PosSaleDto {
+  id: number;
+  saleNo: string;
+  shiftId: number;
+  shiftNo?: string;
+  customerId?: number;
+  customerName?: string;
+  warehouseId: number;
+  warehouseCode?: string;
+  status?: string;
+  subtotal?: number;
+  discountAmount?: number;
+  taxAmount?: number;
+  totalAmount: number;
+  paymentMethod?: string;
+  paidCash?: number;
+  paidCard?: number;
+  paidCredit?: number;
+  idempotencyKey?: string;
+  offlineBatchId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  lines?: PosSaleLineDto[];
+}
+
+export interface PosSaleLineForm {
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+  discountAmount?: number;
+  taxRate?: number;
+}
+
+export interface PosSaleForm {
+  shiftId: number;
+  warehouseId: number;
+  customerId?: number;
+  discountAmount?: number;
+  paidCash?: number;
+  paidCard?: number;
+  paidCredit?: number;
+  idempotencyKey?: string;
+  offlineBatchId?: string;
+  lines: PosSaleLineForm[];
+}
+
+export interface PosOfflineSyncForm {
+  batchKey: string;
+  terminalId?: number;
+  sales: PosSaleForm[];
+}
+
+export interface PosOfflineSyncResultDto {
+  batchKey: string;
+  status: string;
+  processedCount: number;
+  skippedCount: number;
+  failedCount: number;
+  sales: PosSaleDto[];
+}
+
+
+export interface LabelPreviewDto {
+  productId: number;
+  barcode: string;
+  qrPayload: string;
+  name: string;
+  price: number;
+}
+
+export interface StockIncidentDto {
+  id: number;
+  incidentNo: string;
+  warehouseId: number;
+  warehouseCode?: string;
+  warehouseName?: string;
+  productId: number;
+  productCode?: string;
+  productName?: string;
+  quantity: number;
+  incidentType: string;
+  reasonCode?: string;
+  notes?: string;
+  unitCost?: number;
+  financialImpact?: number;
+  status: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  movementId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface StockIncidentForm {
+  incidentNo?: string;
+  warehouseId: number;
+  productId: number;
+  quantity: number;
+  incidentType: string;
+  reasonCode?: string;
+  notes?: string;
+  unitCost?: number;
+}
+
+export interface ReplenishmentProposalDto {
+  id: number;
+  warehouseId: number;
+  warehouseCode?: string;
+  warehouseName?: string;
+  productId: number;
+  productCode?: string;
+  productName?: string;
+  currentQty: number;
+  reorderLevel: number;
+  proposedQty: number;
+  status: string;
+  purchaseOrderId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PurchaseRfqDto {
+  id: number;
+  rfqNo: string;
+  title: string;
+  status: string;
+  dueDate?: string;
+  notes?: string;
+  lines?: PurchaseRfqLineDto[];
+  quotes?: PurchaseRfqQuoteDto[];
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface PurchaseRfqLineDto {
+  id?: number;
+  rfqId?: number;
+  productId: number;
+  productCode?: string;
+  productName?: string;
+  quantity: number;
+  notes?: string;
+}
+
+export interface PurchaseRfqForm {
+  rfqNo?: string;
+  title: string;
+  dueDate?: string;
+  notes?: string;
+  lines: PurchaseRfqLineDto[];
+}
+
+export interface PurchaseRfqQuoteDto {
+  id: number;
+  rfqId: number;
+  supplierId: number;
+  supplierName?: string;
+  unitPrice: number;
+  leadDays: number;
+  notes?: string;
+  selected: boolean;
+  createdAt?: string;
+}
+
+export interface GoodsReceiptDto {
+  id: number;
+  receiptNo: string;
+  supplierId?: number;
+  supplierName?: string;
+  warehouseId: number;
+  warehouseCode?: string;
+  warehouseName?: string;
+  purchaseOrderId?: number;
+  status: string;
+  receivedAt?: string;
+  notes?: string;
+  lines?: GoodsReceiptLineDto[];
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface GoodsReceiptLineDto {
+  id?: number;
+  receiptId?: number;
+  productId: number;
+  productCode?: string;
+  productName?: string;
+  quantity: number;
+  unitCost?: number;
+}
+
+export interface GoodsReceiptForm {
+  receiptNo?: string;
+  supplierId?: number;
+  warehouseId: number;
+  purchaseOrderId?: number;
+  notes?: string;
+  lines: GoodsReceiptLineDto[];
+}
+
+export interface ProductUomConversionDto {
+  id: number;
+  productId: number;
+  unitId: number;
+  unitCode?: string;
+  unitName?: string;
+  factorToBase: number;
+  purchase: boolean;
+  sales: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ProductBarcodeDto {
+  id: number;
+  productId: number;
+  barcode: string;
+  primaryBarcode: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface HrVacancyDto {
+  id: number;
+  title: string;
+  departmentId?: number;
+  status: string;
+  openings: number;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface HrVacancyForm {
+  title: string;
+  departmentId?: number;
+  status: string;
+  openings: number;
+  description?: string;
+}
+
+export interface HrCandidateDto {
+  id: number;
+  fullName: string;
+  email?: string;
+  phone?: string;
+  vacancyId?: number;
+  status: string;
+  score?: number;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface HrCandidateForm {
+  fullName: string;
+  email?: string;
+  phone?: string;
+  vacancyId?: number;
+  status: string;
+  score?: number;
+  notes?: string;
+}
+
+export interface HrInterviewDto {
+  id: number;
+  candidateId: number;
+  scheduledAt: string;
+  interviewer?: string;
+  result?: string;
+  notes?: string;
+  createdAt?: string;
+}
+
+export interface HrInterviewForm {
+  candidateId: number;
+  scheduledAt: string;
+  interviewer?: string;
+  result?: string;
+  notes?: string;
+}
+
+export interface LeaveBalanceDto {
+  id: number;
+  employeeId: number;
+  leaveType: string;
+  balanceDays: number;
+  year: number;
+}
+
+export interface PmoMilestoneDto {
+  id: number;
+  projectId: number;
+  title: string;
+  dueDate?: string;
+  status: string;
+  sortOrder: number;
+}
+
+export interface PmoMilestoneForm {
+  title: string;
+  dueDate?: string;
+  status: string;
+  sortOrder?: number;
+}
+
+export interface PmoRiskDto {
+  id: number;
+  projectId: number;
+  title: string;
+  severity: string;
+  status: string;
+  mitigation?: string;
+}
+
+export interface PmoRiskForm {
+  title: string;
+  severity: string;
+  status: string;
+  mitigation?: string;
+}
+
+export interface PmoIssueDto {
+  id: number;
+  projectId: number;
+  title: string;
+  status: string;
+  ownerName?: string;
+  notes?: string;
+}
+
+export interface PmoIssueForm {
+  title: string;
+  status: string;
+  ownerName?: string;
+  notes?: string;
+}
+
+export interface DigitalCourseDto {
+  id: number;
+  code: string;
+  title: string;
+  description?: string;
+  active: boolean;
+  createdAt?: string;
+}
+
+export interface DigitalCourseForm {
+  code: string;
+  title: string;
+  description?: string;
+  active?: boolean;
+}
+
+export interface DigitalEnrollmentDto {
+  id: number;
+  courseId: number;
+  employeeId: number;
+  progressPct: number;
+  score?: number;
+  status: string;
+  completedAt?: string;
+  certificateNo?: string;
+}
+
+export interface DigitalEnrollmentForm {
+  courseId: number;
+  employeeId: number;
+  progressPct?: number;
+  score?: number;
+  status?: string;
+}
+
+export interface LicenseDto {
+  id: number;
+  licenseKey: string;
+  customerName: string;
+  modulesCsv?: string;
+  maxUsers: number;
+  validFrom: string;
+  validTo: string;
+  graceDays: number;
+  active: boolean;
+  valid: boolean;
+  activatedAt?: string;
+}
+
+export interface LicenseActivateForm {
+  licenseKey: string;
+  customerName: string;
+  modulesCsv?: string;
+  maxUsers?: number;
+  validFrom: string;
+  validTo: string;
+  graceDays?: number;
+  signature: string;
+}
+
+export interface BackupJobDto {
+  id: number;
+  jobNo: string;
+  status: string;
+  triggerType: string;
+  filePath?: string;
+  fileSizeBytes?: number;
+  checksumSha256?: string;
+  errorMessage?: string;
+  startedAt?: string;
+  finishedAt?: string;
+  createdAt?: string;
+  createdBy?: string;
+  downloadable?: boolean;
+}
+
+export interface AlertEventDto {
+  id: number;
+  ruleId?: number;
+  title: string;
+  body?: string;
+  severity: string;
+  entityType?: string;
+  entityRef?: string;
+  deepLink?: string;
+  status: string;
+  createdAt?: string;
+  acknowledgedAt?: string;
 }

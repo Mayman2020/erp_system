@@ -66,7 +66,8 @@ export class InventoryReportPageComponent implements OnInit {
           this.summary = {
             totalSkus: data?.totalSkus,
             lowStockCount: data?.lowStockCount,
-            totalQuantity: data?.totalQuantity
+            totalQuantity: data?.totalQuantity,
+            totalValuation: data?.totalValuation
           };
           this.rows = (data?.stockLevels || []).map((row) => {
             const item = row as unknown as Record<string, unknown>;

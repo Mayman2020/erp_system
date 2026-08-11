@@ -1,5 +1,6 @@
 package com.erp.system.sales.service;
 
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.accounting.domain.Account;
 import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.common.enums.AccountingType;
@@ -13,6 +14,8 @@ import com.erp.system.sales.dto.form.CustomerFormDto;
 import com.erp.system.sales.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +51,14 @@ public class CustomerService {
                         || (customer.getEmail() != null && customer.getEmail().toLowerCase().contains(normalizedSearch)))
                 .map(this::toDisplay)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<CustomerDisplayDto> getCustomersPaged(Boolean active, String q, Pageable pageable) {
+        Page<Customer> customers = q == null || q.isBlank()
+                ? customerRepository.findPaged(active, pageable)
+                : customerRepository.searchPaged(active, q.trim(), pageable);
+        return PageResponse.from(customers.map(this::toDisplay));
     }
 
     @Transactional(readOnly = true)

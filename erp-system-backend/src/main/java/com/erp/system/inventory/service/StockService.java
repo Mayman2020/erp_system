@@ -1,5 +1,6 @@
 package com.erp.system.inventory.service;
 
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.common.enums.StockMovementType;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.common.exception.BusinessException;
@@ -23,6 +24,8 @@ import com.erp.system.notification.domain.NotificationType;
 import com.erp.system.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,6 +107,18 @@ public class StockService {
                         || m.getProduct().getCode().toLowerCase().contains(normalizedSearch))
                 .map(this::toMovementDisplay)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<StockMovementDisplayDto> getMovementsPaged(
+            StockMovementType movementType, TransactionStatus status, Long productId, Long warehouseId,
+            String q, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
+        Page<StockMovement> movements = q == null || q.isBlank()
+                ? stockMovementRepository.findPaged(
+                        movementType, status, productId, warehouseId, fromDate, toDate, pageable)
+                : stockMovementRepository.searchPaged(
+                        movementType, status, productId, warehouseId, fromDate, toDate, q.trim(), pageable);
+        return PageResponse.from(movements.map(this::toMovementDisplay));
     }
 
     @Transactional(readOnly = true)
@@ -356,6 +371,7 @@ public class StockService {
                 .quantity(level.getQuantity())
                 .reservedQuantity(reserved)
                 .availableQuantity(level.getQuantity().subtract(reserved))
+                .costPrice(level.getProduct().getCostPrice())
                 .createdAt(level.getCreatedAt())
                 .updatedAt(level.getUpdatedAt())
                 .build();

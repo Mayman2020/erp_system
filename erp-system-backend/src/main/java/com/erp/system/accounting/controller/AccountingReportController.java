@@ -2,6 +2,7 @@ package com.erp.system.accounting.controller;
 
 import com.erp.system.accounting.dto.display.BalanceSheetReportDto;
 import com.erp.system.accounting.dto.display.ProfitLossReportDto;
+import com.erp.system.accounting.dto.display.TrialBalanceReportDto;
 import com.erp.system.accounting.service.AccountingReportService;
 import com.erp.system.common.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +36,13 @@ public class AccountingReportController {
             @RequestParam(required = false) String currency
     ) {
         return ApiResponse.success(accountingReportService.getBalanceSheet(asOfDate, currency));
+    }
+
+    @GetMapping("/trial-balance")
+    public ApiResponse<TrialBalanceReportDto> getTrialBalance(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
+    ) {
+        return ApiResponse.success(accountingReportService.getTrialBalance(fromDate, toDate));
     }
 }

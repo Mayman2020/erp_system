@@ -1,0 +1,29 @@
+spring:
+  profiles:
+    active: test
+  datasource:
+    url: jdbc:h2:mem:erp_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  flyway:
+    enabled: false
+
+app:
+  security:
+    jwt:
+      secret: test-jwt-secret-key-at-least-32-bytes-long
+      expiration-ms: 3600000
+      refresh-expiration-ms: 7200000
+  cors:
+    allow-all-origins: false
+    allowed-origins: http://localhost:4204
+  backup:
+    enabled: false
+    dir: ${java.io.tmpdir}/erp-backups-test
+  license:
+    signing-secret: test-license-signing-secret-32b

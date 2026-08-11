@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { SupplierDto, SupplierForm } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { ErpApiService } from '../../core/services/erp-api.service';
+import { ErpApiService, PagedResult } from '../../core/services/erp-api.service';
 import { DataTableColumn } from '../../shared/components/data-table/data-table.component';
 import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-master-page.base';
 
@@ -16,6 +16,8 @@ import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-mast
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SuppliersPageComponent extends ErpMasterPageBase<SupplierDto, SupplierForm> implements OnInit, OnDestroy {
+  protected override readonly serverPaging = true;
+
   readonly config: MasterPageConfig = {
     titleKey: 'MENU.SUPPLIERS',
     createKey: 'ERP.CREATE_SUPPLIER',
@@ -51,6 +53,10 @@ export class SuppliersPageComponent extends ErpMasterPageBase<SupplierDto, Suppl
 
   protected fetchList(filters: Record<string, string>): Observable<SupplierDto[]> {
     return this.api.getSuppliers(filters);
+  }
+
+  protected override fetchPagedList(filters: Record<string, string | number | boolean>): Observable<PagedResult<SupplierDto>> {
+    return this.api.getSuppliersPaged(filters);
   }
 
   protected fetchOne(id: number): Observable<SupplierDto> {

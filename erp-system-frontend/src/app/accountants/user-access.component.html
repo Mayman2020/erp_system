@@ -4,37 +4,85 @@
   <div class="erp-card erp-list-page__card">
     <div class="erp-card__body">
       <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
+      <app-erp-alert *ngIf="successKey" type="success" [message]="successKey" extraClass="mb-3" (dismissed)="successKey = ''"></app-erp-alert>
 
       <div class="ua-picker mb-3">
-        <label class="ua-picker__label">{{ 'ACCESS_MANAGEMENT.SELECT_USER' | translate }}</label>
-        <select class="erp-input" [disabled]="loadingUsers" (change)="onSelectUser($any($event.target).value)">
-          <option value="">{{ 'COMMON.SELECT' | translate }}</option>
-          <option *ngFor="let u of users" [value]="u.id">{{ u.fullName || u.username }} ({{ u.username }})</option>
-        </select>
+        <app-searchable-select
+          [items]="userOptions"
+          bindLabel="label"
+          bindValue="id"
+          label="ACCESS_MANAGEMENT.SELECT_USER"
+          [clearable]="true"
+          (selectionChange)="onSelectUser($event)"
+        ></app-searchable-select>
       </div>
 
-      <div class="ua-summary mb-3" *ngIf="selectedUser as u">
+      <form *ngIf="selectedUser as u" class="ua-workspace mb-4" [formGroup]="form" (ngSubmit)="save()">
+        <div class="ua-user-summary">
+          <strong>{{ u.fullName || u.username }}</strong>
+          <span>{{ u.email }}</span>
+        </div>
+
+        <div class="ua-role-grid">
+          <app-searchable-select
+            [items]="primaryRoleOptions"
+            bindLabel="label"
+            bindValue="code"
+            label="ACCESS_MANAGEMENT.PRIMARY_ROLE"
+            formControlName="primaryRoleCode"
+            [required]="true"
+            [clearable]="false"
+            (selectionChange)="onPrimaryRoleSelected($event)"
+          ></app-searchable-select>
+
+          <app-searchable-select
+            [items]="extraRoleOptions"
+            bindLabel="label"
+            bindValue="code"
+            label="ACCESS_MANAGEMENT.ADD_EXTRA_ROLE"
+            formControlName="extraRoleToAdd"
+            [clearable]="true"
+            (selectionChange)="onExtraRoleSelected($event)"
+          ></app-searchable-select>
+        </div>
+
         <div class="ua-summary__row">
-          <span class="ua-summary__label">{{ 'ACCESS_MANAGEMENT.PRIMARY_ROLE' | translate }}</span>
-          <span class="role-chip">{{ ('ROLE.' + (u.primaryRole || '')) | translate }}</span>
-        </div>
-        <div class="ua-summary__row" *ngIf="u.roleCodes?.length">
           <span class="ua-summary__label">{{ 'ACCESS_MANAGEMENT.ASSIGNED_ROLES' | translate }}</span>
-          <span class="role-chip" *ngFor="let code of u.roleCodes">{{ code }}</span>
+          <span class="role-chip role-chip--primary">{{ roleName(form.controls.primaryRoleCode.value) }}</span>
+          <button
+            *ngFor="let code of extraRoleCodes"
+            type="button"
+            class="role-chip role-chip--removable"
+            (click)="removeExtraRole(code)"
+            [attr.aria-label]="('ACCESS_MANAGEMENT.REMOVE_ROLE' | translate) + ' ' + roleName(code)"
+          >
+            {{ roleName(code) }} <mat-icon>close</mat-icon>
+          </button>
         </div>
-        <div class="ua-summary__row" *ngIf="!u.roleCodes?.length">
-          <span class="ua-summary__hint">{{ 'ACCESS_MANAGEMENT.NO_CUSTOM_ROLES_HINT' | translate }}</span>
-        </div>
-      </div>
 
-      <app-data-table
-        *ngIf="selectedUserId"
-        [columns]="columns"
-        [data]="rows"
-        [actions]="[]"
-        [loading]="loadingPermissions"
-        [exportable]="false"
-      ></app-data-table>
+        <div class="ua-actions">
+          <button type="submit" class="erp-btn erp-btn--primary" [disabled]="saving || !form.controls.primaryRoleCode.value">
+            <mat-icon>save</mat-icon>
+            {{ 'COMMON.SAVE' | translate }}
+          </button>
+        </div>
+      </form>
+
+      <section *ngIf="selectedUserId" class="ua-inspector">
+        <h3>{{ 'ACCESS_MANAGEMENT.EFFECTIVE_PERMISSIONS' | translate }}</h3>
+        <div *ngIf="loadingPermissions" class="ua-loading">{{ 'COMMON.LOADING' | translate }}</div>
+        <div *ngIf="!loadingPermissions" class="ua-permission-list">
+          <article *ngFor="let row of rows" class="ua-permission-row">
+            <span class="ua-permission-title">{{ row.title }}</span>
+            <div class="ua-permission-pills">
+              <span *ngFor="let action of grantedActions(row)" class="permission-pill">{{ action | translate }}</span>
+              <span *ngIf="!grantedActions(row).length" class="permission-pill permission-pill--muted">
+                {{ 'ACCESS_MANAGEMENT.NO_ACCESS' | translate }}
+              </span>
+            </div>
+          </article>
+        </div>
+      </section>
     </div>
   </div>
 </section>

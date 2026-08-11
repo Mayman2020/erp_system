@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -15,10 +15,10 @@ describe('NavigationComponent', () => {
   let component: NavigationComponent;
   let fixture: ComponentFixture<NavigationComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [NavigationComponent, StubTranslatePipe],
-      imports: [MatIconModule],
+      declarations: [NavigationComponent],
+      imports: [MatIconModule, StubTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();

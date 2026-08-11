@@ -74,6 +74,11 @@ export interface AdminUserForm {
   roleIds: number[];
 }
 
+export interface AdminUserRolesForm {
+  primaryRoleCode: string;
+  extraRoleCodes: string[];
+}
+
 export interface ScreenSetting {
   screenKey: string;
   enabled: boolean;

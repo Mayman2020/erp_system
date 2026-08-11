@@ -101,16 +101,23 @@ export class ErpDocumentPageShellComponent {
     return this.form?.get('notes') ?? null;
   }
 
-  get warehouseOptions(): Array<{ id: number | null; label: string }> {
-    const items = (this.warehouses || []).map((w) => ({
+  get warehouseLovItems(): Array<{ id: number; label: string }> {
+    return (this.warehouses || []).map((w) => ({
       id: w.id,
       label: `${w.code} - ${w.nameEn || w.name || ''}`
     }));
-    return [{ id: null, label: '—' }, ...items];
+  }
+
+  get partyLovItems(): Array<{ id: number; label: string }> {
+    return (this.parties || []).map((p) => ({ id: p.id, label: p.label }));
+  }
+
+  get warehouseOptions(): Array<{ id: number | null; label: string }> {
+    return [{ id: null, label: '—' }, ...this.warehouseLovItems];
   }
 
   get partySelectOptions(): Array<{ id: number | null; label: string }> {
-    return [{ id: null, label: '—' }, ...(this.parties || [])];
+    return [{ id: null, label: '—' }, ...this.partyLovItems];
   }
 
   statusCount(status: string): number {

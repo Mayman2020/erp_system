@@ -15,6 +15,7 @@ import {
   AdminRolePermission,
   AdminUser,
   AdminUserForm,
+  AdminUserRolesForm,
   ScreenSetting,
   UiMenuItemAdmin,
   UiMenuItemAdminForm,
@@ -48,6 +49,12 @@ export class AdminApiService {
   setUserActive(userId: number, active: boolean): Observable<AdminUser> {
     return this.http
       .patch<ApiResponse<AdminUser>>(`${this.accessBase}/users/${userId}/active`, { active })
+      .pipe(map((res) => res.data));
+  }
+
+  updateUserRoles(userId: number, payload: AdminUserRolesForm): Observable<AdminUser> {
+    return this.http
+      .patch<ApiResponse<AdminUser>>(`${this.accessBase}/users/${userId}/roles`, payload)
       .pipe(map((res) => res.data));
   }
 

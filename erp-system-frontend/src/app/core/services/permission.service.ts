@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map, shareReplay } from 'rxjs/operators';
+import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 import { UiPermission } from '../models/admin.models';
 import { AuthService } from '../auth/auth.service';
 import { AdminApiService } from './admin-api.service';
@@ -9,7 +9,11 @@ import { AdminApiService } from './admin-api.service';
 export class PermissionService {
   private permissions$?: Observable<Map<string, UiPermission>>;
 
-  constructor(private adminApi: AdminApiService, private authService: AuthService) {}
+  constructor(private adminApi: AdminApiService, private authService: AuthService) {
+    this.authService.activeRoleChanged?.subscribe(() => {
+      this.permissions$ = undefined;
+    });
+  }
 
   /** Eager load at app init when a session token exists. */
   loadMine(): Observable<Map<string, UiPermission> | null> {
@@ -36,11 +40,13 @@ export class PermissionService {
   }
 
   can(menuItemId: string, action: keyof UiPermission): Observable<boolean> {
-    const user = this.authService.currentUser;
-    const roles = user?.roles || (user?.role ? [user.role] : []);
-    if (roles.includes('ADMIN')) {
-      return of(true);
-    }
-    return this.getPermissions().pipe(map((permissions) => !!permissions.get(menuItemId)?.[action]));
+    return this.authService.activeRoleChanged.pipe(
+      switchMap((activeRole) => {
+        if (activeRole === 'ADMIN') {
+          return of(true);
+        }
+        return this.getPermissions().pipe(map((permissions) => !!permissions.get(menuItemId)?.[action]));
+      })
+    );
   }
 }

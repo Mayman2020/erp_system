@@ -77,14 +77,16 @@
       ></app-form-field>
     </div>
     <div class="col-md-6 mb-3">
-      <app-form-field
-        [control]="form.controls.currencyCode"
-        labelKey="VOUCHERS.FORM.CURRENCY"
-        icon="currency_exchange"
-        type="select"
-        [options]="currencies"
-        [disabled]="readOnlyMode"
-      ></app-form-field>
+      <app-searchable-select
+        formControlName="currencyCode"
+        label="VOUCHERS.FORM.CURRENCY"
+        placeholder="LOV.SELECT_PLACEHOLDER"
+        bindLabel="label"
+        bindValue="id"
+        [items]="currencyLovItems"
+        [clearable]="false"
+        [required]="true">
+      </app-searchable-select>
     </div>
     <div class="col-md-6 mb-3">
       <app-form-field

@@ -45,8 +45,8 @@ export class DocumentsPageComponent extends ErpMasterPageBase<EmployeeDocumentDt
     super(authService, confirmDialog, cdr);
   }
 
-  get employeeOptions() {
-    return [{ id: null, label: '—' }, ...this.employees.map((e) => ({ id: e.id, label: `${e.employeeCode} - ${e.fullNameEn}` }))];
+  get employeeLovItems(): Array<{ id: number; label: string }> {
+    return this.employees.map((e) => ({ id: e.id, label: `${e.employeeCode} - ${e.fullNameEn}` }));
   }
 
   ngOnInit(): void {
@@ -67,8 +67,8 @@ export class DocumentsPageComponent extends ErpMasterPageBase<EmployeeDocumentDt
     return this.actions;
   }
 
-  onEmployeeFilterChange(employeeId: number | null): void {
-    this.filterEmployeeId = employeeId;
+  onEmployeeFilterChange(employeeId: unknown): void {
+    this.filterEmployeeId = employeeId == null || employeeId === '' ? null : Number(employeeId);
     this.load();
   }
 

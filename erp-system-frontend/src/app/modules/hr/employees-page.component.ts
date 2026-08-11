@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { EmployeeDto, EmployeeForm, DepartmentDto } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { ErpApiService } from '../../core/services/erp-api.service';
+import { ErpApiService, PagedResult } from '../../core/services/erp-api.service';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { DataTableColumn } from '../../shared/components/data-table/data-table.component';
 import { ExportColumn } from '../../shared/components/table-export-toolbar/table-export-toolbar.component';
@@ -18,6 +18,8 @@ import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-mast
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeesPageComponent extends ErpMasterPageBase<EmployeeDto, EmployeeForm> implements OnInit, OnDestroy {
+  protected override readonly serverPaging = true;
+
   readonly config: MasterPageConfig = {
     titleKey: 'MENU.EMPLOYEES',
     createKey: 'ERP.CREATE_EMPLOYEE',
@@ -59,13 +61,19 @@ export class EmployeesPageComponent extends ErpMasterPageBase<EmployeeDto, Emplo
   departments: DepartmentDto[] = [];
   selectedEmployee: EmployeeDto | null = null;
 
-  readonly exportColumns: ExportColumn<EmployeeDto>[] = [
-    { header: 'Code', value: 'employeeCode' },
-    { header: 'Name', value: 'fullNameEn' },
-    { header: 'Job Title', value: 'jobTitle' },
-    { header: 'Salary', value: (row) => row.basicSalary ?? '' },
-    { header: 'Active', value: (row) => row.active ? 'Yes' : 'No' }
-  ];
+  get exportFileName(): string {
+    return 'employees';
+  }
+
+  override get exportColumns(): ExportColumn[] {
+    return [
+      { header: 'Code', value: 'employeeCode' },
+      { header: 'Name', value: 'fullNameEn' },
+      { header: 'Job Title', value: 'jobTitle' },
+      { header: 'Salary', value: (row) => (row as EmployeeDto).basicSalary ?? '' },
+      { header: 'Active', value: (row) => (row as EmployeeDto).active ? 'Yes' : 'No' }
+    ];
+  }
 
   get departmentLovItems(): Array<{ id: number | null; label: string }> {
     return (this.departments || []).map((d) => ({ id: d.id, label: d.nameEn }));
@@ -81,6 +89,10 @@ export class EmployeesPageComponent extends ErpMasterPageBase<EmployeeDto, Emplo
 
   protected fetchList(filters: Record<string, string>): Observable<EmployeeDto[]> {
     return this.api.getEmployees(filters);
+  }
+
+  protected override fetchPagedList(filters: Record<string, string | number | boolean>): Observable<PagedResult<EmployeeDto>> {
+    return this.api.getEmployeesPaged(filters);
   }
 
   protected fetchOne(id: number): Observable<EmployeeDto> {

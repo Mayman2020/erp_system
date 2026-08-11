@@ -94,12 +94,18 @@ export class OrdersPageComponent extends ErpDocumentPageBase<PurchaseOrderDto, P
 
   protected reloadList(): void {
     this.loading = true;
-    this.api.getPurchaseOrders().pipe(finalize(() => {
+    const params: Record<string, string | number> = {
+      page: 0,
+      size: 200,
+      q: this.filters.query || ''
+    };
+    if (this.filters.status) params.status = this.filters.status;
+    this.api.getPurchaseOrdersPaged(params).pipe(finalize(() => {
       this.loading = false;
       this.cdr.markForCheck();
     })).subscribe({
-      next: (rows) => {
-        this.rows = (rows || []).map((r) => {
+      next: (page) => {
+        this.rows = (page?.content || []).map((r) => {
           const mapped = mapAmountRow(r as unknown as Record<string, unknown>);
           const supplier = this.parties.find((p) => p.id === r.supplierId);
           if (supplier) {

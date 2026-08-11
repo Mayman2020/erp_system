@@ -1,14 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { ToastComponent } from './toast.component';
+import { ToastService } from './toast.service';
 
 describe('ToastComponent', () => {
   let component: ToastComponent;
   let fixture: ComponentFixture<ToastComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ToastComponent ]
+      imports: [NgbTooltipModule],
+      declarations: [ToastComponent],
+      providers: [ToastService]
     })
     .compileComponents();
   }));

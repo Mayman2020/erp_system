@@ -1,0 +1,87 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
+  </app-page-header>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
+</section>
+
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'PARTNERS.DISTRIBUTIONS_CREATE' : (formMode === 'edit' ? 'COMMON.EDIT' : 'COMMON.VIEW')" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.distributionNo" labelKey="PARTNERS.DISTRIBUTION_NO" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-8 mb-3"><app-form-field [control]="form.controls.periodLabel" labelKey="PARTNERS.PERIOD_LABEL" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-12 mb-3">
+          <label class="form-check-label d-flex align-items-center gap-2">
+            <input type="checkbox" formControlName="useAccountingProfit" [disabled]="readOnly" />
+            <span>{{ 'PARTNERS.USE_ACCOUNTING_PROFIT' | translate }}</span>
+          </label>
+        </div>
+        <div class="col-md-4 mb-3" *ngIf="form.controls.useAccountingProfit.value">
+          <app-form-field [control]="form.controls.profitFromDate" labelKey="PARTNERS.PROFIT_FROM" type="date" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-md-4 mb-3" *ngIf="form.controls.useAccountingProfit.value">
+          <app-form-field [control]="form.controls.profitToDate" labelKey="PARTNERS.PROFIT_TO" type="date" [readonly]="readOnly"></app-form-field>
+        </div>
+        <div class="col-md-4 mb-3" *ngIf="!form.controls.useAccountingProfit.value">
+          <app-form-field [control]="form.controls.totalProfit" labelKey="PARTNERS.TOTAL_PROFIT" type="number" step="0.01" min="0.01" [readonly]="readOnly"></app-form-field>
+        </div>
+      </div>
+      <div *ngIf="distributionLines.length" class="mt-3">
+        <h6>{{ 'PARTNERS.DISTRIBUTE' | translate }}</h6>
+        <table class="erp-table">
+          <tr *ngFor="let line of distributionLines">
+            <td>{{ line.partnerCode }} - {{ line.partnerName }}</td>
+            <td class="text-right">{{ line.sharePercent | number:'1.2-4' }}%</td>
+            <td class="text-right">{{ line.amount | number:'1.2-2' }}</td>
+          </tr>
+        </table>
+      </div>
+      <app-journal-link *ngIf="currentJournalEntryId" [journalEntryId]="currentJournalEntryId"></app-journal-link>
+      <app-erp-audit-trail
+        *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+        [createdAt]="audit.createdAt"
+        [updatedAt]="audit.updatedAt"
+        [createdBy]="audit.createdBy"
+        [updatedBy]="audit.updatedBy">
+      </app-erp-audit-trail>
+    </form>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

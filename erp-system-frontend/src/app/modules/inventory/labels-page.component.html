@@ -1,0 +1,24 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey"></app-page-header>
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <form [formGroup]="form" class="row align-items-end g-3 mb-4">
+        <div class="col-md-8">
+          <app-form-field [control]="form.controls.productId" labelKey="ERP.PRODUCT" icon="inventory_2" type="select" [options]="productOptions" optionValueField="id" optionLabelField="label"></app-form-field>
+        </div>
+        <div class="col-md-4">
+          <button type="button" class="erp-button erp-button--primary w-100" [disabled]="loading || form.invalid" (click)="previewLabel()">
+            {{ 'INVENTORY.LABEL_PREVIEW' | translate }}
+          </button>
+        </div>
+      </form>
+      <app-erp-alert *ngIf="errorKey" type="danger" [message]="errorKey" extraClass="mb-3" (dismissed)="errorKey = ''"></app-erp-alert>
+      <div *ngIf="preview as p" class="label-preview erp-card p-4">
+        <h3 class="mb-3">{{ p.name }}</h3>
+        <p><strong>{{ 'ERP.BARCODE' | translate }}:</strong> {{ p.barcode }}</p>
+        <p><strong>{{ 'INVENTORY.QR_PAYLOAD' | translate }}:</strong> {{ p.qrPayload }}</p>
+        <p><strong>{{ 'ERP.SALE_PRICE' | translate }}:</strong> {{ p.price | number:'1.2-2' }}</p>
+      </div>
+    </div>
+  </div>
+</section>

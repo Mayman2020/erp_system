@@ -44,8 +44,8 @@ export class LeaveRequestsPageComponent extends ErpMasterPageBase<LeaveRequestDt
       MASTER_CRUD_ACTIONS[2]];
   }
 
-  get employeeOptions() {
-    return [{ id: null, label: '—' }, ...(this.employees || []).map((e) => ({ id: e.id, label: `${e.employeeCode} - ${e.fullNameEn}` }))];
+  get employeeLovItems(): Array<{ id: number; label: string }> {
+    return (this.employees || []).map((e) => ({ id: e.id, label: `${e.employeeCode} - ${e.fullNameEn}` }));
   }
 
   ngOnInit(): void {

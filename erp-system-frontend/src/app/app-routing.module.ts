@@ -114,27 +114,55 @@ const routes: Routes = [
       },
       {
         path: 'inventory',
-        canActivate: [PermissionGuard],
-        data: { menuItemId: 'erp-inventory-products' },
         loadChildren: () => import('./modules/inventory/inventory.module').then(module => module.InventoryModule)
       },
       {
         path: 'sales',
-        canActivate: [PermissionGuard],
-        data: { menuItemId: 'erp-sales-customers' },
         loadChildren: () => import('./modules/sales/sales.module').then(module => module.SalesModule)
       },
       {
         path: 'purchases',
-        canActivate: [PermissionGuard],
-        data: { menuItemId: 'erp-purchases-suppliers' },
         loadChildren: () => import('./modules/purchases/purchases.module').then(module => module.PurchasesModule)
       },
       {
         path: 'hr',
-        canActivate: [PermissionGuard],
-        data: { menuItemId: 'erp-hr-employees' },
         loadChildren: () => import('./modules/hr/hr.module').then(module => module.HrModule)
+      },
+      {
+        path: 'pos',
+        canActivate: [PermissionGuard],
+        data: { menuItemId: 'erp-pos' },
+        loadChildren: () => import('./modules/pos/pos.module').then(module => module.PosModule)
+      },
+      {
+        path: 'maintenance',
+        canActivate: [PermissionGuard],
+        data: { menuItemId: 'erp-maintenance' },
+        loadChildren: () => import('./modules/maintenance/maintenance.module').then(module => module.MaintenanceModule)
+      },
+      {
+        path: 'partners',
+        canActivate: [PermissionGuard],
+        data: { menuItemId: 'erp-partners' },
+        loadChildren: () => import('./modules/partners/partners.module').then(module => module.PartnersModule)
+      },
+      {
+        path: 'pmo',
+        canActivate: [PermissionGuard],
+        data: { menuItemId: 'erp-pmo' },
+        loadChildren: () => import('./modules/pmo/pmo.module').then(module => module.PmoModule)
+      },
+      {
+        path: 'digital-literacy',
+        canActivate: [PermissionGuard],
+        data: { menuItemId: 'erp-digital-literacy' },
+        loadChildren: () => import('./modules/digital-literacy/digital-literacy.module').then(module => module.DigitalLiteracyModule)
+      },
+      {
+        path: 'alerts',
+        canActivate: [PermissionGuard],
+        data: { menuItemId: 'erp-alerts' },
+        loadChildren: () => import('./modules/alerts/alerts.module').then(module => module.AlertsModule)
       },
       {
         path: 'crm',

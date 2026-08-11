@@ -92,9 +92,11 @@ export class AuthService {
   private readonly tokenKey = 'erp_auth_token';
   private readonly refreshTokenKey = 'erp_auth_refresh_token';
   private readonly menuCacheKey = 'erp_ui_menu_cache_v2';
+  private readonly activeRoleKey = 'erp_active_role';
   private readonly authenticatedSubject = new BehaviorSubject<boolean>(!!localStorage.getItem(this.tokenKey));
   private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
   private readonly loadingUserSubject = new BehaviorSubject<boolean>(false);
+  private readonly activeRoleSubject = new BehaviorSubject<string | null>(localStorage.getItem(this.activeRoleKey));
 
   constructor(private http: HttpClient, private injector: Injector) {}
 
@@ -114,12 +116,39 @@ export class AuthService {
     return this.loadingUserSubject.asObservable();
   }
 
+  get activeRoleChanged(): Observable<string | null> {
+    return this.activeRoleSubject.asObservable();
+  }
+
   get currentUser(): AuthUser | null {
     return this.currentUserSubject.value;
   }
 
   get token(): string | null {
     return localStorage.getItem(this.tokenKey);
+  }
+
+  get activeRole(): string | null {
+    return this.activeRoleSubject.value;
+  }
+
+  getEffectiveRoles(): string[] {
+    const user = this.currentUser;
+    const roles = user?.roles?.length ? user.roles : (user?.role ? [user.role] : []);
+    return [...new Set(roles.map((role) => role.trim().toUpperCase()).filter(Boolean))];
+  }
+
+  setActiveRole(roleCode: string): boolean {
+    const normalized = (roleCode || '').trim().toUpperCase();
+    if (!normalized || !this.getEffectiveRoles().includes(normalized)) {
+      return false;
+    }
+    if (this.activeRoleSubject.value === normalized) {
+      return true;
+    }
+    localStorage.setItem(this.activeRoleKey, normalized);
+    this.activeRoleSubject.next(normalized);
+    return true;
   }
 
   login(payload: LoginRequest): Observable<LoginResponse> {
@@ -137,6 +166,8 @@ export class AuthService {
         }
         localStorage.removeItem(this.menuCacheKey);
         localStorage.removeItem('erp_ui_menu_cache');
+        localStorage.removeItem(this.activeRoleKey);
+        this.activeRoleSubject.next(null);
         this.authenticatedSubject.next(true);
         this.refreshPermissions();
         this.refreshCurrentUser();
@@ -167,8 +198,10 @@ export class AuthService {
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.menuCacheKey);
     localStorage.removeItem('erp_ui_menu_cache');
+    localStorage.removeItem(this.activeRoleKey);
     this.authenticatedSubject.next(false);
     this.currentUserSubject.next(null);
+    this.activeRoleSubject.next(null);
     this.refreshPermissions();
   }
 
@@ -199,7 +232,10 @@ export class AuthService {
     this.loadingUserSubject.next(true);
     return this.http.get<ApiResponse<AuthUser>>(`${environment.apiUrl}/profile/me`).pipe(
       map((res) => res.data),
-      tap((user) => this.currentUserSubject.next(user)),
+      tap((user) => {
+        this.currentUserSubject.next(user);
+        this.syncActiveRole(user);
+      }),
       finalize(() => this.loadingUserSubject.next(false))
     );
   }
@@ -216,5 +252,23 @@ export class AuthService {
       map((res) => res.data),
       tap((user) => this.currentUserSubject.next(user))
     );
+  }
+
+  private syncActiveRole(user: AuthUser): void {
+    const roles = [...new Set((user.roles?.length ? user.roles : (user.role ? [user.role] : []))
+      .map((role) => role.trim().toUpperCase())
+      .filter(Boolean))];
+    const persisted = localStorage.getItem(this.activeRoleKey)?.trim().toUpperCase() || null;
+    const nextRole = persisted && roles.includes(persisted)
+      ? persisted
+      : ((user.role || '').trim().toUpperCase() || roles[0] || null);
+    if (nextRole) {
+      localStorage.setItem(this.activeRoleKey, nextRole);
+    } else {
+      localStorage.removeItem(this.activeRoleKey);
+    }
+    if (this.activeRoleSubject.value !== nextRole) {
+      this.activeRoleSubject.next(nextRole);
+    }
   }
 }

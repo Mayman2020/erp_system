@@ -78,6 +78,10 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   /** ASSET branch only — settlement / cash-bank side of vouchers (leaf selectable in template) */
   assetAccountTree: AccountTreeDto[] = [];
 
+  get currencyLovItems() {
+    return (this.currencies || []).map((c) => ({ id: c, label: c }));
+  }
+
   selectedId: number | null = null;
   selectedAuditRecord: PaymentVoucher | ReceiptVoucher | null = null;
   dialogVisible = false;

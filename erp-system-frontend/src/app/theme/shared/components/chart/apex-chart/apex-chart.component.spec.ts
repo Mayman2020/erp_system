@@ -1,14 +1,16 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ApexChartComponent } from './apex-chart.component';
+import { ApexChartService } from './apex-chart.service';
 
 describe('ApexChartComponent', () => {
   let component: ApexChartComponent;
   let fixture: ComponentFixture<ApexChartComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ApexChartComponent ]
+      declarations: [ApexChartComponent],
+      providers: [ApexChartService]
     })
     .compileComponents();
   }));

@@ -1,0 +1,81 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="titleKey">
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
+  </app-page-header>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
+</section>
+
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'PARTNERS.TRANSACTIONS_CREATE' : (formMode === 'edit' ? 'COMMON.EDIT' : 'COMMON.VIEW')" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form [formGroup]="form" class="erp-dialog-form">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <app-searchable-select
+            formControlName="partnerId"
+            label="PARTNERS.TITLE"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="partnerLovItems"
+            [clearable]="false"
+            [required]="true">
+          </app-searchable-select>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">{{ 'PARTNERS.TXN_TYPE' | translate }}</label>
+          <select class="form-control" formControlName="txnType" [disabled]="readOnly">
+            <option *ngFor="let t of txnTypeOptions" [ngValue]="t.id">{{ t.labelKey | translate }}</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.txnDate" labelKey="COMMON.DATE" type="date" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="form.controls.amount" labelKey="ERP.AMOUNT" type="number" step="0.01" min="0.01" [readonly]="readOnly"></app-form-field></div>
+        <div class="col-12 mb-3"><app-form-field [control]="form.controls.notes" labelKey="COMMON.DESCRIPTION" type="textarea" [rows]="2" [readonly]="readOnly"></app-form-field></div>
+      </div>
+      <app-journal-link *ngIf="currentJournalEntryId" [journalEntryId]="currentJournalEntryId"></app-journal-link>
+      <app-erp-audit-trail
+        *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+        [createdAt]="audit.createdAt"
+        [updatedAt]="audit.updatedAt"
+        [createdBy]="audit.createdBy"
+        [updatedBy]="audit.updatedBy">
+      </app-erp-audit-trail>
+    </form>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button *ngIf="!readOnly" type="button" class="erp-button erp-button--primary" [disabled]="saving" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

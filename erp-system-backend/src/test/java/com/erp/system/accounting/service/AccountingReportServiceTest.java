@@ -5,9 +5,12 @@ import com.erp.system.accounting.dto.display.BalanceSheetLineDto;
 import com.erp.system.accounting.dto.display.BalanceSheetReportDto;
 import com.erp.system.accounting.dto.display.ProfitLossLineDto;
 import com.erp.system.accounting.dto.display.ProfitLossReportDto;
+import com.erp.system.accounting.dto.display.TrialBalanceLineDto;
+import com.erp.system.accounting.dto.display.TrialBalanceReportDto;
 import com.erp.system.accounting.repository.AccountRepository;
 import com.erp.system.accounting.repository.JournalEntryLineRepository;
 import com.erp.system.common.enums.AccountingType;
+import com.erp.system.common.exception.BusinessException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -126,6 +130,31 @@ class AccountingReportServiceTest {
         assertThat(report.getTotalLiabilities()).isEqualByComparingTo("300.00");
         assertThat(report.getTotalEquity()).isEqualByComparingTo("200.00");
         assertThat(report.isBalanced()).isTrue();
+    }
+
+    @Test
+    void getTrialBalanceSumsPostedLinesByAccount() {
+        LocalDate from = LocalDate.of(2026, 1, 1);
+        LocalDate to = LocalDate.of(2026, 1, 31);
+
+        when(journalEntryLineRepository.aggregateTrialBalance(from, to)).thenReturn(List.of(
+                TrialBalanceLineDto.builder()
+                        .accountId(1L).accountCode("1110").accountNameEn("Cash").accountNameAr("نقد")
+                        .debit(new BigDecimal("1000.00")).credit(new BigDecimal("200.00")).balance(new BigDecimal("800.00"))
+                        .build(),
+                TrialBalanceLineDto.builder()
+                        .accountId(2L).accountCode("4100").accountNameEn("Sales").accountNameAr("مبيعات")
+                        .debit(BigDecimal.ZERO).credit(new BigDecimal("800.00")).balance(new BigDecimal("-800.00"))
+                        .build()
+        ));
+
+        TrialBalanceReportDto report = accountingReportService.getTrialBalance(from, to);
+
+        assertThat(report.getTotalDebit()).isEqualByComparingTo("1000.00");
+        assertThat(report.getTotalCredit()).isEqualByComparingTo("1000.00");
+        assertThat(report.isBalanced()).isTrue();
+        assertThat(report.getLines()).hasSize(2);
+        assertThat(report.getLines().get(0).getBalance()).isEqualByComparingTo("800.00");
     }
 
     private Account account(Long id, String code, String name,

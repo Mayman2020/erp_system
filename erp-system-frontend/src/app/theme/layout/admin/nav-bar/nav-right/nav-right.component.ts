@@ -6,6 +6,8 @@ import { AuthService, AuthUser, resolveProfileFullName } from '../../../../../co
 import { ThemeService } from '../../../../../core/services/theme.service';
 import { TranslationService } from '../../../../../core/i18n/translation.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
+import { PermissionService } from '../../../../../core/services/permission.service';
+import { CompanyContextService, ErpCompany } from '../../../../../core/services/company-context.service';
 
 @Component({
   standalone: false,
@@ -17,6 +19,7 @@ export class NavRightComponent implements OnInit, OnDestroy {
   darkMode = false;
   unreadCount = 0;
   currentLang = 'ar';
+  companies: ErpCompany[] = [];
   now = new Date();
 
   readonly authenticated$ = this.authService.isAuthenticated$;
@@ -38,7 +41,9 @@ export class NavRightComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef,
     private readonly translationService: TranslationService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    private readonly permissionService: PermissionService,
+    readonly companyContext: CompanyContextService
   ) {}
 
   get activeFlagSrc(): string {
@@ -47,6 +52,13 @@ export class NavRightComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.authService.refreshCurrentUser();
+    this.companyContext.loadAccessible().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (companies) => {
+        this.companies = companies;
+        this.cdr.markForCheck();
+      },
+      error: () => undefined
+    });
     this.currentLang = this.translationService.currentLanguage;
     this.darkMode = this.themeService.mode === 'dark';
     this.themeService.mode$.pipe(takeUntil(this.destroy$)).subscribe((m) => {
@@ -91,7 +103,45 @@ export class NavRightComponent implements OnInit, OnDestroy {
     this.themeService.toggleTheme();
   }
 
+  get effectiveRoles(): string[] {
+    return this.authService.getEffectiveRoles();
+  }
+
+  get activeRole(): string | null {
+    return this.authService.activeRole;
+  }
+
+  switchRole(roleCode: string): void {
+    if (!this.authService.setActiveRole(roleCode)) {
+      return;
+    }
+    this.permissionService.refresh().subscribe({
+      next: () => void this.router.navigate(['/dashboard']),
+      error: () => void this.router.navigate(['/dashboard'])
+    });
+  }
+
+  roleLabel(roleCode: string): string {
+    const key = `ROLE.${roleCode}`;
+    const translated = this.translationService.instant(key);
+    return translated && translated !== key ? translated : roleCode.replace(/_/g, ' ');
+  }
+
+  get activeCompanyId(): number | null {
+    return this.companyContext.activeCompanyId;
+  }
+
+  companyLabel(company: ErpCompany): string {
+    return this.currentLang === 'ar' ? company.nameAr : company.nameEn;
+  }
+
+  switchCompany(companyId: number): void {
+    if (companyId === this.activeCompanyId || !this.companyContext.switchCompany(companyId)) return;
+    window.location.assign('/dashboard');
+  }
+
   logout(): void {
+    this.companyContext.clear();
     this.authService.logout();
     void this.router.navigate(['/auth/signin']);
   }
@@ -105,8 +155,7 @@ export class NavRightComponent implements OnInit, OnDestroy {
 
   resolveRoleKey(user: AuthUser | null): string {
     if (!user) return 'PROFILE.TITLE';
-    const role = (user.role || '').toUpperCase();
-    return role === 'ADMIN' ? 'AUTH.ROLE_ADMIN' : role === 'ACCOUNTANT' ? 'AUTH.ROLE_ACCOUNTANT' : 'PROFILE.TITLE';
+    return `ROLE.${this.activeRole || (user.role || '').toUpperCase()}`;
   }
 
   resolveAvatarUrl(user: AuthUser | null): string {

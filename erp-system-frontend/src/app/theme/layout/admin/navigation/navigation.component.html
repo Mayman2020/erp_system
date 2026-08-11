@@ -42,7 +42,10 @@
       <span class="erp-sidebar-user__role" *ngIf="roleLabel">{{ roleLabel | translate }}</span>
     </div>
   </div>
-  <button type="button" class="erp-sidebar-logout" (click)="logout()" [ngbTooltip]="'AUTH.LOGOUT' | translate" container="body">
+  <button type="button" class="erp-sidebar-logout" (click)="logout()"
+    [ngbTooltip]="sidebarCollapsed ? ('AUTH.LOGOUT' | translate) : null"
+    [disableTooltip]="!sidebarCollapsed" placement="end" container="body"
+    [attr.aria-label]="'AUTH.LOGOUT' | translate">
     <mat-icon>logout</mat-icon><span *ngIf="!sidebarCollapsed">{{ 'AUTH.LOGOUT' | translate }}</span>
   </button>
 </div>

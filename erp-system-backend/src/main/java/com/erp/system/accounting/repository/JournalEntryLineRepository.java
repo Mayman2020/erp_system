@@ -382,4 +382,25 @@ public interface JournalEntryLineRepository extends JpaRepository<JournalEntryLi
             group by line.account.id
             """)
     List<Object[]> sumPostedNetMovementGroupedByAccountIds(@Param("accountIds") Collection<Long> accountIds);
+
+    @Query("""
+            select new com.erp.system.accounting.dto.display.TrialBalanceLineDto(
+                a.id, a.code, a.nameEn, a.nameAr,
+                coalesce(sum(line.debit), 0),
+                coalesce(sum(line.credit), 0),
+                coalesce(sum(line.debit - line.credit), 0))
+            from JournalEntryLine line
+            join line.account a
+            where line.journalEntry.entryDate >= :fromDate
+              and line.journalEntry.entryDate <= :toDate
+              and line.journalEntry.status in (
+                    com.erp.system.common.enums.JournalEntryStatus.APPROVED,
+                    com.erp.system.common.enums.JournalEntryStatus.REVERSED)
+            group by a.id, a.code, a.nameEn, a.nameAr
+            having coalesce(sum(line.debit), 0) <> 0
+                or coalesce(sum(line.credit), 0) <> 0
+            order by a.code
+            """)
+    List<com.erp.system.accounting.dto.display.TrialBalanceLineDto> aggregateTrialBalance(
+            @Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
 }

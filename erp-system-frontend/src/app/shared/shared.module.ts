@@ -40,6 +40,9 @@ import { ErpAuditTrailComponent } from './components/erp-audit-trail/erp-audit-t
 import { LovSelectDialogComponent } from './components/lov-select-dialog/lov-select-dialog.component';
 import { SearchableSelectComponent } from './components/searchable-select/searchable-select.component';
 import { TableExportToolbarComponent } from './components/table-export-toolbar/table-export-toolbar.component';
+import { TablePagerComponent } from './components/table-pager/table-pager.component';
+import { ErpMasterListShellComponent } from './components/erp-master-list-shell/erp-master-list-shell.component';
+import { ErpMasterPageActionsComponent } from './components/erp-master-page-actions/erp-master-page-actions.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -77,7 +80,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     ErpAuditTrailComponent,
     LovSelectDialogComponent,
     SearchableSelectComponent,
-    TableExportToolbarComponent
+    TableExportToolbarComponent,
+    TablePagerComponent,
+    ErpMasterListShellComponent,
+    ErpMasterPageActionsComponent
   ],
   imports: [
     CommonModule,
@@ -141,7 +147,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     JournalLinkComponent,
     ErpAuditTrailComponent,
     SearchableSelectComponent,
-    TableExportToolbarComponent
+    TableExportToolbarComponent,
+    TablePagerComponent,
+    ErpMasterListShellComponent,
+    ErpMasterPageActionsComponent
   ]
 })
 export class SharedModule {}

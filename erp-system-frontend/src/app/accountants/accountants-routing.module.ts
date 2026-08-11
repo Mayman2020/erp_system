@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AccountantsHomeComponent } from './accountants-home.component';
 import { UserAccessComponent } from './user-access.component';
+import { LicensePageComponent } from './license-page.component';
+import { BackupsPageComponent } from './backups-page.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'users', pathMatch: 'full' },
@@ -10,6 +12,8 @@ const routes: Routes = [
   { path: 'lookups', component: AccountantsHomeComponent, data: { tab: 'lookups' } },
   { path: 'screens', component: AccountantsHomeComponent, data: { tab: 'screens' } },
   { path: 'user-access', component: UserAccessComponent },
+  { path: 'license', component: LicensePageComponent },
+  { path: 'backups', component: BackupsPageComponent },
   { path: 'profile', redirectTo: '/settings', pathMatch: 'full' }
 ];
 

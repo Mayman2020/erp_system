@@ -24,7 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Enforces {@code role_menu_permissions} for users with custom role assignments on mutating API calls.
+ * Enforces {@code role_menu_permissions} on mutating API calls for all non-admin users.
+ * Uses {@link HttpServletRequest#getServletPath()} so context-path {@code /api/v1} does not break matching.
  */
 @Component
 @RequiredArgsConstructor
@@ -42,12 +43,11 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
         if (!MUTATING_METHODS.contains(request.getMethod())) {
             return true;
         }
-        String path = request.getRequestURI();
-        if (path == null) {
-            return true;
-        }
+        String path = normalizedPath(request);
         return path.startsWith("/auth/")
+                || path.equals("/auth")
                 || path.startsWith("/admin/")
+                || path.equals("/admin")
                 || path.startsWith("/health")
                 || path.startsWith("/actuator/");
     }
@@ -67,19 +67,15 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        Long userId = currentUserId(authentication);
-        if (userId == null || !accessControlService.hasCustomAssignments(userId)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String menuItemId = resolveMenuItemId(request.getRequestURI());
+        String path = normalizedPath(request);
+        String menuItemId = resolveMenuItemId(path);
         if (menuItemId == null) {
+            // Fail-closed for mapped business modules only; unknown mutating paths rely on role matchers.
             filterChain.doFilter(request, response);
             return;
         }
 
-        String action = resolveAction(request.getMethod(), request.getRequestURI());
+        String action = resolveAction(request.getMethod(), path);
         if (!accessControlService.hasMenuAction(authentication, menuItemId, action)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -91,32 +87,45 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    String normalizedPath(HttpServletRequest request) {
+        String servletPath = request.getServletPath();
+        if (servletPath == null || servletPath.isBlank()) {
+            String uri = request.getRequestURI();
+            if (uri == null || uri.isBlank()) {
+                return "/";
+            }
+            // Fallback when servlet path is unavailable (e.g. unit tests).
+            if (uri.startsWith("/api/v1")) {
+                return uri.substring("/api/v1".length()).isEmpty() ? "/" : uri.substring("/api/v1".length());
+            }
+            if (uri.startsWith("/api")) {
+                return uri.substring("/api".length()).isEmpty() ? "/" : uri.substring("/api".length());
+            }
+            return uri;
+        }
+        return servletPath.startsWith("/") ? servletPath : "/" + servletPath;
+    }
+
     private boolean isAdmin(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(code -> "ROLE_ADMIN".equals(code) || "ADMIN".equals(code));
     }
 
-    private Long currentUserId(Authentication authentication) {
-        if (authentication.getPrincipal() instanceof JwtPrincipal principal) {
-            return principal.userId();
-        }
-        return null;
-    }
-
-    private String resolveMenuItemId(String path) {
+    String resolveMenuItemId(String path) {
         if (path == null || path.isBlank()) {
             return null;
         }
-        String normalized = path.startsWith("/api") ? path.substring(4) : path;
+        String normalized = path.startsWith("/") ? path : "/" + path;
         return PATH_PREFIX_TO_MENU.entrySet().stream()
-                .filter(entry -> normalized.startsWith(entry.getKey()))
+                .filter(entry -> normalized.equals(entry.getKey())
+                        || normalized.startsWith(entry.getKey() + "/"))
                 .map(Map.Entry::getValue)
                 .findFirst()
                 .orElse(null);
     }
 
-    private String resolveAction(String method, String path) {
+    String resolveAction(String method, String path) {
         String normalizedPath = path == null ? "" : path.toLowerCase(Locale.ROOT);
         if (HttpMethod.DELETE.matches(method)) {
             return "DELETE";
@@ -132,7 +141,10 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
                 || normalizedPath.contains("/status")
                 || normalizedPath.contains("/start")
                 || normalizedPath.contains("/complete")
-                || normalizedPath.contains("/convert")) {
+                || normalizedPath.contains("/convert")
+                || normalizedPath.contains("/close")
+                || normalizedPath.contains("/open")
+                || normalizedPath.contains("/sync")) {
             return "EDIT";
         }
         if (HttpMethod.POST.matches(method)) {
@@ -157,6 +169,7 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
         map.put("/accounting/exchange-rates", "settings");
         map.put("/accounting/reconciliation", "reconciliation");
         map.put("/accounting/settings", "settings");
+        map.put("/accounting/reports", "reports");
         map.put("/inventory/products", "erp-inventory-products");
         map.put("/inventory/categories", "erp-inventory-categories");
         map.put("/inventory/warehouses", "erp-inventory-warehouses");
@@ -165,6 +178,9 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
         map.put("/inventory/stock/in", "erp-inventory-movements");
         map.put("/inventory/stock/out", "erp-inventory-movements");
         map.put("/inventory/stock/transfer", "erp-inventory-movements");
+        map.put("/inventory/stock/incidents", "erp-inventory-incidents");
+        map.put("/inventory/stock/replenishment", "erp-inventory-replenishment");
+        map.put("/inventory/labels", "erp-inventory-labels");
         map.put("/sales/customers", "erp-sales-customers");
         map.put("/sales/quotations", "erp-sales-quotations");
         map.put("/sales/orders", "erp-sales-orders");
@@ -175,6 +191,8 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
         map.put("/purchases/invoices", "erp-purchases-invoices");
         map.put("/purchases/returns", "erp-purchases-returns");
         map.put("/purchases/payments", "erp-purchases-payments");
+        map.put("/purchases/rfqs", "erp-purchases-rfqs");
+        map.put("/purchases/receipts", "erp-purchases-receipts");
         map.put("/hr/departments", "erp-hr-departments");
         map.put("/hr/employees", "erp-hr-employees");
         map.put("/hr/attendance", "erp-hr-attendance");
@@ -182,12 +200,25 @@ public class MenuActionAuthorizationFilter extends OncePerRequestFilter {
         map.put("/hr/payroll", "erp-hr-payroll");
         map.put("/hr/payroll-lines", "erp-hr-payroll");
         map.put("/hr/documents", "erp-hr-documents");
+        map.put("/hr/recruitment", "erp-hr-recruitment");
+        map.put("/hr/leave-balances", "erp-hr-leave");
         map.put("/crm/leads", "erp-crm-leads");
         map.put("/crm/activities", "erp-crm-activities");
         map.put("/crm/notes", "erp-crm-notes");
         map.put("/projects", "erp-projects-list");
+        map.put("/pmo", "erp-pmo");
+        map.put("/digital-literacy", "erp-digital-literacy");
         map.put("/manufacturing/work-orders", "erp-manufacturing-orders");
         map.put("/manufacturing/bom", "erp-manufacturing-bom");
+        map.put("/pos", "erp-pos");
+        map.put("/maintenance/tickets", "erp-maintenance-tickets");
+        map.put("/maintenance/assets", "erp-maintenance-assets");
+        map.put("/maintenance/technicians", "erp-maintenance");
+        map.put("/maintenance", "erp-maintenance");
+        map.put("/partners", "erp-partners");
+        map.put("/admin/license", "erp-license");
+        map.put("/admin/backups", "erp-backups");
+        map.put("/alerts", "erp-alerts");
         return map;
     }
 }

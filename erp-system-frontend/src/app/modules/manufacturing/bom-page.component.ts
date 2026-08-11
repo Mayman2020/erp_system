@@ -52,8 +52,8 @@ export class BomPageComponent implements OnInit, OnDestroy {
     return this.formMode === 'view';
   }
 
-  get productOptions(): Array<{ id: number | null; label: string }> {
-    return [{ id: null, label: '—' }, ...this.products.map((p) => ({ id: p.id, label: `${p.code} - ${p.nameEn || p.name}` }))];
+  get productLovItems(): Array<{ id: number; label: string }> {
+    return this.products.map((p) => ({ id: p.id, label: `${p.code} - ${p.nameEn || p.name}` }));
   }
 
   ngOnInit(): void {
@@ -67,8 +67,8 @@ export class BomPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {}
 
-  onParentChange(productId: number | null): void {
-    this.parentProductId = productId;
+  onParentChange(productId: unknown): void {
+    this.parentProductId = productId == null || productId === '' ? null : Number(productId);
     this.loadLines();
   }
 

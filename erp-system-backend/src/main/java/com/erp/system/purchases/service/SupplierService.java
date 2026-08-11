@@ -1,5 +1,6 @@
 package com.erp.system.purchases.service;
 
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.erp.service.ActivityLogService;
 import com.erp.system.purchases.domain.Supplier;
@@ -7,6 +8,8 @@ import com.erp.system.purchases.dto.display.SupplierDisplayDto;
 import com.erp.system.purchases.dto.form.SupplierFormDto;
 import com.erp.system.purchases.repository.SupplierRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,14 @@ public class SupplierService {
         return supplierRepository.findAllByOrderByIdDesc().stream()
                 .map(this::toDisplay)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<SupplierDisplayDto> getPaged(Boolean active, String q, Pageable pageable) {
+        Page<Supplier> suppliers = q == null || q.isBlank()
+                ? supplierRepository.findPaged(active, pageable)
+                : supplierRepository.searchPaged(active, q.trim(), pageable);
+        return PageResponse.from(suppliers.map(this::toDisplay));
     }
 
     @Transactional(readOnly = true)

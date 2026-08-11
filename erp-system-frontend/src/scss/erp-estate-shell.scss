@@ -203,14 +203,26 @@ app-navigation.erp-estate-sidebar::before,
   display: none;
 }
 
-.app-shell.sidebar-collapsed .erp-estate-sidebar .sidebar-brand {
+.app-shell.sidebar-collapsed .erp-estate-sidebar .sidebar-brand,
+.erp-estate-sidebar .sidebar-brand--collapsed {
   justify-content: center;
-  padding: 20px 0 14px;
+  align-items: center;
+  padding: 0;
   gap: 0;
+  width: 100%;
 }
 
-.app-shell.sidebar-collapsed .erp-estate-sidebar .brand-icon {
+.app-shell.sidebar-collapsed .erp-estate-sidebar .brand-icon,
+.erp-estate-sidebar .sidebar-brand--collapsed .brand-icon {
   margin-inline: auto;
+  width: 40px;
+  height: 40px;
+}
+
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-item,
+.app-shell.sidebar-collapsed .erp-estate-sidebar .nav-item--collapse {
+  width: 100%;
+  margin-inline: 0;
 }
 
 .erp-estate-sidebar .erp-sidebar-user {

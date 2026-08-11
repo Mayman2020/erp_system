@@ -43,6 +43,17 @@ import {
   WarehouseDto,
   WorkOrderDto,
   WorkOrderForm,
+  MaintenanceAssetDto,
+  MaintenanceAssetForm,
+  MaintenanceTechnicianDto,
+  MaintenanceTechnicianForm,
+  MaintenanceTicketDto,
+  MaintenanceTicketForm,
+  MaintenanceChecklistForm,
+  MaintenanceSparePartForm,
+  MaintenanceChecklistDto,
+  MaintenanceSparePartDto,
+  AssignTechnicianForm,
   UnitOfMeasureDto,
   UnitOfMeasureForm,
   ProductForm,
@@ -74,8 +85,50 @@ import {
   ProjectMemberDto,
   ProjectMemberForm,
   ProjectExpenseDto,
-  ProjectExpenseForm
+  ProjectExpenseForm,
+  LabelPreviewDto,
+  StockIncidentDto,
+  StockIncidentForm,
+  ReplenishmentProposalDto,
+  PurchaseRfqDto,
+  PurchaseRfqForm,
+  GoodsReceiptDto,
+  GoodsReceiptForm,
+  HrVacancyDto,
+  HrVacancyForm,
+  HrCandidateDto,
+  HrCandidateForm,
+  HrInterviewDto,
+  HrInterviewForm,
+  LeaveBalanceDto,
+  PmoMilestoneDto,
+  PmoMilestoneForm,
+  PmoRiskDto,
+  PmoRiskForm,
+  PmoIssueDto,
+  PmoIssueForm,
+  DigitalCourseDto,
+  DigitalCourseForm,
+  DigitalEnrollmentDto,
+  DigitalEnrollmentForm,
+  LicenseDto,
+  LicenseActivateForm,
+  BackupJobDto,
+  AlertEventDto
 } from '../models/erp.models';
+
+export interface PagedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
+
+export type PagedResult<T> = PagedResponse<T>;
+export type PagedQuery = Record<string, string | number | boolean>;
 
 @Injectable({ providedIn: 'root' })
 export class ErpApiService {
@@ -86,7 +139,12 @@ export class ErpApiService {
   private readonly crmBase = `${environment.apiUrl}/crm`;
   private readonly projectsBase = `${environment.apiUrl}/projects`;
   private readonly manufacturingBase = `${environment.apiUrl}/manufacturing`;
+  private readonly maintenanceBase = `${environment.apiUrl}/maintenance`;
   private readonly erpBase = `${environment.apiUrl}/erp`;
+  private readonly pmoBase = `${environment.apiUrl}/pmo`;
+  private readonly digitalLiteracyBase = `${environment.apiUrl}/digital-literacy`;
+  private readonly alertsBase = `${environment.apiUrl}/alerts`;
+  private readonly adminBase = `${environment.apiUrl}/admin`;
 
   constructor(private http: HttpClient) {}
 
@@ -97,16 +155,28 @@ export class ErpApiService {
       .pipe(map((res) => res.data || []));
   }
 
+  getProductsPaged(filters: PagedQuery = {}): Observable<PagedResult<ProductDto>> {
+    return this.getPaged(`${this.inventoryBase}/products/paged`, filters);
+  }
+
   getCategories(filters: Record<string, string | number | boolean> = {}): Observable<ProductCategoryDto[]> {
     return this.http
       .get<ApiResponse<ProductCategoryDto[]>>(`${this.inventoryBase}/categories`, { params: this.toParams(filters) })
       .pipe(map((res) => res.data || []));
   }
 
+  getCategoriesPaged(filters: PagedQuery = {}): Observable<PagedResult<ProductCategoryDto>> {
+    return this.getPaged(`${this.inventoryBase}/categories/paged`, filters);
+  }
+
   getWarehouses(filters: Record<string, string | number | boolean> = {}): Observable<WarehouseDto[]> {
     return this.http
       .get<ApiResponse<WarehouseDto[]>>(`${this.inventoryBase}/warehouses`, { params: this.toParams(filters) })
       .pipe(map((res) => res.data || []));
+  }
+
+  getWarehousesPaged(filters: PagedQuery = {}): Observable<PagedResult<WarehouseDto>> {
+    return this.getPaged(`${this.inventoryBase}/warehouses/paged`, filters);
   }
 
   getStockLevels(filters: Record<string, string | number | boolean> = {}): Observable<StockLevelDto[]> {
@@ -121,11 +191,19 @@ export class ErpApiService {
       .pipe(map((res) => res.data || []));
   }
 
+  getStockMovementsPaged(filters: PagedQuery = {}): Observable<PagedResult<StockMovementDto>> {
+    return this.getPaged(`${this.inventoryBase}/stock/movements/paged`, filters);
+  }
+
   // Sales
   getCustomers(filters: Record<string, string | number | boolean> = {}): Observable<CustomerDto[]> {
     return this.http
       .get<ApiResponse<CustomerDto[]>>(`${this.salesBase}/customers`, { params: this.toParams(filters) })
       .pipe(map((res) => res.data || []));
+  }
+
+  getCustomersPaged(filters: PagedQuery = {}): Observable<PagedResult<CustomerDto>> {
+    return this.getPaged(`${this.salesBase}/customers/paged`, filters);
   }
 
   getSalesQuotations(filters: Record<string, string | number | boolean> = {}): Observable<SalesQuotationDto[]> {
@@ -192,6 +270,10 @@ export class ErpApiService {
     return this.http
       .get<ApiResponse<SalesInvoiceDto[]>>(`${this.salesBase}/invoices`, { params: this.toParams(filters) })
       .pipe(map((res) => res.data || []));
+  }
+
+  getSalesInvoicesPaged(filters: PagedQuery = {}): Observable<PagedResult<SalesInvoiceDto>> {
+    return this.getPaged(`${this.salesBase}/invoices/paged`, filters);
   }
 
   getSalesInvoice(id: number): Observable<SalesInvoiceDto> {
@@ -265,10 +347,18 @@ export class ErpApiService {
       .pipe(map((res) => res.data || []));
   }
 
+  getSuppliersPaged(filters: PagedQuery = {}): Observable<PagedResult<SupplierDto>> {
+    return this.getPaged(`${this.purchasesBase}/suppliers/paged`, filters);
+  }
+
   getPurchaseOrders(filters: Record<string, string | number | boolean> = {}): Observable<PurchaseOrderDto[]> {
     return this.http
       .get<ApiResponse<PurchaseOrderDto[]>>(`${this.purchasesBase}/orders`, { params: this.toParams(filters) })
       .pipe(map((res) => res.data || []));
+  }
+
+  getPurchaseOrdersPaged(filters: PagedQuery = {}): Observable<PagedResult<PurchaseOrderDto>> {
+    return this.getPaged(`${this.purchasesBase}/orders/paged`, filters);
   }
 
   getPurchaseOrder(id: number): Observable<PurchaseOrderDto> {
@@ -384,10 +474,18 @@ export class ErpApiService {
       .pipe(map((res) => res.data || []));
   }
 
+  getEmployeesPaged(filters: PagedQuery = {}): Observable<PagedResult<EmployeeDto>> {
+    return this.getPaged(`${this.hrBase}/employees/paged`, filters);
+  }
+
   getAttendanceRecords(filters: Record<string, string | number | boolean> = {}): Observable<AttendanceRecordDto[]> {
     return this.http
       .get<ApiResponse<AttendanceRecordDto[]>>(`${this.hrBase}/attendance`, { params: this.toParams(filters) })
       .pipe(map((res) => res.data || []));
+  }
+
+  getAttendanceRecordsPaged(filters: PagedQuery = {}): Observable<PagedResult<AttendanceRecordDto>> {
+    return this.getPaged(`${this.hrBase}/attendance/paged`, filters);
   }
 
   getLeaveRequests(filters: Record<string, string | number | boolean> = {}): Observable<LeaveRequestDto[]> {
@@ -503,6 +601,133 @@ export class ErpApiService {
   cancelWorkOrder(id: number, actor: string): Observable<WorkOrderDto> {
     return this.http
       .post<ApiResponse<WorkOrderDto>>(`${this.manufacturingBase}/work-orders/${id}/cancel`, null, { params: { actor } })
+      .pipe(map((res) => res.data));
+  }
+
+  // Maintenance
+  getMaintenanceAssets(status?: string): Observable<MaintenanceAssetDto[]> {
+    return this.http
+      .get<ApiResponse<MaintenanceAssetDto[]>>(`${this.maintenanceBase}/assets`, { params: this.toParams({ status }) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  getMaintenanceAsset(id: number): Observable<MaintenanceAssetDto> {
+    return this.http
+      .get<ApiResponse<MaintenanceAssetDto>>(`${this.maintenanceBase}/assets/${id}`)
+      .pipe(map((res) => res.data));
+  }
+
+  createMaintenanceAsset(payload: MaintenanceAssetForm): Observable<MaintenanceAssetDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceAssetDto>>(`${this.maintenanceBase}/assets`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  updateMaintenanceAsset(id: number, payload: MaintenanceAssetForm): Observable<MaintenanceAssetDto> {
+    return this.http
+      .put<ApiResponse<MaintenanceAssetDto>>(`${this.maintenanceBase}/assets/${id}`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  deleteMaintenanceAsset(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.maintenanceBase}/assets/${id}`);
+  }
+
+  getMaintenanceTechnicians(activeOnly = true): Observable<MaintenanceTechnicianDto[]> {
+    return this.http
+      .get<ApiResponse<MaintenanceTechnicianDto[]>>(`${this.maintenanceBase}/technicians`, { params: this.toParams({ activeOnly }) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  getMaintenanceTechnician(id: number): Observable<MaintenanceTechnicianDto> {
+    return this.http
+      .get<ApiResponse<MaintenanceTechnicianDto>>(`${this.maintenanceBase}/technicians/${id}`)
+      .pipe(map((res) => res.data));
+  }
+
+  createMaintenanceTechnician(payload: MaintenanceTechnicianForm): Observable<MaintenanceTechnicianDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceTechnicianDto>>(`${this.maintenanceBase}/technicians`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  updateMaintenanceTechnician(id: number, payload: MaintenanceTechnicianForm): Observable<MaintenanceTechnicianDto> {
+    return this.http
+      .put<ApiResponse<MaintenanceTechnicianDto>>(`${this.maintenanceBase}/technicians/${id}`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  deleteMaintenanceTechnician(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.maintenanceBase}/technicians/${id}`);
+  }
+
+  getMaintenanceTickets(status?: string): Observable<MaintenanceTicketDto[]> {
+    return this.http
+      .get<ApiResponse<MaintenanceTicketDto[]>>(`${this.maintenanceBase}/tickets`, { params: this.toParams({ status }) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  getMaintenanceTicket(id: number): Observable<MaintenanceTicketDto> {
+    return this.http
+      .get<ApiResponse<MaintenanceTicketDto>>(`${this.maintenanceBase}/tickets/${id}`)
+      .pipe(map((res) => res.data));
+  }
+
+  createMaintenanceTicket(payload: MaintenanceTicketForm): Observable<MaintenanceTicketDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceTicketDto>>(`${this.maintenanceBase}/tickets`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  updateMaintenanceTicket(id: number, payload: MaintenanceTicketForm): Observable<MaintenanceTicketDto> {
+    return this.http
+      .put<ApiResponse<MaintenanceTicketDto>>(`${this.maintenanceBase}/tickets/${id}`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  deleteMaintenanceTicket(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.maintenanceBase}/tickets/${id}`);
+  }
+
+  assignMaintenanceTicket(id: number, payload: AssignTechnicianForm, actor: string): Observable<MaintenanceTicketDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceTicketDto>>(`${this.maintenanceBase}/tickets/${id}/assign`, payload, { params: { actor } })
+      .pipe(map((res) => res.data));
+  }
+
+  startMaintenanceTicket(id: number, actor: string): Observable<MaintenanceTicketDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceTicketDto>>(`${this.maintenanceBase}/tickets/${id}/start`, null, { params: { actor } })
+      .pipe(map((res) => res.data));
+  }
+
+  completeMaintenanceTicket(id: number, actor: string): Observable<MaintenanceTicketDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceTicketDto>>(`${this.maintenanceBase}/tickets/${id}/complete`, null, { params: { actor } })
+      .pipe(map((res) => res.data));
+  }
+
+  cancelMaintenanceTicket(id: number, actor: string): Observable<MaintenanceTicketDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceTicketDto>>(`${this.maintenanceBase}/tickets/${id}/cancel`, null, { params: { actor } })
+      .pipe(map((res) => res.data));
+  }
+
+  addMaintenanceChecklistItem(ticketId: number, payload: MaintenanceChecklistForm): Observable<MaintenanceChecklistDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceChecklistDto>>(`${this.maintenanceBase}/tickets/${ticketId}/checklists`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  addMaintenanceSparePart(ticketId: number, payload: MaintenanceSparePartForm): Observable<MaintenanceSparePartDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceSparePartDto>>(`${this.maintenanceBase}/tickets/${ticketId}/spare-parts`, payload)
+      .pipe(map((res) => res.data));
+  }
+
+  issueMaintenanceSparePart(ticketId: number, sparePartId: number, actor: string): Observable<MaintenanceSparePartDto> {
+    return this.http
+      .post<ApiResponse<MaintenanceSparePartDto>>(`${this.maintenanceBase}/tickets/${ticketId}/spare-parts/${sparePartId}/issue`, null, { params: { actor } })
       .pipe(map((res) => res.data));
   }
 
@@ -1000,6 +1225,111 @@ export class ErpApiService {
       .pipe(map((res) => res.data || []));
   }
 
+  // Stock incidents
+  getStockIncidents(filters: Record<string, string> = {}): Observable<StockIncidentDto[]> {
+    return this.http
+      .get<ApiResponse<StockIncidentDto[]>>(`${this.inventoryBase}/stock/incidents`, { params: this.toParams(filters) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  getStockIncident(id: number): Observable<StockIncidentDto> {
+    return this.http.get<ApiResponse<StockIncidentDto>>(`${this.inventoryBase}/stock/incidents/${id}`).pipe(map((res) => res.data));
+  }
+
+  createStockIncident(payload: StockIncidentForm): Observable<StockIncidentDto> {
+    return this.http.post<ApiResponse<StockIncidentDto>>(`${this.inventoryBase}/stock/incidents`, payload).pipe(map((res) => res.data));
+  }
+
+  updateStockIncident(id: number, payload: StockIncidentForm): Observable<StockIncidentDto> {
+    return this.http.put<ApiResponse<StockIncidentDto>>(`${this.inventoryBase}/stock/incidents/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  approveStockIncident(id: number): Observable<StockIncidentDto> {
+    return this.http.post<ApiResponse<StockIncidentDto>>(`${this.inventoryBase}/stock/incidents/${id}/approve`, null).pipe(map((res) => res.data));
+  }
+
+  deleteStockIncident(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.inventoryBase}/stock/incidents/${id}`);
+  }
+
+  // Replenishment
+  getReplenishmentProposals(filters: Record<string, string> = {}): Observable<ReplenishmentProposalDto[]> {
+    return this.http
+      .get<ApiResponse<ReplenishmentProposalDto[]>>(`${this.inventoryBase}/stock/replenishment`, { params: this.toParams(filters) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  generateReplenishmentProposals(): Observable<ReplenishmentProposalDto[]> {
+    return this.http
+      .post<ApiResponse<ReplenishmentProposalDto[]>>(`${this.inventoryBase}/stock/replenishment/generate`, null)
+      .pipe(map((res) => res.data || []));
+  }
+
+  convertReplenishmentToPurchaseOrder(supplierId: number, warehouseId?: number): Observable<PurchaseOrderDto> {
+    return this.http
+      .post<ApiResponse<PurchaseOrderDto>>(`${this.inventoryBase}/stock/replenishment/convert`, null, {
+        params: this.toParams({ supplierId, warehouseId })
+      })
+      .pipe(map((res) => res.data));
+  }
+
+  // Labels
+  getLabelPreview(productId: number): Observable<LabelPreviewDto> {
+    return this.http
+      .get<ApiResponse<LabelPreviewDto>>(`${this.inventoryBase}/labels/preview`, { params: { productId: String(productId) } })
+      .pipe(map((res) => res.data));
+  }
+
+  // Purchase RFQs
+  getPurchaseRfqs(): Observable<PurchaseRfqDto[]> {
+    return this.http.get<ApiResponse<PurchaseRfqDto[]>>(`${this.purchasesBase}/rfqs`).pipe(map((res) => res.data || []));
+  }
+
+  getPurchaseRfq(id: number): Observable<PurchaseRfqDto> {
+    return this.http.get<ApiResponse<PurchaseRfqDto>>(`${this.purchasesBase}/rfqs/${id}`).pipe(map((res) => res.data));
+  }
+
+  createPurchaseRfq(payload: PurchaseRfqForm): Observable<PurchaseRfqDto> {
+    return this.http.post<ApiResponse<PurchaseRfqDto>>(`${this.purchasesBase}/rfqs`, payload).pipe(map((res) => res.data));
+  }
+
+  updatePurchaseRfq(id: number, payload: PurchaseRfqForm): Observable<PurchaseRfqDto> {
+    return this.http.put<ApiResponse<PurchaseRfqDto>>(`${this.purchasesBase}/rfqs/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  submitPurchaseRfq(id: number): Observable<PurchaseRfqDto> {
+    return this.http.post<ApiResponse<PurchaseRfqDto>>(`${this.purchasesBase}/rfqs/${id}/submit`, null).pipe(map((res) => res.data));
+  }
+
+  deletePurchaseRfq(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.purchasesBase}/rfqs/${id}`);
+  }
+
+  // Goods receipts
+  getGoodsReceipts(): Observable<GoodsReceiptDto[]> {
+    return this.http.get<ApiResponse<GoodsReceiptDto[]>>(`${this.purchasesBase}/receipts`).pipe(map((res) => res.data || []));
+  }
+
+  getGoodsReceipt(id: number): Observable<GoodsReceiptDto> {
+    return this.http.get<ApiResponse<GoodsReceiptDto>>(`${this.purchasesBase}/receipts/${id}`).pipe(map((res) => res.data));
+  }
+
+  createGoodsReceipt(payload: GoodsReceiptForm): Observable<GoodsReceiptDto> {
+    return this.http.post<ApiResponse<GoodsReceiptDto>>(`${this.purchasesBase}/receipts`, payload).pipe(map((res) => res.data));
+  }
+
+  updateGoodsReceipt(id: number, payload: GoodsReceiptForm): Observable<GoodsReceiptDto> {
+    return this.http.put<ApiResponse<GoodsReceiptDto>>(`${this.purchasesBase}/receipts/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  approveGoodsReceipt(id: number): Observable<GoodsReceiptDto> {
+    return this.http.post<ApiResponse<GoodsReceiptDto>>(`${this.purchasesBase}/receipts/${id}/approve`, null).pipe(map((res) => res.data));
+  }
+
+  deleteGoodsReceipt(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.purchasesBase}/receipts/${id}`);
+  }
+
   // Document conversions
   convertQuotationToOrder(id: number, actor: string): Observable<SalesOrderDto> {
     return this.http
@@ -1016,6 +1346,201 @@ export class ErpApiService {
   convertPurchaseOrderToInvoice(id: number, actor: string): Observable<PurchaseInvoiceDto> {
     return this.http
       .post<ApiResponse<PurchaseInvoiceDto>>(`${this.purchasesBase}/orders/${id}/convert-to-invoice`, null, { params: { actor } })
+      .pipe(map((res) => res.data));
+  }
+
+  generatePayrollFromAttendance(id: number): Observable<PayrollRunDto> {
+    return this.http
+      .post<ApiResponse<PayrollRunDto>>(`${this.hrBase}/payroll/${id}/generate-from-attendance`, null)
+      .pipe(map((res) => res.data));
+  }
+
+  // Recruitment
+  getVacancies(): Observable<HrVacancyDto[]> {
+    return this.http.get<ApiResponse<HrVacancyDto[]>>(`${this.hrBase}/recruitment/vacancies`).pipe(map((res) => res.data || []));
+  }
+
+  createVacancy(payload: HrVacancyForm): Observable<HrVacancyDto> {
+    return this.http.post<ApiResponse<HrVacancyDto>>(`${this.hrBase}/recruitment/vacancies`, payload).pipe(map((res) => res.data));
+  }
+
+  updateVacancy(id: number, payload: HrVacancyForm): Observable<HrVacancyDto> {
+    return this.http.put<ApiResponse<HrVacancyDto>>(`${this.hrBase}/recruitment/vacancies/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deleteVacancy(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.hrBase}/recruitment/vacancies/${id}`);
+  }
+
+  getCandidates(vacancyId?: number): Observable<HrCandidateDto[]> {
+    return this.http
+      .get<ApiResponse<HrCandidateDto[]>>(`${this.hrBase}/recruitment/candidates`, { params: this.toParams({ vacancyId }) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  createCandidate(payload: HrCandidateForm): Observable<HrCandidateDto> {
+    return this.http.post<ApiResponse<HrCandidateDto>>(`${this.hrBase}/recruitment/candidates`, payload).pipe(map((res) => res.data));
+  }
+
+  updateCandidate(id: number, payload: HrCandidateForm): Observable<HrCandidateDto> {
+    return this.http.put<ApiResponse<HrCandidateDto>>(`${this.hrBase}/recruitment/candidates/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deleteCandidate(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.hrBase}/recruitment/candidates/${id}`);
+  }
+
+  getInterviews(candidateId?: number): Observable<HrInterviewDto[]> {
+    return this.http
+      .get<ApiResponse<HrInterviewDto[]>>(`${this.hrBase}/recruitment/interviews`, { params: this.toParams({ candidateId }) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  createInterview(payload: HrInterviewForm): Observable<HrInterviewDto> {
+    return this.http.post<ApiResponse<HrInterviewDto>>(`${this.hrBase}/recruitment/interviews`, payload).pipe(map((res) => res.data));
+  }
+
+  updateInterview(id: number, payload: HrInterviewForm): Observable<HrInterviewDto> {
+    return this.http.put<ApiResponse<HrInterviewDto>>(`${this.hrBase}/recruitment/interviews/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deleteInterview(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.hrBase}/recruitment/interviews/${id}`);
+  }
+
+  getLeaveBalances(employeeId?: number, year?: number): Observable<LeaveBalanceDto[]> {
+    return this.http
+      .get<ApiResponse<LeaveBalanceDto[]>>(`${this.hrBase}/leave-balances`, { params: this.toParams({ employeeId, year }) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  // PMO
+  getPmoMilestones(projectId: number): Observable<PmoMilestoneDto[]> {
+    return this.http.get<ApiResponse<PmoMilestoneDto[]>>(`${this.pmoBase}/projects/${projectId}/milestones`).pipe(map((res) => res.data || []));
+  }
+
+  createPmoMilestone(projectId: number, payload: PmoMilestoneForm): Observable<PmoMilestoneDto> {
+    return this.http.post<ApiResponse<PmoMilestoneDto>>(`${this.pmoBase}/projects/${projectId}/milestones`, payload).pipe(map((res) => res.data));
+  }
+
+  updatePmoMilestone(projectId: number, id: number, payload: PmoMilestoneForm): Observable<PmoMilestoneDto> {
+    return this.http.put<ApiResponse<PmoMilestoneDto>>(`${this.pmoBase}/projects/${projectId}/milestones/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deletePmoMilestone(projectId: number, id: number): Observable<void> {
+    return this.http.delete<void>(`${this.pmoBase}/projects/${projectId}/milestones/${id}`);
+  }
+
+  getPmoRisks(projectId: number): Observable<PmoRiskDto[]> {
+    return this.http.get<ApiResponse<PmoRiskDto[]>>(`${this.pmoBase}/projects/${projectId}/risks`).pipe(map((res) => res.data || []));
+  }
+
+  createPmoRisk(projectId: number, payload: PmoRiskForm): Observable<PmoRiskDto> {
+    return this.http.post<ApiResponse<PmoRiskDto>>(`${this.pmoBase}/projects/${projectId}/risks`, payload).pipe(map((res) => res.data));
+  }
+
+  updatePmoRisk(projectId: number, id: number, payload: PmoRiskForm): Observable<PmoRiskDto> {
+    return this.http.put<ApiResponse<PmoRiskDto>>(`${this.pmoBase}/projects/${projectId}/risks/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deletePmoRisk(projectId: number, id: number): Observable<void> {
+    return this.http.delete<void>(`${this.pmoBase}/projects/${projectId}/risks/${id}`);
+  }
+
+  getPmoIssues(projectId: number): Observable<PmoIssueDto[]> {
+    return this.http.get<ApiResponse<PmoIssueDto[]>>(`${this.pmoBase}/projects/${projectId}/issues`).pipe(map((res) => res.data || []));
+  }
+
+  createPmoIssue(projectId: number, payload: PmoIssueForm): Observable<PmoIssueDto> {
+    return this.http.post<ApiResponse<PmoIssueDto>>(`${this.pmoBase}/projects/${projectId}/issues`, payload).pipe(map((res) => res.data));
+  }
+
+  updatePmoIssue(projectId: number, id: number, payload: PmoIssueForm): Observable<PmoIssueDto> {
+    return this.http.put<ApiResponse<PmoIssueDto>>(`${this.pmoBase}/projects/${projectId}/issues/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deletePmoIssue(projectId: number, id: number): Observable<void> {
+    return this.http.delete<void>(`${this.pmoBase}/projects/${projectId}/issues/${id}`);
+  }
+
+  // Digital literacy
+  getDigitalCourses(): Observable<DigitalCourseDto[]> {
+    return this.http.get<ApiResponse<DigitalCourseDto[]>>(`${this.digitalLiteracyBase}/courses`).pipe(map((res) => res.data || []));
+  }
+
+  createDigitalCourse(payload: DigitalCourseForm): Observable<DigitalCourseDto> {
+    return this.http.post<ApiResponse<DigitalCourseDto>>(`${this.digitalLiteracyBase}/courses`, payload).pipe(map((res) => res.data));
+  }
+
+  updateDigitalCourse(id: number, payload: DigitalCourseForm): Observable<DigitalCourseDto> {
+    return this.http.put<ApiResponse<DigitalCourseDto>>(`${this.digitalLiteracyBase}/courses/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  deleteDigitalCourse(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.digitalLiteracyBase}/courses/${id}`);
+  }
+
+  getDigitalEnrollments(courseId?: number, employeeId?: number): Observable<DigitalEnrollmentDto[]> {
+    return this.http
+      .get<ApiResponse<DigitalEnrollmentDto[]>>(`${this.digitalLiteracyBase}/enrollments`, { params: this.toParams({ courseId, employeeId }) })
+      .pipe(map((res) => res.data || []));
+  }
+
+  createDigitalEnrollment(payload: DigitalEnrollmentForm): Observable<DigitalEnrollmentDto> {
+    return this.http.post<ApiResponse<DigitalEnrollmentDto>>(`${this.digitalLiteracyBase}/enrollments`, payload).pipe(map((res) => res.data));
+  }
+
+  updateDigitalEnrollment(id: number, payload: DigitalEnrollmentForm): Observable<DigitalEnrollmentDto> {
+    return this.http.put<ApiResponse<DigitalEnrollmentDto>>(`${this.digitalLiteracyBase}/enrollments/${id}`, payload).pipe(map((res) => res.data));
+  }
+
+  updateDigitalEnrollmentProgress(id: number, progressPct: number, score?: number): Observable<DigitalEnrollmentDto> {
+    return this.http
+      .post<ApiResponse<DigitalEnrollmentDto>>(`${this.digitalLiteracyBase}/enrollments/${id}/progress`, null, { params: this.toParams({ progressPct, score }) })
+      .pipe(map((res) => res.data));
+  }
+
+  deleteDigitalEnrollment(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.digitalLiteracyBase}/enrollments/${id}`);
+  }
+
+  // License & backups
+  getCurrentLicense(): Observable<LicenseDto | null> {
+    return this.http.get<ApiResponse<LicenseDto | null>>(`${this.adminBase}/license`).pipe(map((res) => res.data ?? null));
+  }
+
+  activateLicense(payload: LicenseActivateForm): Observable<LicenseDto> {
+    return this.http.post<ApiResponse<LicenseDto>>(`${this.adminBase}/license/activate`, payload).pipe(map((res) => res.data));
+  }
+
+  getBackups(): Observable<BackupJobDto[]> {
+    return this.http.get<ApiResponse<BackupJobDto[]>>(`${this.adminBase}/backups`).pipe(map((res) => res.data || []));
+  }
+
+  createBackup(): Observable<BackupJobDto> {
+    return this.http.post<ApiResponse<BackupJobDto>>(`${this.adminBase}/backups`, null).pipe(map((res) => res.data));
+  }
+
+  getBackup(id: number): Observable<BackupJobDto> {
+    return this.http.get<ApiResponse<BackupJobDto>>(`${this.adminBase}/backups/${id}`).pipe(map((res) => res.data));
+  }
+
+  downloadBackup(id: number): Observable<Blob> {
+    return this.http.get(`${this.adminBase}/backups/${id}/download`, { responseType: 'blob' });
+  }
+
+  // Alerts
+  getAlerts(status?: string): Observable<AlertEventDto[]> {
+    return this.http.get<ApiResponse<AlertEventDto[]>>(`${this.alertsBase}`, { params: this.toParams({ status }) }).pipe(map((res) => res.data || []));
+  }
+
+  acknowledgeAlert(id: number): Observable<AlertEventDto> {
+    return this.http.post<ApiResponse<AlertEventDto>>(`${this.alertsBase}/${id}/acknowledge`, null).pipe(map((res) => res.data));
+  }
+
+  private getPaged<T>(url: string, filters: PagedQuery): Observable<PagedResult<T>> {
+    return this.http
+      .get<ApiResponse<PagedResponse<T>>>(url, { params: this.toParams(filters) })
       .pipe(map((res) => res.data));
   }
 

@@ -1,6 +1,9 @@
 # ERP API smoke test
 $ErrorActionPreference = 'Continue'
-$base = 'http://localhost:8087/api/v1'
+$base = if ($env:ERP_API_BASE_URL) { $env:ERP_API_BASE_URL.TrimEnd('/') } else { 'http://localhost:10080/api/v1' }
+$username = if ($env:ERP_TEST_USERNAME) { $env:ERP_TEST_USERNAME } else { 'admin' }
+$password = if ($env:ERP_TEST_PASSWORD) { $env:ERP_TEST_PASSWORD } else { 'admin' }
+$replacementPassword = if ($env:ERP_TEST_NEW_PASSWORD) { $env:ERP_TEST_NEW_PASSWORD } else { 'Admin@Test2026!' }
 $failures = @()
 $passed = 0
 
@@ -16,8 +19,17 @@ function Test-Get {
     }
 }
 
-$login = Invoke-RestMethod -Uri "$base/auth/login" -Method POST -ContentType 'application/json' -Body '{"usernameOrEmail":"admin","password":"Admin@123"}'
+$loginBody = @{ usernameOrEmail = $username; password = $password } | ConvertTo-Json -Compress
+$login = Invoke-RestMethod -Uri "$base/auth/login" -Method POST -ContentType 'application/json' -Body $loginBody
 $h = @{ Authorization = "Bearer $($login.data.token)" }
+if ($login.data.user.mustChangePassword) {
+    $changeBody = @{ currentPassword = $password; newPassword = $replacementPassword } | ConvertTo-Json -Compress
+    Invoke-RestMethod -Uri "$base/profile/me/password" -Headers $h -Method PUT -ContentType 'application/json' -Body $changeBody | Out-Null
+    $password = $replacementPassword
+    $loginBody = @{ usernameOrEmail = $username; password = $password } | ConvertTo-Json -Compress
+    $login = Invoke-RestMethod -Uri "$base/auth/login" -Method POST -ContentType 'application/json' -Body $loginBody
+    $h = @{ Authorization = "Bearer $($login.data.token)" }
+}
 Write-Host "Login OK" -ForegroundColor Green
 
 @(

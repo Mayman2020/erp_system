@@ -1,13 +1,56 @@
 <section class="erp-page erp-list-page erp-estate-fade-up">
-  <app-page-header [titleKey]="titleKey"><div header-actions class="erp-toolbar-icons"><button class="erp-button erp-button--primary" type="button" (click)="openCreate()"><mat-icon>add</mat-icon><span>{{ 'ERP.CREATE_LEAVE' | translate }}</span></button></div></app-page-header>
-  <div class="erp-card erp-list-page__card"><div class="erp-card__body">
-    <app-advanced-search-bar [showStatus]="true" [statusOptions]="statusOptions" (search)="onSearch($event)"></app-advanced-search-bar>
-    <app-data-table [columns]="columns" [data]="rows" [actions]="tableActions" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
-  </div></div>
+  <app-page-header [titleKey]="titleKey">
+    <app-erp-master-page-actions
+      header-actions
+      [canCreate]="canCreate"
+      [canExport]="canExport"
+      [createKey]="config.createKey"
+      [titleKey]="titleKey"
+      [exportFileName]="exportFileName"
+      [exportColumns]="exportColumns"
+      [rows]="rows"
+      [menuItemId]="config.menuItemId || ''"
+      [disabled]="listLoad.refreshing"
+      (create)="openCreate()">
+    </app-erp-master-page-actions>
+  </app-page-header>
+
+  <app-erp-master-list-shell
+    [listLoad]="listLoad"
+    [showSearch]="showSearch"
+    [showDateRange]="showDateRange"
+    [showStatus]="showStatus"
+    [statusOptions]="statusOptions"
+    [errorKey]="errorKey"
+    [successKey]="successKey"
+    [formVisible]="formVisible"
+    [columns]="columns"
+    [pagedRows]="pagedRows"
+    [actions]="actions"
+    [totalElements]="totalElements"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (search)="onSearch($event)"
+    (pageIndexChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)"
+    (dismissError)="errorKey = ''"
+    (dismissSuccess)="successKey = ''">
+  </app-erp-master-list-shell>
 </section>
 <app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'ERP.CREATE_LEAVE' : 'COMMON.EDIT'" size="lg" (close)="closeForm()">
   <div dialog-body><form [formGroup]="form"><div class="row">
-    <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.employeeId" labelKey="MENU.EMPLOYEES" type="select" [options]="employeeOptions" optionValueField="id" optionLabelField="label" [disabled]="readOnly"></app-form-field></div>
+    <div class="col-md-6 mb-3">
+      <app-searchable-select
+        formControlName="employeeId"
+        label="MENU.EMPLOYEES"
+        placeholder="LOV.SELECT_PLACEHOLDER"
+        bindLabel="label"
+        bindValue="id"
+        [items]="employeeLovItems"
+        [clearable]="false"
+        [required]="true">
+      </app-searchable-select>
+    </div>
     <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.leaveType" labelKey="ERP.LEAVE_TYPE" [readonly]="readOnly"></app-form-field></div>
     <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.startDate" labelKey="COMMON.FROM_DATE" type="date" [readonly]="readOnly"></app-form-field></div>
     <div class="col-md-6 mb-3"><app-form-field [control]="form.controls.endDate" labelKey="COMMON.TO_DATE" type="date" [readonly]="readOnly"></app-form-field></div>

@@ -23,7 +23,6 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         default_schema: erp_system
   flyway:
@@ -33,3 +32,21 @@ spring:
     repair-on-migrate: true
     schemas: erp_system
     locations: classpath:db/migration
+
+# Local-only JWT default (never used by prod profile)
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:erp-system-super-secret-key-change-me-2026}
+  license:
+    signing-secret: ${LICENSE_SIGNING_SECRET:erp-dev-license-signing-secret-2026}
+  backup:
+    pg-dump-path: ${BACKUP_PG_DUMP_PATH:pg_dump}
+    host: ${BACKUP_DB_HOST:localhost}
+    port: ${BACKUP_DB_PORT:5432}
+    db: ${BACKUP_DB_NAME:postgres}
+    user: ${BACKUP_DB_USER:postgres}
+    password: ${BACKUP_DB_PASSWORD:admin}
+    dir: ${BACKUP_OUTPUT_DIR:./backups}
+  erp:
+    demo-data-enabled: ${ERP_DEMO_DATA_ENABLED:true}

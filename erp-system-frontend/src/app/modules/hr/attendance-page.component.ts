@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { AttendanceRecordDto, AttendanceRecordForm, EmployeeDto } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { ErpApiService } from '../../core/services/erp-api.service';
+import { ErpApiService, PagedResult } from '../../core/services/erp-api.service';
 import { DataTableColumn } from '../../shared/components/data-table/data-table.component';
 import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-master-page.base';
 
@@ -16,6 +16,7 @@ import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-mast
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AttendancePageComponent extends ErpMasterPageBase<AttendanceRecordDto, AttendanceRecordForm> implements OnInit, OnDestroy {
+  protected override readonly serverPaging = true;
   readonly config: MasterPageConfig = { titleKey: 'MENU.ATTENDANCE', createKey: 'ERP.CREATE_ATTENDANCE', editKey: 'COMMON.EDIT', viewKey: 'COMMON.VIEW', showDateRange: true };
   readonly columns: DataTableColumn[] = [
     { key: 'attendanceDate', title: 'COMMON.DATE', kind: 'date' },
@@ -38,8 +39,8 @@ export class AttendancePageComponent extends ErpMasterPageBase<AttendanceRecordD
     super(authService, confirmDialog, cdr);
   }
 
-  get employeeOptions() {
-    return [{ id: null, label: '—' }, ...(this.employees || []).map((e) => ({ id: e.id, label: `${e.employeeCode} - ${e.fullNameEn}` }))];
+  get employeeLovItems(): Array<{ id: number; label: string }> {
+    return (this.employees || []).map((e) => ({ id: e.id, label: `${e.employeeCode} - ${e.fullNameEn}` }));
   }
 
   ngOnInit(): void {
@@ -49,6 +50,10 @@ export class AttendancePageComponent extends ErpMasterPageBase<AttendanceRecordD
   ngOnDestroy(): void { this.destroyMasterPage(); }
 
   protected fetchList(f: Record<string, string>): Observable<AttendanceRecordDto[]> { return this.api.getAttendanceRecords(f); }
+
+  protected override fetchPagedList(filters: Record<string, string | number | boolean>): Observable<PagedResult<AttendanceRecordDto>> {
+    return this.api.getAttendanceRecordsPaged(filters);
+  }
   protected fetchOne(id: number): Observable<AttendanceRecordDto> { return this.api.getAttendanceRecord(id); }
   protected createItem(p: AttendanceRecordForm): Observable<AttendanceRecordDto> { return this.api.createAttendanceRecord(p); }
   protected updateItem(id: number, p: AttendanceRecordForm): Observable<AttendanceRecordDto> { return this.api.updateAttendanceRecord(id, p); }

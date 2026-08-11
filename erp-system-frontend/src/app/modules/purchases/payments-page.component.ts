@@ -66,12 +66,20 @@ export class PaymentsPageComponent extends ErpMasterPageBase<SupplierPaymentDto,
     ];
   }
 
+  get supplierLovItems() {
+    return (this.suppliers || []).map((s) => ({ id: s.id, label: `${s.code} - ${s.nameEn}` }));
+  }
+
+  get invoiceLovItems() {
+    return (this.invoices || []).map((i) => ({ id: i.id, label: `${i.invoiceNumber} (${i.totalAmount})` }));
+  }
+
   get supplierOptions() {
-    return [{ id: null, label: '—' }, ...(this.suppliers || []).map((s) => ({ id: s.id, label: `${s.code} - ${s.nameEn}` }))];
+    return [{ id: null, label: '—' }, ...this.supplierLovItems];
   }
 
   get invoiceOptions() {
-    return [{ id: null, label: '—' }, ...(this.invoices || []).map((i) => ({ id: i.id, label: `${i.invoiceNumber} (${i.totalAmount})` }))];
+    return [{ id: null, label: '—' }, ...this.invoiceLovItems];
   }
 
   ngOnInit(): void {

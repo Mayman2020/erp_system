@@ -1,5 +1,6 @@
 package com.erp.system.erp.service;
 
+import com.erp.system.accounting.service.AccountingReportService;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.erp.dto.display.*;
 import com.erp.system.hr.domain.Employee;
@@ -35,6 +36,7 @@ public class ErpDashboardService {
     private final StockService stockService;
     private final ActivityLogService activityLogService;
     private final EmployeeRepository employeeRepository;
+    private final AccountingReportService accountingReportService;
 
     @Transactional(readOnly = true)
     public ErpDashboardDisplayDto getDashboard(LocalDate fromDate, LocalDate toDate) {
@@ -49,7 +51,7 @@ public class ErpDashboardService {
 
         BigDecimal totalSales = sumAmount(salesInvoices.stream().map(SalesInvoice::getTotalAmount).toList());
         BigDecimal totalPurchases = sumAmount(purchaseInvoices.stream().map(PurchaseInvoice::getTotalAmount).toList());
-        BigDecimal netProfit = totalSales.subtract(totalPurchases);
+        BigDecimal netProfit = accountingNetProfit(effectiveFrom, effectiveTo, totalSales, totalPurchases);
 
         long newOrders = salesOrderRepository.findAll().stream()
                 .filter(o -> o.getStatus() == TransactionStatus.APPROVED || o.getStatus() == TransactionStatus.PENDING)
@@ -83,8 +85,10 @@ public class ErpDashboardService {
                 .salesGrowthPercent(growthPercent(currentMonthSales, previousMonthSales))
                 .purchasesGrowthPercent(growthPercent(currentMonthPurchases, previousMonthPurchases))
                 .profitGrowthPercent(growthPercent(
-                        currentMonthSales.subtract(currentMonthPurchases),
-                        previousMonthSales.subtract(previousMonthPurchases)))
+                        accountingNetProfit(currentMonth.atDay(1), currentMonth.atEndOfMonth(),
+                                currentMonthSales, currentMonthPurchases),
+                        accountingNetProfit(previousMonth.atDay(1), previousMonth.atEndOfMonth(),
+                                previousMonthSales, previousMonthPurchases)))
                 .ordersGrowthPercent(growthPercent(BigDecimal.valueOf(currentMonthOrders), BigDecimal.valueOf(previousMonthOrders)))
                 .lowStockCount(lowStock.size())
                 .monthlySales(monthlySales)
@@ -240,6 +244,15 @@ public class ErpDashboardService {
 
     private BigDecimal sumAmount(List<BigDecimal> amounts) {
         return amounts.stream().reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal accountingNetProfit(LocalDate from, LocalDate to,
+                                           BigDecimal invoiceSales, BigDecimal invoicePurchases) {
+        try {
+            return accountingReportService.getProfitLoss(from, to).getNetProfit();
+        } catch (Exception ignored) {
+            return invoiceSales.subtract(invoicePurchases);
+        }
     }
 
     private LowStockItemDto toLowStockItem(LowStockAlertDisplayDto alert) {

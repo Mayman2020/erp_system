@@ -39,6 +39,11 @@ public class PayrollRunController {
         return ApiResponse.success(payrollRunService.update(id, request));
     }
 
+    @PostMapping("/{id}/generate-from-attendance")
+    public ApiResponse<PayrollRunDisplayDto> generateFromAttendance(@PathVariable Long id) {
+        return ApiResponse.success(payrollRunService.generateFromAttendance(id));
+    }
+
     @PostMapping("/{id}/approve")
     public ApiResponse<PayrollRunDisplayDto> approve(@PathVariable Long id, @RequestParam String actor) {
         return ApiResponse.success(payrollRunService.approve(id, actor));

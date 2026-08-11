@@ -6,7 +6,7 @@
 const BASE = (process.argv[2] || process.env.ERP_API_BASE || 'http://localhost:8087/api/v1').replace(/\/$/, '');
 const LOGIN = {
   usernameOrEmail: process.env.ERP_LOGIN_USER || 'admin',
-  password: process.env.ERP_LOGIN_PASS || 'Admin@123'
+  password: process.env.ERP_LOGIN_PASS || 'admin'
 };
 
 const results = [];
@@ -108,6 +108,14 @@ async function main() {
   await check('GET /inventory/stock/levels', 'GET', '/inventory/stock/levels');
   await check('GET /inventory/stock/low-stock', 'GET', '/inventory/stock/low-stock');
   await check('GET /inventory/stock/movements', 'GET', '/inventory/stock/movements');
+  await check('GET /inventory/products/paged', 'GET', '/inventory/products/paged?page=0&size=5');
+  await check('GET /inventory/products/paged?q', 'GET', '/inventory/products/paged?page=0&size=5&q=a');
+  await check('GET /inventory/categories/paged', 'GET', '/inventory/categories/paged?page=0&size=5');
+  await check('GET /inventory/categories/paged?q', 'GET', '/inventory/categories/paged?page=0&size=5&q=a');
+  await check('GET /inventory/warehouses/paged', 'GET', '/inventory/warehouses/paged?page=0&size=5');
+  await check('GET /inventory/warehouses/paged?q', 'GET', '/inventory/warehouses/paged?page=0&size=5&q=a');
+  await check('GET /inventory/stock/movements/paged', 'GET', '/inventory/stock/movements/paged?page=0&size=5');
+  await check('GET /inventory/stock/movements/paged?q', 'GET', '/inventory/stock/movements/paged?page=0&size=5&q=a');
 
   // Sales
   await check('GET /sales/customers', 'GET', '/sales/customers');
@@ -115,6 +123,10 @@ async function main() {
   await check('GET /sales/orders', 'GET', '/sales/orders');
   await check('GET /sales/invoices', 'GET', '/sales/invoices');
   await check('GET /sales/returns', 'GET', '/sales/returns');
+  await check('GET /sales/customers/paged', 'GET', '/sales/customers/paged?page=0&size=5');
+  await check('GET /sales/customers/paged?q', 'GET', '/sales/customers/paged?page=0&size=5&q=a');
+  await check('GET /sales/invoices/paged', 'GET', '/sales/invoices/paged?page=0&size=5');
+  await check('GET /sales/invoices/paged?q', 'GET', '/sales/invoices/paged?page=0&size=5&q=a');
 
   // Purchases
   await check('GET /purchases/suppliers', 'GET', '/purchases/suppliers');
@@ -122,6 +134,10 @@ async function main() {
   await check('GET /purchases/invoices', 'GET', '/purchases/invoices');
   await check('GET /purchases/returns', 'GET', '/purchases/returns');
   await check('GET /purchases/payments', 'GET', '/purchases/payments');
+  await check('GET /purchases/suppliers/paged', 'GET', '/purchases/suppliers/paged?page=0&size=5');
+  await check('GET /purchases/suppliers/paged?q', 'GET', '/purchases/suppliers/paged?page=0&size=5&q=a');
+  await check('GET /purchases/orders/paged', 'GET', '/purchases/orders/paged?page=0&size=5');
+  await check('GET /purchases/orders/paged?q', 'GET', '/purchases/orders/paged?page=0&size=5&q=a');
 
   // HR
   await check('GET /hr/departments', 'GET', '/hr/departments');
@@ -130,6 +146,10 @@ async function main() {
   await check('GET /hr/leave-requests', 'GET', '/hr/leave-requests');
   await check('GET /hr/payroll', 'GET', '/hr/payroll');
   await check('GET /hr/documents', 'GET', '/hr/documents');
+  await check('GET /hr/employees/paged', 'GET', '/hr/employees/paged?page=0&size=5');
+  await check('GET /hr/employees/paged?q', 'GET', '/hr/employees/paged?page=0&size=5&q=a');
+  await check('GET /hr/attendance/paged', 'GET', '/hr/attendance/paged?page=0&size=5');
+  await check('GET /hr/attendance/paged?q', 'GET', '/hr/attendance/paged?page=0&size=5&q=a');
 
   // CRM & Projects
   await check('GET /crm/leads', 'GET', '/crm/leads');
@@ -331,6 +351,24 @@ async function main() {
       expect: [200, 204]
     });
   }
+
+  // Capability rollout endpoints
+  await check('GET /pos/terminals', 'GET', '/pos/terminals');
+  await check('GET /pos/shifts', 'GET', '/pos/shifts');
+  await check('GET /pos/shifts/current', 'GET', '/pos/shifts/current', { expect: [200, 204] });
+  await check('GET /inventory/stock/incidents', 'GET', '/inventory/stock/incidents');
+  await check('GET /purchases/rfqs', 'GET', '/purchases/rfqs');
+  await check('GET /purchases/receipts', 'GET', '/purchases/receipts');
+  await check('GET /maintenance/assets', 'GET', '/maintenance/assets');
+  await check('GET /maintenance/tickets', 'GET', '/maintenance/tickets');
+  await check('GET /partners', 'GET', '/partners');
+  await check('GET /partners/distributions', 'GET', '/partners/distributions');
+  await check('GET /hr/recruitment/vacancies', 'GET', '/hr/recruitment/vacancies');
+  await check('GET /digital-literacy/courses', 'GET', '/digital-literacy/courses');
+  await check('GET /alerts', 'GET', '/alerts');
+  await check('GET /accounting/reports/trial-balance', 'GET', `/accounting/reports/trial-balance?fromDate=${today}&toDate=${today}`);
+  await check('GET /admin/license', 'GET', '/admin/license');
+  await check('GET /admin/backups', 'GET', '/admin/backups');
 
   const passed = results.filter((r) => r.ok).length;
   const total = results.length;

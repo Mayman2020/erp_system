@@ -330,6 +330,25 @@ export interface BalanceSheetReportDto {
   balanced: boolean;
 }
 
+export interface TrialBalanceLineDto {
+  accountId: number;
+  accountCode: string;
+  accountNameEn: string;
+  accountNameAr?: string;
+  debit: number;
+  credit: number;
+  balance: number;
+}
+
+export interface TrialBalanceReportDto {
+  fromDate: string;
+  toDate: string;
+  lines: TrialBalanceLineDto[];
+  totalDebit: number;
+  totalCredit: number;
+  balanced: boolean;
+}
+
 export interface AccountingTransactionDto {
   id: number;
   transactionDate: string;

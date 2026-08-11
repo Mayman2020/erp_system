@@ -1,5 +1,6 @@
 package com.erp.system.purchases.service;
 
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
@@ -20,6 +21,8 @@ import com.erp.system.sales.support.SalesDocumentTotalsSupport;
 import com.erp.system.sales.support.SalesDocumentTotalsSupport.DocumentAmounts;
 import com.erp.system.sales.support.SalesDocumentTotalsSupport.LineAmounts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +45,15 @@ public class PurchaseOrderService {
     @Transactional(readOnly = true)
     public List<PurchaseOrderDisplayDto> getAll() {
         return purchaseOrderRepository.findAllByOrderByIdDesc().stream().map(this::toDisplay).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<PurchaseOrderDisplayDto> getPaged(
+            TransactionStatus status, String q, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
+        Page<PurchaseOrder> orders = q == null || q.isBlank()
+                ? purchaseOrderRepository.findPaged(status, fromDate, toDate, pageable)
+                : purchaseOrderRepository.searchPaged(status, fromDate, toDate, q.trim(), pageable);
+        return PageResponse.from(orders.map(this::toDisplay));
     }
 
     @Transactional(readOnly = true)

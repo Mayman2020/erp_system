@@ -5,6 +5,7 @@ import com.erp.system.auth.dto.AdminAccessRoleDto;
 import com.erp.system.auth.dto.AdminAccessRoleFormDto;
 import com.erp.system.auth.dto.AdminUserDto;
 import com.erp.system.auth.dto.AdminUserFormDto;
+import com.erp.system.auth.dto.AdminUserRolesFormDto;
 import com.erp.system.auth.service.AdminAccessManagementService;
 import com.erp.system.common.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -56,6 +57,12 @@ public class AdminAccessManagementController {
     @PatchMapping("/users/{userId}/active")
     public ApiResponse<AdminUserDto> setUserActive(@PathVariable Long userId, @Valid @RequestBody AdminUserActiveDto request) {
         return ApiResponse.success(adminAccessManagementService.setUserActive(userId, request.getActive()));
+    }
+
+    @PatchMapping("/users/{userId}/roles")
+    public ApiResponse<AdminUserDto> updateUserRoles(@PathVariable Long userId,
+                                                     @Valid @RequestBody AdminUserRolesFormDto request) {
+        return ApiResponse.success(adminAccessManagementService.updateUserRoles(userId, request));
     }
 
     @GetMapping("/users/{userId}/effective-permissions")

@@ -12,7 +12,7 @@ spring:
     type: caffeine
     cache-names: lookups
     caffeine:
-      spec: maximumSize=500,expireAfterWrite=10m
+      spec: maximumSize=500,expireAfterWrite=10m,recordStats
 
 # Actuator: full JSON at /api/v1/actuator/health (servlet context-path applies).
 # Root /health and /actuator/health are also served by Tomcat (see RootHealthEngineValve) for probes.
@@ -51,9 +51,20 @@ app:
     from: ${MAIL_FROM:noreply@erp.local}
   security:
     jwt:
-      secret: ${JWT_SECRET:erp-system-super-secret-key-change-me-2026}
+      # No insecure default in base config — set JWT_SECRET or use application-dev.yml
+      secret: ${JWT_SECRET:}
       expiration-ms: ${JWT_EXPIRATION_MS:86400000}
       refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+  license:
+    signing-secret: ${LICENSE_SIGNING_SECRET:}
+  backup:
+    pg-dump-path: ${BACKUP_PG_DUMP_PATH:pg_dump}
+    host: ${BACKUP_DB_HOST:localhost}
+    port: ${BACKUP_DB_PORT:5432}
+    db: ${BACKUP_DB_NAME:postgres}
+    user: ${BACKUP_DB_USER:postgres}
+    password: ${BACKUP_DB_PASSWORD:}
+    dir: ${BACKUP_OUTPUT_DIR:./backups}
 
 logging:
   level:

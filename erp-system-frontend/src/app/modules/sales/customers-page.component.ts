@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { CustomerDto, CustomerForm } from '../../core/models/erp.models';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
-import { ErpApiService } from '../../core/services/erp-api.service';
+import { ErpApiService, PagedResult } from '../../core/services/erp-api.service';
 import { DataTableColumn } from '../../shared/components/data-table/data-table.component';
 import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-master-page.base';
 
@@ -16,6 +16,8 @@ import { ErpMasterPageBase, MasterPageConfig } from '../../shared/utils/erp-mast
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CustomersPageComponent extends ErpMasterPageBase<CustomerDto, CustomerForm> implements OnInit, OnDestroy {
+  protected override readonly serverPaging = true;
+
   readonly config: MasterPageConfig = {
     titleKey: 'MENU.CUSTOMERS',
     createKey: 'ERP.CREATE_CUSTOMER',
@@ -51,6 +53,10 @@ export class CustomersPageComponent extends ErpMasterPageBase<CustomerDto, Custo
 
   protected fetchList(filters: Record<string, string>): Observable<CustomerDto[]> {
     return this.api.getCustomers(filters);
+  }
+
+  protected override fetchPagedList(filters: Record<string, string | number | boolean>): Observable<PagedResult<CustomerDto>> {
+    return this.api.getCustomersPaged(filters);
   }
 
   protected fetchOne(id: number): Observable<CustomerDto> {

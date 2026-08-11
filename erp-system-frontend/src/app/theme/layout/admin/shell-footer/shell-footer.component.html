@@ -22,10 +22,14 @@
       <div class="erp-shell-footer__underline" aria-hidden="true"><span></span></div>
       <p class="erp-shell-footer__office">{{ 'login.footerOfficeLine' | translate }}</p>
       <div class="erp-shell-footer__icons">
-        <span class="erp-shell-footer__icon-chip" [attr.title]="'AUTH.SECURE_LOGIN' | translate">
+        <span class="erp-shell-footer__icon-chip"
+          [ngbTooltip]="'AUTH.SECURE_LOGIN' | translate" placement="top" container="body"
+          [attr.aria-label]="'AUTH.SECURE_LOGIN' | translate">
           <mat-icon>lock</mat-icon>
         </span>
-        <span class="erp-shell-footer__icon-chip" [attr.title]="'login.footerOfficeTitle' | translate">
+        <span class="erp-shell-footer__icon-chip"
+          [ngbTooltip]="'login.footerOfficeTitle' | translate" placement="top" container="body"
+          [attr.aria-label]="'login.footerOfficeTitle' | translate">
           <mat-icon>cloud_done</mat-icon>
         </span>
       </div>

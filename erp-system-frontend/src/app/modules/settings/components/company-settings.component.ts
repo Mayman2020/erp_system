@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CompanySettings } from '../../../core/models/company-settings.models';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   standalone: false,
@@ -25,10 +26,21 @@ export class CompanySettingsComponent implements OnChanges {
     { value: 10, labelKey: 'MONTH.OCTOBER' }, { value: 11, labelKey: 'MONTH.NOVEMBER' }, { value: 12, labelKey: 'MONTH.DECEMBER' }
   ];
 
+  get monthLovItems() {
+    return this.monthOptions.map((m) => ({
+      id: m.value,
+      label: this.translation.instant(m.labelKey)
+    }));
+  }
+
   form: FormGroup;
   logoPreview = '';
 
-  constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
+  constructor(
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private translation: TranslationService
+  ) {
     this.form = this.fb.group({
       companyNameEn: ['', [Validators.required, Validators.maxLength(200)]],
       companyNameAr: ['', [Validators.required, Validators.maxLength(200)]],

@@ -1,4 +1,4 @@
-﻿{
+{
   "COMMON": {
     "ID": "المعرف",
     "NAME": "اسم",
@@ -51,6 +51,7 @@
     "DESC": "تنازلي",
     "ERROR_LOADING": "لا يمكن تحميل البيانات",
     "ERROR_SAVING": "تعذر حفظ البيانات",
+    "FORBIDDEN": "ليس لديك صلاحية لهذا الإجراء",
     "PREVIOUS": "السابق",
     "NEXT": "التالي",
     "PAGINATION": "ترقيم الصفحات",
@@ -76,6 +77,10 @@
     "EXPORT_PDF": "تصدير إلى PDF",
     "ADD": "إضافة",
     "PAGE": "صفحة",
+    "TITLE": "العنوان",
+    "PRIORITY": "الأولوية",
+    "DUE_DATE": "تاريخ الاستحقاق",
+    "CREATED_AT": "تاريخ الإنشاء",
     "DESCRIPTION": "الوصف",
     "DATE": "التاريخ",
     "UPGRADE_TO_PRO": "الترقية للنسخة المميزة",
@@ -119,7 +124,9 @@
     "TOGGLE_MENU": "إظهار/إخفاء القائمة",
     "LANGUAGE": "اللغة",
     "LIGHT_MODE": "الوضع الفاتح",
-    "DARK_MODE": "الوضع الداكن"
+    "DARK_MODE": "الوضع الداكن",
+    "ACTIVE_ROLE": "الدور النشط",
+    "ACTIVE_COMPANY": "الشركة أو الفرع النشط"
   },
   "COMMAND_PALETTE": {
     "TITLE": "بحث سريع (Ctrl+K)",
@@ -145,7 +152,17 @@
   },
   "ROLE": {
     "ADMIN": "مسؤل",
-    "ACCOUNTANT": "محاسب"
+    "ACCOUNTANT": "محاسب",
+    "ACCOUNTANT_STANDARD": "محاسب قياسي",
+    "MANAGER": "مدير",
+    "REPORT_VIEWER": "مستعرض التقارير",
+    "TREASURY_OPERATOR": "مسؤول الخزينة",
+    "SALES": "المبيعات",
+    "PURCHASE": "المشتريات",
+    "INVENTORY": "المخزون",
+    "HR": "الموارد البشرية",
+    "TECHNICIAN": "فني",
+    "CASHIER": "أمين صندوق"
   },
   "ACCOUNT_TYPE": {
     "ASSET": "أصل",
@@ -532,6 +549,17 @@
       "TOTAL_LIABILITIES": "إجمالي الالتزامات",
       "TOTAL_EQUITY": "إجمالي حقوق الملكية",
       "EQUATION": "المعادلة المحاسبية"
+    },
+    "TRIAL_BALANCE": {
+      "TITLE": "ميزان المراجعة",
+      "DESCRIPTION": "مجموع المدين والدائن لكل حساب خلال فترة.",
+      "DEBIT": "مدين",
+      "CREDIT": "دائن",
+      "BALANCE": "الرصيد",
+      "TOTAL_DEBIT": "إجمالي المدين",
+      "TOTAL_CREDIT": "إجمالي الدائن",
+      "BALANCED": "متوازن",
+      "TOTAL_ROW": "الإجماليات"
     }
   },
   "GENERAL_LEDGER": {
@@ -980,6 +1008,12 @@
     "LOAD_ERROR": "فشل تحميل بيانات إدارة الصلاحيات.",
     "USER_ACCESS_TITLE": "صلاحيات المستخدم الفعلية",
     "SELECT_USER": "اختر مستخدماً",
+    "ADD_EXTRA_ROLE": "إضافة دور إضافي",
+    "REMOVE_ROLE": "إزالة الدور",
+    "EFFECTIVE_PERMISSIONS": "مستعرض الصلاحيات الفعلية",
+    "NO_ACCESS": "لا توجد صلاحية",
+    "USER_ROLES_UPDATE_SUCCESS": "تم تحديث أدوار المستخدم بنجاح.",
+    "USER_ROLES_UPDATE_ERROR": "تعذر تحديث أدوار المستخدم.",
     "SCREEN": "الشاشة",
     "CAN_VIEW": "عرض",
     "CAN_CREATE": "إنشاء",
@@ -1065,7 +1099,204 @@
     "BOM": "قائمة المواد",
     "LOW_STOCK": "تنبيهات نقص المخزون",
     "EMPLOYEE_DOCUMENTS": "مستندات الموظفين",
-    "ACTIVITY_LOG": "سجل النشاط"
+    "ACTIVITY_LOG": "سجل النشاط",
+    "POS": "نقطة البيع",
+    "POS_SALE": "شاشة البيع",
+    "POS_SHIFTS": "الورديات",
+    "STOCK_INCIDENTS": "التوالف والفقد",
+    "REPLENISHMENT": "إعادة التوريد",
+    "BARCODE_LABELS": "ملصقات الباركود",
+    "RFQ": "طلبات عروض الأسعار",
+    "GOODS_RECEIPTS": "استلام البضاعة",
+    "MAINTENANCE": "الصيانة والخدمات",
+    "MAINTENANCE_TICKETS": "تذاكر الصيانة",
+    "MAINTENANCE_ASSETS": "الأصول والأجهزة",
+    "PARTNERS": "الشركاء وحقوق الملكية",
+    "PARTNERS_LIST": "الشركاء",
+    "PROFIT_DISTRIBUTIONS": "توزيع الأرباح",
+    "RECRUITMENT": "التوظيف",
+    "PMO": "مكتب إدارة المشاريع",
+    "DIGITAL_LITERACY": "التحول الرقمي والمهارات",
+    "ALERT_LOG": "سجل التنبيهات",
+    "LICENSE": "الترخيص",
+    "BACKUPS": "النسخ الاحتياطي"
+  },
+  "POS": {
+    "TITLE": "نقطة البيع",
+    "OPEN_SHIFT": "فتح وردية",
+    "CLOSE_SHIFT": "إغلاق الوردية",
+    "OPENING_CASH": "الرصيد الافتتاحي",
+    "CLOSING_CASH": "الرصيد الختامي",
+    "WAREHOUSE": "المستودع",
+    "TERMINAL": "الجهاز",
+    "CART_EMPTY": "سلة المبيعات فارغة",
+    "PAY_CASH": "نقداً",
+    "PAY_CARD": "بطاقة",
+    "PAY_CREDIT": "أجل",
+    "CONFIRM_SALE": "تأكيد البيع",
+    "OFFLINE": "غير متصل — سيتم المزامنة لاحقاً",
+    "ONLINE": "متصل بالخادم",
+    "DISCREPANCY": "فرق الصندوق",
+    "SHIFT_LIST": "سجل الورديات",
+    "CURRENT_SHIFT": "الوردية الحالية"
+  },
+  "ALERTS": {
+    "TITLE": "سجل الإشعارات العام",
+    "ACKNOWLEDGE": "تأكيد الاطلاع",
+    "SEVERITY": "الخطورة"
+  },
+  "PARTNERS": {
+    "TITLE": "الشركاء",
+    "CREATE": "شريك جديد",
+    "CODE": "رمز الشريك",
+    "SHARE": "نسبة الحصة",
+    "CAPITAL": "حساب رأس المال",
+    "DRAWING": "حساب المسحوبات",
+    "DISTRIBUTE": "توزيع الأرباح",
+    "TRANSACTIONS_TITLE": "معاملات الشركاء",
+    "TRANSACTIONS_CREATE": "معاملة جديدة",
+    "TXN_TYPE": "نوع المعاملة",
+    "TXN_CAPITAL": "مساهمة رأس مال",
+    "TXN_DRAWING": "مسحوبات",
+    "DISTRIBUTIONS_TITLE": "توزيعات الأرباح",
+    "DISTRIBUTIONS_CREATE": "توزيع جديد",
+    "PERIOD_LABEL": "الفترة",
+    "TOTAL_PROFIT": "إجمالي الربح",
+    "PROFIT_FROM": "ربح من تاريخ",
+    "PROFIT_TO": "ربح إلى تاريخ",
+    "USE_ACCOUNTING_PROFIT": "من قائمة الدخل",
+    "DISTRIBUTION_NO": "رقم التوزيع",
+    "APPROVE": "اعتماد وترحيل"
+  },
+  "MAINTENANCE": {
+    "TITLE": "الصيانة",
+    "TICKETS": "التذاكر",
+    "ASSETS": "الأصول",
+    "ASSIGN": "تعيين فني",
+    "CHECKLIST": "قائمة الفحص",
+    "SPARES": "قطع الغيار",
+    "CREATE_ASSET": "أصل جديد",
+    "CREATE_TICKET": "تذكرة جديدة",
+    "EDIT_TICKET": "تعديل التذكرة",
+    "VIEW_TICKET": "عرض التذكرة",
+    "SERIAL_NO": "الرقم التسلسلي",
+    "TECHNICIAN": "الفني",
+    "TICKET_TYPE": "نوع التذكرة",
+    "SLA_HOURS": "ساعات SLA",
+    "OPENED_AT": "تاريخ الفتح",
+    "CHECKLIST_ITEM": "بند الفحص",
+    "ISSUE_SPARE": "صرف",
+    "START": "بدء",
+    "COMPLETE": "إكمال",
+    "ASSET_SAVE_SUCCESS": "تم حفظ الأصل",
+    "ASSET_DELETE_SUCCESS": "تم حذف الأصل",
+    "TICKET_SAVE_SUCCESS": "تم حفظ التذكرة",
+    "TICKET_DELETE_SUCCESS": "تم حذف التذكرة",
+    "ASSIGN_SUCCESS": "تم تعيين الفني",
+    "CHECKLIST_ADDED": "تمت إضافة بند الفحص",
+    "SPARE_ADDED": "تمت إضافة قطعة الغيار",
+    "ISSUE_SPARE_SUCCESS": "تم صرف قطعة الغيار من المخزون",
+    "START_SUCCESS": "تم بدء التذكرة",
+    "COMPLETE_SUCCESS": "تم إكمال التذكرة وصرف قطع الغيار المتبقية",
+    "CANCEL_SUCCESS": "تم إلغاء التذكرة",
+    "DELETE_ASSET_CONFIRM": "حذف هذا الأصل؟",
+    "DELETE_TICKET_CONFIRM": "حذف هذه التذكرة؟",
+    "START_CONFIRM": "بدء هذه التذكرة؟",
+    "COMPLETE_CONFIRM": "إكمال هذه التذكرة؟ سيتم خصم قطع الغيار غير المصروفة من المخزون.",
+    "CANCEL_CONFIRM": "إلغاء هذه التذكرة؟",
+    "ISSUE_SPARE_CONFIRM": "صرف قطعة الغيار من المخزون الآن؟"
+  },
+  "MAINTENANCE_STATUS": {
+    "OPEN": "مفتوحة",
+    "ASSIGNED": "معينة",
+    "IN_PROGRESS": "قيد التنفيذ",
+    "CLOSED": "مغلقة",
+    "CANCELLED": "ملغاة"
+  },
+  "MAINTENANCE_PRIORITY": {
+    "LOW": "منخفضة",
+    "MEDIUM": "متوسطة",
+    "HIGH": "عالية",
+    "CRITICAL": "حرجة"
+  },
+  "MAINTENANCE_ASSET_STATUS": {
+    "ACTIVE": "نشط",
+    "INACTIVE": "غير نشط"
+  },
+  "LICENSE": {
+    "TITLE": "ترخيص النظام",
+    "ACTIVATE": "تفعيل الترخيص",
+    "VALID_TO": "صالح حتى",
+    "MAX_USERS": "أقصى مستخدمين",
+    "KEY": "مفتاح الترخيص",
+    "CUSTOMER": "العميل",
+    "MODULES": "الوحدات",
+    "SIGNATURE": "التوقيع",
+    "VALID": "ساري",
+    "EXPIRED": "منتهي أو غير صالح"
+  },
+  "BACKUPS": {
+    "TITLE": "النسخ الاحتياطي",
+    "CREATE": "إنشاء نسخة الآن",
+    "STATUS": "الحالة",
+    "DOWNLOAD": "تنزيل",
+    "SIZE": "حجم الملف (بايت)"
+  },
+  "RECRUITMENT": {
+    "TITLE": "التوظيف",
+    "VACANCIES": "الوظائف الشاغرة",
+    "CANDIDATES": "المتقدمون",
+    "INTERVIEWS": "المقابلات",
+    "OPENINGS": "عدد الشواغر",
+    "SCORE": "الدرجة",
+    "SCHEDULED_AT": "موعد المقابلة",
+    "INTERVIEWER": "المقابل",
+    "RESULT": "النتيجة",
+    "LEAVE_BALANCES": "أرصدة الإجازات",
+    "LEAVE_TYPE": "نوع الإجازة",
+    "BALANCE_DAYS": "الرصيد (أيام)",
+    "YEAR": "السنة"
+  },
+  "PMO": {
+    "TITLE": "مكتب إدارة المشاريع",
+    "MILESTONES": "المعالم",
+    "RISKS": "المخاطر",
+    "ISSUES": "المشكلات",
+    "SEVERITY": "الخطورة",
+    "MITIGATION": "التخفيف",
+    "OWNER": "المسؤول"
+  },
+  "DIGITAL": {
+    "TITLE": "المهارات الرقمية",
+    "COURSES": "الدورات",
+    "ENROLLMENTS": "التسجيلات",
+    "ENROLL": "تسجيل",
+    "PROGRESS": "التقدم",
+    "CERTIFICATE": "الشهادة",
+    "UPDATE_PROGRESS": "إكمال / إصدار شهادة"
+  },
+  "INCIDENTS": {
+    "TITLE": "التوالف والفقد",
+    "CREATE": "حادث جديد",
+    "DAMAGED": "تالف",
+    "LOST": "مفقود",
+    "APPROVE": "اعتماد الأثر المالي",
+    "FINANCIAL_IMPACT": "الأثر المالي"
+  },
+  "INVENTORY": {
+    "LABEL_PREVIEW": "معاينة الملصق",
+    "QR_PAYLOAD": "محتوى QR",
+    "GENERATE_REPLENISHMENT": "توليد مقترحات التوريد",
+    "CONVERT_TO_PO": "تحويل إلى أمر شراء",
+    "CURRENT_QTY": "الكمية الحالية",
+    "PROPOSED_QTY": "الكمية المقترحة",
+    "REPLENISH_GENERATED": "تم توليد مقترحات إعادة التوريد",
+    "REPLENISH_CONVERTED": "تم إنشاء أمر شراء مسودة من المقترحات"
+  },
+  "PURCHASES": {
+    "CREATE_RFQ": "طلب عرض سعر جديد",
+    "CREATE_RECEIPT": "استلام بضاعة جديد",
+    "DUE_DATE": "تاريخ الاستحقاق"
   },
   "MANUFACTURING": {
     "CREATE": "أمر تشغيل جديد",
@@ -1103,8 +1334,14 @@
     "NUMBER": "الرقم",
     "DATE": "التاريخ",
     "TYPE": "النوع",
+    "TITLE": "العنوان",
+    "REASON": "السبب",
+    "NOTES": "ملاحظات",
+    "LINES": "البنود",
     "PRODUCT": "المنتج",
     "QUANTITY": "الكمية",
+    "UNIT_COST": "تكلفة الوحدة",
+    "CUSTOMER": "العميل",
     "AVAILABLE": "المتاح",
     "SALE_PRICE": "سعر البيع",
     "LOCATION": "الموقع",
@@ -1134,6 +1371,7 @@
     "TOTAL_SKUS": "إجمالي الأصناف",
     "LOW_STOCK_COUNT": "أصناف منخفضة المخزون",
     "TOTAL_QUANTITY": "إجمالي الكمية",
+    "TOTAL_VALUATION": "قيمة المخزون",
     "NET_PROFIT": "صافي الربح",
     "CREATE_PRODUCT": "منتج جديد",
     "CREATE_CATEGORY": "تصنيف جديد",
@@ -1161,6 +1399,7 @@
     "CONVERT_TO_INVOICE_SUCCESS": "تم إنشاء الفاتورة بنجاح",
     "CREATE_QUOTATION": "إنشاء عرض سعر",
     "PAYROLL_LINES": "بنود الرواتب",
+    "GENERATE_FROM_ATTENDANCE": "توليد من الحضور",
     "BASIC_SALARY": "الراتب الأساسي",
     "ALLOWANCES": "البدلات",
     "DEDUCTIONS": "الخصومات",
@@ -1249,5 +1488,4 @@
     "DECEMBER": "ديسمبر"
   }
 }
-
 

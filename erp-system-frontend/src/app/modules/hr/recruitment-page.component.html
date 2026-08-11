@@ -1,0 +1,81 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="'RECRUITMENT.TITLE'">
+    <div header-actions class="erp-toolbar-icons" *ngIf="canMutate">
+      <button
+        class="erp-button erp-button--primary"
+        type="button"
+        (click)="openCreate()"
+        [ngbTooltip]="'COMMON.ADD' | translate"
+        placement="top"
+        container="body"
+        [attr.aria-label]="'COMMON.ADD' | translate">
+        <mat-icon aria-hidden="true">add</mat-icon><span>{{ 'COMMON.ADD' | translate }}</span>
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="erp-card erp-list-page__card">
+    <div class="erp-card__body">
+      <div class="recruitment-tabs mb-3">
+        <button type="button" class="erp-button" [class.erp-button--primary]="activeTab === 'vacancies'" (click)="setTab('vacancies')">{{ 'RECRUITMENT.VACANCIES' | translate }}</button>
+        <button type="button" class="erp-button" [class.erp-button--primary]="activeTab === 'candidates'" (click)="setTab('candidates')">{{ 'RECRUITMENT.CANDIDATES' | translate }}</button>
+        <button type="button" class="erp-button" [class.erp-button--primary]="activeTab === 'interviews'" (click)="setTab('interviews')">{{ 'RECRUITMENT.INTERVIEWS' | translate }}</button>
+        <button type="button" class="erp-button" [class.erp-button--primary]="activeTab === 'balances'" (click)="setTab('balances')">{{ 'RECRUITMENT.LEAVE_BALANCES' | translate }}</button>
+      </div>
+      <app-data-table [columns]="columns" [data]="rows" [actions]="canMutate ? tableActions : []" [loading]="loading" (actionClick)="onTableAction($event)"></app-data-table>
+    </div>
+  </div>
+</section>
+
+<app-erp-dialog [visible]="formVisible" [titleKey]="formMode === 'create' ? 'COMMON.ADD' : 'COMMON.EDIT'" size="lg" (close)="closeForm()">
+  <div dialog-body>
+    <form *ngIf="activeTab === 'vacancies'" [formGroup]="vacancyForm">
+      <div class="row">
+        <div class="col-md-8 mb-3"><app-form-field [control]="vacancyForm.controls.title" labelKey="COMMON.TITLE"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="vacancyForm.controls.status" labelKey="COMMON.STATUS"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="vacancyForm.controls.openings" labelKey="RECRUITMENT.OPENINGS" type="number"></app-form-field></div>
+        <div class="col-12 mb-3"><app-form-field [control]="vacancyForm.controls.description" labelKey="COMMON.DESCRIPTION" type="textarea" [rows]="3"></app-form-field></div>
+      </div>
+    </form>
+    <form *ngIf="activeTab === 'candidates'" [formGroup]="candidateForm">
+      <div class="row">
+        <div class="col-md-6 mb-3"><app-form-field [control]="candidateForm.controls.fullName" labelKey="COMMON.NAME"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="candidateForm.controls.status" labelKey="COMMON.STATUS"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="candidateForm.controls.email" labelKey="ERP.EMAIL"></app-form-field></div>
+        <div class="col-md-6 mb-3"><app-form-field [control]="candidateForm.controls.phone" labelKey="ERP.PHONE"></app-form-field></div>
+        <div class="col-12 mb-3"><app-form-field [control]="candidateForm.controls.notes" labelKey="INVOICES.NOTES" type="textarea" [rows]="2"></app-form-field></div>
+      </div>
+    </form>
+    <form *ngIf="activeTab === 'interviews'" [formGroup]="interviewForm">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <app-searchable-select
+            formControlName="candidateId"
+            label="RECRUITMENT.CANDIDATES"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="candidateLovItems"
+            [clearable]="false"
+            [required]="true">
+          </app-searchable-select>
+        </div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="interviewForm.controls.scheduledAt" labelKey="RECRUITMENT.SCHEDULED_AT" type="date"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="interviewForm.controls.interviewer" labelKey="RECRUITMENT.INTERVIEWER"></app-form-field></div>
+        <div class="col-md-4 mb-3"><app-form-field [control]="interviewForm.controls.result" labelKey="RECRUITMENT.RESULT"></app-form-field></div>
+        <div class="col-12 mb-3"><app-form-field [control]="interviewForm.controls.notes" labelKey="INVOICES.NOTES" type="textarea" [rows]="2"></app-form-field></div>
+      </div>
+    </form>
+    <app-erp-audit-trail
+      *ngIf="formMode !== 'create' && selectedAuditRecord as audit"
+      [createdAt]="audit.createdAt"
+      [updatedAt]="audit.updatedAt"
+      [createdBy]="audit.createdBy"
+      [updatedBy]="audit.updatedBy">
+    </app-erp-audit-trail>
+  </div>
+  <div dialog-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="erp-button erp-button--secondary" (click)="closeForm()">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button type="button" class="erp-button erp-button--primary" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
+  </div>
+</app-erp-dialog>

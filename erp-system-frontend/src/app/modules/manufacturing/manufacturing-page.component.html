@@ -37,28 +37,27 @@
           <app-form-field [control]="form.controls.orderNumber" labelKey="ERP.NUMBER" icon="tag" [readonly]="readOnly"></app-form-field>
         </div>
         <div class="col-md-6 mb-3">
-          <app-form-field
-            [control]="form.controls.productId"
-            labelKey="ERP.PRODUCT"
-            icon="inventory_2"
-            type="select"
-            [options]="productOptions"
-            optionValueField="id"
-            optionLabelField="label"
-            [disabled]="readOnly"
-          ></app-form-field>
+          <app-searchable-select
+            formControlName="productId"
+            label="ERP.PRODUCT"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="productLovItems"
+            [clearable]="false"
+            [required]="true">
+          </app-searchable-select>
         </div>
         <div class="col-md-6 mb-3">
-          <app-form-field
-            [control]="form.controls.warehouseId"
-            labelKey="INVOICES.WAREHOUSE"
-            icon="warehouse"
-            type="select"
-            [options]="warehouseOptions"
-            optionValueField="id"
-            optionLabelField="label"
-            [disabled]="readOnly"
-          ></app-form-field>
+          <app-searchable-select
+            formControlName="warehouseId"
+            label="INVOICES.WAREHOUSE"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="warehouseLovItems"
+            [clearable]="true">
+          </app-searchable-select>
         </div>
         <div class="col-md-6 mb-3">
           <app-form-field

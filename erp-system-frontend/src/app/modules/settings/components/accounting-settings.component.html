@@ -24,15 +24,16 @@
                 ></app-form-field>
               </div>
               <div class="col-md-6 mb-3">
-                <app-form-field
-                  [control]="accountingForm.controls.baseCurrency"
-                  labelKey="SETTINGS.BASE_CURRENCY"
-                  icon="currency_exchange"
-                  type="select"
-                  [options]="currencyOptions"
-                  optionValueField="code"
-                  optionLabelField="code"
-                ></app-form-field>
+                <app-searchable-select
+                  formControlName="baseCurrency"
+                  label="SETTINGS.BASE_CURRENCY"
+                  placeholder="LOV.SELECT_PLACEHOLDER"
+                  bindLabel="label"
+                  bindValue="id"
+                  [items]="currencyLovItems"
+                  [clearable]="false"
+                  [required]="true">
+                </app-searchable-select>
               </div>
               
               <div class="col-12 mb-4">
@@ -79,13 +80,16 @@
               <div class="erp-card__body">
                 <form [formGroup]="fiscalYearForm" class="row">
                   <div class="col-12 mb-3">
-                    <app-form-field
-                      [control]="fiscalYearForm.controls.year"
-                      labelKey="SETTINGS.YEAR"
-                      icon="calendar_today"
-                      type="select"
-                      [options]="fiscalYearSelectOptions"
-                    ></app-form-field>
+                    <app-searchable-select
+                      formControlName="year"
+                      label="SETTINGS.YEAR"
+                      placeholder="LOV.SELECT_PLACEHOLDER"
+                      bindLabel="label"
+                      bindValue="id"
+                      [items]="fiscalYearNumberLovItems"
+                      [clearable]="false"
+                      [required]="true">
+                    </app-searchable-select>
                   </div>
                   <div class="col-12 mb-3 fiscal-form-date">
                     <app-form-field
@@ -125,15 +129,16 @@
               <div class="erp-card__body">
                 <form [formGroup]="fiscalPeriodForm" class="row">
                   <div class="col-12 mb-3">
-                    <app-form-field
-                      [control]="fiscalPeriodForm.controls.fiscalYearId"
-                      labelKey="SETTINGS.SELECT_FISCAL_YEAR"
-                      icon="date_range"
-                      type="select"
-                      [options]="settings?.fiscalYears || []"
-                      optionValueField="id"
-                      optionLabelField="year"
-                    ></app-form-field>
+                    <app-searchable-select
+                      formControlName="fiscalYearId"
+                      label="SETTINGS.SELECT_FISCAL_YEAR"
+                      placeholder="LOV.SELECT_PLACEHOLDER"
+                      bindLabel="label"
+                      bindValue="id"
+                      [items]="fiscalYearLovItems"
+                      [clearable]="false"
+                      [required]="true">
+                    </app-searchable-select>
                   </div>
                   <div class="col-12 mb-3">
                     <app-form-field [control]="fiscalPeriodForm.controls.periodName" labelKey="SETTINGS.PERIOD_NAME" icon="title"></app-form-field>

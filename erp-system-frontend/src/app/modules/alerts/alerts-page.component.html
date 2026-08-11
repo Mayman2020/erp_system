@@ -1,0 +1,6 @@
+<section class="erp-page erp-list-page erp-estate-fade-up">
+  <app-page-header [titleKey]="'ALERTS.TITLE'"></app-page-header>
+  <div class="erp-card erp-list-page__card"><div class="erp-card__body">
+    <app-data-table [columns]="columns" [data]="tableRows" [actions]="actions" [loading]="loading" (actionClick)="onAction($event)"></app-data-table>
+  </div></div>
+</section>

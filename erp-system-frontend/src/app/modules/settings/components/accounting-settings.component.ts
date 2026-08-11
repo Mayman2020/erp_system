@@ -50,6 +50,18 @@ export class AccountingSettingsComponent implements OnInit, OnDestroy {
     return out;
   })();
 
+  get currencyLovItems() {
+    return (this.currencyOptions || []).map((c) => ({ id: c.code, label: c.code }));
+  }
+
+  get fiscalYearNumberLovItems() {
+    return this.fiscalYearSelectOptions.map((y) => ({ id: y, label: String(y) }));
+  }
+
+  get fiscalYearLovItems() {
+    return (this.settings?.fiscalYears || []).map((y) => ({ id: y.id, label: String(y.year) }));
+  }
+
   private readonly destroy$ = new Subject<void>();
 
   constructor(

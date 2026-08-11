@@ -6,9 +6,14 @@ import { OrdersPageComponent } from './orders-page.component';
 import { InvoicesPageComponent } from './invoices-page.component';
 import { ReturnsPageComponent } from './returns-page.component';
 import { PaymentsPageComponent } from './payments-page.component';
+import { RfqsPageComponent } from './rfqs-page.component';
+import { ReceiptsPageComponent } from './receipts-page.component';
 
 @NgModule({
-  declarations: [SuppliersPageComponent, OrdersPageComponent, InvoicesPageComponent, ReturnsPageComponent, PaymentsPageComponent],
+  declarations: [
+    SuppliersPageComponent, OrdersPageComponent, InvoicesPageComponent, ReturnsPageComponent, PaymentsPageComponent,
+    RfqsPageComponent, ReceiptsPageComponent
+  ],
   imports: [SharedModule, PurchasesRoutingModule]
 })
 export class PurchasesModule {}

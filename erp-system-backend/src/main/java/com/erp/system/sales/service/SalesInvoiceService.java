@@ -1,5 +1,6 @@
 package com.erp.system.sales.service;
 
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.accounting.domain.Account;
 import com.erp.system.accounting.domain.JournalEntry;
 import com.erp.system.accounting.service.AccountingPostingService;
@@ -31,6 +32,8 @@ import com.erp.system.sales.support.SalesDocumentTotalsSupport.DocumentAmounts;
 import com.erp.system.sales.support.SalesDocumentTotalsSupport.LineAmounts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,6 +79,15 @@ public class SalesInvoiceService {
                         || invoice.getCustomer().getNameEn().toLowerCase().contains(normalizedSearch))
                 .map(this::toDisplay)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<SalesInvoiceDisplayDto> getInvoicesPaged(
+            TransactionStatus status, String q, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
+        Page<SalesInvoice> invoices = q == null || q.isBlank()
+                ? invoiceRepository.findPaged(status, fromDate, toDate, pageable)
+                : invoiceRepository.searchPaged(status, fromDate, toDate, q.trim(), pageable);
+        return PageResponse.from(invoices.map(this::toDisplay));
     }
 
     @Transactional(readOnly = true)

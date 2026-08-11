@@ -6,6 +6,7 @@ import com.erp.system.auth.domain.User;
 import com.erp.system.auth.repository.AccessRoleRepository;
 import com.erp.system.auth.repository.RoleMenuPermissionRepository;
 import com.erp.system.auth.repository.UserAccessRoleRepository;
+import com.erp.system.common.security.ActiveRoleContext;
 import com.erp.system.common.security.JwtPrincipal;
 import com.erp.system.ui.domain.UiMenuItem;
 import com.erp.system.ui.dto.MenuActionPermissionDto;
@@ -33,6 +34,7 @@ public class AccessControlService {
     private final AccessRoleRepository accessRoleRepository;
     private final RoleMenuPermissionRepository roleMenuPermissionRepository;
     private final UiMenuItemRepository uiMenuItemRepository;
+    private final ActiveRoleContext activeRoleContext;
 
     @Transactional(readOnly = true)
     public List<AccessRole> assignedRoles(Long userId) {
@@ -67,14 +69,16 @@ public class AccessControlService {
             return List.of();
         }
 
+        String activeRole = activeRoleContext.getRoleCode();
         if (hasCustomAssignments(userId)) {
             List<String> roleCodes = assignedRoles(userId).stream()
                     .map(AccessRole::getCode)
+                    .filter(code -> activeRole == null || activeRole.equalsIgnoreCase(code))
                     .toList();
             return mergePermissions(roleMenuPermissionRepository.findByRoleCodeIn(roleCodes));
         }
 
-        return fallbackPermissions(authorityCodes(authentication));
+        return fallbackPermissions(activeRole == null ? authorityCodes(authentication) : List.of(activeRole));
     }
 
     /** Effective permissions for an arbitrary user (used by the admin "effective permissions" inspector). */
@@ -111,7 +115,25 @@ public class AccessControlService {
     }
 
     @Transactional(readOnly = true)
+    public boolean isAssignedRole(Authentication authentication, String roleCode) {
+        if (roleCode == null || roleCode.isBlank()) {
+            return false;
+        }
+        Long userId = currentUserId(authentication);
+        if (userId != null && hasCustomAssignments(userId)) {
+            return assignedRoles(userId).stream()
+                    .map(AccessRole::getCode)
+                    .anyMatch(code -> roleCode.equalsIgnoreCase(code));
+        }
+        return authorityCodes(authentication).stream().anyMatch(code -> roleCode.equalsIgnoreCase(code));
+    }
+
+    @Transactional(readOnly = true)
     public List<String> currentRoleCodes(Authentication authentication) {
+        String activeRole = activeRoleContext.getRoleCode();
+        if (activeRole != null) {
+            return List.of(activeRole);
+        }
         Long userId = currentUserId(authentication);
         if (userId == null) {
             return authorityCodes(authentication);

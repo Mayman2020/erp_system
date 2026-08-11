@@ -5,6 +5,7 @@ import com.erp.system.auth.domain.RoleMenuPermission;
 import com.erp.system.auth.domain.User;
 import com.erp.system.auth.domain.UserAccessRole;
 import com.erp.system.auth.domain.UserProfile;
+import com.erp.system.auth.domain.UserRole;
 import com.erp.system.auth.dto.AdminAccessContextDto;
 import com.erp.system.auth.dto.AdminAccessRoleDto;
 import com.erp.system.auth.dto.AdminAccessRoleFormDto;
@@ -12,6 +13,7 @@ import com.erp.system.auth.dto.AdminAccessRolePermissionDto;
 import com.erp.system.auth.dto.AdminAccessRolePermissionFormDto;
 import com.erp.system.auth.dto.AdminUserDto;
 import com.erp.system.auth.dto.AdminUserFormDto;
+import com.erp.system.auth.dto.AdminUserRolesFormDto;
 import com.erp.system.auth.repository.AccessRoleRepository;
 import com.erp.system.auth.repository.RoleMenuPermissionRepository;
 import com.erp.system.auth.repository.UserAccessRoleRepository;
@@ -125,6 +127,42 @@ public class AdminAccessManagementService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
         user.setActive(active);
         return toUserDto(userRepository.save(user));
+    }
+
+    @Transactional
+    public AdminUserDto updateUserRoles(Long userId, AdminUserRolesFormDto request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+
+        String primaryRoleCode = normalizeRoleCode(request.getPrimaryRoleCode());
+        UserRole primaryRole;
+        try {
+            primaryRole = UserRole.valueOf(primaryRoleCode);
+        } catch (IllegalArgumentException ex) {
+            throw new BusinessException("Primary role must be ADMIN or ACCOUNTANT");
+        }
+
+        Set<String> requestedCodes = new java.util.LinkedHashSet<>();
+        requestedCodes.add(primaryRoleCode);
+        if (request.getExtraRoleCodes() != null) {
+            request.getExtraRoleCodes().stream()
+                    .filter(java.util.Objects::nonNull)
+                    .map(this::normalizeRoleCode)
+                    .forEach(requestedCodes::add);
+        }
+
+        List<AccessRole> roles = accessRoleRepository.findByCodeIn(requestedCodes);
+        if (roles.size() != requestedCodes.size()) {
+            throw new BusinessException("One or more selected roles were not found");
+        }
+        if (roles.stream().anyMatch(role -> !role.isActive())) {
+            throw new BusinessException("Inactive roles cannot be assigned");
+        }
+
+        user.setRole(primaryRole);
+        userRepository.save(user);
+        replaceAssignments(user, roles);
+        return toUserDto(user);
     }
 
     @Transactional(readOnly = true)
@@ -255,6 +293,21 @@ public class AdminAccessManagementService {
                     .role(role)
                     .build());
         }
+    }
+
+    private void replaceAssignments(User user, List<AccessRole> roles) {
+        if (roles == null || roles.isEmpty()) {
+            throw new BusinessException("A user must have at least one role");
+        }
+        userAccessRoleRepository.deleteByUserId(user.getId());
+        userAccessRoleRepository.flush();
+        for (AccessRole role : roles) {
+            userAccessRoleRepository.save(UserAccessRole.builder()
+                    .user(user)
+                    .role(role)
+                    .build());
+        }
+        userAccessRoleRepository.flush();
     }
 
     private void syncPermissions(AccessRole role, List<AdminAccessRolePermissionFormDto> permissions) {

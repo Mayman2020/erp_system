@@ -1,5 +1,6 @@
 package com.erp.system.inventory.service;
 
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.common.exception.BusinessException;
 import com.erp.system.common.exception.ResourceNotFoundException;
 import com.erp.system.erp.service.ActivityLogService;
@@ -13,6 +14,8 @@ import com.erp.system.inventory.repository.ProductRepository;
 import com.erp.system.inventory.repository.StockLevelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +49,15 @@ public class ProductService {
                 .filter(product -> active == null || product.isActive() == active)
                 .map(this::toDisplay)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ProductDisplayDto> getProductsPaged(Boolean active, Long categoryId, String q,
+                                                            Pageable pageable) {
+        Page<Product> products = q == null || q.isBlank()
+                ? productRepository.findPaged(active, categoryId, pageable)
+                : productRepository.searchPaged(active, categoryId, q.trim(), pageable);
+        return PageResponse.from(products.map(this::toDisplay));
     }
 
     @Transactional(readOnly = true)

@@ -76,18 +76,12 @@ export class ManufacturingPageComponent implements OnInit, OnDestroy {
     return this.formMode === 'view';
   }
 
-  get productOptions(): Array<{ id: number | null; label: string }> {
-    return [
-      { id: null, label: '—' },
-      ...(this.products || []).map((p) => ({ id: p.id, label: `${p.code} - ${p.name || p.nameEn || ''}` }))
-    ];
+  get productLovItems(): Array<{ id: number; label: string }> {
+    return (this.products || []).map((p) => ({ id: p.id, label: `${p.code} - ${p.name || p.nameEn || ''}` }));
   }
 
-  get warehouseOptions(): Array<{ id: number | null; label: string }> {
-    return [
-      { id: null, label: '—' },
-      ...(this.warehouses || []).map((w) => ({ id: w.id, label: `${w.code} - ${w.nameEn || w.name || ''}` }))
-    ];
+  get warehouseLovItems(): Array<{ id: number; label: string }> {
+    return (this.warehouses || []).map((w) => ({ id: w.id, label: `${w.code} - ${w.nameEn || w.name || ''}` }));
   }
 
   ngOnInit(): void {

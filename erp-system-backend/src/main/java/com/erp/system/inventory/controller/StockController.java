@@ -1,6 +1,7 @@
 package com.erp.system.inventory.controller;
 
 import com.erp.system.common.dto.ApiResponse;
+import com.erp.system.common.dto.PageResponse;
 import com.erp.system.common.enums.StockMovementType;
 import com.erp.system.common.enums.TransactionStatus;
 import com.erp.system.inventory.dto.display.LowStockAlertDisplayDto;
@@ -11,6 +12,8 @@ import com.erp.system.inventory.service.StockService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +56,23 @@ public class StockController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
     ) {
         return ApiResponse.success(stockService.getMovements(movementType, status, productId, warehouseId, search, fromDate, toDate));
+    }
+
+    @GetMapping("/movements/paged")
+    public ApiResponse<PageResponse<StockMovementDisplayDto>> getMovementsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) StockMovementType movementType,
+            @RequestParam(required = false) TransactionStatus status,
+            @RequestParam(required = false) Long productId,
+            @RequestParam(required = false) Long warehouseId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+        PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 200),
+                Sort.by(Sort.Order.desc("movementDate"), Sort.Order.desc("id")));
+        return ApiResponse.success(stockService.getMovementsPaged(
+                movementType, status, productId, warehouseId, q, fromDate, toDate, pageable));
     }
 
     @GetMapping("/movements/{id}")

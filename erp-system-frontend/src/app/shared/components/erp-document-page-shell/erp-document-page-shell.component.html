@@ -105,29 +105,28 @@
             [readonly]="readOnly"
           ></app-form-field>
         </div>
-        <div class="col-md-3 mb-3">
-          <app-form-field
-            [control]="partyControl"
-            [labelKey]="partyLabelKey"
-            icon="person"
-            type="select"
-            [options]="partySelectOptions"
-            optionValueField="id"
-            optionLabelField="label"
-            [disabled]="readOnly"
-          ></app-form-field>
+        <div class="col-md-3 mb-3" *ngIf="partyControl">
+          <app-searchable-select
+            [formControl]="$any(partyControl)"
+            [label]="partyLabelKey"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="partyLovItems"
+            [clearable]="true"
+            [required]="true">
+          </app-searchable-select>
         </div>
-        <div class="col-md-3 mb-3" *ngIf="showWarehouse">
-          <app-form-field
-            [control]="warehouseControl"
-            labelKey="INVOICES.WAREHOUSE"
-            icon="warehouse"
-            type="select"
-            [options]="warehouseOptions"
-            optionValueField="id"
-            optionLabelField="label"
-            [disabled]="readOnly"
-          ></app-form-field>
+        <div class="col-md-3 mb-3" *ngIf="showWarehouse && warehouseControl">
+          <app-searchable-select
+            [formControl]="$any(warehouseControl)"
+            label="INVOICES.WAREHOUSE"
+            placeholder="LOV.SELECT_PLACEHOLDER"
+            bindLabel="label"
+            bindValue="id"
+            [items]="warehouseLovItems"
+            [clearable]="true">
+          </app-searchable-select>
         </div>
         <div class="col-md-3 mb-3" *ngIf="showInvoiceLink">
           <app-form-field
